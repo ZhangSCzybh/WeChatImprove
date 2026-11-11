@@ -1,0 +1,48 @@
+{
+  "setContact:chatRoomMemList:isNotify:": [
+    {
+      "address": "0x102022710",
+      "rt": 1,
+      "adrp": "0x10202270c"
+    }
+  ],
+  "onNewSyncAddMessage:": [
+    {
+      "address": "0x105e44284",
+      "rt": 24,
+      "adrp": "0x105e44280"
+    }
+  ],
+  "AsyncOnAddMsg:MsgWrap:": [
+    {
+      "address": "0x104ddf9cc",
+      "rt": 1,
+      "adrp": "0x104ddf9c8"
+    },
+    {
+      "address": "0x104de8c30",
+      "rt": 1,
+      "adrp": "0x104de8c2c"
+    },
+    {
+      "address": "0x104dea8b4",
+      "rt": 1,
+      "adrp": "0x104dea8b0"
+    },
+    {
+      "address": "0x104deba1c",
+      "rt": 1,
+      "adrp": "0x104deba18"
+    },
+    {
+      "address": "0x104df1448",
+      "rt": 1,
+      "adrp": "0x104df1444"
+    },
+    {
+      "address": "0x104df5b10",
+      "rt": 1,
+      "adrp": "0x104df5b0c"
+    }
+  ]
+}

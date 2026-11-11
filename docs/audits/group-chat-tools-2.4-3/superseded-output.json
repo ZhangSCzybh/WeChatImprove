@@ -1,0 +1,5 @@
+{
+  "reason": "Manager config completion must enable ingress once before requesting baseline, to retain a synchronously captured callback token.",
+  "previous_build_result": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/group-chat-tools-2.4-3/build-attempt-20261110T124549.869310Z/build-result.json",
+  "superseded_output": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/group-chat-tools-2.4-3/build-attempt-20261110T124549.869310Z/superseded-output-before-ingress-order-fix"
+}

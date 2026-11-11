@@ -1,0 +1,29 @@
+
+=== short-gap ===
+short-gap evidence: initial requests=1, requests after contact+5.2s=2, welcomes=1, baselineVersion=2
+Group chat welcome short-gap: 6 checks passed
+
+=== system-hint ===
+Group chat welcome system-hint: 10 checks passed
+
+=== deferred-covered ===
+Group chat welcome deferred-covered: 8 checks passed
+
+=== quiet-active ===
+quiet-active evidence: native requests=2, current baselineVersion=2, welcomes=1, old observation gap=300s, joinTimes=absent
+Group chat welcome quiet-active: 6 checks passed
+
+=== inactive-bounce ===
+inactive-bounce evidence: requests=2, welcomes=1, baselineVersion=2, freshJoinMetadata=YES
+Group chat welcome inactive-bounce: 6 checks passed
+
+=== inactive-deadline ===
+Group chat welcome inactive-deadline: 12 checks passed
+
+=== prepare-failure ===
+prepare-failure evidence: prepareFails=1, submitAttempts=0, nativeHandoffs=0, status=当前无法发送群欢迎消息，请检查微信版本和群状态。
+Group chat welcome prepare-failure: 6 checks passed
+
+=== submit-failure ===
+submit-failure evidence: prepareFails=0, submitAttempts=1, nativeHandoffs=0, status=欢迎消息未提交：群成员或发送条件已变化。
+Group chat welcome submit-failure: 6 checks passed

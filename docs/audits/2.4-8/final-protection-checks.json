@@ -1,0 +1,15 @@
+{
+  "tests_visible_top_level": 307,
+  "tests_recursive_files": 324,
+  "tests_unchanged": true,
+  "historical_package_files": 300,
+  "historical_packages_unchanged": true,
+  "production_inputs": 429,
+  "changed_production_files": [
+    "Controllers/CSGroupChatSettingsViewController.m",
+    "Controllers/CSReleaseNotesViewController.m",
+    "Headers/CSUserInfoHelper.h",
+    "control"
+  ],
+  "frozen_build_inputs_match": true
+}

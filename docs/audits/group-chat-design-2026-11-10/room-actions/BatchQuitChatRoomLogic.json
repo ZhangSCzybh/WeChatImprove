@@ -1,0 +1,385 @@
+{
+  "name": "BatchQuitChatRoomLogic",
+  "class_offset": "0x1ee45578",
+  "superclass": "NSObject",
+  "methods": [
+    {
+      "selector": "init",
+      "encoding": "@16@0:8",
+      "imp": "0x10038da88",
+      "metadata_offset": "0x1710a1b0"
+    },
+    {
+      "selector": "dealloc",
+      "encoding": "v16@0:8",
+      "imp": "0x10038dbec",
+      "metadata_offset": "0x1710a1bc"
+    },
+    {
+      "selector": "startWithRoomNames:clearHistory:",
+      "encoding": "v28@0:8@16B24",
+      "imp": "0x10038dc44",
+      "metadata_offset": "0x1710a1c8"
+    },
+    {
+      "selector": "cancel",
+      "encoding": "v16@0:8",
+      "imp": "0x10038e4b8",
+      "metadata_offset": "0x1710a1d4"
+    },
+    {
+      "selector": "processNextRoom",
+      "encoding": "v16@0:8",
+      "imp": "0x10038e808",
+      "metadata_offset": "0x1710a1e0"
+    },
+    {
+      "selector": "approveCurrentRoomAndContinue:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10038ec48",
+      "metadata_offset": "0x1710a1ec"
+    },
+    {
+      "selector": "prepareApprovedRoomsAndSend",
+      "encoding": "v16@0:8",
+      "imp": "0x10038ee1c",
+      "metadata_offset": "0x1710a1f8"
+    },
+    {
+      "selector": "sendBatchWithRoomNames:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10038f29c",
+      "metadata_offset": "0x1710a204"
+    },
+    {
+      "selector": "MessageReturn:Event:",
+      "encoding": "v28@0:8@16I24",
+      "imp": "0x10038f700",
+      "metadata_offset": "0x1710a210"
+    },
+    {
+      "selector": "handleBatchResponse:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10038f914",
+      "metadata_offset": "0x1710a21c"
+    },
+    {
+      "selector": "handleResultList:requestedRoomNames:",
+      "encoding": "v32@0:8@16@24",
+      "imp": "0x100390020",
+      "metadata_offset": "0x1710a228"
+    },
+    {
+      "selector": "enqueueRetryForRoom:intoRoomNames:",
+      "encoding": "B32@0:8@16@24",
+      "imp": "0x1003905d8",
+      "metadata_offset": "0x1710a234"
+    },
+    {
+      "selector": "scheduleRetryForRoomNames:delayed:",
+      "encoding": "v28@0:8@16B24",
+      "imp": "0x1003907b8",
+      "metadata_offset": "0x1710a240"
+    },
+    {
+      "selector": "reconcileSuccessfulRoom:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x100390b88",
+      "metadata_offset": "0x1710a24c"
+    },
+    {
+      "selector": "recordSuccessForRoom:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x100390f14",
+      "metadata_offset": "0x1710a258"
+    },
+    {
+      "selector": "recordFailureForRoom:errorMessage:",
+      "encoding": "v32@0:8@16@24",
+      "imp": "0x100390ff8",
+      "metadata_offset": "0x1710a264"
+    },
+    {
+      "selector": "complete",
+      "encoding": "v16@0:8",
+      "imp": "0x100391130",
+      "metadata_offset": "0x1710a270"
+    },
+    {
+      "selector": "removeActiveEventObserver",
+      "encoding": "v16@0:8",
+      "imp": "0x100391454",
+      "metadata_offset": "0x1710a27c"
+    },
+    {
+      "selector": "genericQuitFailureMessage",
+      "encoding": "@16@0:8",
+      "imp": "0x1003914d8",
+      "metadata_offset": "0x1710a288"
+    },
+    {
+      "selector": "delegate",
+      "encoding": "@16@0:8",
+      "imp": "0x1003915c0",
+      "metadata_offset": "0x1710a294"
+    },
+    {
+      "selector": "setDelegate:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1003915d8",
+      "metadata_offset": "0x1710a2a0"
+    },
+    {
+      "selector": "pendingRoomNames",
+      "encoding": "@16@0:8",
+      "imp": "0x1003915e4",
+      "metadata_offset": "0x1710a2ac"
+    },
+    {
+      "selector": "setPendingRoomNames:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1003915ec",
+      "metadata_offset": "0x1710a2b8"
+    },
+    {
+      "selector": "approvedRoomNames",
+      "encoding": "@16@0:8",
+      "imp": "0x1003915f8",
+      "metadata_offset": "0x1710a2c4"
+    },
+    {
+      "selector": "setApprovedRoomNames:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x100391600",
+      "metadata_offset": "0x1710a2d0"
+    },
+    {
+      "selector": "successRoomNames",
+      "encoding": "@16@0:8",
+      "imp": "0x10039160c",
+      "metadata_offset": "0x1710a2dc"
+    },
+    {
+      "selector": "setSuccessRoomNames:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x100391614",
+      "metadata_offset": "0x1710a2e8"
+    },
+    {
+      "selector": "failures",
+      "encoding": "@16@0:8",
+      "imp": "0x100391620",
+      "metadata_offset": "0x1710a2f4"
+    },
+    {
+      "selector": "setFailures:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x100391628",
+      "metadata_offset": "0x1710a300"
+    },
+    {
+      "selector": "retryCountByRoomName",
+      "encoding": "@16@0:8",
+      "imp": "0x100391634",
+      "metadata_offset": "0x1710a30c"
+    },
+    {
+      "selector": "setRetryCountByRoomName:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10039163c",
+      "metadata_offset": "0x1710a318"
+    },
+    {
+      "selector": "oldUITypeByRoomName",
+      "encoding": "@16@0:8",
+      "imp": "0x100391648",
+      "metadata_offset": "0x1710a324"
+    },
+    {
+      "selector": "setOldUITypeByRoomName:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x100391650",
+      "metadata_offset": "0x1710a330"
+    },
+    {
+      "selector": "activeRequestRoomNames",
+      "encoding": "@16@0:8",
+      "imp": "0x10039165c",
+      "metadata_offset": "0x1710a33c"
+    },
+    {
+      "selector": "setActiveRequestRoomNames:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x100391664",
+      "metadata_offset": "0x1710a348"
+    },
+    {
+      "selector": "currentRoomName",
+      "encoding": "@16@0:8",
+      "imp": "0x10039166c",
+      "metadata_offset": "0x1710a354"
+    },
+    {
+      "selector": "setCurrentRoomName:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x100391674",
+      "metadata_offset": "0x1710a360"
+    },
+    {
+      "selector": "clearHistory",
+      "encoding": "B16@0:8",
+      "imp": "0x10039167c",
+      "metadata_offset": "0x1710a36c"
+    },
+    {
+      "selector": "setClearHistory:",
+      "encoding": "v20@0:8B16",
+      "imp": "0x100391684",
+      "metadata_offset": "0x1710a378"
+    },
+    {
+      "selector": "running",
+      "encoding": "B16@0:8",
+      "imp": "0x10039168c",
+      "metadata_offset": "0x1710a384"
+    },
+    {
+      "selector": "setRunning:",
+      "encoding": "v20@0:8B16",
+      "imp": "0x100391694",
+      "metadata_offset": "0x1710a390"
+    },
+    {
+      "selector": "stage",
+      "encoding": "Q16@0:8",
+      "imp": "0x10039169c",
+      "metadata_offset": "0x1710a39c"
+    },
+    {
+      "selector": "setStage:",
+      "encoding": "v24@0:8Q16",
+      "imp": "0x1003916a4",
+      "metadata_offset": "0x1710a3a8"
+    },
+    {
+      "selector": "eventID",
+      "encoding": "I16@0:8",
+      "imp": "0x1003916ac",
+      "metadata_offset": "0x1710a3b4"
+    },
+    {
+      "selector": "setEventID:",
+      "encoding": "v20@0:8I16",
+      "imp": "0x1003916b4",
+      "metadata_offset": "0x1710a3c0"
+    },
+    {
+      "selector": "retryGeneration",
+      "encoding": "Q16@0:8",
+      "imp": "0x1003916bc",
+      "metadata_offset": "0x1710a3cc"
+    },
+    {
+      "selector": "setRetryGeneration:",
+      "encoding": "v24@0:8Q16",
+      "imp": "0x1003916c4",
+      "metadata_offset": "0x1710a3d8"
+    },
+    {
+      "selector": "errorMessage",
+      "encoding": "@16@0:8",
+      "imp": "0x1003916cc",
+      "metadata_offset": "0x1710a3e4"
+    },
+    {
+      "selector": "setErrorMessage:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1003916d4",
+      "metadata_offset": "0x1710a3f0"
+    },
+    {
+      "selector": "hasNetworkError",
+      "encoding": "B16@0:8",
+      "imp": "0x1003916dc",
+      "metadata_offset": "0x1710a3fc"
+    },
+    {
+      "selector": "setHasNetworkError:",
+      "encoding": "v20@0:8B16",
+      "imp": "0x1003916e4",
+      "metadata_offset": "0x1710a408"
+    },
+    {
+      "selector": ".cxx_destruct",
+      "encoding": "v16@0:8",
+      "imp": "0x1003916ec",
+      "metadata_offset": "0x1710a414"
+    }
+  ],
+  "ivars": [
+    {
+      "name": "_clearHistory",
+      "encoding": "B"
+    },
+    {
+      "name": "_running",
+      "encoding": "B"
+    },
+    {
+      "name": "_hasNetworkError",
+      "encoding": "B"
+    },
+    {
+      "name": "_eventID",
+      "encoding": "I"
+    },
+    {
+      "name": "_delegate",
+      "encoding": "@\"<BatchQuitChatRoomLogicDelegate>\""
+    },
+    {
+      "name": "_pendingRoomNames",
+      "encoding": "@\"NSMutableArray\""
+    },
+    {
+      "name": "_approvedRoomNames",
+      "encoding": "@\"NSMutableArray\""
+    },
+    {
+      "name": "_successRoomNames",
+      "encoding": "@\"NSMutableArray\""
+    },
+    {
+      "name": "_failures",
+      "encoding": "@\"NSMutableDictionary\""
+    },
+    {
+      "name": "_retryCountByRoomName",
+      "encoding": "@\"NSMutableDictionary\""
+    },
+    {
+      "name": "_oldUITypeByRoomName",
+      "encoding": "@\"NSMutableDictionary\""
+    },
+    {
+      "name": "_activeRequestRoomNames",
+      "encoding": "@\"NSArray\""
+    },
+    {
+      "name": "_currentRoomName",
+      "encoding": "@\"NSString\""
+    },
+    {
+      "name": "_stage",
+      "encoding": "Q"
+    },
+    {
+      "name": "_retryGeneration",
+      "encoding": "Q"
+    },
+    {
+      "name": "_errorMessage",
+      "encoding": "@\"NSString\""
+    }
+  ]
+}

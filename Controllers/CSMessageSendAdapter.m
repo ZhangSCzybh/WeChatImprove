@@ -93,6 +93,24 @@ static CSMessagePreparedSend *CSVoidRoute(id receiver, NSString *selector, NSArr
         return CSVoidRoute(manager,@"AddMsg:MsgWrap:",@[targetID,wrap],wrap);
     } @catch (__unused NSException *e) { return nil; }
 }
+- (CSMessagePreparedSend *)prepareGroupText:(NSString *)text mentions:(NSArray<NSString *> *)mentions targetID:(NSString *)targetID accountID:(NSString *)accountID {
+    @try {
+        if (![targetID isKindOfClass:NSString.class] || ![targetID hasSuffix:@"@chatroom"] || ![mentions isKindOfClass:NSArray.class] || mentions.count>10000) return nil;
+        NSMutableOrderedSet *ids=[NSMutableOrderedSet orderedSet];
+        NSCharacterSet *allowed=[NSCharacterSet characterSetWithCharactersInString:@"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-@."];
+        for(id member in mentions) {
+            if(![member isKindOfClass:NSString.class] || ![member length] || [member length]>128 || [member isEqual:@"notify@all"] ||
+               [member hasSuffix:@"@chatroom"] || [member rangeOfCharacterFromSet:allowed.invertedSet].location!=NSNotFound)return nil;
+            [ids addObject:member];
+        }
+        CSMessagePreparedSend *route=[self prepareScheduledText:text targetID:targetID accountID:accountID];if(!route)return nil;
+        // The generic setter also supports scalar fields. Mentions require the
+        // evidenced object ABI; an incompatible setter must never be invoked.
+        if(ids.count && (!CSMessageNativeSupports(route.outputWrap,@"setM_nsAtUserList:",@"v",@[@"@"]) ||
+            !CSMessageNativeSet(route.outputWrap,@"setM_nsAtUserList:",[ids.array componentsJoinedByString:@","],YES)))return nil;
+        return route;
+    } @catch (__unused NSException *exception) { return nil; }
+}
 - (CSMessagePreparedSend *)prepareContext:(CSMessageActionContext *)context targetID:(NSString *)targetID voice:(CSMessageVoiceResource *)voice {
     return [self prepareContext:context targetID:targetID voice:voice appData:nil appDataPath:nil];
 }

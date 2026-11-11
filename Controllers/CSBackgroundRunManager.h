@@ -14,10 +14,13 @@ extern NSNotificationName const CSBackgroundRunStateChangedNotification;
 - (instancetype)initWithDefaults:(NSUserDefaults *)defaults audio:(id<CSBackgroundRunAudio>)audio supportsBackgroundAudio:(BOOL)supported runtime:(id<CSBackgroundRunRuntime>)runtime;
 - (void)start;
 - (void)reloadSettings;
+// Main-thread request from the current group configuration. This does not change the global setting.
+- (void)setGroupChatBackgroundRequested:(BOOL)requested;
 @property(nonatomic, readonly) BOOL enabled;
 @property(nonatomic, readonly) BOOL backgroundAudioActive;
 // A current execution opportunity, not a guarantee against system suspension.
 @property(nonatomic, readonly) BOOL canAttemptBackgroundWork;
+@property(nonatomic, readonly) BOOL canAttemptGroupChatBackgroundWork;
 @property(nonatomic, readonly) BOOL supportsBackgroundAudio;
 @property(nonatomic, copy, readonly) NSString *statusText;
 @property(nonatomic, copy, readonly) NSString *lastBackgroundResult;

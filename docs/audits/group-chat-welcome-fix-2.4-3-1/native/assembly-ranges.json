@@ -1,0 +1,261 @@
+[
+  {
+    "file": "CContactMgr-callOnModifyExt_-annotated.asm",
+    "sha256": "5cd52b3d6751c07cf0a98ff973f260dfad22518d5dd208888dfe5778411a5886",
+    "first_instruction": "0x1010b4b00",
+    "last_instruction": "0x1010b4ef8",
+    "instruction_lines": 255
+  },
+  {
+    "file": "CContactMgr-setContact_chatRoomMemList_isNotify_-annotated.asm",
+    "sha256": "ec5905ce0d3ea4fd15fe1a00923cfae0b33aae12b1a8480230758937966a3e0d",
+    "first_instruction": "0x100c77bd0",
+    "last_instruction": "0x100c77d7c",
+    "instruction_lines": 108
+  },
+  {
+    "file": "CContactMgr-setContact_nsAdminList_nsMemberList_-annotated.asm",
+    "sha256": "20d4f70d440ff2730fb9a8bc671bade3ea49f926f1462f2d898d882a58b82821",
+    "first_instruction": "0x100c77820",
+    "last_instruction": "0x100c7794c",
+    "instruction_lines": 76
+  },
+  {
+    "file": "CContactMgr-setContact_nsAdminList_nsMemberList_.asm",
+    "sha256": "ef6bc0d065e41c1fb02b6ae8433a579d724c4b386a5a76f9cf91d649fe380fa3",
+    "first_instruction": "0x100c77820",
+    "last_instruction": "0x100c7794c",
+    "instruction_lines": 76
+  },
+  {
+    "file": "CGroupDB-QuitGroup_withUsrName_-annotated.asm",
+    "sha256": "726fff6decc8672028d0be5c1e3085754436a81b0e473b8f12bb7e9513270c0a",
+    "first_instruction": "0x1020223e4",
+    "last_instruction": "0x102022880",
+    "instruction_lines": 296
+  },
+  {
+    "file": "CGroupDB-QuitGroup_withUsrName_.asm",
+    "sha256": "8a47dbfe61c92f737dc8cc5c75d30c7b9697e500c1e5950503dfa20d10365ef2",
+    "first_instruction": "0x1020223e4",
+    "last_instruction": "0x102022880",
+    "instruction_lines": 296
+  },
+  {
+    "file": "CGroupMgr-MessageReturn_Event_-annotated.asm",
+    "sha256": "7344bbe272941eb57a2941170a6a55ba4320a00225f4618fa6a8ea70d6f9670a",
+    "first_instruction": "0x10204b0d8",
+    "last_instruction": "0x10204b36c",
+    "instruction_lines": 166
+  },
+  {
+    "file": "CGroupMgr-MessageReturn_Event_.asm",
+    "sha256": "bbf38b866b14795d1e089b97eb3e8a49d9f1a6e674bdae7f397d0ae66578ef88",
+    "first_instruction": "0x10204b0d8",
+    "last_instruction": "0x10204b36c",
+    "instruction_lines": 166
+  },
+  {
+    "file": "CGroupMgr-OnAddChatRoomMember_-annotated.asm",
+    "sha256": "5d3d122d4ca4a7623da9d1654120a54149a97b133629c8281e8cccc38c961f4a",
+    "first_instruction": "0x10203b60c",
+    "last_instruction": "0x10203c2a0",
+    "instruction_lines": 806
+  },
+  {
+    "file": "CGroupMgr-OnAddChatRoomMember_.asm",
+    "sha256": "dbbdaab92534ad6109adc79868ace92c9ef712c4398e1df0d378af9c3ac0e5ef",
+    "first_instruction": "0x10203b60c",
+    "last_instruction": "0x10203c2a0",
+    "instruction_lines": 806
+  },
+  {
+    "file": "CGroupMgr-OnGetChatRoomMemberDetail_-annotated.asm",
+    "sha256": "733f8d29fa2e21ad7e71bab4c493f3c48d7a557602821456fbc9ef49c6897672",
+    "first_instruction": "0x10203ed80",
+    "last_instruction": "0x10203f964",
+    "instruction_lines": 762
+  },
+  {
+    "file": "CGroupMgr-OnUpdateContact_-annotated.asm",
+    "sha256": "d6bfc105b8ad612672f53f03cdc5f5d96b4d9e0c81ede0200d3fb2fbc01ad622",
+    "first_instruction": "0x102040438",
+    "last_instruction": "0x102040950",
+    "instruction_lines": 327
+  },
+  {
+    "file": "CGroupMgr-OnUpdateContact_.asm",
+    "sha256": "35df1e165f9629bfd56811ed103fa3e54801731e4bda454c99de514a447850a9",
+    "first_instruction": "0x102040438",
+    "last_instruction": "0x102040950",
+    "instruction_lines": 327
+  },
+  {
+    "file": "CGroupMgr-createProtoBufEvent_forCgi_andUserData_eventHandler_-annotated.asm",
+    "sha256": "558a011c9f98968a30eafe561db337a51bc623d237cb953a34488e67187c45a7",
+    "first_instruction": "0x102040bac",
+    "last_instruction": "0x102040d6c",
+    "instruction_lines": 113
+  },
+  {
+    "file": "CGroupMgr-createProtoBufEvent_forCgi_andUserData_eventHandler_.asm",
+    "sha256": "b20f3530f517ad01ad602ec320fae75dbec744427b439a496bd46b1747f83882",
+    "first_instruction": "0x102040bac",
+    "last_instruction": "0x102040d6c",
+    "instruction_lines": 113
+  },
+  {
+    "file": "CMessageMgr-AsyncOnAddMsgForSession_MsgWrap_NewMsgArriveNotify_-annotated.asm",
+    "sha256": "3c1478d6dca8d7b73b6a310de13e5cc20539ce0a3ae99f547109cc8d5be2faa1",
+    "first_instruction": "0x104dda038",
+    "last_instruction": "0x104dda11c",
+    "instruction_lines": 58
+  },
+  {
+    "file": "CMessageMgr-AsyncOnAddMsgForSession_MsgWrap_NewMsgArriveNotify_.asm",
+    "sha256": "4f13f2199fb9d6860924ac9587b5c8fd240250482517c70f88be6f8dd7a1be9e",
+    "first_instruction": "0x104dda038",
+    "last_instruction": "0x104dda11c",
+    "instruction_lines": 58
+  },
+  {
+    "file": "CMessageMgr-AsyncOnAddMsg_MsgWrap_-annotated.asm",
+    "sha256": "2d7ed7d9e09ee15bbe5709db2289f8ab69cc0f69b1cb5c7f85391f5837b2eec7",
+    "first_instruction": "0x104dd9d54",
+    "last_instruction": "0x104dd9eb4",
+    "instruction_lines": 89
+  },
+  {
+    "file": "CMessageMgr-AsyncOnAddMsg_MsgWrap_.asm",
+    "sha256": "ee187c43fc37c647f06c024c63e55833912822b84d636f536decbba8e98bb2ee",
+    "first_instruction": "0x104dd9d54",
+    "last_instruction": "0x104dd9eb4",
+    "instruction_lines": 89
+  },
+  {
+    "file": "CMessageMgr-onNewSyncAddMessage_-annotated.asm",
+    "sha256": "3224cd342610f75dfe69e25a44e1ea91ceab29a3ca93c2d7025f58144daa8e76",
+    "first_instruction": "0x104df0cf8",
+    "last_instruction": "0x104df14a4",
+    "instruction_lines": 492
+  },
+  {
+    "file": "CMessageMgr-onNewSyncAddMessage_.asm",
+    "sha256": "0bc7ee9ca06b749425ffbaceb7b31aaceada626156576246b43acbd12769d00c",
+    "first_instruction": "0x104df0cf8",
+    "last_instruction": "0x104df14a4",
+    "instruction_lines": 492
+  },
+  {
+    "file": "GetChatroomMemberDetailRequest-initialize-annotated.asm",
+    "sha256": "b0f2f3c477a9e64baf8d3bf0494b8747528eb3e9aede2a880f50003d656f7503",
+    "first_instruction": "0x10aef3b98",
+    "last_instruction": "0x10aef3bb8",
+    "instruction_lines": 9
+  },
+  {
+    "file": "GetChatroomMemberDetailRequest-initialize.asm",
+    "sha256": "b0f2f3c477a9e64baf8d3bf0494b8747528eb3e9aede2a880f50003d656f7503",
+    "first_instruction": "0x10aef3b98",
+    "last_instruction": "0x10aef3bb8",
+    "instruction_lines": 9
+  },
+  {
+    "file": "GetChatroomMemberDetailResponse-initialize-annotated.asm",
+    "sha256": "b87859ee3b57b6aca26870e18773b6377e6bc56a609b297f256fb147609debea",
+    "first_instruction": "0x10aef3bbc",
+    "last_instruction": "0x10aef3bdc",
+    "instruction_lines": 9
+  },
+  {
+    "file": "GetChatroomMemberDetailResponse-initialize.asm",
+    "sha256": "b87859ee3b57b6aca26870e18773b6377e6bc56a609b297f256fb147609debea",
+    "first_instruction": "0x10aef3bbc",
+    "last_instruction": "0x10aef3bdc",
+    "instruction_lines": 9
+  },
+  {
+    "file": "ProtoInitialize-annotated.asm",
+    "sha256": "0e3e97b497b203745e42a2344ceeaf3998ee90ae92f973781ff708823b6ad4ba",
+    "first_instruction": "0x10f85f9ac",
+    "last_instruction": "0x10f85fc78",
+    "instruction_lines": 180
+  },
+  {
+    "file": "ProtoInitialize.asm",
+    "sha256": "0e3e97b497b203745e42a2344ceeaf3998ee90ae92f973781ff708823b6ad4ba",
+    "first_instruction": "0x10f85f9ac",
+    "last_instruction": "0x10f85fc78",
+    "instruction_lines": 180
+  },
+  {
+    "file": "ProtobufCGIWrap-m_pbRequest-annotated.asm",
+    "sha256": "5e2a5c7e15a78cb44c28d85276e53818e1782a8e53b732f23e5eae68286d0cce",
+    "first_instruction": "0x1056a5cf4",
+    "last_instruction": "0x1056a5cf8",
+    "instruction_lines": 2
+  },
+  {
+    "file": "ProtobufCGIWrap-m_pbRequest.asm",
+    "sha256": "5e2a5c7e15a78cb44c28d85276e53818e1782a8e53b732f23e5eae68286d0cce",
+    "first_instruction": "0x1056a5cf4",
+    "last_instruction": "0x1056a5cf8",
+    "instruction_lines": 2
+  },
+  {
+    "file": "ProtobufCGIWrap-m_pbResponse-annotated.asm",
+    "sha256": "474d1d32fb0cb4b569512641576ce126d8c064cadc2f7a13ad62658a3e347937",
+    "first_instruction": "0x1056a5d18",
+    "last_instruction": "0x1056a5d1c",
+    "instruction_lines": 2
+  },
+  {
+    "file": "ProtobufCGIWrap-m_pbResponse.asm",
+    "sha256": "474d1d32fb0cb4b569512641576ce126d8c064cadc2f7a13ad62658a3e347937",
+    "first_instruction": "0x1056a5d18",
+    "last_instruction": "0x1056a5d1c",
+    "instruction_lines": 2
+  },
+  {
+    "file": "ProtobufEventHandler-OnProtocolResponse_shouldContinue_-annotated.asm",
+    "sha256": "accd23f74f6a18c4814087dfc201c5d266407addd5982c685f9968c6ece514ad",
+    "first_instruction": "0x10569eaa0",
+    "last_instruction": "0x10569eaa4",
+    "instruction_lines": 2
+  },
+  {
+    "file": "ProtobufEventHandler-OnProtocolResponse_shouldContinue_.asm",
+    "sha256": "accd23f74f6a18c4814087dfc201c5d266407addd5982c685f9968c6ece514ad",
+    "first_instruction": "0x10569eaa0",
+    "last_instruction": "0x10569eaa4",
+    "instruction_lines": 2
+  },
+  {
+    "file": "SyncCmdHandler-BatchAddMsg_ShowPush_-annotated.asm",
+    "sha256": "bdeeb4fa2c0a3b8557fb0020b92d6f18ad38131f3118c1463d483f926c629bc8",
+    "first_instruction": "0x105e415ac",
+    "last_instruction": "0x105e43584",
+    "instruction_lines": 2039
+  },
+  {
+    "file": "SyncCmdHandler-BatchAddMsg_ShowPush_.asm",
+    "sha256": "a403a4ccb3c743f7debacc5c7a46b97a1fbddc7f3fccc8730c94beeadba05082",
+    "first_instruction": "0x105e415ac",
+    "last_instruction": "0x105e43584",
+    "instruction_lines": 2039
+  },
+  {
+    "file": "SyncCmdHandler-onNewSyncAddMessage-containing-function-annotated.asm",
+    "sha256": "4220493e1546a3ee48ed5891e4668985dd6edaed6ddc921c6749fddefe9e48f1",
+    "first_instruction": "0x105e44154",
+    "last_instruction": "0x105e45b30",
+    "instruction_lines": 1656
+  },
+  {
+    "file": "SyncCmdHandler-onNewSyncAddMessage-containing-function.asm",
+    "sha256": "daa320e7b0e2907157d74a266abf0497e93f52dcd78e82b2255d1d57e87a7fc7",
+    "first_instruction": "0x105e44154",
+    "last_instruction": "0x105e45b30",
+    "instruction_lines": 1656
+  }
+]

@@ -1,0 +1,285 @@
+{
+  "name": "MsgMediaGroupMgr",
+  "class_offset": "0x1ef28328",
+  "superclass": "MMUserService",
+  "methods": [
+    {
+      "selector": "groupStatInfo:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x10509755c",
+      "metadata_offset": "0x16f54608"
+    },
+    {
+      "selector": "isMediaGroupExpanded:",
+      "encoding": "B24@0:8@16",
+      "imp": "0x105096708",
+      "metadata_offset": "0x16f54614"
+    },
+    {
+      "selector": "isMediaGroupEditing:",
+      "encoding": "B24@0:8@16",
+      "imp": "0x105096828",
+      "metadata_offset": "0x16f54620"
+    },
+    {
+      "selector": "allMsgsCountForMediaGroup:",
+      "encoding": "q24@0:8@16",
+      "imp": "0x1050968ec",
+      "metadata_offset": "0x16f5462c"
+    },
+    {
+      "selector": "allMsgsForMediaGroup:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x1050969bc",
+      "metadata_offset": "0x16f54638"
+    },
+    {
+      "selector": "isMediaGroupFirstMsg:",
+      "encoding": "B24@0:8@16",
+      "imp": "0x105096aa4",
+      "metadata_offset": "0x16f54644"
+    },
+    {
+      "selector": "displayMsgsForMediaGroup:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x105096b80",
+      "metadata_offset": "0x16f54650"
+    },
+    {
+      "selector": "isMediaGroupFirstDisplayMsg:",
+      "encoding": "B24@0:8@16",
+      "imp": "0x105096c68",
+      "metadata_offset": "0x16f5465c"
+    },
+    {
+      "selector": "updateMediaGroupCurrentIndex:withMsg:",
+      "encoding": "v32@0:8q16@24",
+      "imp": "0x105096d44",
+      "metadata_offset": "0x16f54668"
+    },
+    {
+      "selector": "mediaGroupCurrentIndexForMsg:",
+      "encoding": "q24@0:8@16",
+      "imp": "0x105096fa0",
+      "metadata_offset": "0x16f54674"
+    },
+    {
+      "selector": "isUnread:",
+      "encoding": "B24@0:8@16",
+      "imp": "0x1050970cc",
+      "metadata_offset": "0x16f54680"
+    },
+    {
+      "selector": "clearUnread:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10509711c",
+      "metadata_offset": "0x16f5468c"
+    },
+    {
+      "selector": "addNotifyRecord:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x105097128",
+      "metadata_offset": "0x16f54698"
+    },
+    {
+      "selector": "clearNotify:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1050971a8",
+      "metadata_offset": "0x16f546a4"
+    },
+    {
+      "selector": "allNotifyForChatName:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x105097214",
+      "metadata_offset": "0x16f546b0"
+    },
+    {
+      "selector": "clearNotifyForChatName:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105097294",
+      "metadata_offset": "0x16f546bc"
+    },
+    {
+      "selector": "maxSequenceIdInMediaGroup:",
+      "encoding": "I24@0:8@16",
+      "imp": "0x105097300",
+      "metadata_offset": "0x16f546c8"
+    },
+    {
+      "selector": "OnDelMsg:DelAll:",
+      "encoding": "v28@0:8@16B24",
+      "imp": "0x1050974e8",
+      "metadata_offset": "0x16f546d4"
+    },
+    {
+      "selector": "onServiceInit",
+      "encoding": "v16@0:8",
+      "imp": "0x1050953cc",
+      "metadata_offset": "0x16f546e0"
+    },
+    {
+      "selector": "onServiceTerminate",
+      "encoding": "v16@0:8",
+      "imp": "0x105095618",
+      "metadata_offset": "0x16f546ec"
+    },
+    {
+      "selector": "isSenderEnabled",
+      "encoding": "B16@0:8",
+      "imp": "0x1050956e8",
+      "metadata_offset": "0x16f546f8"
+    },
+    {
+      "selector": "isReceiverEnabled",
+      "encoding": "B16@0:8",
+      "imp": "0x10509570c",
+      "metadata_offset": "0x16f54704"
+    },
+    {
+      "selector": "attachChatAgentForChatName:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x105095730",
+      "metadata_offset": "0x16f54710"
+    },
+    {
+      "selector": "chatAgentForChatName:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x10509584c",
+      "metadata_offset": "0x16f5471c"
+    },
+    {
+      "selector": "metaForMediaGroup:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x1050958e4",
+      "metadata_offset": "0x16f54728"
+    },
+    {
+      "selector": "createTimeForMediaGroup:",
+      "encoding": "I24@0:8@16",
+      "imp": "0x105095a2c",
+      "metadata_offset": "0x16f54734"
+    },
+    {
+      "selector": "unreadForMediaGroup:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x105095a78",
+      "metadata_offset": "0x16f54740"
+    },
+    {
+      "selector": "clearUnreadForMediaGroup:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105095cf8",
+      "metadata_offset": "0x16f5474c"
+    },
+    {
+      "selector": "receiveMediaGroupMessages:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105095f40",
+      "metadata_offset": "0x16f54758"
+    },
+    {
+      "selector": "enableFlag",
+      "encoding": "q16@0:8",
+      "imp": "0x1050965b8",
+      "metadata_offset": "0x16f54764"
+    },
+    {
+      "selector": "setEnableFlag:",
+      "encoding": "v24@0:8q16",
+      "imp": "0x1050965c8",
+      "metadata_offset": "0x16f54770"
+    },
+    {
+      "selector": "mmgDB",
+      "encoding": "@16@0:8",
+      "imp": "0x1050965d8",
+      "metadata_offset": "0x16f5477c"
+    },
+    {
+      "selector": "setMmgDB:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1050965e8",
+      "metadata_offset": "0x16f54788"
+    },
+    {
+      "selector": "metaCache",
+      "encoding": "@16@0:8",
+      "imp": "0x1050965fc",
+      "metadata_offset": "0x16f54794"
+    },
+    {
+      "selector": "setMetaCache:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10509660c",
+      "metadata_offset": "0x16f547a0"
+    },
+    {
+      "selector": "chatAgents",
+      "encoding": "@16@0:8",
+      "imp": "0x105096620",
+      "metadata_offset": "0x16f547ac"
+    },
+    {
+      "selector": "setChatAgents:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105096630",
+      "metadata_offset": "0x16f547b8"
+    },
+    {
+      "selector": "unreadCache",
+      "encoding": "@16@0:8",
+      "imp": "0x105096644",
+      "metadata_offset": "0x16f547c4"
+    },
+    {
+      "selector": "setUnreadCache:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105096654",
+      "metadata_offset": "0x16f547d0"
+    },
+    {
+      "selector": "animationConfig",
+      "encoding": "@16@0:8",
+      "imp": "0x105096668",
+      "metadata_offset": "0x16f547dc"
+    },
+    {
+      "selector": "setAnimationConfig:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105096678",
+      "metadata_offset": "0x16f547e8"
+    },
+    {
+      "selector": ".cxx_destruct",
+      "encoding": "v16@0:8",
+      "imp": "0x10509668c",
+      "metadata_offset": "0x16f547f4"
+    }
+  ],
+  "ivars": [
+    {
+      "name": "_enableFlag",
+      "encoding": "q"
+    },
+    {
+      "name": "_mmgDB",
+      "encoding": "@\"MsgMediaGroupDB\""
+    },
+    {
+      "name": "_metaCache",
+      "encoding": "@\"NSMutableDictionary\""
+    },
+    {
+      "name": "_chatAgents",
+      "encoding": "@\"NSMapTable\""
+    },
+    {
+      "name": "_unreadCache",
+      "encoding": "@\"NSMapTable\""
+    },
+    {
+      "name": "_animationConfig",
+      "encoding": "@\"MsgMediaGroupViewConfig\""
+    }
+  ]
+}

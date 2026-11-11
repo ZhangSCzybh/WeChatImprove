@@ -1,0 +1,23 @@
+=== Tests/verify-group-chat-backup.sh rc=0 elapsed=4.18s ===
+Group chat backup: 57 checks passed
+
+=== Tests/verify-group-chat-core.sh rc=0 elapsed=1.88s ===
+Group chat core: 110 checks, 0 failures (temporary fixtures only)
+
+=== Tests/verify-group-chat-manager.sh rc=0 elapsed=5.44s ===
+Group chat manager lifecycle: 48 checks passed
+
+=== Tests/verify-group-chat-mentions.sh rc=0 elapsed=2.10s ===
+Group chat native mentions: 45 checks, 0 failures (recording fixtures only)
+
+=== Tests/verify-group-chat-notice.sh rc=0 elapsed=2.12s ===
+Group notice references: 35 checks, 0 failures
+
+=== Tests/verify-group-chat-quit.sh rc=0 elapsed=1.53s ===
+PASS 12 coordinator scenarios; fake services only.
+
+=== Tests/verify-group-chat-runtime.sh rc=0 elapsed=2.41s ===
+Group chat runtime: 165 checks, 0 failures (offline fixtures only)
+
+=== Tests/verify-group-chat-store.sh rc=0 elapsed=1.61s ===
+Group chat store: 27 checks passed

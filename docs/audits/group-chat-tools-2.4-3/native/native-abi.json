@@ -1,0 +1,119 @@
+{
+  "target_sha256": "1d626426df97058a8a87c661532b2801cd27b7d9fcc12e27609c751f5877b7ed",
+  "version": "8.0.80.34",
+  "classes": [
+    {
+      "class": "CContact",
+      "methods": [
+        {
+          "selector": "getChatRoomMemberDisplayName:",
+          "encoding": "@24@0:8@16",
+          "imp": "0x101071164",
+          "metadata_offset": "0x16ec4d1c"
+        },
+        {
+          "selector": "isChatRoomDismissed",
+          "encoding": "B16@0:8",
+          "imp": "0x101074b1c",
+          "metadata_offset": "0x16ec4eb4"
+        },
+        {
+          "selector": "isChatRoomBlocked",
+          "encoding": "B16@0:8",
+          "imp": "0x101074b68",
+          "metadata_offset": "0x16ec4ec0"
+        },
+        {
+          "selector": "IsChatRoomContact:",
+          "encoding": "B24@0:8@16",
+          "imp": "0x101074910",
+          "metadata_offset": "0x16e9313c"
+        }
+      ]
+    },
+    {
+      "class": "CGroupMgr",
+      "methods": [
+        {
+          "selector": "GetGroupMemberUserListByContact:",
+          "encoding": "@24@0:8@16",
+          "imp": "0x102039cc4",
+          "metadata_offset": "0x16ec8d10"
+        },
+        {
+          "selector": "IsUsrInChatRoom:Usr:",
+          "encoding": "B32@0:8@16@24",
+          "imp": "0x10203a1fc",
+          "metadata_offset": "0x16ec8d34"
+        },
+        {
+          "selector": "ShowInContactBook:sync:",
+          "encoding": "B28@0:8@16B24",
+          "imp": "0x10203a6e8",
+          "metadata_offset": "0x16ec8d40"
+        },
+        {
+          "selector": "GetEntireChatRoomMemberDetail:",
+          "encoding": "B24@0:8@16",
+          "imp": "0x1020413dc",
+          "metadata_offset": "0x16ec8e3c"
+        }
+      ]
+    },
+    {
+      "class": "ChatRoomData",
+      "methods": [
+        {
+          "selector": "getDislayNameForUserName:",
+          "encoding": "@24@0:8@16",
+          "imp": "0x100f7aa70",
+          "metadata_offset": "0x171879ac"
+        }
+      ]
+    },
+    {
+      "class": "ChatRoomUtils",
+      "methods": [
+        {
+          "selector": "openContactProfile:ofChatRoomContact:inViewController:delegate:searchScene:",
+          "encoding": "v56@0:8@16@24@32@40Q48",
+          "imp": "0x100fd803c",
+          "metadata_offset": "0x17017ba8"
+        }
+      ]
+    },
+    {
+      "class": "CMessageMgr",
+      "methods": [
+        {
+          "selector": "GetValidNewBizMsgCountByChatName:bizType:",
+          "encoding": "I32@0:8@16q24",
+          "imp": "0x104de4814",
+          "metadata_offset": "0x16eca454"
+        }
+      ]
+    },
+    {
+      "class": "WCBizUtil",
+      "methods": [
+        {
+          "selector": "calcValidNewTransferCountWithUsername:",
+          "encoding": "I24@0:8@16",
+          "imp": "0x106ee96f8",
+          "metadata_offset": "0x170b5ad8"
+        }
+      ]
+    },
+    {
+      "class": "NewSyncService",
+      "methods": [
+        {
+          "selector": "NeedToSyncOplog",
+          "encoding": "v16@0:8",
+          "imp": "0x105465630",
+          "metadata_offset": "0x1743d084"
+        }
+      ]
+    }
+  ]
+}

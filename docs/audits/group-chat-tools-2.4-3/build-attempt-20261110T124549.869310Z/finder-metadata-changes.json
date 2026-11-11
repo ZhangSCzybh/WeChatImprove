@@ -1,0 +1,14 @@
+{
+  "packages/.DS_Store": {
+    "before": {
+      "kind": "file",
+      "bytes": 26628,
+      "sha256": "41fab616a9503fb3740a830ac4def03403df4bfc937efed9dc67057dd73b139d"
+    },
+    "after": {
+      "kind": "file",
+      "bytes": 26628,
+      "sha256": "e7f70f818dc4d166e1a56072fa2f1c5969a9a0cc0a5964d1182bc170427ef58c"
+    }
+  }
+}

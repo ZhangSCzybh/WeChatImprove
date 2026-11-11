@@ -18,6 +18,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable CSMessagePreparedSend *)prepareVoiceResource:(CSMessageVoiceResource *)resource accountID:(NSString *)accountID targetID:(NSString *)targetID;
 // Fresh text for an explicitly configured task. Preparation never sends or opens a chat.
 - (nullable CSMessagePreparedSend *)prepareScheduledText:(NSString *)text targetID:(NSString *)targetID accountID:(NSString *)accountID;
+// Fresh group text with actual native mention metadata. Preparation never sends.
+- (nullable CSMessagePreparedSend *)prepareGroupText:(NSString *)text mentions:(NSArray<NSString *> *)mentions targetID:(NSString *)targetID accountID:(NSString *)accountID;
 - (nullable CSMessagePreparedSend *)prepareContext:(CSMessageActionContext *)context targetID:(NSString *)targetID voice:(nullable CSMessageVoiceResource *)voice appData:(nullable NSData *)appData appDataPath:(nullable NSString *)path;
 - (nullable CSMessagePreparedSend *)prepareContext:(CSMessageActionContext *)context targetID:(NSString *)targetID voice:(nullable CSMessageVoiceResource *)voice;
 @end

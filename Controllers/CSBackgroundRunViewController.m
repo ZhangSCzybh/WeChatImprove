@@ -86,7 +86,7 @@
 }
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section { return self.sections[section].header; }
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
-    if (section==0) return @"开启后先使用系统允许的有限后台执行时间，剩余时间不足时再按需尝试近静音音频；回到前台或关闭开关时释放资源。后台运行仍可能增加耗电。";
+    if (section==0) return @"开启后先使用系统允许的有限后台执行时间，剩余时间不足时再按需尝试近静音音频；回到前台时释放资源；若群聊也开启了「后台实时运行」，关闭这里后群聊仍可使用后台资源。后台运行可能增加耗电。";
     if (section==1) return @"当前状态表示此刻可尝试的后台执行条件，不代表系统保证持续运行或红包、收款已经成功。后台音频声明仅表示安装包配置，不能证明系统已允许持续运行。";
     if (section==2) return @"仅保留当前微信进程中最近一次后台记录，时间按设备本地时区显示。最后检查仅证明该时刻执行过检查，不能证明此前一直运行；开始观察表示中途开始记录，不是真实进入后台时刻。点击任意记录查看完整信息。";
     return nil;
@@ -113,7 +113,7 @@
     if (indexPath.section==2) { [self showLastBackgroundRecord]; return; }
     if (indexPath.section!=3) return;
     UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"后台运行说明"
-        message:@"开启后优先申请系统允许的有限后台执行时间。有限剩余时间不足 8 秒时，若当前微信包已声明后台音频且音频可用，再尝试近静音循环音频接力；初次任务申请失败时也可尝试音频。音频至少播放 5 秒，有限预算恢复至至少 12 秒并经两次相隔至少 1 秒的检查确认后停止音频，继续利用系统任务。不需要设置触发间隔。\n\n音频提供继续执行的机会，不能保证给系统任务补充时间。音频期间显示的极大剩余时间不能证明停止音频后预算仍然充足，因此部分情况下音频仍会持续。\n\n返回前台或关闭开关时立即释放后台任务与音频资源；微信通话、录音及系统音频中断优先，允许后再尝试恢复。音频启动失败不会连续重试，可回到前台后再切到后台。\n\n当前状态只表示此刻可尝试的执行条件，安装包中的后台音频声明也不代表系统保证永久后台运行。系统挂起、结束进程或用户划掉微信后，插件无法自行唤醒微信；后台消息与自动领取仍依赖微信原生服务。"
+        message:@"开启后优先申请系统允许的有限后台执行时间。有限剩余时间不足 8 秒时，若当前微信包已声明后台音频且音频可用，再尝试近静音循环音频接力；初次任务申请失败时也可尝试音频。音频至少播放 5 秒，有限预算恢复至至少 12 秒并经两次相隔至少 1 秒的检查确认后停止音频，继续利用系统任务。不需要设置触发间隔。\n\n音频提供继续执行的机会，不能保证给系统任务补充时间。音频期间显示的极大剩余时间不能证明停止音频后预算仍然充足，因此部分情况下音频仍会持续。\n\n返回前台或所有后台需求都关闭时，释放后台任务与音频资源。群聊的「后台实时运行」可以独立使用这些资源。微信通话、录音及系统音频中断优先，允许后再尝试恢复。音频启动失败不会连续重试，可回到前台后再切到后台。\n\n当前状态只表示此刻可尝试的执行条件，安装包中的后台音频声明也不代表系统保证永久后台运行。系统挂起、结束进程或用户划掉微信后，插件无法自行唤醒微信；后台消息与自动领取仍依赖微信原生服务。"
         preferredStyle:UIAlertControllerStyleAlert];
     [alert addAction:[UIAlertAction actionWithTitle:@"了解了" style:UIAlertActionStyleDefault handler:nil]];
     [self presentViewController:alert animated:YES completion:nil];

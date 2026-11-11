@@ -1,0 +1,20 @@
+Scenario A
+  authoritative roster: first request accepted without response, one background retry produced v2
+  native AddMsg: welcome with at-list in Background, departure in Background (被移出); local AddLocalMsg=1
+  scheduled actual timer -> native AddMsg state=Background, persisted history=submitted, plugin leases/audio=0
+  native AddMsg: welcome with at-list in Background, departure in Background (被移出); local AddLocalMsg=1
+PASS A: 44 assertions
+Scenario B
+  native AddMsg: welcome with at-list in Active, departure in Background (被移出); local AddLocalMsg=1
+PASS B: 21 assertions
+Scenario B-queued
+  native AddMsg: welcome with at-list in Active, departure in Active (离群（原因未确认）); local AddLocalMsg=1
+  native AddMsg: welcome with at-list in Active, departure in Active (离群（原因未确认）); local AddLocalMsg=1
+PASS B-queued: 25 assertions
+Scenario C
+  native AddMsg: welcome with at-list in Background, departure in Background (被移出); local AddLocalMsg=1
+  plugin lease attempts=1, audio starts=1; both released at foreground
+PASS C: 22 assertions
+Scenario D
+  native AddMsg: welcome with at-list in Active, departure in Active (离群（原因未确认）); local AddLocalMsg=1
+PASS D: 21 assertions

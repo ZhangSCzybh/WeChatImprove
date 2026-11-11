@@ -1,0 +1,383 @@
+{
+  "name": "WWKFContactMgr",
+  "class_offset": "0x1f0150d8",
+  "superclass": "MMUserService",
+  "methods": [
+    {
+      "selector": "callDeallocInCatagoryDataBase",
+      "encoding": "v16@0:8",
+      "imp": "0x10a84e560",
+      "metadata_offset": "0x16fe0f30"
+    },
+    {
+      "selector": "openDB",
+      "encoding": "v16@0:8",
+      "imp": "0x10a84e56c",
+      "metadata_offset": "0x16fe0f3c"
+    },
+    {
+      "selector": "setupTable",
+      "encoding": "v16@0:8",
+      "imp": "0x10a84e6c4",
+      "metadata_offset": "0x16fe0f48"
+    },
+    {
+      "selector": "closeDB",
+      "encoding": "v16@0:8",
+      "imp": "0x10a84e734",
+      "metadata_offset": "0x16fe0f54"
+    },
+    {
+      "selector": "setupTableWithName:tableClass:",
+      "encoding": "@32@0:8@16#24",
+      "imp": "0x10a84e7b4",
+      "metadata_offset": "0x16fe0f60"
+    },
+    {
+      "selector": "willRecoverDatabase",
+      "encoding": "v16@0:8",
+      "imp": "0x10a84e918",
+      "metadata_offset": "0x16fe0f6c"
+    },
+    {
+      "selector": "didRecoverDatabase",
+      "encoding": "v16@0:8",
+      "imp": "0x10a84e974",
+      "metadata_offset": "0x16fe0f78"
+    },
+    {
+      "selector": "registerRecoverNotification",
+      "encoding": "v16@0:8",
+      "imp": "0x10a84e9f8",
+      "metadata_offset": "0x16fe0f84"
+    },
+    {
+      "selector": "unregisterRecoverNotification",
+      "encoding": "v16@0:8",
+      "imp": "0x10a84eb0c",
+      "metadata_offset": "0x16fe0f90"
+    },
+    {
+      "selector": "wwkfContactDBWillRecoverNotificationName",
+      "encoding": "@16@0:8",
+      "imp": "0x10a84eb5c",
+      "metadata_offset": "0x16fe0f9c"
+    },
+    {
+      "selector": "db_getAllContacts",
+      "encoding": "@16@0:8",
+      "imp": "0x10a84eb98",
+      "metadata_offset": "0x16fe0fa8"
+    },
+    {
+      "selector": "db_getContactWithUserName:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x10a84ee68",
+      "metadata_offset": "0x16fe0fb4"
+    },
+    {
+      "selector": "db_getContactWithAppId:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x10a84f074",
+      "metadata_offset": "0x16fe0fc0"
+    },
+    {
+      "selector": "db_insertOrUpdateContact:",
+      "encoding": "B24@0:8@16",
+      "imp": "0x10a84f2f8",
+      "metadata_offset": "0x16fe0fcc"
+    },
+    {
+      "selector": "db_deleteContactWithUserName:",
+      "encoding": "B24@0:8@16",
+      "imp": "0x10a84f660",
+      "metadata_offset": "0x16fe0fd8"
+    },
+    {
+      "selector": "db_modifyHeadImageStatus:withUserName:",
+      "encoding": "B32@0:8@16@24",
+      "imp": "0x10a84f844",
+      "metadata_offset": "0x16fe0fe4"
+    },
+    {
+      "selector": "wwkfContactWithDBContact:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x10a84fd00",
+      "metadata_offset": "0x16fe0ff0"
+    },
+    {
+      "selector": "dbContactWithWWKFContact:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x10a85042c",
+      "metadata_offset": "0x16fe0ffc"
+    },
+    {
+      "selector": "pathOfWeWorkKFDB",
+      "encoding": "@16@0:8",
+      "imp": "0x10a850b88",
+      "metadata_offset": "0x16fe1008"
+    },
+    {
+      "selector": "getCContactWithWWKFUserName:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x10a84e36c",
+      "metadata_offset": "0x16fe1014"
+    },
+    {
+      "selector": "getAllCContactOfWWKF",
+      "encoding": "@16@0:8",
+      "imp": "0x10a84e3d0",
+      "metadata_offset": "0x16fe1020"
+    },
+    {
+      "selector": "dealloc",
+      "encoding": "v16@0:8",
+      "imp": "0x10a850c20",
+      "metadata_offset": "0x16fe102c"
+    },
+    {
+      "selector": "onServiceInit",
+      "encoding": "v16@0:8",
+      "imp": "0x10a850c6c",
+      "metadata_offset": "0x16fe1038"
+    },
+    {
+      "selector": "onServiceClearData",
+      "encoding": "v16@0:8",
+      "imp": "0x10a850d10",
+      "metadata_offset": "0x16fe1044"
+    },
+    {
+      "selector": "onServiceEnterBackground",
+      "encoding": "v16@0:8",
+      "imp": "0x10a850db0",
+      "metadata_offset": "0x16fe1050"
+    },
+    {
+      "selector": "getContactWithUserName:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x10a850dbc",
+      "metadata_offset": "0x16fe105c"
+    },
+    {
+      "selector": "getContactsWithAppId:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x10a850ed8",
+      "metadata_offset": "0x16fe1068"
+    },
+    {
+      "selector": "getAllWWKFContacts",
+      "encoding": "@16@0:8",
+      "imp": "0x10a850ffc",
+      "metadata_offset": "0x16fe1074"
+    },
+    {
+      "selector": "__getContactFromCacheWithUserName:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x10a851008",
+      "metadata_offset": "0x16fe1080"
+    },
+    {
+      "selector": "__getContactsFromCachetWithAppId:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x10a8510a8",
+      "metadata_offset": "0x16fe108c"
+    },
+    {
+      "selector": "setContactToLocal:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10a851148",
+      "metadata_offset": "0x16fe1098"
+    },
+    {
+      "selector": "updateContactToDBAndCache:",
+      "encoding": "B24@0:8@16",
+      "imp": "0x10a8513d8",
+      "metadata_offset": "0x16fe10a4"
+    },
+    {
+      "selector": "modifyHeadImageStatus:withUserName:",
+      "encoding": "B32@0:8@16@24",
+      "imp": "0x10a851584",
+      "metadata_offset": "0x16fe10b0"
+    },
+    {
+      "selector": "deleteContactFromDBAndCache:",
+      "encoding": "B24@0:8@16",
+      "imp": "0x10a851754",
+      "metadata_offset": "0x16fe10bc"
+    },
+    {
+      "selector": "setWWKFContact:typeBit:set:localSet:",
+      "encoding": "B36@0:8@16I24B28B32",
+      "imp": "0x10a851908",
+      "metadata_offset": "0x16fe10c8"
+    },
+    {
+      "selector": "addOplogWithWWKFContact:mute:",
+      "encoding": "I28@0:8@16B24",
+      "imp": "0x10a851af8",
+      "metadata_offset": "0x16fe10d4"
+    },
+    {
+      "selector": "addOplogType:Buffer:",
+      "encoding": "I28@0:8I16@20",
+      "imp": "0x10a851b9c",
+      "metadata_offset": "0x16fe10e0"
+    },
+    {
+      "selector": "tryDeleteInvalidWWKFContacts",
+      "encoding": "v16@0:8",
+      "imp": "0x10a851c8c",
+      "metadata_offset": "0x16fe10ec"
+    },
+    {
+      "selector": "mainThread_updateContactCacheAndCallModifyContactWithContact:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10a852030",
+      "metadata_offset": "0x16fe10f8"
+    },
+    {
+      "selector": "mainThread_updateContactCacheAndCallModifyContact:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10a8521d0",
+      "metadata_offset": "0x16fe1104"
+    },
+    {
+      "selector": "mainThread_deleteContactCacheAndCallModifyContactWithContact:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10a8522a8",
+      "metadata_offset": "0x16fe1110"
+    },
+    {
+      "selector": "mainThread_callModifyContactHeadURLWithContact:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10a852444",
+      "metadata_offset": "0x16fe111c"
+    },
+    {
+      "selector": "openSlotKV",
+      "encoding": "v16@0:8",
+      "imp": "0x10a852570",
+      "metadata_offset": "0x16fe1128"
+    },
+    {
+      "selector": "cacheContactUserNameForKFUrl:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x10a8525d8",
+      "metadata_offset": "0x16fe1134"
+    },
+    {
+      "selector": "setCacheContactUserName:foKFUrl:",
+      "encoding": "B32@0:8@16@24",
+      "imp": "0x10a8526a4",
+      "metadata_offset": "0x16fe1140"
+    },
+    {
+      "selector": "lastDeleteInvalidContactTimeStamp",
+      "encoding": "I16@0:8",
+      "imp": "0x10a85289c",
+      "metadata_offset": "0x16fe114c"
+    },
+    {
+      "selector": "updateLastDeleteInvalidContactTimeStamp",
+      "encoding": "v16@0:8",
+      "imp": "0x10a8528f8",
+      "metadata_offset": "0x16fe1158"
+    },
+    {
+      "selector": "deleteInvalidContactDefautltInterval",
+      "encoding": "I16@0:8",
+      "imp": "0x10a852964",
+      "metadata_offset": "0x16fe1164"
+    },
+    {
+      "selector": "userName2ContactMap",
+      "encoding": "@16@0:8",
+      "imp": "0x10a852970",
+      "metadata_offset": "0x16fe1170"
+    },
+    {
+      "selector": "setUserName2ContactMap:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10a852980",
+      "metadata_offset": "0x16fe117c"
+    },
+    {
+      "selector": "appId2ContactsMap",
+      "encoding": "@16@0:8",
+      "imp": "0x10a852994",
+      "metadata_offset": "0x16fe1188"
+    },
+    {
+      "selector": "setAppId2ContactsMap:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10a8529a4",
+      "metadata_offset": "0x16fe1194"
+    },
+    {
+      "selector": "slotKv",
+      "encoding": "@16@0:8",
+      "imp": "0x10a8529b8",
+      "metadata_offset": "0x16fe11a0"
+    },
+    {
+      "selector": "setSlotKv:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10a8529c8",
+      "metadata_offset": "0x16fe11ac"
+    },
+    {
+      "selector": "db",
+      "encoding": "@16@0:8",
+      "imp": "0x10a8529dc",
+      "metadata_offset": "0x16fe11b8"
+    },
+    {
+      "selector": "setDb:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10a8529ec",
+      "metadata_offset": "0x16fe11c4"
+    },
+    {
+      "selector": "tableContact",
+      "encoding": "@16@0:8",
+      "imp": "0x10a852a00",
+      "metadata_offset": "0x16fe11d0"
+    },
+    {
+      "selector": "setTableContact:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10a852a10",
+      "metadata_offset": "0x16fe11dc"
+    },
+    {
+      "selector": ".cxx_destruct",
+      "encoding": "v16@0:8",
+      "imp": "0x10a852a24",
+      "metadata_offset": "0x16fe11e8"
+    }
+  ],
+  "ivars": [
+    {
+      "name": "_userName2ContactMap",
+      "encoding": "@\"NSMutableDictionary\""
+    },
+    {
+      "name": "_appId2ContactsMap",
+      "encoding": "@\"NSMutableDictionary\""
+    },
+    {
+      "name": "_slotKv",
+      "encoding": "@\"MemoryMappedKV\""
+    },
+    {
+      "name": "_db",
+      "encoding": "@\"WCTDatabase\""
+    },
+    {
+      "name": "_tableContact",
+      "encoding": "@\"WCTTable\""
+    }
+  ]
+}

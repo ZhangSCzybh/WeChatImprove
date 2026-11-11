@@ -1,0 +1,44 @@
+{
+  "name": "BizFollowedContactMgr",
+  "class_offset": "0x1ee46360",
+  "superclass": "MMUserService",
+  "methods": [
+    {
+      "selector": "openBizFollowedContactList",
+      "encoding": "v16@0:8",
+      "imp": "0x1003bf2f0",
+      "metadata_offset": "0x1710de18"
+    },
+    {
+      "selector": "openBrsFollowedContactList",
+      "encoding": "v16@0:8",
+      "imp": "0x1003bf3d8",
+      "metadata_offset": "0x1710de24"
+    },
+    {
+      "selector": "openPhotoFollowedContactList",
+      "encoding": "v16@0:8",
+      "imp": "0x1003bf4bc",
+      "metadata_offset": "0x1710de30"
+    },
+    {
+      "selector": "preloadBizInitialDataIfNeed",
+      "encoding": "v16@0:8",
+      "imp": "0x1003bf5a4",
+      "metadata_offset": "0x1710de3c"
+    },
+    {
+      "selector": "preloadBrsInitialDataIfNeed",
+      "encoding": "v16@0:8",
+      "imp": "0x1003bf6a8",
+      "metadata_offset": "0x1710de48"
+    },
+    {
+      "selector": "preloadPhotoInitialDataIfNeed",
+      "encoding": "v16@0:8",
+      "imp": "0x1003bf72c",
+      "metadata_offset": "0x1710de54"
+    }
+  ],
+  "ivars": []
+}

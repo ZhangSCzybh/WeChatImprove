@@ -1,0 +1,133 @@
+{
+  "name": "W1wUserContactMgr",
+  "class_offset": "0x1ef5f440",
+  "superclass": "MMUserService",
+  "methods": [
+    {
+      "selector": "onServiceInit",
+      "encoding": "v16@0:8",
+      "imp": "0x1066ce408",
+      "metadata_offset": "0x17520d60"
+    },
+    {
+      "selector": "onServiceClearData",
+      "encoding": "v16@0:8",
+      "imp": "0x1066ce510",
+      "metadata_offset": "0x17520d6c"
+    },
+    {
+      "selector": "getContact:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x1066ce514",
+      "metadata_offset": "0x17520d78"
+    },
+    {
+      "selector": "forceUpdateContactForUsrName:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1066ce5b4",
+      "metadata_offset": "0x17520d84"
+    },
+    {
+      "selector": "updateUserNames:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1066ce6f8",
+      "metadata_offset": "0x17520d90"
+    },
+    {
+      "selector": "checkQueue",
+      "encoding": "v16@0:8",
+      "imp": "0x1066cecd8",
+      "metadata_offset": "0x17520d9c"
+    },
+    {
+      "selector": "batchFetchContactDetailInfo:isInQueue:",
+      "encoding": "v28@0:8@16B24",
+      "imp": "0x1066cee50",
+      "metadata_offset": "0x17520da8"
+    },
+    {
+      "selector": "fetchContactDetailInfo:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1066cf008",
+      "metadata_offset": "0x17520db4"
+    },
+    {
+      "selector": "onReceiveResponse:isInQueue:",
+      "encoding": "v28@0:8@16B24",
+      "imp": "0x1066cf0c8",
+      "metadata_offset": "0x17520dc0"
+    },
+    {
+      "selector": "contactStorage",
+      "encoding": "@16@0:8",
+      "imp": "0x1066cf688",
+      "metadata_offset": "0x17520dcc"
+    },
+    {
+      "selector": "setContactStorage:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1066cf698",
+      "metadata_offset": "0x17520dd8"
+    },
+    {
+      "selector": "contactUpdateTimes",
+      "encoding": "@16@0:8",
+      "imp": "0x1066cf6ac",
+      "metadata_offset": "0x17520de4"
+    },
+    {
+      "selector": "setContactUpdateTimes:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1066cf6bc",
+      "metadata_offset": "0x17520df0"
+    },
+    {
+      "selector": "isUpdating",
+      "encoding": "B16@0:8",
+      "imp": "0x1066cf6d0",
+      "metadata_offset": "0x17520dfc"
+    },
+    {
+      "selector": "setIsUpdating:",
+      "encoding": "v20@0:8B16",
+      "imp": "0x1066cf6e0",
+      "metadata_offset": "0x17520e08"
+    },
+    {
+      "selector": "updateQueue",
+      "encoding": "@16@0:8",
+      "imp": "0x1066cf6f0",
+      "metadata_offset": "0x17520e14"
+    },
+    {
+      "selector": "setUpdateQueue:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1066cf700",
+      "metadata_offset": "0x17520e20"
+    },
+    {
+      "selector": ".cxx_destruct",
+      "encoding": "v16@0:8",
+      "imp": "0x1066cf714",
+      "metadata_offset": "0x17520e2c"
+    }
+  ],
+  "ivars": [
+    {
+      "name": "_isUpdating",
+      "encoding": "B"
+    },
+    {
+      "name": "_contactStorage",
+      "encoding": "@\"W1wUserContactStorage\""
+    },
+    {
+      "name": "_contactUpdateTimes",
+      "encoding": "@\"NSMutableDictionary\""
+    },
+    {
+      "name": "_updateQueue",
+      "encoding": "@\"NSMutableArray\""
+    }
+  ]
+}

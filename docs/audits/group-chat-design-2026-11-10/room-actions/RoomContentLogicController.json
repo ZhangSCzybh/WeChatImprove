@@ -1,0 +1,1305 @@
+{
+  "name": "RoomContentLogicController",
+  "class_offset": "0x1ef3bf68",
+  "superclass": "BaseMsgContentLogicController",
+  "methods": [
+    {
+      "selector": "init",
+      "encoding": "@16@0:8",
+      "imp": "0x10594e798",
+      "metadata_offset": "0x17486940"
+    },
+    {
+      "selector": "initWithLocalID:CreateTime:ContentViewDisshowStatus:searchKeywordList:fromScene:",
+      "encoding": "@48@0:8I16I20Q24@32Q40",
+      "imp": "0x10594e978",
+      "metadata_offset": "0x1748694c"
+    },
+    {
+      "selector": "onWillEnterRoom",
+      "encoding": "v16@0:8",
+      "imp": "0x10594eb58",
+      "metadata_offset": "0x17486958"
+    },
+    {
+      "selector": "setM_dicExtraInfo:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10594ee98",
+      "metadata_offset": "0x17486964"
+    },
+    {
+      "selector": "reportOpenIMChatRoom:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10594ef10",
+      "metadata_offset": "0x17486970"
+    },
+    {
+      "selector": "getGroupContact",
+      "encoding": "@16@0:8",
+      "imp": "0x10594f0cc",
+      "metadata_offset": "0x1748697c"
+    },
+    {
+      "selector": "GetMsg:FromID:Limit:LeftCount:",
+      "encoding": "@40@0:8@16I24i28^I32",
+      "imp": "0x10594f0e0",
+      "metadata_offset": "0x17486988"
+    },
+    {
+      "selector": "getMsgFromLocalId:createTime:sequence:limit:",
+      "encoding": "@32@0:8I16I20I24I28",
+      "imp": "0x10594f2e8",
+      "metadata_offset": "0x17486994"
+    },
+    {
+      "selector": "GetDownMsg:FromID:Limit:LeftCount:",
+      "encoding": "@40@0:8@16I24i28^I32",
+      "imp": "0x10594f524",
+      "metadata_offset": "0x174869a0"
+    },
+    {
+      "selector": "getDownMsgFromLocalId:createTime:sequence:limit:",
+      "encoding": "@32@0:8I16I20I24I28",
+      "imp": "0x10594f72c",
+      "metadata_offset": "0x174869ac"
+    },
+    {
+      "selector": "ClearUnRead:FromID:ToID:",
+      "encoding": "v32@0:8@16I24I28",
+      "imp": "0x10594f968",
+      "metadata_offset": "0x174869b8"
+    },
+    {
+      "selector": "clearAllMsg",
+      "encoding": "v16@0:8",
+      "imp": "0x10594fa30",
+      "metadata_offset": "0x174869c4"
+    },
+    {
+      "selector": "DelMsg:MsgList:DelAll:",
+      "encoding": "v36@0:8@16@24B32",
+      "imp": "0x10594fa70",
+      "metadata_offset": "0x174869d0"
+    },
+    {
+      "selector": "AddMsg:MsgWrap:",
+      "encoding": "v32@0:8@16@24",
+      "imp": "0x10594fb48",
+      "metadata_offset": "0x174869dc"
+    },
+    {
+      "selector": "ResendMsg:MsgWrap:",
+      "encoding": "v32@0:8@16@24",
+      "imp": "0x1059502c8",
+      "metadata_offset": "0x174869e8"
+    },
+    {
+      "selector": "getMsgSendOpEntry",
+      "encoding": "@16@0:8",
+      "imp": "0x1059503f8",
+      "metadata_offset": "0x174869f4"
+    },
+    {
+      "selector": "CanSendImageMsg:",
+      "encoding": "B24@0:8@16",
+      "imp": "0x1059505b8",
+      "metadata_offset": "0x17486a00"
+    },
+    {
+      "selector": "CanSendVoiceMsg",
+      "encoding": "B16@0:8",
+      "imp": "0x1059505c0",
+      "metadata_offset": "0x17486a0c"
+    },
+    {
+      "selector": "CanLongPressHeadImage",
+      "encoding": "B16@0:8",
+      "imp": "0x1059505c8",
+      "metadata_offset": "0x17486a18"
+    },
+    {
+      "selector": "CanSendVoipMsg",
+      "encoding": "B16@0:8",
+      "imp": "0x1059505d0",
+      "metadata_offset": "0x17486a24"
+    },
+    {
+      "selector": "CustomToolViewEX:inputPresenter:",
+      "encoding": "v32@0:8@16@24",
+      "imp": "0x1059505d8",
+      "metadata_offset": "0x17486a30"
+    },
+    {
+      "selector": "shouldUseNewTipsNavBar",
+      "encoding": "B16@0:8",
+      "imp": "0x1059506c8",
+      "metadata_offset": "0x17486a3c"
+    },
+    {
+      "selector": "initChatroomUnavailableTipsView",
+      "encoding": "v16@0:8",
+      "imp": "0x1059506d0",
+      "metadata_offset": "0x17486a48"
+    },
+    {
+      "selector": "canReplyMsg",
+      "encoding": "B16@0:8",
+      "imp": "0x105950c2c",
+      "metadata_offset": "0x17486a54"
+    },
+    {
+      "selector": "shouldShowChatroomUnavailableTipsView",
+      "encoding": "B16@0:8",
+      "imp": "0x105950c4c",
+      "metadata_offset": "0x17486a60"
+    },
+    {
+      "selector": "chatroomUnavailableType",
+      "encoding": "q16@0:8",
+      "imp": "0x105950c70",
+      "metadata_offset": "0x17486a6c"
+    },
+    {
+      "selector": "IsShowAttachmentButtonRedDot",
+      "encoding": "B16@0:8",
+      "imp": "0x105950cdc",
+      "metadata_offset": "0x17486a78"
+    },
+    {
+      "selector": "OnClickAttachmentButton:",
+      "encoding": "v20@0:8B16",
+      "imp": "0x105950ecc",
+      "metadata_offset": "0x17486a84"
+    },
+    {
+      "selector": "OnClickAttachmentButtonAction",
+      "encoding": "v16@0:8",
+      "imp": "0x105950f9c",
+      "metadata_offset": "0x17486a90"
+    },
+    {
+      "selector": "getInputToolWeAppOpEntryAr",
+      "encoding": "@16@0:8",
+      "imp": "0x105951200",
+      "metadata_offset": "0x17486a9c"
+    },
+    {
+      "selector": "getInputToolWeAppNotShowIndex",
+      "encoding": "q16@0:8",
+      "imp": "0x1059512dc",
+      "metadata_offset": "0x17486aa8"
+    },
+    {
+      "selector": "onInputToolWeAppButtonClickedWithItem:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1059513b0",
+      "metadata_offset": "0x17486ab4"
+    },
+    {
+      "selector": "onShowInputToolWeAppAr:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10595177c",
+      "metadata_offset": "0x17486ac0"
+    },
+    {
+      "selector": "GetRightBarBtn",
+      "encoding": "@16@0:8",
+      "imp": "0x1059519a4",
+      "metadata_offset": "0x17486acc"
+    },
+    {
+      "selector": "GetRightBarButtonImageName",
+      "encoding": "@16@0:8",
+      "imp": "0x105951adc",
+      "metadata_offset": "0x17486ad8"
+    },
+    {
+      "selector": "GetRightBarButtonTitle",
+      "encoding": "@16@0:8",
+      "imp": "0x105951b20",
+      "metadata_offset": "0x17486ae4"
+    },
+    {
+      "selector": "isGroupMember",
+      "encoding": "B16@0:8",
+      "imp": "0x105951b28",
+      "metadata_offset": "0x17486af0"
+    },
+    {
+      "selector": "OpenContactInfo:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105951bd0",
+      "metadata_offset": "0x17486afc"
+    },
+    {
+      "selector": "isChatRoomDismissed",
+      "encoding": "B16@0:8",
+      "imp": "0x105951eb4",
+      "metadata_offset": "0x17486b08"
+    },
+    {
+      "selector": "isChatRoomBlocked",
+      "encoding": "B16@0:8",
+      "imp": "0x105951f00",
+      "metadata_offset": "0x17486b14"
+    },
+    {
+      "selector": "isChatRoomMember",
+      "encoding": "B16@0:8",
+      "imp": "0x105951f4c",
+      "metadata_offset": "0x17486b20"
+    },
+    {
+      "selector": "OpenDetailInfo",
+      "encoding": "v16@0:8",
+      "imp": "0x105952528",
+      "metadata_offset": "0x17486b2c"
+    },
+    {
+      "selector": "restoreNavInteraction:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105952c4c",
+      "metadata_offset": "0x17486b38"
+    },
+    {
+      "selector": "GetUsrTitle",
+      "encoding": "@16@0:8",
+      "imp": "0x105952c94",
+      "metadata_offset": "0x17486b44"
+    },
+    {
+      "selector": "GetChatRoomTitle",
+      "encoding": "@16@0:8",
+      "imp": "0x105952d2c",
+      "metadata_offset": "0x17486b50"
+    },
+    {
+      "selector": "getMemeberCountLabel",
+      "encoding": "@16@0:8",
+      "imp": "0x105952e68",
+      "metadata_offset": "0x17486b5c"
+    },
+    {
+      "selector": "getDefaultTitleTailSubViews",
+      "encoding": "@16@0:8",
+      "imp": "0x105953144",
+      "metadata_offset": "0x17486b68"
+    },
+    {
+      "selector": "GetTitleLabelOffset",
+      "encoding": "d16@0:8",
+      "imp": "0x105953338",
+      "metadata_offset": "0x17486b74"
+    },
+    {
+      "selector": "shouldPreventViewcontrollerAutorotate",
+      "encoding": "B16@0:8",
+      "imp": "0x1059534b0",
+      "metadata_offset": "0x17486b80"
+    },
+    {
+      "selector": "OnViewRoomAnnouncement",
+      "encoding": "v16@0:8",
+      "imp": "0x1059534c0",
+      "metadata_offset": "0x17486b8c"
+    },
+    {
+      "selector": "OnViewRoomAnnouncement:",
+      "encoding": "v20@0:8i16",
+      "imp": "0x1059534d0",
+      "metadata_offset": "0x17486b98"
+    },
+    {
+      "selector": "OnClickSecurityTipsBar:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105953820",
+      "metadata_offset": "0x17486ba4"
+    },
+    {
+      "selector": "OnViewChatRoomInvitationList",
+      "encoding": "v16@0:8",
+      "imp": "0x105953ab4",
+      "metadata_offset": "0x17486bb0"
+    },
+    {
+      "selector": "OnCloseChatRoomInvitationTipsBar",
+      "encoding": "v16@0:8",
+      "imp": "0x105953c5c",
+      "metadata_offset": "0x17486bbc"
+    },
+    {
+      "selector": "onChatRoomInvitationUnReadCountChanged",
+      "encoding": "v16@0:8",
+      "imp": "0x105953d50",
+      "metadata_offset": "0x17486bc8"
+    },
+    {
+      "selector": "updateChatRoomInvitationBanner",
+      "encoding": "v16@0:8",
+      "imp": "0x105953d5c",
+      "metadata_offset": "0x17486bd4"
+    },
+    {
+      "selector": "OnTagLink:messageWrap:",
+      "encoding": "v32@0:8@16@24",
+      "imp": "0x1059540f8",
+      "metadata_offset": "0x17486be0"
+    },
+    {
+      "selector": "enterChatRoomInfo:scene:",
+      "encoding": "v28@0:8@16i24",
+      "imp": "0x1059547b4",
+      "metadata_offset": "0x17486bec"
+    },
+    {
+      "selector": "OnViewChatRoomDesc",
+      "encoding": "v16@0:8",
+      "imp": "0x105954b84",
+      "metadata_offset": "0x17486bf8"
+    },
+    {
+      "selector": "OnGetChatRoomInfo:Info:showBanner:",
+      "encoding": "v36@0:8@16@24B32",
+      "imp": "0x105954c7c",
+      "metadata_offset": "0x17486c04"
+    },
+    {
+      "selector": "onChatRoomToolButtonClick",
+      "encoding": "v16@0:8",
+      "imp": "0x105954f40",
+      "metadata_offset": "0x17486c10"
+    },
+    {
+      "selector": "onExitRoom",
+      "encoding": "v16@0:8",
+      "imp": "0x105955038",
+      "metadata_offset": "0x17486c1c"
+    },
+    {
+      "selector": "updateTipsNavBarReporter",
+      "encoding": "v16@0:8",
+      "imp": "0x1059552d8",
+      "metadata_offset": "0x17486c28"
+    },
+    {
+      "selector": "onTopMsg:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105955548",
+      "metadata_offset": "0x17486c34"
+    },
+    {
+      "selector": "onCancelTopMsg:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1059560a0",
+      "metadata_offset": "0x17486c40"
+    },
+    {
+      "selector": "onSetRoomTopMsgWithUserName:msgSvrID:bSuccess:errorMsg:",
+      "encoding": "v44@0:8@16Q24B32@36",
+      "imp": "0x10595665c",
+      "metadata_offset": "0x17486c4c"
+    },
+    {
+      "selector": "onUnSetRoomTopMsgWithUserName:msgSvrID:bSuccess:errorMsg:",
+      "encoding": "v44@0:8@16Q24B32@36",
+      "imp": "0x10595687c",
+      "metadata_offset": "0x17486c58"
+    },
+    {
+      "selector": "updateTopMessageInfo",
+      "encoding": "v16@0:8",
+      "imp": "0x105956af0",
+      "metadata_offset": "0x17486c64"
+    },
+    {
+      "selector": "OnClickTopMessageTipsBar:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105957378",
+      "metadata_offset": "0x17486c70"
+    },
+    {
+      "selector": "OnClickCloseTopMessageTipsBar:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105957924",
+      "metadata_offset": "0x17486c7c"
+    },
+    {
+      "selector": "OnClickCancelTopMessageTipsBar:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105957bf8",
+      "metadata_offset": "0x17486c88"
+    },
+    {
+      "selector": "cancelTopOfMsgSvrId:",
+      "encoding": "v24@0:8q16",
+      "imp": "0x105957cb8",
+      "metadata_offset": "0x17486c94"
+    },
+    {
+      "selector": "getFilteredTopMsgInfoList",
+      "encoding": "@16@0:8",
+      "imp": "0x105957ecc",
+      "metadata_offset": "0x17486ca0"
+    },
+    {
+      "selector": "OnMsgRevoked:n64MsgId:",
+      "encoding": "v32@0:8@16q24",
+      "imp": "0x1059580b0",
+      "metadata_offset": "0x17486cac"
+    },
+    {
+      "selector": "OnGroupNoticeMsgRevoked:n64MsgId:item:",
+      "encoding": "v40@0:8@16q24@32",
+      "imp": "0x105958440",
+      "metadata_offset": "0x17486cb8"
+    },
+    {
+      "selector": "OnRevokeMsg:MsgWrap:ResultCode:ResultMsg:EducationMsg:",
+      "encoding": "v52@0:8@16@24I32@36@44",
+      "imp": "0x105958540",
+      "metadata_offset": "0x17486cc4"
+    },
+    {
+      "selector": "onDeleteMsg:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105958a50",
+      "metadata_offset": "0x17486cd0"
+    },
+    {
+      "selector": "onTopMsgMenuItemExposed:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105958aa0",
+      "metadata_offset": "0x17486cdc"
+    },
+    {
+      "selector": "onCancelTopMsgMenuItemExposed:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105958b58",
+      "metadata_offset": "0x17486ce8"
+    },
+    {
+      "selector": "viewWillRotateToOrientation:",
+      "encoding": "v24@0:8q16",
+      "imp": "0x105958ddc",
+      "metadata_offset": "0x17486cf4"
+    },
+    {
+      "selector": "getSubTitle",
+      "encoding": "@16@0:8",
+      "imp": "0x105958e34",
+      "metadata_offset": "0x17486d00"
+    },
+    {
+      "selector": "checkGetChatRoomInfo:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105958ebc",
+      "metadata_offset": "0x17486d0c"
+    },
+    {
+      "selector": "tryGetChatRoomMemberDetail:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105959128",
+      "metadata_offset": "0x17486d18"
+    },
+    {
+      "selector": "updateFinderClubInfoIfNeeded",
+      "encoding": "v16@0:8",
+      "imp": "0x10595932c",
+      "metadata_offset": "0x17486d24"
+    },
+    {
+      "selector": "ViewDidAppear",
+      "encoding": "v16@0:8",
+      "imp": "0x105959630",
+      "metadata_offset": "0x17486d30"
+    },
+    {
+      "selector": "setHasShowUnreadTip:",
+      "encoding": "v24@0:8Q16",
+      "imp": "0x1059596b4",
+      "metadata_offset": "0x17486d3c"
+    },
+    {
+      "selector": "onClickUnreadTip:",
+      "encoding": "v24@0:8Q16",
+      "imp": "0x1059596cc",
+      "metadata_offset": "0x17486d48"
+    },
+    {
+      "selector": "onWillDisplayMsg:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1059596e4",
+      "metadata_offset": "0x17486d54"
+    },
+    {
+      "selector": "DidAddMsg:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105959764",
+      "metadata_offset": "0x17486d60"
+    },
+    {
+      "selector": "ViewDidInit",
+      "encoding": "v16@0:8",
+      "imp": "0x1059597e4",
+      "metadata_offset": "0x17486d6c"
+    },
+    {
+      "selector": "onPopFromNavigationController",
+      "encoding": "v16@0:8",
+      "imp": "0x105959938",
+      "metadata_offset": "0x17486d78"
+    },
+    {
+      "selector": "onPerformAction:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1059599a0",
+      "metadata_offset": "0x17486d84"
+    },
+    {
+      "selector": "ViewWillAppear",
+      "encoding": "v16@0:8",
+      "imp": "0x105959af4",
+      "metadata_offset": "0x17486d90"
+    },
+    {
+      "selector": "onEnterRoom",
+      "encoding": "v16@0:8",
+      "imp": "0x105959f8c",
+      "metadata_offset": "0x17486d9c"
+    },
+    {
+      "selector": "resetAttachmentButtonRedDotFlag",
+      "encoding": "v16@0:8",
+      "imp": "0x10595a318",
+      "metadata_offset": "0x17486da8"
+    },
+    {
+      "selector": "checkAddFriend",
+      "encoding": "v16@0:8",
+      "imp": "0x10595a34c",
+      "metadata_offset": "0x17486db4"
+    },
+    {
+      "selector": "checkSecurityBannerShow",
+      "encoding": "v16@0:8",
+      "imp": "0x10595a370",
+      "metadata_offset": "0x17486dc0"
+    },
+    {
+      "selector": "nameForHeadImageLongPressed:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x10595a5a8",
+      "metadata_offset": "0x17486dcc"
+    },
+    {
+      "selector": "AddAtUser:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10595a640",
+      "metadata_offset": "0x17486dd8"
+    },
+    {
+      "selector": "onInputTextDeleteAll",
+      "encoding": "v16@0:8",
+      "imp": "0x10595aad0",
+      "metadata_offset": "0x17486de4"
+    },
+    {
+      "selector": "clearAtMeCount",
+      "encoding": "v16@0:8",
+      "imp": "0x10595ab98",
+      "metadata_offset": "0x17486df0"
+    },
+    {
+      "selector": "clearNewInvCount",
+      "encoding": "v16@0:8",
+      "imp": "0x10595ac60",
+      "metadata_offset": "0x17486dfc"
+    },
+    {
+      "selector": "clearNewInvApprove",
+      "encoding": "v16@0:8",
+      "imp": "0x10595ad28",
+      "metadata_offset": "0x17486e08"
+    },
+    {
+      "selector": "clearAACount",
+      "encoding": "v16@0:8",
+      "imp": "0x10595adf0",
+      "metadata_offset": "0x17486e14"
+    },
+    {
+      "selector": "clearTransferCount",
+      "encoding": "v16@0:8",
+      "imp": "0x10595aeb8",
+      "metadata_offset": "0x17486e20"
+    },
+    {
+      "selector": "clearUpdatableMsgNotify",
+      "encoding": "v16@0:8",
+      "imp": "0x10595af80",
+      "metadata_offset": "0x17486e2c"
+    },
+    {
+      "selector": "clearGroupUndoneSessionFlag",
+      "encoding": "v16@0:8",
+      "imp": "0x10595b048",
+      "metadata_offset": "0x17486e38"
+    },
+    {
+      "selector": "clearChatRoomSpecialAttentionFlag",
+      "encoding": "v16@0:8",
+      "imp": "0x10595b110",
+      "metadata_offset": "0x17486e44"
+    },
+    {
+      "selector": "clearEcsGiftUnhandledFlag",
+      "encoding": "v16@0:8",
+      "imp": "0x10595b1d8",
+      "metadata_offset": "0x17486e50"
+    },
+    {
+      "selector": "shouldHideToolViewWhenKeyboardHide",
+      "encoding": "B16@0:8",
+      "imp": "0x10595b2a0",
+      "metadata_offset": "0x17486e5c"
+    },
+    {
+      "selector": "onChatroomMemberRemoveViewCancel",
+      "encoding": "v16@0:8",
+      "imp": "0x10595b314",
+      "metadata_offset": "0x17486e68"
+    },
+    {
+      "selector": "clickLinkToDealWithSysXml:fromScene:",
+      "encoding": "v32@0:8@16@24",
+      "imp": "0x10595b318",
+      "metadata_offset": "0x17486e74"
+    },
+    {
+      "selector": "onClickJumpToSession:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10595b58c",
+      "metadata_offset": "0x17486e80"
+    },
+    {
+      "selector": "onClickPatMessageLinkWithUrl:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10595b650",
+      "metadata_offset": "0x17486e8c"
+    },
+    {
+      "selector": "getTargetProfileFromURL:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x10595b98c",
+      "metadata_offset": "0x17486e98"
+    },
+    {
+      "selector": "jumpToProfile:fromPatMessage:",
+      "encoding": "v28@0:8@16B24",
+      "imp": "0x10595b9a8",
+      "metadata_offset": "0x17486ea4"
+    },
+    {
+      "selector": "jumpToSession:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10595bcec",
+      "metadata_offset": "0x17486eb0"
+    },
+    {
+      "selector": "approveMembersFromApproveScene:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10595bf74",
+      "metadata_offset": "0x17486ebc"
+    },
+    {
+      "selector": "chatRoomAdminFromAdminExplainScene:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10595c130",
+      "metadata_offset": "0x17486ec8"
+    },
+    {
+      "selector": "getResultWithRegularInString:WithPatterns:",
+      "encoding": "@32@0:8@16@24",
+      "imp": "0x10595c1f8",
+      "metadata_offset": "0x17486ed4"
+    },
+    {
+      "selector": "onApproveInvitationSuccess:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10595c2b4",
+      "metadata_offset": "0x17486ee0"
+    },
+    {
+      "selector": "sendInviteFromApproveToInviterScene:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10595c360",
+      "metadata_offset": "0x17486eec"
+    },
+    {
+      "selector": "OnInviteChatRoomMember:Ret:Error:withUserData:",
+      "encoding": "v44@0:8@16i24@28@36",
+      "imp": "0x10595c600",
+      "metadata_offset": "0x17486ef8"
+    },
+    {
+      "selector": "processNewXMLInInviteScene:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10595c9cc",
+      "metadata_offset": "0x17486f04"
+    },
+    {
+      "selector": "delChatRoomMemberFromInvitionScene:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10595d230",
+      "metadata_offset": "0x17486f10"
+    },
+    {
+      "selector": "delChatRoomMemberFromQRcodeScene:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10595d350",
+      "metadata_offset": "0x17486f1c"
+    },
+    {
+      "selector": "removeChatRoomMember:scene:",
+      "encoding": "v32@0:8@16Q24",
+      "imp": "0x10595d814",
+      "metadata_offset": "0x17486f28"
+    },
+    {
+      "selector": "revokeChatRoomQRCode:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10595dad8",
+      "metadata_offset": "0x17486f34"
+    },
+    {
+      "selector": "checkAndBrowseRoomHistory:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10595dd44",
+      "metadata_offset": "0x17486f40"
+    },
+    {
+      "selector": "isFromChatBoxList",
+      "encoding": "B16@0:8",
+      "imp": "0x10595e044",
+      "metadata_offset": "0x17486f4c"
+    },
+    {
+      "selector": "actionSheet:clickedButtonAtIndex:",
+      "encoding": "v32@0:8@16q24",
+      "imp": "0x10595e0c0",
+      "metadata_offset": "0x17486f58"
+    },
+    {
+      "selector": "onClickDelete",
+      "encoding": "v16@0:8",
+      "imp": "0x10595e9e4",
+      "metadata_offset": "0x17486f64"
+    },
+    {
+      "selector": "realDoDelete",
+      "encoding": "v16@0:8",
+      "imp": "0x10595ec78",
+      "metadata_offset": "0x17486f70"
+    },
+    {
+      "selector": "newMessageFromChatRoomInfo:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10595eee0",
+      "metadata_offset": "0x17486f7c"
+    },
+    {
+      "selector": "onModifyContact:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10595ef4c",
+      "metadata_offset": "0x17486f88"
+    },
+    {
+      "selector": "CanRemoteRecord",
+      "encoding": "B16@0:8",
+      "imp": "0x10595f4f0",
+      "metadata_offset": "0x17486f94"
+    },
+    {
+      "selector": "existEmptyMemberContact",
+      "encoding": "B16@0:8",
+      "imp": "0x10595f4f8",
+      "metadata_offset": "0x17486fa0"
+    },
+    {
+      "selector": "ViewWillInit",
+      "encoding": "v16@0:8",
+      "imp": "0x10595f718",
+      "metadata_offset": "0x17486fac"
+    },
+    {
+      "selector": "chatRoomNeedGetContact",
+      "encoding": "B16@0:8",
+      "imp": "0x10595fa38",
+      "metadata_offset": "0x17486fb8"
+    },
+    {
+      "selector": "showRoomContactSelectorViewController",
+      "encoding": "v16@0:8",
+      "imp": "0x10595fadc",
+      "metadata_offset": "0x17486fc4"
+    },
+    {
+      "selector": "isLastCharacterAlphaNumeric:",
+      "encoding": "B24@0:8@16",
+      "imp": "0x10595fe70",
+      "metadata_offset": "0x17486fd0"
+    },
+    {
+      "selector": "onTextChange:selectedRange:markedRange:",
+      "encoding": "v56@0:8@16{_NSRange=QQ}24{_NSRange=QQ}40",
+      "imp": "0x10595ff78",
+      "metadata_offset": "0x17486fdc"
+    },
+    {
+      "selector": "didSelectContact:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1059601d0",
+      "metadata_offset": "0x17486fe8"
+    },
+    {
+      "selector": "didMultiSelectContact:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105960328",
+      "metadata_offset": "0x17486ff4"
+    },
+    {
+      "selector": "getAtUserContactDisplayName:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x105960578",
+      "metadata_offset": "0x17487000"
+    },
+    {
+      "selector": "onCancelSelectContact",
+      "encoding": "v16@0:8",
+      "imp": "0x1059606cc",
+      "metadata_offset": "0x1748700c"
+    },
+    {
+      "selector": "onRevokeChatroomQRCode:success:errTip:",
+      "encoding": "v36@0:8@16B24@28",
+      "imp": "0x105960748",
+      "metadata_offset": "0x17487018"
+    },
+    {
+      "selector": "onSetStrangerRemark:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1059609f8",
+      "metadata_offset": "0x17487024"
+    },
+    {
+      "selector": "onTipsShowInfoChangeWithPathKey:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105960a68",
+      "metadata_offset": "0x17487030"
+    },
+    {
+      "selector": "updateChatroomContact:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105960d8c",
+      "metadata_offset": "0x1748703c"
+    },
+    {
+      "selector": "OnChangeGroup:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105960e94",
+      "metadata_offset": "0x17487048"
+    },
+    {
+      "selector": "OnChangeMemberDisplayName:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105960f44",
+      "metadata_offset": "0x17487054"
+    },
+    {
+      "selector": "OnChangeMemberShowDisplayName:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105961000",
+      "metadata_offset": "0x17487060"
+    },
+    {
+      "selector": "OnChangeMemberVerifyStatus:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1059610bc",
+      "metadata_offset": "0x1748706c"
+    },
+    {
+      "selector": "OnChangeNotifyStatus:withStatus:",
+      "encoding": "v28@0:8@16B24",
+      "imp": "0x1059611a8",
+      "metadata_offset": "0x17487078"
+    },
+    {
+      "selector": "OnDelGroupMember:withResult:memberList:errTip:",
+      "encoding": "v44@0:8@16I24@28@36",
+      "imp": "0x105961280",
+      "metadata_offset": "0x17487084"
+    },
+    {
+      "selector": "OnUpdateApproveMessage:MessageWrap:",
+      "encoding": "v32@0:8@16@24",
+      "imp": "0x105961590",
+      "metadata_offset": "0x17487090"
+    },
+    {
+      "selector": "mainSwitch_shouldHandleAppmsg",
+      "encoding": "B16@0:8",
+      "imp": "0x105961620",
+      "metadata_offset": "0x1748709c"
+    },
+    {
+      "selector": "inPageSwitch_shouldPreCreateAndUpdateAndTryReport",
+      "encoding": "B16@0:8",
+      "imp": "0x105961628",
+      "metadata_offset": "0x174870a8"
+    },
+    {
+      "selector": "shouldPreDownloadPageData",
+      "encoding": "B16@0:8",
+      "imp": "0x1059616d4",
+      "metadata_offset": "0x174870b4"
+    },
+    {
+      "selector": "currPageAppmsgEnterType",
+      "encoding": "I16@0:8",
+      "imp": "0x105961780",
+      "metadata_offset": "0x174870c0"
+    },
+    {
+      "selector": "currPageAppmsgReportScene",
+      "encoding": "I16@0:8",
+      "imp": "0x105961788",
+      "metadata_offset": "0x174870cc"
+    },
+    {
+      "selector": "onWCGroupUpdateUndoneItem:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105961790",
+      "metadata_offset": "0x174870d8"
+    },
+    {
+      "selector": "onWCGroupDisposeUndoneItem:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105961870",
+      "metadata_offset": "0x174870e4"
+    },
+    {
+      "selector": "onWCGroupCompleteUndoneItem:result:",
+      "encoding": "v28@0:8@16B24",
+      "imp": "0x105961960",
+      "metadata_offset": "0x174870f0"
+    },
+    {
+      "selector": "onWCGroupRevokeUndoneItem:result:",
+      "encoding": "v28@0:8@16B24",
+      "imp": "0x105961a48",
+      "metadata_offset": "0x174870fc"
+    },
+    {
+      "selector": "onWCGroupSetMessageUndone:result:",
+      "encoding": "v28@0:8@16B24",
+      "imp": "0x105961b4c",
+      "metadata_offset": "0x17487108"
+    },
+    {
+      "selector": "onWCGroupDeleteAll:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105961c34",
+      "metadata_offset": "0x17487114"
+    },
+    {
+      "selector": "doClickGroupUndoneItem:scene:",
+      "encoding": "v28@0:8@16I24",
+      "imp": "0x105961d44",
+      "metadata_offset": "0x17487120"
+    },
+    {
+      "selector": "doClickGroupUndoneItem:scene:doCheck:",
+      "encoding": "v32@0:8@16I24B28",
+      "imp": "0x105961d54",
+      "metadata_offset": "0x1748712c"
+    },
+    {
+      "selector": "doClickRoomTodoCustomLinkWithUrl:chatname:",
+      "encoding": "v32@0:8@16@24",
+      "imp": "0x1059621f0",
+      "metadata_offset": "0x17487138"
+    },
+    {
+      "selector": "showSettingRoomTodoActionSheetWithMessage:showEdu:",
+      "encoding": "v28@0:8@16B24",
+      "imp": "0x105962774",
+      "metadata_offset": "0x17487144"
+    },
+    {
+      "selector": "showRevokeGroupUndoneActionSheetWithObj:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105962aac",
+      "metadata_offset": "0x17487150"
+    },
+    {
+      "selector": "setMessageAsTodoEvent:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105962d60",
+      "metadata_offset": "0x1748715c"
+    },
+    {
+      "selector": "revokeGroupUndoneItem:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105962ff4",
+      "metadata_offset": "0x17487168"
+    },
+    {
+      "selector": "showFinderClubReddotIfNeeded:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10596339c",
+      "metadata_offset": "0x17487174"
+    },
+    {
+      "selector": "showHistoryRecordExpiredTips:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10596365c",
+      "metadata_offset": "0x17487180"
+    },
+    {
+      "selector": "showHistoryRecordDownloadFailTips:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10596372c",
+      "metadata_offset": "0x1748718c"
+    },
+    {
+      "selector": "showHistoryRevokeTips:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105963818",
+      "metadata_offset": "0x17487198"
+    },
+    {
+      "selector": "internalPushToHistoryRecord:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1059638e8",
+      "metadata_offset": "0x174871a4"
+    },
+    {
+      "selector": "onChatroomFinderClubInfoUpdated:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105963be4",
+      "metadata_offset": "0x174871b0"
+    },
+    {
+      "selector": "OnRoomHistoryDownloadExipired:DataId:",
+      "encoding": "v32@0:8@16@24",
+      "imp": "0x105963cf8",
+      "metadata_offset": "0x174871bc"
+    },
+    {
+      "selector": "OnRoomHistoryDownloadFail:DataId:",
+      "encoding": "v32@0:8@16@24",
+      "imp": "0x105963e3c",
+      "metadata_offset": "0x174871c8"
+    },
+    {
+      "selector": "OnRoomHistoryDownloadOK:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105963f80",
+      "metadata_offset": "0x174871d4"
+    },
+    {
+      "selector": "isEnableTopicSearchInteraction",
+      "encoding": "B16@0:8",
+      "imp": "0x1059640c4",
+      "metadata_offset": "0x174871e0"
+    },
+    {
+      "selector": "isEnableTopicSearchShare",
+      "encoding": "B16@0:8",
+      "imp": "0x10596415c",
+      "metadata_offset": "0x174871ec"
+    },
+    {
+      "selector": "onClickTopicSearchEntry",
+      "encoding": "v16@0:8",
+      "imp": "0x1059641f4",
+      "metadata_offset": "0x174871f8"
+    },
+    {
+      "selector": "showTagHalfScreenQueryViewController:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105964480",
+      "metadata_offset": "0x17487204"
+    },
+    {
+      "selector": "onTopicSearchResultSended:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105964524",
+      "metadata_offset": "0x17487210"
+    },
+    {
+      "selector": "onTopicSearchQuerySelected:context:",
+      "encoding": "v32@0:8@16@24",
+      "imp": "0x105964580",
+      "metadata_offset": "0x1748721c"
+    },
+    {
+      "selector": "onTopicSearchCancel:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105964644",
+      "metadata_offset": "0x17487228"
+    },
+    {
+      "selector": "onGrowTextViewDidShowMenuControllerWithMenuItemArr:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1059646a0",
+      "metadata_offset": "0x17487234"
+    },
+    {
+      "selector": "onGrowTextViewMenuItemClicked:growTextView:",
+      "encoding": "v32@0:8Q16@24",
+      "imp": "0x1059649b0",
+      "metadata_offset": "0x17487240"
+    },
+    {
+      "selector": "baseContactToForwardSearchResult",
+      "encoding": "@16@0:8",
+      "imp": "0x105964d2c",
+      "metadata_offset": "0x1748724c"
+    },
+    {
+      "selector": "supportWXKeyBoard",
+      "encoding": "B16@0:8",
+      "imp": "0x105964dc0",
+      "metadata_offset": "0x17487258"
+    },
+    {
+      "selector": "getBaseMsgContentViewScene",
+      "encoding": "I16@0:8",
+      "imp": "0x105964e00",
+      "metadata_offset": "0x17487264"
+    },
+    {
+      "selector": "onScrollViewDidEndDragging:willDecelerate:",
+      "encoding": "v28@0:8@16B24",
+      "imp": "0x105964e08",
+      "metadata_offset": "0x17487270"
+    },
+    {
+      "selector": "topicSearchVC",
+      "encoding": "@16@0:8",
+      "imp": "0x105964e60",
+      "metadata_offset": "0x1748727c"
+    },
+    {
+      "selector": "setTopicSearchVC:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105964e80",
+      "metadata_offset": "0x17487288"
+    },
+    {
+      "selector": "chatroomUnavailableTipsView",
+      "encoding": "@16@0:8",
+      "imp": "0x105964e94",
+      "metadata_offset": "0x17487294"
+    },
+    {
+      "selector": "setChatroomUnavailableTipsView:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105964ea4",
+      "metadata_offset": "0x174872a0"
+    },
+    {
+      "selector": "inputToolView",
+      "encoding": "@16@0:8",
+      "imp": "0x105964eb8",
+      "metadata_offset": "0x174872ac"
+    },
+    {
+      "selector": "setInputToolView:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105964ed8",
+      "metadata_offset": "0x174872b8"
+    },
+    {
+      "selector": ".cxx_destruct",
+      "encoding": "v16@0:8",
+      "imp": "0x105964eec",
+      "metadata_offset": "0x174872c4"
+    }
+  ],
+  "ivars": [
+    {
+      "name": "m_bStartShowRoomContactSelector",
+      "encoding": "B"
+    },
+    {
+      "name": "m_ChatRoomInfoSettingMgr",
+      "encoding": "@\"ChatRoomInfoSettingMgr\""
+    },
+    {
+      "name": "m_bTipsShow",
+      "encoding": "B"
+    },
+    {
+      "name": "m_bPresentRoomContactSelector",
+      "encoding": "B"
+    },
+    {
+      "name": "m_forbidGetGroupMemberDetail",
+      "encoding": "B"
+    },
+    {
+      "name": "m_chatRoomUpgradeOpenIMLogic",
+      "encoding": "@\"ChatRoomUpgradeOpenIMLogic\""
+    },
+    {
+      "name": "m_chatRoomToolViewController",
+      "encoding": "@\"ChatRoomToolViewController\""
+    },
+    {
+      "name": "m_chatRoomDelMemController",
+      "encoding": "@\"RoomDelMemController\""
+    },
+    {
+      "name": "m_historyContext",
+      "encoding": "@\"RoomHistoryContext\""
+    },
+    {
+      "name": "m_reportController",
+      "encoding": "@\"RoomReportController\""
+    },
+    {
+      "name": "m_waitingChatRoomInfo",
+      "encoding": "B"
+    },
+    {
+      "name": "m_hadAttachmentRedDot",
+      "encoding": "B"
+    },
+    {
+      "name": "m_lastAtContact",
+      "encoding": "@\"CBaseContact\""
+    },
+    {
+      "name": "m_lastAtNickName",
+      "encoding": "@\"NSString\""
+    },
+    {
+      "name": "m_lastAtHeadUrl",
+      "encoding": "@\"NSString\""
+    },
+    {
+      "name": "_topicSearchVC",
+      "encoding": "@\"WCTopicSearchViewController\""
+    },
+    {
+      "name": "_chatroomUnavailableTipsView",
+      "encoding": "@\"ChatUnavailableTipsView\""
+    },
+    {
+      "name": "_inputToolView",
+      "encoding": "@\"MMInputToolView\""
+    }
+  ]
+}

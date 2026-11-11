@@ -1,0 +1,62 @@
+[
+  {
+    "class": "BaseMsgContentLogicController",
+    "method": {
+      "selector": "SendTextMessage:externInfo:",
+      "types": "v32@0:8@16@24",
+      "imp": "0x1002d4bf4"
+    },
+    "end": "0x1002d4f4c",
+    "file": "BaseMsgContentLogicController-SendTextMessage_externInfo_.asm",
+    "exit_code": 0,
+    "stderr": ""
+  },
+  {
+    "class": "BaseMsgContentLogicController",
+    "method": {
+      "selector": "AddAtUser:",
+      "types": "v24@0:8@16",
+      "imp": "0x1002d9e74"
+    },
+    "end": "0x1002d9e78",
+    "file": "BaseMsgContentLogicController-AddAtUser_.asm",
+    "exit_code": 0,
+    "stderr": ""
+  },
+  {
+    "class": "BaseMsgContentLogicController",
+    "method": {
+      "selector": "genMsgSource",
+      "types": "@16@0:8",
+      "imp": "0x1002e44bc"
+    },
+    "end": "0x1002e45fc",
+    "file": "BaseMsgContentLogicController-genMsgSource.asm",
+    "exit_code": 0,
+    "stderr": ""
+  },
+  {
+    "class": "CMessageWrap",
+    "method": {
+      "selector": "setM_nsAtUserList:",
+      "types": "v24@0:8@16",
+      "imp": "0x104e51b60"
+    },
+    "end": "0x104e51bb0",
+    "file": "CMessageWrap-setM_nsAtUserList_.asm",
+    "exit_code": 0,
+    "stderr": ""
+  },
+  {
+    "class": "CMessageWrap",
+    "method": {
+      "selector": "UpdateMsgSource",
+      "types": "v16@0:8",
+      "imp": "0x104e56c04"
+    },
+    "end": "0x104e57ef0",
+    "file": "CMessageWrap-UpdateMsgSource.asm",
+    "exit_code": 0,
+    "stderr": ""
+  }
+]

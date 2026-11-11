@@ -1,0 +1,2 @@
+quiet-active evidence: native requests=2, current baselineVersion=2, welcomes=1, old observation gap=300s, joinTimes=absent
+Group chat welcome quiet-active: 6 checks passed

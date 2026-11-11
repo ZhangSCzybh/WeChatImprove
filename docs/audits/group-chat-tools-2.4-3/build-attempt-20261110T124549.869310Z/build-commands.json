@@ -1,0 +1,46 @@
+[
+  {
+    "scheme": "rootless",
+    "command": [
+      "make",
+      "package",
+      "-j4",
+      "SCHEME=rootless",
+      "PACKAGE_VERSION=2.4-3",
+      "_THEOS_LOCAL_DATA_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-release-2.4-3-group-chat-tools-build-fcifz97s/rootless/.theos",
+      "THEOS_OBJ_DIR_NAME=obj",
+      "THEOS_STAGING_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-release-2.4-3-group-chat-tools-build-fcifz97s/rootless/staging",
+      "THEOS_BUILD_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-release-2.4-3-group-chat-tools-build-fcifz97s/rootless",
+      "THEOS_PACKAGE_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-release-2.4-3-group-chat-tools-build-fcifz97s/rootless/packages"
+    ],
+    "exit_code": 0,
+    "seconds": 24.83,
+    "log": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/group-chat-tools-2.4-3/build-attempt-20261110T124549.869310Z/rootless-build.log",
+    "warning_count": 8,
+    "object_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-release-2.4-3-group-chat-tools-build-fcifz97s/rootless/.theos/obj",
+    "staging_dir": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-release-2.4-3-group-chat-tools-build-fcifz97s/rootless/staging",
+    "package_dir": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-release-2.4-3-group-chat-tools-build-fcifz97s/rootless/packages"
+  },
+  {
+    "scheme": "rootful",
+    "command": [
+      "make",
+      "package",
+      "-j4",
+      "SCHEME=rootful",
+      "PACKAGE_VERSION=2.4-3",
+      "_THEOS_LOCAL_DATA_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-release-2.4-3-group-chat-tools-build-fcifz97s/rootful/.theos",
+      "THEOS_OBJ_DIR_NAME=obj",
+      "THEOS_STAGING_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-release-2.4-3-group-chat-tools-build-fcifz97s/rootful/staging",
+      "THEOS_BUILD_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-release-2.4-3-group-chat-tools-build-fcifz97s/rootful",
+      "THEOS_PACKAGE_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-release-2.4-3-group-chat-tools-build-fcifz97s/rootful/packages"
+    ],
+    "exit_code": 0,
+    "seconds": 24.74,
+    "log": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/group-chat-tools-2.4-3/build-attempt-20261110T124549.869310Z/rootful-build.log",
+    "warning_count": 8,
+    "object_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-release-2.4-3-group-chat-tools-build-fcifz97s/rootful/.theos/obj",
+    "staging_dir": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-release-2.4-3-group-chat-tools-build-fcifz97s/rootful/staging",
+    "package_dir": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-release-2.4-3-group-chat-tools-build-fcifz97s/rootful/packages"
+  }
+]

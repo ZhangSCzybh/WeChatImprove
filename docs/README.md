@@ -1,11 +1,19 @@
 # 文档索引
 
-当前发布记录：[2.4-2 语音气泡进度与拖动播放](audits/voice-playback-controls-2026-11-10/README.md)。
+当前发布记录：[2.4-8 群聊文案编辑页布局统一](audits/2.4-8/README.md)。
 
 2.3-4 同时保留 2.3-1～2.3-3 的发现页外观、添加入口和编辑页布局修复。
 
 ## 近期修复与分析
 
+- [2.4-8：群聊文案编辑页布局统一](audits/2.4-8/README.md)
+- [2.4-7：后台执行机会下的群聊通知](audits/2.4-7/README.md)
+- [2.4-6：群聊跟随全局后台运行设置](audits/2.4-6/README.md)
+- [2.4-5：微信 ID 变量与群聊后台处理](audits/2.4-5/README.md)
+- [2.4-4：本群退群通知与成员变化补查](audits/2.4-4/README.md)
+- [2.4-3-1：入群欢迎漏发修复](audits/group-chat-welcome-fix-2.4-3-1/README.md)
+- [2.4-3：群聊功能实现与交付](audits/group-chat-tools-2.4-3/README.md)
+- [群聊原生接口设计证据](audits/group-chat-design-2026-11-10/README.md)
 - [2.4-2：语音气泡进度与拖动播放](audits/voice-playback-controls-2026-11-10/README.md)
 
 - [2.4-1：收藏语音转发与正式发布核验](audits/release-2.4-1-favorite-voice-forward/README.md)

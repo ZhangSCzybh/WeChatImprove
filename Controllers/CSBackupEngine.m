@@ -7,6 +7,7 @@
 #import "CSBackupRestoreDiagnostics.h"
 #import "CSScheduledTaskStore.h"
 #import "CSAIReplyStore.h"
+#import "CSGroupChatStore.h"
 #import <sys/stat.h>
 static NSString *const Profiles=@"com.wechat.enhance.chat_group.account_profiles";
 static NSString *const Selection=@"com.wechat.enhance.chat_group.selection.";
@@ -89,7 +90,7 @@ static NSString *StartupSession(void){static NSString *identifier;static dispatc
 - (NSArray *)rawFields:(NSError **)error {
     NSArray *fields=[self preferenceFields:error];if(!fields)return nil;
     NSMutableArray *result=[fields mutableCopy];NSString *account=self.context()[@"account"];
-    if(account.length){NSDictionary *scheduled=[self scheduledFieldForAccount:account error:error];if(!scheduled)return nil;if([scheduled[@"present"] boolValue])[result addObject:scheduled];NSDictionary *ai=[self aiFieldForAccount:account error:error];if(!ai)return nil;if([ai[@"present"] boolValue])[result addObject:ai];}
+    if(account.length){NSDictionary *scheduled=[self scheduledFieldForAccount:account error:error];if(!scheduled)return nil;if([scheduled[@"present"] boolValue])[result addObject:scheduled];NSDictionary *ai=[self aiFieldForAccount:account error:error];if(!ai)return nil;if([ai[@"present"] boolValue])[result addObject:ai];NSDictionary *groups=[self groupChatFieldForAccount:account error:error];if(!groups)return nil;if([groups[@"present"] boolValue])[result addObject:groups];}
     [result sortUsingComparator:^NSComparisonResult(NSDictionary *a,NSDictionary *b){return [Identity(a) compare:Identity(b)];}];return result;
 }
 - (NSDictionary *)scheduledFieldForAccount:(NSString *)account error:(NSError **)error {
@@ -103,6 +104,12 @@ static NSString *StartupSession(void){static NSString *identifier;static dispatc
     NSError *failure=nil;NSDictionary *state=[CSAIReplyStore readStateAtURL:CSAIReplyFileURL(self.resourceRoot,account) account:account error:&failure];
     if(failure){if(error)*error=failure;return nil;}
     NSMutableDictionary *field=[@{@"domain":CSAIReplyBackupDomain,@"key":account,@"present":state?@YES:@NO} mutableCopy];if(state)field[@"value"]=state;return field;
+}
+- (NSDictionary *)groupChatFieldForAccount:(NSString *)account error:(NSError **)error {
+    if(![CSBackupRegistry entryForDomain:CSGroupChatBackupDomain key:account]){EngineFail(error,@"群聊功能配置所属账号无效");return nil;}
+    NSError *failure=nil;NSDictionary *state=CSGroupChatReadState(CSGroupChatFileURL(self.resourceRoot,account),account,&failure);
+    if(failure){if(error)*error=failure;return nil;}
+    NSMutableDictionary *field=[@{@"domain":CSGroupChatBackupDomain,@"key":account,@"present":state?@YES:@NO} mutableCopy];if(state)field[@"value"]=state;return field;
 }
 - (NSArray *)readRawFields:(NSError **)error {
     NSMutableDictionary *values=[NSMutableDictionary dictionary];
@@ -203,6 +210,9 @@ static NSString *StartupSession(void){static NSString *identifier;static dispatc
                 state[@"configuration"]=configuration;state[@"handled"]=@{};state[@"history"]=@[];f[@"value"]=state;
                 [warnings addObject:@"AI 回复恢复后总开关关闭；API Key、连接验证和运行记录不随备份导入。请重新设置 Key 并测试连接。"];
             }
+        }else if([f[@"domain"] isEqual:CSGroupChatBackupDomain]) {
+            if(![accounts containsObject:key] || ![key isEqual:context[@"account"]] || ![key isEqual:source[@"account"]]){[warnings addObject:@"已跳过其他账号的群聊功能配置：请登录备份原账号后恢复。"];continue;}
+            if([f[@"present"] boolValue])[warnings addObject:@"群聊功能恢复所选群、文案、延迟和开关；重新建立成员基线，不导入待发送欢迎或批量退群任务，也不补发历史事件。"];
         }else if([key isEqual:Profiles]) {
             if(!accounts.count)continue;
             NSDictionary *old=byID[Identity(f)][@"value"]?:@{};NSMutableDictionary *merged=[old mutableCopy];NSDictionary *incoming=f[@"value"]?:@{};
@@ -221,8 +231,8 @@ static NSString *StartupSession(void){static NSString *identifier;static dispatc
     NSArray *raw=[self preferenceFields:error];if(!raw)return nil;NSMutableDictionary *byID=[NSMutableDictionary dictionary];for(NSDictionary *f in raw)byID[Identity(f)]=f;
     NSMutableArray *result=[NSMutableArray array];for(NSDictionary *f in fields){
         // Rollback may run after an account change; verify the journal's original file.
-        NSDictionary *before=[f[@"domain"] isEqual:CSScheduledTaskBackupDomain]?[self scheduledFieldForAccount:f[@"key"] error:error]:([f[@"domain"] isEqual:CSAIReplyBackupDomain]?[self aiFieldForAccount:f[@"key"] error:error]:byID[Identity(f)]);
-        if(([f[@"domain"] isEqual:CSScheduledTaskBackupDomain]||[f[@"domain"] isEqual:CSAIReplyBackupDomain])&&!before)return nil;
+        NSDictionary *before=[f[@"domain"] isEqual:CSScheduledTaskBackupDomain]?[self scheduledFieldForAccount:f[@"key"] error:error]:([f[@"domain"] isEqual:CSAIReplyBackupDomain]?[self aiFieldForAccount:f[@"key"] error:error]:([f[@"domain"] isEqual:CSGroupChatBackupDomain]?[self groupChatFieldForAccount:f[@"key"] error:error]:byID[Identity(f)]));
+        if(([f[@"domain"] isEqual:CSScheduledTaskBackupDomain]||[f[@"domain"] isEqual:CSAIReplyBackupDomain]||[f[@"domain"] isEqual:CSGroupChatBackupDomain])&&!before)return nil;
         [result addObject:before?:@{@"domain":f[@"domain"],@"key":f[@"key"],@"present":@NO}];
     }return result;
 }
@@ -258,6 +268,7 @@ static NSString *StartupSession(void){static NSString *identifier;static dispatc
     for(NSString *part in @[@"before",@"after"]){NSArray *fields=journal[part];if(![fields isKindOfClass:NSArray.class]||fields.count>4096)return EngineFail(error,@"恢复日志配置列表无效");
         NSMutableSet *seen=[NSMutableSet set];for(NSDictionary *f in fields){if(![f isKindOfClass:NSDictionary.class])return EngineFail(error,@"恢复字段损坏");NSDictionary *entry=[CSBackupRegistry entryForDomain:f[@"domain"] key:f[@"key"]];if(!entry||![f[@"present"] isKindOfClass:NSNumber.class]||[seen containsObject:Identity(f)])return EngineFail(error,@"恢复日志包含未登记或重复的配置");[seen addObject:Identity(f)];if([f[@"present"] boolValue]&&![CSBackupRegistry validateValue:f[@"value"] entry:entry error:error])return NO;
             if([f[@"domain"] isEqual:CSAIReplyBackupDomain]&&(![f[@"key"] isEqual:journal[@"account"]]||([f[@"present"] boolValue]&&(!f[@"value"][@"history"]||!f[@"value"][@"handled"]))))return EngineFail(error,@"AI 回复恢复日志所属账号或状态无效");
+            if([f[@"domain"] isEqual:CSGroupChatBackupDomain]&&![f[@"key"] isEqual:journal[@"account"]])return EngineFail(error,@"群聊功能恢复日志所属账号无效");
             if([f[@"domain"] isEqual:CSScheduledTaskBackupDomain]&&(![f[@"key"] isEqual:journal[@"account"]]||([f[@"present"] boolValue]&&!f[@"value"][@"history"])))return EngineFail(error,@"定时任务恢复日志所属账号或状态无效");}
     }
     for(NSString *part in @[@"beforeWrites",@"afterWrites"]){NSDictionary *writes=journal[part];if(![writes isKindOfClass:NSDictionary.class]||writes.count>256)return EngineFail(error,@"恢复日志资源无效");
@@ -285,6 +296,14 @@ static NSString *StartupSession(void){static NSString *identifier;static dispatc
         if([f[@"domain"] isEqual:CSAIReplyBackupDomain]){
             BOOL ok=[CSAIReplyStore replaceState:[f[@"present"] boolValue]?f[@"value"]:nil atURL:CSAIReplyFileURL(self.resourceRoot,f[@"key"]) account:f[@"key"] error:error];
             if(!ok)return NO;if(self.checkpoint)self.checkpoint(@"preference");continue;
+        }
+        if([f[@"domain"] isEqual:CSGroupChatBackupDomain]){
+            NSURL *url=CSGroupChatFileURL(self.resourceRoot,f[@"key"]);NSDictionary *details=@{@"path":url.path,@"action":[f[@"present"] boolValue]?@"write":@"reset"};
+            [self.store recordRestoreStage:@"write-group-chat-tools" status:@"started" error:nil details:details];NSError *failure=nil;
+            BOOL ok=CSGroupChatWriteState([f[@"present"] boolValue]?f[@"value"]:nil,url,f[@"key"],&failure);
+            [self.store recordRestoreStage:@"write-group-chat-tools" status:ok?@"ok":@"failed" error:failure details:details];
+            if(!ok){if(error)*error=failure;return NO;}
+            if(self.checkpoint)self.checkpoint(@"group-chat-tools");continue;
         }
         if([f[@"domain"] isEqual:CSScheduledTaskBackupDomain]){
             NSURL *url=CSScheduledTaskFileURL(self.resourceRoot,f[@"key"]);NSDictionary *details=@{@"path":url.path,@"action":[f[@"present"] boolValue]?@"write":@"reset"};

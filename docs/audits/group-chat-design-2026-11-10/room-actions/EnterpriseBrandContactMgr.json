@@ -1,0 +1,140 @@
+{
+  "name": "EnterpriseBrandContactMgr",
+  "class_offset": "0x1ee7e0a8",
+  "superclass": "MMUserService",
+  "methods": [
+    {
+      "selector": "init",
+      "encoding": "@16@0:8",
+      "imp": "0x1017127c0",
+      "metadata_offset": "0x171da580"
+    },
+    {
+      "selector": "getEnabledSubBrandContactList:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x101712848",
+      "metadata_offset": "0x171da58c"
+    },
+    {
+      "selector": "getDisabledSubBrandContactList:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x101712ac0",
+      "metadata_offset": "0x171da598"
+    },
+    {
+      "selector": "getEnterpriseChatContact:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x101712d38",
+      "metadata_offset": "0x171da5a4"
+    },
+    {
+      "selector": "getEnterpriseChatExtendContacts:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x101712f7c",
+      "metadata_offset": "0x171da5b0"
+    },
+    {
+      "selector": "hasChatExtendSubBrand:",
+      "encoding": "B24@0:8@16",
+      "imp": "0x101713238",
+      "metadata_offset": "0x171da5bc"
+    },
+    {
+      "selector": "getSubBrandContacts:ForConnectMsgType:",
+      "encoding": "@32@0:8@16Q24",
+      "imp": "0x101713288",
+      "metadata_offset": "0x171da5c8"
+    },
+    {
+      "selector": "hasMainBrandForConnectMsgType:",
+      "encoding": "B24@0:8Q16",
+      "imp": "0x101713538",
+      "metadata_offset": "0x171da5d4"
+    },
+    {
+      "selector": "getMainAndChatBrandListForConnectMsgType:",
+      "encoding": "@24@0:8Q16",
+      "imp": "0x101713588",
+      "metadata_offset": "0x171da5e0"
+    },
+    {
+      "selector": "sortMainAndChatBrandContacts:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x101713994",
+      "metadata_offset": "0x171da5ec"
+    },
+    {
+      "selector": "updateEnterpriseBrandContactOfMainBrand:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1017139e4",
+      "metadata_offset": "0x171da5f8"
+    },
+    {
+      "selector": "forceUpdateEnterpriseBrandContact:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x101713dc4",
+      "metadata_offset": "0x171da604"
+    },
+    {
+      "selector": "switchBrandContact:enable:",
+      "encoding": "v28@0:8@16B24",
+      "imp": "0x101713f48",
+      "metadata_offset": "0x171da610"
+    },
+    {
+      "selector": "handleSwitchBrandContact:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1017140ac",
+      "metadata_offset": "0x171da61c"
+    },
+    {
+      "selector": "callEnterpriseBrandContactModifiedExtension:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1017142b0",
+      "metadata_offset": "0x171da628"
+    },
+    {
+      "selector": "callEnterpriseBrandAttrChangedExtension:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1017143a4",
+      "metadata_offset": "0x171da634"
+    },
+    {
+      "selector": "callEnterpriseBrandContactDeletedExtension:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x101714498",
+      "metadata_offset": "0x171da640"
+    },
+    {
+      "selector": "callEnterpriseBrandSyncedExtension:extParams:",
+      "encoding": "v32@0:8@16@24",
+      "imp": "0x10171458c",
+      "metadata_offset": "0x171da64c"
+    },
+    {
+      "selector": "onModifyContact:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1017146b0",
+      "metadata_offset": "0x171da658"
+    },
+    {
+      "selector": "onDeleteContact:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1017147e0",
+      "metadata_offset": "0x171da664"
+    },
+    {
+      "selector": "onRemoveContactFromAddressBook:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1017148e0",
+      "metadata_offset": "0x171da670"
+    },
+    {
+      "selector": "MessageReturn:Event:",
+      "encoding": "v28@0:8@16I24",
+      "imp": "0x1017148ec",
+      "metadata_offset": "0x171da67c"
+    }
+  ],
+  "ivars": []
+}

@@ -1,0 +1,123 @@
+{
+  "name": "MCSBrandContactMgr",
+  "class_offset": "0x1eeace58",
+  "superclass": "NSObject",
+  "methods": [
+    {
+      "selector": "init",
+      "encoding": "@16@0:8",
+      "imp": "0x10245cad8",
+      "metadata_offset": "0x17276470"
+    },
+    {
+      "selector": "initData",
+      "encoding": "v16@0:8",
+      "imp": "0x10245cb74",
+      "metadata_offset": "0x1727647c"
+    },
+    {
+      "selector": "setDeclineFactor",
+      "encoding": "v16@0:8",
+      "imp": "0x10245cc58",
+      "metadata_offset": "0x17276488"
+    },
+    {
+      "selector": "tryUpdateData",
+      "encoding": "v16@0:8",
+      "imp": "0x10245cd28",
+      "metadata_offset": "0x17276494"
+    },
+    {
+      "selector": "cleanData",
+      "encoding": "v16@0:8",
+      "imp": "0x10245cfec",
+      "metadata_offset": "0x172764a0"
+    },
+    {
+      "selector": "getMCSArray",
+      "encoding": "@16@0:8",
+      "imp": "0x10245d080",
+      "metadata_offset": "0x172764ac"
+    },
+    {
+      "selector": "removeItem:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10245d088",
+      "metadata_offset": "0x172764b8"
+    },
+    {
+      "selector": "onSelectContact:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10245d2b4",
+      "metadata_offset": "0x172764c4"
+    },
+    {
+      "selector": "addScore:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10245d334",
+      "metadata_offset": "0x172764d0"
+    },
+    {
+      "selector": "pathForMCSFile",
+      "encoding": "@16@0:8",
+      "imp": "0x10245d734",
+      "metadata_offset": "0x172764dc"
+    },
+    {
+      "selector": "loadLocalData",
+      "encoding": "v16@0:8",
+      "imp": "0x10245d798",
+      "metadata_offset": "0x172764e8"
+    },
+    {
+      "selector": "trySaveData",
+      "encoding": "v16@0:8",
+      "imp": "0x10245d908",
+      "metadata_offset": "0x172764f4"
+    },
+    {
+      "selector": "onEnterBackGround",
+      "encoding": "v16@0:8",
+      "imp": "0x10245d9e0",
+      "metadata_offset": "0x17276500"
+    },
+    {
+      "selector": "onClearData",
+      "encoding": "v16@0:8",
+      "imp": "0x10245da14",
+      "metadata_offset": "0x1727650c"
+    },
+    {
+      "selector": "onAppTerminate",
+      "encoding": "v16@0:8",
+      "imp": "0x10245da58",
+      "metadata_offset": "0x17276518"
+    },
+    {
+      "selector": "onMMDynamicConfigUpdated",
+      "encoding": "v16@0:8",
+      "imp": "0x10245da8c",
+      "metadata_offset": "0x17276524"
+    },
+    {
+      "selector": ".cxx_destruct",
+      "encoding": "v16@0:8",
+      "imp": "0x10245da98",
+      "metadata_offset": "0x17276530"
+    }
+  ],
+  "ivars": [
+    {
+      "name": "_arrMCSItems",
+      "encoding": "@\"NSMutableArray\""
+    },
+    {
+      "name": "_lastUpdateTime",
+      "encoding": "I"
+    },
+    {
+      "name": "_bNeedSave",
+      "encoding": "B"
+    }
+  ]
+}

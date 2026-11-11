@@ -1,0 +1,364 @@
+{
+  "release": true,
+  "version": "2.4-3",
+  "checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "snapshot": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-release-2.4-3-group-chat-tools-build-57vnis13/source",
+  "work_directory": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-release-2.4-3-group-chat-tools-build-57vnis13",
+  "audit_directory": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/group-chat-tools-2.4-3/build-attempt-20261110T123940.740128Z",
+  "delivery_directory": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/packages/2.4-3-group-chat-tools",
+  "device_installed": false,
+  "builds": [
+    {
+      "scheme": "rootless",
+      "command": [
+        "make",
+        "package",
+        "-j4",
+        "SCHEME=rootless",
+        "PACKAGE_VERSION=2.4-3",
+        "_THEOS_LOCAL_DATA_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-release-2.4-3-group-chat-tools-build-57vnis13/rootless/.theos",
+        "THEOS_OBJ_DIR_NAME=obj",
+        "THEOS_STAGING_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-release-2.4-3-group-chat-tools-build-57vnis13/rootless/staging",
+        "THEOS_BUILD_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-release-2.4-3-group-chat-tools-build-57vnis13/rootless",
+        "THEOS_PACKAGE_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-release-2.4-3-group-chat-tools-build-57vnis13/rootless/packages"
+      ],
+      "exit_code": 0,
+      "seconds": 25.74,
+      "log": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/group-chat-tools-2.4-3/build-attempt-20261110T123940.740128Z/rootless-build.log",
+      "warning_count": 8,
+      "object_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-release-2.4-3-group-chat-tools-build-57vnis13/rootless/.theos/obj",
+      "staging_dir": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-release-2.4-3-group-chat-tools-build-57vnis13/rootless/staging",
+      "package_dir": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-release-2.4-3-group-chat-tools-build-57vnis13/rootless/packages"
+    },
+    {
+      "scheme": "rootful",
+      "command": [
+        "make",
+        "package",
+        "-j4",
+        "SCHEME=rootful",
+        "PACKAGE_VERSION=2.4-3",
+        "_THEOS_LOCAL_DATA_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-release-2.4-3-group-chat-tools-build-57vnis13/rootful/.theos",
+        "THEOS_OBJ_DIR_NAME=obj",
+        "THEOS_STAGING_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-release-2.4-3-group-chat-tools-build-57vnis13/rootful/staging",
+        "THEOS_BUILD_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-release-2.4-3-group-chat-tools-build-57vnis13/rootful",
+        "THEOS_PACKAGE_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-release-2.4-3-group-chat-tools-build-57vnis13/rootful/packages"
+      ],
+      "exit_code": 0,
+      "seconds": 25.74,
+      "log": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/docs/audits/group-chat-tools-2.4-3/build-attempt-20261110T123940.740128Z/rootful-build.log",
+      "warning_count": 8,
+      "object_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-release-2.4-3-group-chat-tools-build-57vnis13/rootful/.theos/obj",
+      "staging_dir": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-release-2.4-3-group-chat-tools-build-57vnis13/rootful/staging",
+      "package_dir": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-release-2.4-3-group-chat-tools-build-57vnis13/rootful/packages"
+    }
+  ],
+  "verified": [
+    {
+      "Package": "com.wechat.improve",
+      "Version": "2.4-3",
+      "Architecture": "iphoneos-arm64",
+      "scheme": "rootless",
+      "payload_path": "var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib",
+      "architectures": [
+        "arm64",
+        "arm64e"
+      ],
+      "dylib_sha256": "88e0ba719597d689bba044fd99ba1a8fbe3e41f41fdfc00bdba84b50e263915e",
+      "injection_filter": {
+        "Filter": {
+          "Bundles": [
+            "com.tencent.xin"
+          ],
+          "Executables": [
+            "ZYBH"
+          ]
+        }
+      },
+      "dsym_uuids": {
+        "arm64": "986C18EB-DFCF-3059-BDEE-A9EF3D4ABE13",
+        "arm64e": "347E11A8-1361-3D3C-820F-8D1001F6B794"
+      },
+      "symbol_evidence": {
+        "arm64": {
+          "thin_sha256": "12f17b143db176c48885fc20740ceafada093751e6fef00ba0a2ce2c7a8846cc",
+          "dwarf_sha256": "68a6118cfadb512b963e96473743cc29cb4e197f8e6f7fcae6abd8cae68b86e9",
+          "exported_markers": [
+            "_OBJC_CLASS_$_CSGroupChatManager",
+            "_OBJC_CLASS_$_CSGroupChatSettingsViewController",
+            "_OBJC_CLASS_$_CSGroupChatQuitCoordinator",
+            "_CSGroupChatPostDepartureNotice",
+            "_CSGroupChatInstallRuntimeHooks",
+            "_CSGroupChatSaveToContacts",
+            "_OBJC_CLASS_$_CSFavoriteVoiceContext",
+            "_OBJC_CLASS_$_CSFavoriteVoiceMediaProvider",
+            "_OBJC_CLASS_$_CSFavoriteVoiceForwardAdapter",
+            "_CSFavoriteHasPendingVoiceDownloads",
+            "_CSMessageValidateVoiceData",
+            "_CSMessageHasPendingVoiceDownloads",
+            "_OBJC_CLASS_$_CSMessageActionCoordinator",
+            "_OBJC_CLASS_$_CSVoiceForwardAdapter",
+            "_CSCFCurrentForwardRecipients",
+            "_OBJC_CLASS_$_CSVoicePlaybackController",
+            "_OBJC_CLASS_$_CSVoicePlaybackPreferences",
+            "_CSVoicePlaybackRefreshCell",
+            "_CSVoicePlaybackDetachCell",
+            "_CSVoicePlaybackOwnsTouch"
+          ],
+          "hook_markers": [
+            "_logos_method$_ungrouped$MsgPlayingFacade$OnBeginPlaying$success$",
+            "_logos_method$_ungrouped$MsgPlayingFacade$OnEndPlaying$isForceStop$",
+            "_logos_method$_ungrouped$VoiceMessageCellView$onBeginPlayingMsg$autoPlayEnabled$",
+            "_logos_method$_ungrouped$FavVoiceDetaiViewController$onAction$",
+            "_logos_method$_ungrouped$FavVoiceDetaiViewController$onFavActionSheetSelectedForwardToUser$",
+            "_logos_method$_ungrouped$FavActionSheet$initWithFavDelegate$enableType$",
+            "_logos_method$_ungrouped$MyFavoritesViewController$forwardData$",
+            "_logos_method$_ungrouped$FavoritesMgr$onDownloadFavoritesItemFinished$ErrCode$",
+            "_logos_method$_ungrouped$ForwardMessageLogicController$ForwardMsg$ToContact$",
+            "_logos_method$_ungrouped$VoiceMsgDownloader$OnRecvData$"
+          ],
+          "selector_markers": [
+            "OnGetChatRoomMemberDetail:",
+            "setM_nsAtUserList:",
+            "ShowInContactBook:sync:",
+            "startWithRoomNames:clearHistory:",
+            "csgroupmember_v1.",
+            "calcVoiceTimeWithData:VoiceFormat:",
+            "onMultiDone",
+            "onMultiDoneInPageSheetMode",
+            "m_dicMultiSelect",
+            "allValuesInOrder",
+            "m_selectView",
+            "FavDataItemWrap",
+            "currentPlayingMsg",
+            "currentPlayTime",
+            "seekToTime:",
+            "isMsgPlaying:",
+            "com.wechat.enhance.voice_playback.progress_enabled"
+          ],
+          "debug_markers": [
+            "+[CSFavoriteVoiceContext standaloneItemForListObject:]",
+            "-[CSVoicePlaybackController seekToTime:message:generation:]"
+          ]
+        },
+        "arm64e": {
+          "thin_sha256": "a3cb2416944dc7aadb14c8b4fe6b330ee3b9fcb9fc794e9b2b90ca7e6227ab2a",
+          "dwarf_sha256": "a240eb25d62d6709571124a39842e5227d329b7f2b38385b3df3e725d215e644",
+          "exported_markers": [
+            "_OBJC_CLASS_$_CSGroupChatManager",
+            "_OBJC_CLASS_$_CSGroupChatSettingsViewController",
+            "_OBJC_CLASS_$_CSGroupChatQuitCoordinator",
+            "_CSGroupChatPostDepartureNotice",
+            "_CSGroupChatInstallRuntimeHooks",
+            "_CSGroupChatSaveToContacts",
+            "_OBJC_CLASS_$_CSFavoriteVoiceContext",
+            "_OBJC_CLASS_$_CSFavoriteVoiceMediaProvider",
+            "_OBJC_CLASS_$_CSFavoriteVoiceForwardAdapter",
+            "_CSFavoriteHasPendingVoiceDownloads",
+            "_CSMessageValidateVoiceData",
+            "_CSMessageHasPendingVoiceDownloads",
+            "_OBJC_CLASS_$_CSMessageActionCoordinator",
+            "_OBJC_CLASS_$_CSVoiceForwardAdapter",
+            "_CSCFCurrentForwardRecipients",
+            "_OBJC_CLASS_$_CSVoicePlaybackController",
+            "_OBJC_CLASS_$_CSVoicePlaybackPreferences",
+            "_CSVoicePlaybackRefreshCell",
+            "_CSVoicePlaybackDetachCell",
+            "_CSVoicePlaybackOwnsTouch"
+          ],
+          "hook_markers": [
+            "_logos_method$_ungrouped$MsgPlayingFacade$OnBeginPlaying$success$",
+            "_logos_method$_ungrouped$MsgPlayingFacade$OnEndPlaying$isForceStop$",
+            "_logos_method$_ungrouped$VoiceMessageCellView$onBeginPlayingMsg$autoPlayEnabled$",
+            "_logos_method$_ungrouped$FavVoiceDetaiViewController$onAction$",
+            "_logos_method$_ungrouped$FavVoiceDetaiViewController$onFavActionSheetSelectedForwardToUser$",
+            "_logos_method$_ungrouped$FavActionSheet$initWithFavDelegate$enableType$",
+            "_logos_method$_ungrouped$MyFavoritesViewController$forwardData$",
+            "_logos_method$_ungrouped$FavoritesMgr$onDownloadFavoritesItemFinished$ErrCode$",
+            "_logos_method$_ungrouped$ForwardMessageLogicController$ForwardMsg$ToContact$",
+            "_logos_method$_ungrouped$VoiceMsgDownloader$OnRecvData$"
+          ],
+          "selector_markers": [
+            "OnGetChatRoomMemberDetail:",
+            "setM_nsAtUserList:",
+            "ShowInContactBook:sync:",
+            "startWithRoomNames:clearHistory:",
+            "csgroupmember_v1.",
+            "calcVoiceTimeWithData:VoiceFormat:",
+            "onMultiDone",
+            "onMultiDoneInPageSheetMode",
+            "m_dicMultiSelect",
+            "allValuesInOrder",
+            "m_selectView",
+            "FavDataItemWrap",
+            "currentPlayingMsg",
+            "currentPlayTime",
+            "seekToTime:",
+            "isMsgPlaying:",
+            "com.wechat.enhance.voice_playback.progress_enabled"
+          ],
+          "debug_markers": [
+            "+[CSFavoriteVoiceContext standaloneItemForListObject:]",
+            "-[CSVoicePlaybackController seekToTime:message:generation:]"
+          ]
+        }
+      }
+    },
+    {
+      "Package": "com.wechat.improve",
+      "Version": "2.4-3",
+      "Architecture": "iphoneos-arm",
+      "scheme": "rootful",
+      "payload_path": "Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib",
+      "architectures": [
+        "arm64",
+        "arm64e"
+      ],
+      "dylib_sha256": "86a192c462b9cf325f08f2d0bb346c707205894104778f365dba53f44a178a9e",
+      "injection_filter": {
+        "Filter": {
+          "Bundles": [
+            "com.tencent.xin"
+          ],
+          "Executables": [
+            "ZYBH"
+          ]
+        }
+      },
+      "dsym_uuids": {
+        "arm64": "443C35F9-882A-312D-B10F-CEA86C0617C1",
+        "arm64e": "407ADB37-4B02-3049-8DAF-4CDE43B3388A"
+      },
+      "symbol_evidence": {
+        "arm64": {
+          "thin_sha256": "8b57ea170b65fe78542e6fe3f7b69e573e74ea017848314a7c7984e8dca70395",
+          "dwarf_sha256": "53b3233dad827ed26700d47e607e88815e7275580985d889900a553a0ac78132",
+          "exported_markers": [
+            "_OBJC_CLASS_$_CSGroupChatManager",
+            "_OBJC_CLASS_$_CSGroupChatSettingsViewController",
+            "_OBJC_CLASS_$_CSGroupChatQuitCoordinator",
+            "_CSGroupChatPostDepartureNotice",
+            "_CSGroupChatInstallRuntimeHooks",
+            "_CSGroupChatSaveToContacts",
+            "_OBJC_CLASS_$_CSFavoriteVoiceContext",
+            "_OBJC_CLASS_$_CSFavoriteVoiceMediaProvider",
+            "_OBJC_CLASS_$_CSFavoriteVoiceForwardAdapter",
+            "_CSFavoriteHasPendingVoiceDownloads",
+            "_CSMessageValidateVoiceData",
+            "_CSMessageHasPendingVoiceDownloads",
+            "_OBJC_CLASS_$_CSMessageActionCoordinator",
+            "_OBJC_CLASS_$_CSVoiceForwardAdapter",
+            "_CSCFCurrentForwardRecipients",
+            "_OBJC_CLASS_$_CSVoicePlaybackController",
+            "_OBJC_CLASS_$_CSVoicePlaybackPreferences",
+            "_CSVoicePlaybackRefreshCell",
+            "_CSVoicePlaybackDetachCell",
+            "_CSVoicePlaybackOwnsTouch"
+          ],
+          "hook_markers": [
+            "_logos_method$_ungrouped$MsgPlayingFacade$OnBeginPlaying$success$",
+            "_logos_method$_ungrouped$MsgPlayingFacade$OnEndPlaying$isForceStop$",
+            "_logos_method$_ungrouped$VoiceMessageCellView$onBeginPlayingMsg$autoPlayEnabled$",
+            "_logos_method$_ungrouped$FavVoiceDetaiViewController$onAction$",
+            "_logos_method$_ungrouped$FavVoiceDetaiViewController$onFavActionSheetSelectedForwardToUser$",
+            "_logos_method$_ungrouped$FavActionSheet$initWithFavDelegate$enableType$",
+            "_logos_method$_ungrouped$MyFavoritesViewController$forwardData$",
+            "_logos_method$_ungrouped$FavoritesMgr$onDownloadFavoritesItemFinished$ErrCode$",
+            "_logos_method$_ungrouped$ForwardMessageLogicController$ForwardMsg$ToContact$",
+            "_logos_method$_ungrouped$VoiceMsgDownloader$OnRecvData$"
+          ],
+          "selector_markers": [
+            "OnGetChatRoomMemberDetail:",
+            "setM_nsAtUserList:",
+            "ShowInContactBook:sync:",
+            "startWithRoomNames:clearHistory:",
+            "csgroupmember_v1.",
+            "calcVoiceTimeWithData:VoiceFormat:",
+            "onMultiDone",
+            "onMultiDoneInPageSheetMode",
+            "m_dicMultiSelect",
+            "allValuesInOrder",
+            "m_selectView",
+            "FavDataItemWrap",
+            "currentPlayingMsg",
+            "currentPlayTime",
+            "seekToTime:",
+            "isMsgPlaying:",
+            "com.wechat.enhance.voice_playback.progress_enabled"
+          ],
+          "debug_markers": [
+            "+[CSFavoriteVoiceContext standaloneItemForListObject:]",
+            "-[CSVoicePlaybackController seekToTime:message:generation:]"
+          ]
+        },
+        "arm64e": {
+          "thin_sha256": "8b77d08f2e83cc58bd941009e313ca998489cf942fe52bbe77ffcf6a07ed7d77",
+          "dwarf_sha256": "ba89fa6e0c1c15a1e5d8a7dec08f582dfdc62db98e55289392eb05296958bf0c",
+          "exported_markers": [
+            "_OBJC_CLASS_$_CSGroupChatManager",
+            "_OBJC_CLASS_$_CSGroupChatSettingsViewController",
+            "_OBJC_CLASS_$_CSGroupChatQuitCoordinator",
+            "_CSGroupChatPostDepartureNotice",
+            "_CSGroupChatInstallRuntimeHooks",
+            "_CSGroupChatSaveToContacts",
+            "_OBJC_CLASS_$_CSFavoriteVoiceContext",
+            "_OBJC_CLASS_$_CSFavoriteVoiceMediaProvider",
+            "_OBJC_CLASS_$_CSFavoriteVoiceForwardAdapter",
+            "_CSFavoriteHasPendingVoiceDownloads",
+            "_CSMessageValidateVoiceData",
+            "_CSMessageHasPendingVoiceDownloads",
+            "_OBJC_CLASS_$_CSMessageActionCoordinator",
+            "_OBJC_CLASS_$_CSVoiceForwardAdapter",
+            "_CSCFCurrentForwardRecipients",
+            "_OBJC_CLASS_$_CSVoicePlaybackController",
+            "_OBJC_CLASS_$_CSVoicePlaybackPreferences",
+            "_CSVoicePlaybackRefreshCell",
+            "_CSVoicePlaybackDetachCell",
+            "_CSVoicePlaybackOwnsTouch"
+          ],
+          "hook_markers": [
+            "_logos_method$_ungrouped$MsgPlayingFacade$OnBeginPlaying$success$",
+            "_logos_method$_ungrouped$MsgPlayingFacade$OnEndPlaying$isForceStop$",
+            "_logos_method$_ungrouped$VoiceMessageCellView$onBeginPlayingMsg$autoPlayEnabled$",
+            "_logos_method$_ungrouped$FavVoiceDetaiViewController$onAction$",
+            "_logos_method$_ungrouped$FavVoiceDetaiViewController$onFavActionSheetSelectedForwardToUser$",
+            "_logos_method$_ungrouped$FavActionSheet$initWithFavDelegate$enableType$",
+            "_logos_method$_ungrouped$MyFavoritesViewController$forwardData$",
+            "_logos_method$_ungrouped$FavoritesMgr$onDownloadFavoritesItemFinished$ErrCode$",
+            "_logos_method$_ungrouped$ForwardMessageLogicController$ForwardMsg$ToContact$",
+            "_logos_method$_ungrouped$VoiceMsgDownloader$OnRecvData$"
+          ],
+          "selector_markers": [
+            "OnGetChatRoomMemberDetail:",
+            "setM_nsAtUserList:",
+            "ShowInContactBook:sync:",
+            "startWithRoomNames:clearHistory:",
+            "csgroupmember_v1.",
+            "calcVoiceTimeWithData:VoiceFormat:",
+            "onMultiDone",
+            "onMultiDoneInPageSheetMode",
+            "m_dicMultiSelect",
+            "allValuesInOrder",
+            "m_selectView",
+            "FavDataItemWrap",
+            "currentPlayingMsg",
+            "currentPlayTime",
+            "seekToTime:",
+            "isMsgPlaying:",
+            "com.wechat.enhance.voice_playback.progress_enabled"
+          ],
+          "debug_markers": [
+            "+[CSFavoriteVoiceContext standaloneItemForListObject:]",
+            "-[CSVoicePlaybackController seekToTime:message:generation:]"
+          ]
+        }
+      }
+    }
+  ],
+  "preservation": {
+    "main_theos": true,
+    "previous_packages": false
+  },
+  "status": "failed",
+  "failure": "AssertionError('A protected original changed during build.')"
+}

@@ -1,0 +1,253 @@
+{
+  "name": "DeleteContactConfirmActionSheet",
+  "class_offset": "0x1ee6b318",
+  "superclass": "MMAutoLayoutSheetView",
+  "methods": [
+    {
+      "selector": "initWithContact:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x10121f880",
+      "metadata_offset": "0x171a22d8"
+    },
+    {
+      "selector": "initWithContact:customTitle:customDesc:customConfirmBtnTitle:customCheckBoxTitle:",
+      "encoding": "@56@0:8@16@24@32@40@48",
+      "imp": "0x10121f8c0",
+      "metadata_offset": "0x171a22e4"
+    },
+    {
+      "selector": "initWithContact:customTitle:customDesc:customConfirmBtnTitle:customCheckBoxTitle:showCheckBox:",
+      "encoding": "@60@0:8@16@24@32@40@48B56",
+      "imp": "0x10121f8f0",
+      "metadata_offset": "0x171a22f0"
+    },
+    {
+      "selector": "initWithContact:customTitle:customDesc:customConfirmBtnTitle:customCheckBoxTitle:showCheckBox:allowTapBgToClose:",
+      "encoding": "@64@0:8@16@24@32@40@48B56B60",
+      "imp": "0x10121f91c",
+      "metadata_offset": "0x171a22fc"
+    },
+    {
+      "selector": "initView",
+      "encoding": "v16@0:8",
+      "imp": "0x10121fad4",
+      "metadata_offset": "0x171a2308"
+    },
+    {
+      "selector": "getHeadingTitle",
+      "encoding": "@16@0:8",
+      "imp": "0x10121ff00",
+      "metadata_offset": "0x171a2314"
+    },
+    {
+      "selector": "getDescTitle",
+      "encoding": "@16@0:8",
+      "imp": "0x101220148",
+      "metadata_offset": "0x171a2320"
+    },
+    {
+      "selector": "getConfirmButtonTitle",
+      "encoding": "@16@0:8",
+      "imp": "0x101220288",
+      "metadata_offset": "0x171a232c"
+    },
+    {
+      "selector": "getClearAllMessageTitle",
+      "encoding": "@16@0:8",
+      "imp": "0x1012203c8",
+      "metadata_offset": "0x171a2338"
+    },
+    {
+      "selector": "genCheckBox",
+      "encoding": "@16@0:8",
+      "imp": "0x101220508",
+      "metadata_offset": "0x171a2344"
+    },
+    {
+      "selector": "genButtonStack",
+      "encoding": "@16@0:8",
+      "imp": "0x101220d8c",
+      "metadata_offset": "0x171a2350"
+    },
+    {
+      "selector": "onCheckBoxClicked:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1012210f0",
+      "metadata_offset": "0x171a235c"
+    },
+    {
+      "selector": "onConfirm",
+      "encoding": "v16@0:8",
+      "imp": "0x1012211e0",
+      "metadata_offset": "0x171a2368"
+    },
+    {
+      "selector": "confirmBlock",
+      "encoding": "@?16@0:8",
+      "imp": "0x1012212ac",
+      "metadata_offset": "0x171a2374"
+    },
+    {
+      "selector": "setConfirmBlock:",
+      "encoding": "v24@0:8@?16",
+      "imp": "0x1012212bc",
+      "metadata_offset": "0x171a2380"
+    },
+    {
+      "selector": "allowTapBgToClose",
+      "encoding": "B16@0:8",
+      "imp": "0x1012212c8",
+      "metadata_offset": "0x171a238c"
+    },
+    {
+      "selector": "setAllowTapBgToClose:",
+      "encoding": "v20@0:8B16",
+      "imp": "0x1012212d8",
+      "metadata_offset": "0x171a2398"
+    },
+    {
+      "selector": "contact",
+      "encoding": "@16@0:8",
+      "imp": "0x1012212e8",
+      "metadata_offset": "0x171a23a4"
+    },
+    {
+      "selector": "setContact:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1012212f8",
+      "metadata_offset": "0x171a23b0"
+    },
+    {
+      "selector": "checkBox",
+      "encoding": "@16@0:8",
+      "imp": "0x10122130c",
+      "metadata_offset": "0x171a23bc"
+    },
+    {
+      "selector": "setCheckBox:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10122131c",
+      "metadata_offset": "0x171a23c8"
+    },
+    {
+      "selector": "checkBoxImageView",
+      "encoding": "@16@0:8",
+      "imp": "0x101221330",
+      "metadata_offset": "0x171a23d4"
+    },
+    {
+      "selector": "setCheckBoxImageView:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x101221340",
+      "metadata_offset": "0x171a23e0"
+    },
+    {
+      "selector": "customTitle",
+      "encoding": "@16@0:8",
+      "imp": "0x101221354",
+      "metadata_offset": "0x171a23ec"
+    },
+    {
+      "selector": "setCustomTitle:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x101221364",
+      "metadata_offset": "0x171a23f8"
+    },
+    {
+      "selector": "customDesc",
+      "encoding": "@16@0:8",
+      "imp": "0x101221370",
+      "metadata_offset": "0x171a2404"
+    },
+    {
+      "selector": "setCustomDesc:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x101221380",
+      "metadata_offset": "0x171a2410"
+    },
+    {
+      "selector": "customConfirmBtnTitle",
+      "encoding": "@16@0:8",
+      "imp": "0x10122138c",
+      "metadata_offset": "0x171a241c"
+    },
+    {
+      "selector": "setCustomConfirmBtnTitle:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10122139c",
+      "metadata_offset": "0x171a2428"
+    },
+    {
+      "selector": "customCheckBoxTitle",
+      "encoding": "@16@0:8",
+      "imp": "0x1012213a8",
+      "metadata_offset": "0x171a2434"
+    },
+    {
+      "selector": "setCustomCheckBoxTitle:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1012213b8",
+      "metadata_offset": "0x171a2440"
+    },
+    {
+      "selector": "showCheckBox",
+      "encoding": "B16@0:8",
+      "imp": "0x1012213c4",
+      "metadata_offset": "0x171a244c"
+    },
+    {
+      "selector": "setShowCheckBox:",
+      "encoding": "v20@0:8B16",
+      "imp": "0x1012213d4",
+      "metadata_offset": "0x171a2458"
+    },
+    {
+      "selector": ".cxx_destruct",
+      "encoding": "v16@0:8",
+      "imp": "0x1012213e4",
+      "metadata_offset": "0x171a2464"
+    }
+  ],
+  "ivars": [
+    {
+      "name": "_allowTapBgToClose",
+      "encoding": "B"
+    },
+    {
+      "name": "_showCheckBox",
+      "encoding": "B"
+    },
+    {
+      "name": "_confirmBlock",
+      "encoding": "@?"
+    },
+    {
+      "name": "_contact",
+      "encoding": "@\"CContact\""
+    },
+    {
+      "name": "_checkBox",
+      "encoding": "@\"UIButton\""
+    },
+    {
+      "name": "_checkBoxImageView",
+      "encoding": "@\"UIImageView\""
+    },
+    {
+      "name": "_customTitle",
+      "encoding": "@\"NSString\""
+    },
+    {
+      "name": "_customDesc",
+      "encoding": "@\"NSString\""
+    },
+    {
+      "name": "_customConfirmBtnTitle",
+      "encoding": "@\"NSString\""
+    },
+    {
+      "name": "_customCheckBoxTitle",
+      "encoding": "@\"NSString\""
+    }
+  ]
+}

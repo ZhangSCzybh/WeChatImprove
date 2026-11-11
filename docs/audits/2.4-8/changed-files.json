@@ -1,0 +1,18 @@
+{
+  "Controllers/CSGroupChatSettingsViewController.m": {
+    "before": "a51de3efcb05d5805748ba8729cdcf762178cd82344f4aa0129ae5f0479b0cd7",
+    "after": "97d7bdbde3997fdf5803041f4d0d8072fdeaa1aa6651c588b293e7bb5c368fdf"
+  },
+  "Controllers/CSReleaseNotesViewController.m": {
+    "before": "d43463be338b378349d230d01ee62b673765d247215260c36bf3fdb1f0ef5900",
+    "after": "615a2c0897ee8843710f66621c3763a13e815436ee30ffc5baca667a4a4e74bc"
+  },
+  "Headers/CSUserInfoHelper.h": {
+    "before": "b34f3178741d3e27ff1377a7c518ac01c40f385752e88f5762cd8b6f0c3cfaae",
+    "after": "abedfc10883be78611a86d217e6442b51bab493da0e7b150b1e8ef2ffb609fb3"
+  },
+  "control": {
+    "before": "f045315002fb8ec353862783e9491de86ee07ed4faf96dc160e8ba86c41d1c41",
+    "after": "938aef0efb5591d6761e502d0b5b1d741188061b972527bb8edbf3f4ccf996c7"
+  }
+}

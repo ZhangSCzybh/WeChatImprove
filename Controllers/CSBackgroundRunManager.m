@@ -39,7 +39,7 @@ typedef NS_ENUM(NSUInteger, CSBackgroundRunPhase) {
 @property(nonatomic) BOOL started, background, attempted, interrupted, resumeBlocked, mediaLost, hostYielded;
 @property(nonatomic) BOOL cycleActive, cycleEnded, rotationFailed, reconciling, reconcileAgain;
 @property(nonatomic) BOOL taskExpirationPending;
-@property(nonatomic) BOOL publishedWork, publishedAudio;
+@property(nonatomic) BOOL groupChatRequested, publishedWork, publishedGroupChatWork, publishedAudio;
 @property(nonatomic) NSUInteger generation, checkGeneration, recoverySamples;
 @property(nonatomic) CSBackgroundRunPhase phase;
 @property(nonatomic) NSTimeInterval nextRotation, checkDeadline, audioStartedAt, lastRecoverySample;
@@ -72,11 +72,14 @@ typedef NS_ENUM(NSUInteger, CSBackgroundRunPhase) {
     [NSNotificationCenter.defaultCenter removeObserver:self];
     [_scheduledCheck cancel]; [_task end]; [_audio stop];
 }
-- (BOOL)backgroundAudioActive { return self.enabled && self.background && self.audio.playing && self.audio.sessionOwned; }
-- (BOOL)canAttemptBackgroundWork {
-    return self.enabled && self.background && self.cycleActive && !self.cycleEnded &&
+- (BOOL)resourcesRequested { return self.enabled || self.groupChatRequested; }
+- (BOOL)backgroundAudioActive { return self.resourcesRequested && self.background && self.audio.playing && self.audio.sessionOwned; }
+- (BOOL)executionAvailable {
+    return self.resourcesRequested && self.background && self.cycleActive && !self.cycleEnded &&
         (self.backgroundAudioActive || (self.task.valid && self.runtime.backgroundTimeRemaining>0));
 }
+- (BOOL)canAttemptBackgroundWork { return self.enabled && self.executionAvailable; }
+- (BOOL)canAttemptGroupChatBackgroundWork { return self.groupChatRequested && self.executionAvailable; }
 - (void)start {
     NSAssert(NSThread.isMainThread,@"Background manager is main-thread owned");
     if (self.started) return;
@@ -100,10 +103,11 @@ typedef NS_ENUM(NSUInteger, CSBackgroundRunPhase) {
     return NO;
 }
 - (void)publish:(NSString *)status phase:(CSBackgroundRunPhase)phase {
-    BOOL work=self.canAttemptBackgroundWork, audio=self.backgroundAudioActive;
-    BOOL changed=self.phase!=phase || self.publishedWork!=work || self.publishedAudio!=audio || ![self.statusText isEqual:status];
-    self.phase=phase; self.publishedWork=work; self.publishedAudio=audio; self.statusText=status;
-    if (self.checkRecordRequested && self.observationOpen && self.background && self.enabled) {
+    BOOL available=self.executionAvailable, audio=self.backgroundAudioActive;
+    BOOL work=self.enabled && available, groupWork=self.groupChatRequested && available;
+    BOOL changed=self.phase!=phase || self.publishedWork!=work || self.publishedGroupChatWork!=groupWork || self.publishedAudio!=audio || ![self.statusText isEqual:status];
+    self.phase=phase; self.publishedWork=work; self.publishedGroupChatWork=groupWork; self.publishedAudio=audio; self.statusText=status;
+    if (self.checkRecordRequested && self.observationOpen && self.background && self.resourcesRequested) {
         self.checkRecordRequested=NO;
         self.lastBackgroundCheckedAt=self.runtime.currentDate;
         self.lastBackgroundCheckStatus=status;
@@ -112,7 +116,7 @@ typedef NS_ENUM(NSUInteger, CSBackgroundRunPhase) {
         // Settings reread records on foreground entry. A timestamp-only update
         // must not wake state observers such as the AI configuration manager.
     }
-    if (self.background && self.enabled && ![self.lastBackgroundResult isEqual:status]) { self.lastBackgroundResult=status; changed=YES; }
+    if (self.background && self.resourcesRequested && ![self.lastBackgroundResult isEqual:status]) { self.lastBackgroundResult=status; changed=YES; }
     if (changed) [NSNotificationCenter.defaultCenter postNotificationName:CSBackgroundRunStateChangedNotification object:self];
 }
 - (void)beginObservationWithKnownEntry:(BOOL)knownEntry {
@@ -154,24 +158,36 @@ typedef NS_ENUM(NSUInteger, CSBackgroundRunPhase) {
     self.cycleEnded=YES; [self releaseResources];
     [self publish:reason phase:CSRunEnded];
 }
+- (void)reconcileDemandFrom:(BOOL)previouslyRequested stopReason:(NSString *)stopReason {
+    BOOL requested=self.resourcesRequested;
+    // A second consumer shares the current cycle, including its budget and expiration.
+    if (requested!=previouslyRequested) {
+        self.attempted=NO; self.cycleEnded=NO; self.audioFailure=nil;
+        if (self.background) {
+            if (requested) {
+                if (!self.observationOpen) [self beginObservationWithKnownEntry:NO];
+                self.lastBackgroundStoppedAt=nil; self.lastBackgroundStopReason=@"尚未结束";
+                self.checkRecordRequested=YES;
+            } else { [self recordStop:stopReason]; self.checkRecordRequested=NO; }
+        }
+    }
+    [self reconcile];
+}
 - (void)reloadSettings {
     if (!NSThread.isMainThread) {
         if (!atomic_exchange(&_refreshPending,true)) dispatch_async(dispatch_get_main_queue(),^{ atomic_store(&self->_refreshPending,false); [self reloadSettings]; });
         return;
     }
-    BOOL enabled=[self.defaults boolForKey:CSBackgroundRunEnabledKey];
-    if (self.enabled!=enabled) {
-        self.attempted=NO; self.cycleEnded=NO; self.audioFailure=nil;
-        if (self.background) {
-            if (enabled) {
-                if (!self.observationOpen) [self beginObservationWithKnownEntry:NO];
-                self.lastBackgroundStoppedAt=nil; self.lastBackgroundStopReason=@"尚未结束";
-                self.checkRecordRequested=YES;
-            } else { [self recordStop:@"关闭后台运行"]; self.checkRecordRequested=NO; }
-        }
-    }
-    self.enabled=enabled;
-    [self reconcile];
+    BOOL previouslyRequested=self.resourcesRequested;
+    self.enabled=[self.defaults boolForKey:CSBackgroundRunEnabledKey];
+    [self reconcileDemandFrom:previouslyRequested stopReason:@"关闭后台运行"];
+}
+- (void)setGroupChatBackgroundRequested:(BOOL)requested {
+    NSAssert(NSThread.isMainThread,@"Background manager is main-thread owned");
+    if (self.groupChatRequested==requested) return;
+    BOOL previouslyRequested=self.resourcesRequested;
+    self.groupChatRequested=requested;
+    [self reconcileDemandFrom:previouslyRequested stopReason:@"群聊已停止请求后台运行"];
 }
 - (void)taskExpired:(id<CSBackgroundRunTask>)task generation:(NSUInteger)generation {
     if (generation!=self.generation || task!=self.task) return;
@@ -188,7 +204,7 @@ typedef NS_ENUM(NSUInteger, CSBackgroundRunPhase) {
     id<CSBackgroundRunTask> candidate=[self.runtime beginTaskWithExpirationHandler:^(id<CSBackgroundRunTask> expired){
         [weakSelf taskExpired:expired generation:generation];
     }];
-    if (generation!=self.generation || !self.cycleActive || !self.enabled || !self.background) { [candidate end]; return; }
+    if (generation!=self.generation || !self.cycleActive || !self.resourcesRequested || !self.background) { [candidate end]; return; }
     if (!candidate.valid) { [candidate end]; self.rotationFailed=YES; return; }
     id<CSBackgroundRunTask> old=self.task;
     self.task=candidate; self.nextRotation=now+CSRunRotationInterval;
@@ -220,10 +236,11 @@ typedef NS_ENUM(NSUInteger, CSBackgroundRunPhase) {
     } @finally { self.reconciling=NO; }
 }
 - (void)reconcileOnce {
-    if (!self.enabled || !self.background) {
+    if (!self.resourcesRequested || !self.background) {
         self.checkRecordRequested=NO;
         [self releaseResources]; self.cycleEnded=NO;
-        [self publish:self.enabled?@"前台待机":@"未启用" phase:self.enabled?CSRunStandby:CSRunDisabled];
+        NSString *status=self.enabled?@"前台待机":(self.groupChatRequested?@"群聊实时待机":@"未启用");
+        [self publish:status phase:self.resourcesRequested?CSRunStandby:CSRunDisabled];
         return;
     }
     if (self.cycleEnded) { [self publish:self.statusText phase:CSRunEnded]; return; }
@@ -237,14 +254,14 @@ typedef NS_ENUM(NSUInteger, CSBackgroundRunPhase) {
         self.cycleActive=YES; self.generation++; self.rotationFailed=NO;
         [self replaceTaskAtTime:now];
     }
-    if (!self.cycleActive || !self.enabled || !self.background) return;
+    if (!self.cycleActive || !self.resourcesRequested || !self.background) return;
     NSUInteger generation=self.generation;
     if (self.task && !self.task.valid) {
         id<CSBackgroundRunTask> expired=self.task; self.task=nil; [expired end]; self.rotationFailed=YES;
         if (!self.backgroundAudioActive) { [self finishCycle:@"后台任务已到期，本轮运行结束"]; return; }
     }
     if (self.task.valid && !self.rotationFailed && now>=self.nextRotation) [self replaceTaskAtTime:now];
-    if (generation!=self.generation || !self.cycleActive || !self.enabled || !self.background) return;
+    if (generation!=self.generation || !self.cycleActive || !self.resourcesRequested || !self.background) return;
     if (self.taskExpirationPending) return;
     NSTimeInterval remaining=self.runtime.backgroundTimeRemaining;
     BOOL finite=CSRunFiniteBudget(remaining);
@@ -259,14 +276,14 @@ typedef NS_ENUM(NSUInteger, CSBackgroundRunPhase) {
         self.hostYielded=YES; [self.audio relinquish];
         audioBlocked=@"微信正在使用音频，保活已让出"; blockedPhase=CSRunYielding;
     }
-    if (generation!=self.generation || !self.cycleActive || !self.enabled || !self.background) return;
+    if (generation!=self.generation || !self.cycleActive || !self.resourcesRequested || !self.background) return;
     if (!self.backgroundAudioActive) self.recoverySamples=0;
     BOOL needsAudio=!taskUsable || (finite && remaining<CSRunAudioThreshold);
     if (needsAudio && !self.backgroundAudioActive && !audioBlocked && !self.attempted) {
         self.attempted=YES;
         NSError *error=nil;
         BOOL started=[self.audio startWithError:&error];
-        if (generation!=self.generation || !self.cycleActive || !self.enabled || !self.background) return;
+        if (generation!=self.generation || !self.cycleActive || !self.resourcesRequested || !self.background) return;
         if (started && self.backgroundAudioActive) {
             self.hostYielded=NO; self.audioFailure=nil; self.audioStartedAt=now;
             self.recoverySamples=0; self.lastRecoverySample=-INFINITY;
@@ -281,7 +298,7 @@ typedef NS_ENUM(NSUInteger, CSBackgroundRunPhase) {
             }
         } else self.recoverySamples=0;
     }
-    if (generation!=self.generation || !self.cycleActive || !self.enabled || !self.background) return;
+    if (generation!=self.generation || !self.cycleActive || !self.resourcesRequested || !self.background) return;
     if (!self.backgroundAudioActive && (!taskUsable || (finite && remaining<CSRunCleanupThreshold))) {
         [self finishCycle:audioBlocked?:self.audioFailure?:@"后台预算不足，本轮运行结束"];
         return;
@@ -308,7 +325,7 @@ typedef NS_ENUM(NSUInteger, CSBackgroundRunPhase) {
 }
 - (void)setBackgroundState:(BOOL)background {
     if (self.background!=background) {
-        if (background && self.enabled) {
+        if (background && self.resourcesRequested) {
             [self beginObservationWithKnownEntry:YES];
             self.checkRecordRequested=YES;
         } else if (!background) [self recordForegroundReturn];
@@ -323,7 +340,7 @@ typedef NS_ENUM(NSUInteger, CSBackgroundRunPhase) {
     // A real release/resume event may create a new opportunity after a task-only
     // session ended. Ordinary route/defaults notifications cannot do so.
     self.cycleEnded=NO;
-    if (self.observationOpen && self.background && self.enabled) {
+    if (self.observationOpen && self.background && self.resourcesRequested) {
         self.lastBackgroundStoppedAt=nil; self.lastBackgroundStopReason=@"尚未结束";
         self.checkRecordRequested=YES;
     }
@@ -371,11 +388,11 @@ typedef NS_ENUM(NSUInteger, CSBackgroundRunPhase) {
         if (note.object!=self.audio) return;
         [self.audio stop]; self.attempted=YES; self.audioFailure=@"后台音频已停止，下次进入后台再尝试";
     } else if ([name isEqual:AVAudioSessionRouteChangeNotification]) {
-        if (self.enabled && self.background && self.audio.sessionOwned && !self.audio.playing && self.attempted && !self.hostYielded && !self.interrupted && !self.mediaLost) {
+        if (self.resourcesRequested && self.background && self.audio.sessionOwned && !self.audio.playing && self.attempted && !self.hostYielded && !self.interrupted && !self.mediaLost) {
             [self.audio stop]; self.audioFailure=@"音频路由已变化，下次进入后台再尝试";
         }
     }
-    if (self.background && self.enabled && !self.cycleEnded) self.checkRecordRequested=YES;
+    if (self.background && self.resourcesRequested && !self.cycleEnded) self.checkRecordRequested=YES;
     [self reconcile];
 }
 @end

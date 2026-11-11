@@ -1,0 +1,5 @@
+Command: clang -fobjc-arc -framework Foundation fixture.m -o fixture
+Then executed the macOS fixture only; WeChat was not executed.
+Observed stdout:
+resolver called
+class_getInstanceMethod found=1

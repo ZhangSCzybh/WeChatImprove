@@ -1,0 +1,44 @@
+[
+  {
+    "file": "SyncCmdHandler-BatchAddMsg_ShowPush_.asm",
+    "start": "0x105e415ac",
+    "stop_exclusive": "0x105e43588",
+    "selector_load_target": "0x105e415ac",
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=4393801132",
+      "--stop-address=4393809288",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-4b6441f8-4e09-4a13-9071-759ca0cc225f/Payload/WeChat.app/WeChat"
+    ]
+  },
+  {
+    "file": "SyncCmdHandler-onNewSyncAddMessage-containing-function.asm",
+    "start": "0x105e44154",
+    "stop_exclusive": "0x105e45b34",
+    "selector_load_target": "0x105e44284",
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=4393812308",
+      "--stop-address=4393818932",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-4b6441f8-4e09-4a13-9071-759ca0cc225f/Payload/WeChat.app/WeChat"
+    ]
+  },
+  {
+    "file": "CGroupDB-QuitGroup_withUsrName_.asm",
+    "start": "0x1020223e4",
+    "stop_exclusive": "0x102022884",
+    "selector_load_target": "0x1020223e4",
+    "command": [
+      "xcrun",
+      "llvm-objdump",
+      "--disassemble",
+      "--start-address=4328661988",
+      "--stop-address=4328663172",
+      "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-4b6441f8-4e09-4a13-9071-759ca0cc225f/Payload/WeChat.app/WeChat"
+    ]
+  }
+]

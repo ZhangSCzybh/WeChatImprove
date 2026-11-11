@@ -1,0 +1,253 @@
+{
+  "name": "StrangerContactMgr",
+  "class_offset": "0x1ef493c0",
+  "superclass": "MMUserService",
+  "methods": [
+    {
+      "selector": "p_getStrangerContactHeadImageDataFilePath",
+      "encoding": "@16@0:8",
+      "imp": "0x105deaf88",
+      "metadata_offset": "0x16f70b08"
+    },
+    {
+      "selector": "saveStrangerContactHeadImageToDataFileInternal",
+      "encoding": "v16@0:8",
+      "imp": "0x105deafec",
+      "metadata_offset": "0x16f70b14"
+    },
+    {
+      "selector": "loadStrangerContactHeadImageInternal",
+      "encoding": "v16@0:8",
+      "imp": "0x105deb140",
+      "metadata_offset": "0x16f70b20"
+    },
+    {
+      "selector": "recordDownloadSuccessHeadImageUrl:url:",
+      "encoding": "v32@0:8@16@24",
+      "imp": "0x105deb2ec",
+      "metadata_offset": "0x16f70b2c"
+    },
+    {
+      "selector": "getDownloadSuccessHeadImageUrl:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x105deb5b4",
+      "metadata_offset": "0x16f70b38"
+    },
+    {
+      "selector": "pathForOldData",
+      "encoding": "@16@0:8",
+      "imp": "0x105deb640",
+      "metadata_offset": "0x16f70b44"
+    },
+    {
+      "selector": "pathForData",
+      "encoding": "@16@0:8",
+      "imp": "0x105deb6a4",
+      "metadata_offset": "0x16f70b50"
+    },
+    {
+      "selector": "pathForOldTimeData",
+      "encoding": "@16@0:8",
+      "imp": "0x105deb708",
+      "metadata_offset": "0x16f70b5c"
+    },
+    {
+      "selector": "pathForTimeData",
+      "encoding": "@16@0:8",
+      "imp": "0x105deb76c",
+      "metadata_offset": "0x16f70b68"
+    },
+    {
+      "selector": "tryLoadData",
+      "encoding": "v16@0:8",
+      "imp": "0x105deb7d0",
+      "metadata_offset": "0x16f70b74"
+    },
+    {
+      "selector": "ReduceCache",
+      "encoding": "v16@0:8",
+      "imp": "0x105debb50",
+      "metadata_offset": "0x16f70b80"
+    },
+    {
+      "selector": "saveData",
+      "encoding": "v16@0:8",
+      "imp": "0x105debee0",
+      "metadata_offset": "0x16f70b8c"
+    },
+    {
+      "selector": "clearMemoryCache",
+      "encoding": "v16@0:8",
+      "imp": "0x105dec060",
+      "metadata_offset": "0x16f70b98"
+    },
+    {
+      "selector": "onServiceInit",
+      "encoding": "v16@0:8",
+      "imp": "0x105dec0b8",
+      "metadata_offset": "0x16f70ba4"
+    },
+    {
+      "selector": "onServiceClearData",
+      "encoding": "v16@0:8",
+      "imp": "0x105dec244",
+      "metadata_offset": "0x16f70bb0"
+    },
+    {
+      "selector": "onServiceMemoryWarning",
+      "encoding": "v16@0:8",
+      "imp": "0x105dec320",
+      "metadata_offset": "0x16f70bbc"
+    },
+    {
+      "selector": "IsInQueue:",
+      "encoding": "B24@0:8@16",
+      "imp": "0x105dec32c",
+      "metadata_offset": "0x16f70bc8"
+    },
+    {
+      "selector": "SetAccessTime:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105dec53c",
+      "metadata_offset": "0x16f70bd4"
+    },
+    {
+      "selector": "getContactByName:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x105dec644",
+      "metadata_offset": "0x16f70be0"
+    },
+    {
+      "selector": "addContact:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105dec6d0",
+      "metadata_offset": "0x16f70bec"
+    },
+    {
+      "selector": "updateContact:withScene:",
+      "encoding": "v28@0:8@16I24",
+      "imp": "0x105deca1c",
+      "metadata_offset": "0x16f70bf8"
+    },
+    {
+      "selector": "updateContactFromContact:withScene:",
+      "encoding": "v28@0:8@16I24",
+      "imp": "0x105decc30",
+      "metadata_offset": "0x16f70c04"
+    },
+    {
+      "selector": "GetUsrArray",
+      "encoding": "@16@0:8",
+      "imp": "0x105decf24",
+      "metadata_offset": "0x16f70c10"
+    },
+    {
+      "selector": "CheckQueue",
+      "encoding": "v16@0:8",
+      "imp": "0x105ded15c",
+      "metadata_offset": "0x16f70c1c"
+    },
+    {
+      "selector": "checkIfForbiddenGetContact:",
+      "encoding": "B24@0:8@16",
+      "imp": "0x105ded378",
+      "metadata_offset": "0x16f70c28"
+    },
+    {
+      "selector": "updateLimitDuration",
+      "encoding": "d16@0:8",
+      "imp": "0x105ded4e4",
+      "metadata_offset": "0x16f70c34"
+    },
+    {
+      "selector": "InternalUpdateContact:",
+      "encoding": "B24@0:8@16",
+      "imp": "0x105ded4f0",
+      "metadata_offset": "0x16f70c40"
+    },
+    {
+      "selector": "handleNewContact:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105dee204",
+      "metadata_offset": "0x16f70c4c"
+    },
+    {
+      "selector": "hasBrandIconUrlChange:andModContact:",
+      "encoding": "B32@0:8@16@24",
+      "imp": "0x105dee674",
+      "metadata_offset": "0x16f70c58"
+    },
+    {
+      "selector": "isBrandModContact:",
+      "encoding": "B24@0:8@16",
+      "imp": "0x105dee7e8",
+      "metadata_offset": "0x16f70c64"
+    },
+    {
+      "selector": "MessageReturn:Event:",
+      "encoding": "v28@0:8@16I24",
+      "imp": "0x105dee858",
+      "metadata_offset": "0x16f70c70"
+    },
+    {
+      "selector": "onDeleteContact:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x105defa74",
+      "metadata_offset": "0x16f70c7c"
+    },
+    {
+      "selector": "onBrandContactModified:withAttrChanged:",
+      "encoding": "v32@0:8@16@24",
+      "imp": "0x105defc34",
+      "metadata_offset": "0x16f70c88"
+    },
+    {
+      "selector": ".cxx_destruct",
+      "encoding": "v16@0:8",
+      "imp": "0x105df0368",
+      "metadata_offset": "0x16f70c94"
+    }
+  ],
+  "ivars": [
+    {
+      "name": "m_bMemCacheNeedReload",
+      "encoding": "B"
+    },
+    {
+      "name": "m_dicContacts",
+      "encoding": "@\"NSMutableDictionary\""
+    },
+    {
+      "name": "m_dicLastAccessTime",
+      "encoding": "@\"NSMutableDictionary\""
+    },
+    {
+      "name": "m_lastUpdateTime",
+      "encoding": "@\"NSMutableDictionary\""
+    },
+    {
+      "name": "m_arrQueue",
+      "encoding": "@\"NSMutableArray\""
+    },
+    {
+      "name": "m_dicGetingContacts",
+      "encoding": "@\"NSMutableDictionary\""
+    },
+    {
+      "name": "m_dicContactScene",
+      "encoding": "@\"NSMutableDictionary\""
+    },
+    {
+      "name": "m_arrUploading",
+      "encoding": "@\"NSMutableArray\""
+    },
+    {
+      "name": "m_uiCurEventID",
+      "encoding": "I"
+    },
+    {
+      "name": "m_headImageInfoData",
+      "encoding": "@\"StrangerContactHeadImageData\""
+    }
+  ]
+}

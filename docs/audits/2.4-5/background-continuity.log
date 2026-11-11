@@ -1,0 +1,7 @@
+2.4-5 group audit variables: 9 checks passed
+2.4-5 group audit realtime: 15 checks passed
+2.4-5 group audit opt-out: 12 checks passed
+2.4-5 group audit missing-key: 12 checks passed
+2.4-5 group audit budget-lost: 8 checks passed
+2.4-5 group audit departure-budget-lost: 8 checks passed
+2.4-5 group audit settings-and-backup: 16 checks passed

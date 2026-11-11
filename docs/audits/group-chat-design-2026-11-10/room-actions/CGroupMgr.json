@@ -1,0 +1,1279 @@
+{
+  "name": "CGroupMgr",
+  "class_offset": "0x1ee973c8",
+  "superclass": "MMUserService",
+  "methods": [
+    {
+      "selector": "CreateOpenIMGroupWithMemberList:",
+      "encoding": "B24@0:8@16",
+      "imp": "0x10202d624",
+      "metadata_offset": "0x16ec87e8"
+    },
+    {
+      "selector": "OnOpenIMCreateChatRoom:",
+      "encoding": "i24@0:8@16",
+      "imp": "0x10202d820",
+      "metadata_offset": "0x16ec87f4"
+    },
+    {
+      "selector": "HandleCreateOpenIMChatRoomOK:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x10202dc60",
+      "metadata_offset": "0x16ec8800"
+    },
+    {
+      "selector": "AddOpenIMGroupMember:withMemberList:withDesp:",
+      "encoding": "B40@0:8@16@24@32",
+      "imp": "0x10202e6c0",
+      "metadata_offset": "0x16ec880c"
+    },
+    {
+      "selector": "OnAddOpenIMChatRoomMember:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10202e8b8",
+      "metadata_offset": "0x16ec8818"
+    },
+    {
+      "selector": "DeleteOpenIMGroupMember:withMemberList:",
+      "encoding": "B32@0:8@16@24",
+      "imp": "0x10202f944",
+      "metadata_offset": "0x16ec8824"
+    },
+    {
+      "selector": "OnDeleteOpenIMChatRoomMemberResponse:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10202fb6c",
+      "metadata_offset": "0x16ec8830"
+    },
+    {
+      "selector": "InviteOpenIMGroupMember:withMemberList:withUserData:",
+      "encoding": "B40@0:8@16@24@32",
+      "imp": "0x10203028c",
+      "metadata_offset": "0x16ec883c"
+    },
+    {
+      "selector": "OnInviteOpenIMChatRoomMemberResp:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x102030500",
+      "metadata_offset": "0x16ec8848"
+    },
+    {
+      "selector": "ChangeOpenIMChatRoomOwner:NewOwner:",
+      "encoding": "B32@0:8@16@24",
+      "imp": "0x102030ce8",
+      "metadata_offset": "0x16ec8854"
+    },
+    {
+      "selector": "OnChangeOpenIMChatRoomOwnerResp:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x102030e9c",
+      "metadata_offset": "0x16ec8860"
+    },
+    {
+      "selector": "ApproveOpenIMGroupMember:withInviterName:withInviteeList:withTicket:withUserData:",
+      "encoding": "B56@0:8@16@24@32@40@48",
+      "imp": "0x1020315cc",
+      "metadata_offset": "0x16ec886c"
+    },
+    {
+      "selector": "OnApproveOpenIMGroupMember:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10203187c",
+      "metadata_offset": "0x16ec8878"
+    },
+    {
+      "selector": "GetOpenIMChatRoomInfo:",
+      "encoding": "B24@0:8@16",
+      "imp": "0x102031c94",
+      "metadata_offset": "0x16ec8884"
+    },
+    {
+      "selector": "OnGetOpenIMChatRoomInfoResp:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x102031ed0",
+      "metadata_offset": "0x16ec8890"
+    },
+    {
+      "selector": "GetOpenIMChatRoomMemberDetail:",
+      "encoding": "B24@0:8@16",
+      "imp": "0x1020326e4",
+      "metadata_offset": "0x16ec889c"
+    },
+    {
+      "selector": "OnOpenIMGetChatRoomMemberDetail:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x1020329e4",
+      "metadata_offset": "0x16ec88a8"
+    },
+    {
+      "selector": "SetOpenIMGroupTopic:withTopic:",
+      "encoding": "B32@0:8@16@24",
+      "imp": "0x10203380c",
+      "metadata_offset": "0x16ec88b4"
+    },
+    {
+      "selector": "QuitOpenIMGroup:withUsrName:",
+      "encoding": "B32@0:8@16@24",
+      "imp": "0x102033948",
+      "metadata_offset": "0x16ec88c0"
+    },
+    {
+      "selector": "OnOpenIMOplogRespForOpenIMQuitGroup:Resp:",
+      "encoding": "v32@0:8@16@24",
+      "imp": "0x102033ae4",
+      "metadata_offset": "0x16ec88cc"
+    },
+    {
+      "selector": "SetOpenIMChatRoomAnnouncement:Announcement:",
+      "encoding": "B32@0:8@16@24",
+      "imp": "0x10203408c",
+      "metadata_offset": "0x16ec88d8"
+    },
+    {
+      "selector": "SetOpenIMGroupSelfDisplayName:DisplayName:",
+      "encoding": "I32@0:8@16@24",
+      "imp": "0x1020341d8",
+      "metadata_offset": "0x16ec88e4"
+    },
+    {
+      "selector": "SetOpenIMGroupShowDislayName:forGroup:sync:",
+      "encoding": "B32@0:8B16@20B28",
+      "imp": "0x102034320",
+      "metadata_offset": "0x16ec88f0"
+    },
+    {
+      "selector": "setOpenImChatRoom:inContactBook:sync:",
+      "encoding": "B32@0:8@16B24B28",
+      "imp": "0x1020345c0",
+      "metadata_offset": "0x16ec88fc"
+    },
+    {
+      "selector": "setOpenImChatRoom:top:sync:",
+      "encoding": "B32@0:8@16B24B28",
+      "imp": "0x102034674",
+      "metadata_offset": "0x16ec8908"
+    },
+    {
+      "selector": "setOpenImChatRoom:mute:sync:",
+      "encoding": "B32@0:8@16B24B28",
+      "imp": "0x102034728",
+      "metadata_offset": "0x16ec8914"
+    },
+    {
+      "selector": "changeOpenImChatRoomAccessType:type:",
+      "encoding": "B28@0:8@16I24",
+      "imp": "0x1020347dc",
+      "metadata_offset": "0x16ec8920"
+    },
+    {
+      "selector": "OnOpenIMOplogRespForSetChatRoomAnnouncement:Resp:",
+      "encoding": "v32@0:8@16@24",
+      "imp": "0x102034888",
+      "metadata_offset": "0x16ec892c"
+    },
+    {
+      "selector": "OnOpenIMOplogRespForModTopic:Resp:",
+      "encoding": "v32@0:8@16@24",
+      "imp": "0x1020350cc",
+      "metadata_offset": "0x16ec8938"
+    },
+    {
+      "selector": "OnOpenIMOplogRespForChangeChatRoomAccessType:Resp:",
+      "encoding": "v32@0:8@16@24",
+      "imp": "0x1020355a0",
+      "metadata_offset": "0x16ec8944"
+    },
+    {
+      "selector": "OnOpenIMOplogResp:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x102035ba8",
+      "metadata_offset": "0x16ec8950"
+    },
+    {
+      "selector": "OpenIMMessageReturn:Event:",
+      "encoding": "v28@0:8@16I24",
+      "imp": "0x102035c70",
+      "metadata_offset": "0x16ec895c"
+    },
+    {
+      "selector": "p_handleMemContact:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x102035d98",
+      "metadata_offset": "0x16ec8968"
+    },
+    {
+      "selector": "p_genContactFromMemberResp:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x102035f4c",
+      "metadata_offset": "0x16ec8974"
+    },
+    {
+      "selector": "p_createOpenIMProtoBufEvent:forCgi:andUserData:eventHandler:",
+      "encoding": "I44@0:8@16I24@28#36",
+      "imp": "0x102036030",
+      "metadata_offset": "0x16ec8980"
+    },
+    {
+      "selector": "p_startOplogType:buffer:isSelfHandle:",
+      "encoding": "I32@0:8I16@20B28",
+      "imp": "0x1020361f4",
+      "metadata_offset": "0x16ec898c"
+    },
+    {
+      "selector": "p_addOplogType:buffer:needSync:",
+      "encoding": "B32@0:8I16@20B28",
+      "imp": "0x102036318",
+      "metadata_offset": "0x16ec8998"
+    },
+    {
+      "selector": "isShowUpgradeChatRoomEntranceWithGroupUserName:andFuncFlag:",
+      "encoding": "B28@0:8@16I24",
+      "imp": "0x10202b3cc",
+      "metadata_offset": "0x16ec89a4"
+    },
+    {
+      "selector": "handleUpgradeChatRoomNeedShowSystemMessageAndRedDotWithGroupUserName:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10202b580",
+      "metadata_offset": "0x16ec89b0"
+    },
+    {
+      "selector": "reportUpgradeChatRoomNeedShowSystemMessageWithGroupUserName:upgradeChatRoomShowSystemMessageTyp:",
+      "encoding": "v28@0:8@16I24",
+      "imp": "0x10202b8b4",
+      "metadata_offset": "0x16ec89bc"
+    },
+    {
+      "selector": "updateChatRoomLocalSendUpgradeTypeWithGroupUserName:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10202b958",
+      "metadata_offset": "0x16ec89c8"
+    },
+    {
+      "selector": "requestUpgradeChatRoomRedDot",
+      "encoding": "v16@0:8",
+      "imp": "0x10202ba08",
+      "metadata_offset": "0x16ec89d4"
+    },
+    {
+      "selector": "sendUpgradeChatRoomNeedShowSystemMessageWithGroupUserName:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10202ba94",
+      "metadata_offset": "0x16ec89e0"
+    },
+    {
+      "selector": "sendUpgradeChatRoomNeedShowSystemMessageWithGroupUserName:andMessageContent:",
+      "encoding": "v32@0:8@16@24",
+      "imp": "0x10202bc80",
+      "metadata_offset": "0x16ec89ec"
+    },
+    {
+      "selector": "CheckForwardUpgradeChatRoomSwitch",
+      "encoding": "B16@0:8",
+      "imp": "0x10202beb0",
+      "metadata_offset": "0x16ec89f8"
+    },
+    {
+      "selector": "simpleCheckUpgradeChatRoomNeedShowSystemMessageAndRedDot:",
+      "encoding": "B24@0:8@16",
+      "imp": "0x10202bf54",
+      "metadata_offset": "0x16ec8a04"
+    },
+    {
+      "selector": "isCheckShowUpgradeChatRoomRedDot:",
+      "encoding": "B24@0:8@16",
+      "imp": "0x10202c020",
+      "metadata_offset": "0x16ec8a10"
+    },
+    {
+      "selector": "checkToBeUpgradeHadNotUpgradeChatRoom:",
+      "encoding": "B24@0:8@16",
+      "imp": "0x10202c104",
+      "metadata_offset": "0x16ec8a1c"
+    },
+    {
+      "selector": "checkHadUpgradeHadChatRoom:",
+      "encoding": "B24@0:8@16",
+      "imp": "0x10202c198",
+      "metadata_offset": "0x16ec8a28"
+    },
+    {
+      "selector": "checkToBeUpgradeChatRoomMemberMoreThanMax:",
+      "encoding": "B24@0:8@16",
+      "imp": "0x10202c1e8",
+      "metadata_offset": "0x16ec8a34"
+    },
+    {
+      "selector": "checkUpgradeChatRoomNeedShowSystemMessageAndRedDotWithGroupUserName:",
+      "encoding": "B24@0:8@16",
+      "imp": "0x10202c2f4",
+      "metadata_offset": "0x16ec8a40"
+    },
+    {
+      "selector": "checkIsCanUpgradeOpenIMGroupContact",
+      "encoding": "B16@0:8",
+      "imp": "0x10202c450",
+      "metadata_offset": "0x16ec8a4c"
+    },
+    {
+      "selector": "GetUpgradeAssociateAtRoomManageInfo:",
+      "encoding": "B24@0:8@16",
+      "imp": "0x10202c6e8",
+      "metadata_offset": "0x16ec8a58"
+    },
+    {
+      "selector": "GetUpgradeAssociateAtRoomManageInfo:andTicket:andScene:",
+      "encoding": "B36@0:8@16@24I32",
+      "imp": "0x10202c890",
+      "metadata_offset": "0x16ec8a64"
+    },
+    {
+      "selector": "OnGetUpgradeAssociateAtRoomManageInfo:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10202ca78",
+      "metadata_offset": "0x16ec8a70"
+    },
+    {
+      "selector": "UpgradeAssociateChatRoom:andTicket:andScene:",
+      "encoding": "B36@0:8@16@24I32",
+      "imp": "0x10202cf88",
+      "metadata_offset": "0x16ec8a7c"
+    },
+    {
+      "selector": "OnUpgradeAssociateChatRoom:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10202d170",
+      "metadata_offset": "0x16ec8a88"
+    },
+    {
+      "selector": "processNewXMLInApproveScene:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10202843c",
+      "metadata_offset": "0x16ec8a94"
+    },
+    {
+      "selector": "getResultWithRegularInString:WithPatterns:",
+      "encoding": "@32@0:8@16@24",
+      "imp": "0x102028ec0",
+      "metadata_offset": "0x16ec8aa0"
+    },
+    {
+      "selector": "disableChatRoomAccessVerifyWithSystemMsgWrap:andNsUsrName:",
+      "encoding": "v32@0:8@16@24",
+      "imp": "0x102028f7c",
+      "metadata_offset": "0x16ec8aac"
+    },
+    {
+      "selector": "processNewXmlUpgradeAssociateChatRoom:andNsUsrName:",
+      "encoding": "v32@0:8@16@24",
+      "imp": "0x102029600",
+      "metadata_offset": "0x16ec8ab8"
+    },
+    {
+      "selector": "processNewXmlChatRoomTopMsg:andNsUsrName:",
+      "encoding": "v32@0:8@16@24",
+      "imp": "0x1020299dc",
+      "metadata_offset": "0x16ec8ac4"
+    },
+    {
+      "selector": "OnGetNewXmlMsg:Type:MsgWrap:",
+      "encoding": "v40@0:8@16@24@32",
+      "imp": "0x10202a840",
+      "metadata_offset": "0x16ec8ad0"
+    },
+    {
+      "selector": "processRoomAnnouncement:userName:",
+      "encoding": "v32@0:8@16@24",
+      "imp": "0x10202aa24",
+      "metadata_offset": "0x16ec8adc"
+    },
+    {
+      "selector": "getChatRoomPanelDynamicWeAppArWithBusinessType:",
+      "encoding": "@24@0:8Q16",
+      "imp": "0x10202429c",
+      "metadata_offset": "0x16ec8ae8"
+    },
+    {
+      "selector": "getInputToolWeAppNotShowIndexWithBusinessType:",
+      "encoding": "q24@0:8Q16",
+      "imp": "0x102024540",
+      "metadata_offset": "0x16ec8af4"
+    },
+    {
+      "selector": "getChatRoomPanelDynamicWeAppAr",
+      "encoding": "@16@0:8",
+      "imp": "0x102024730",
+      "metadata_offset": "0x16ec8b00"
+    },
+    {
+      "selector": "changPanelDynamicWeAppJSONToItemAr:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x102024b24",
+      "metadata_offset": "0x16ec8b0c"
+    },
+    {
+      "selector": "isShowPanelDynamicWeAppRedDotInAttachmentButtonWithBusinessType:",
+      "encoding": "B24@0:8Q16",
+      "imp": "0x102025114",
+      "metadata_offset": "0x16ec8b18"
+    },
+    {
+      "selector": "saveHadShowPanelDynamicWeAppRedDotInAttachmentButtonWithBusinessType:",
+      "encoding": "v24@0:8Q16",
+      "imp": "0x10202533c",
+      "metadata_offset": "0x16ec8b24"
+    },
+    {
+      "selector": "clearRemoveDWeAppInRedDotHadShowArWithAllPanelDynamicWeAppAr:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x102025704",
+      "metadata_offset": "0x16ec8b30"
+    },
+    {
+      "selector": "getPanelDynamicWeAppHadRedDotAr",
+      "encoding": "@16@0:8",
+      "imp": "0x102025ae4",
+      "metadata_offset": "0x16ec8b3c"
+    },
+    {
+      "selector": "getMMKVpanelDynamicWeAppHadRedDotArKey",
+      "encoding": "@16@0:8",
+      "imp": "0x102025e58",
+      "metadata_offset": "0x16ec8b48"
+    },
+    {
+      "selector": "setRoomtToolSalterWXapp:withWeAppInfoList:",
+      "encoding": "B32@0:8@16@24",
+      "imp": "0x102025edc",
+      "metadata_offset": "0x16ec8b54"
+    },
+    {
+      "selector": "OnSetRoomtToolSalterWXapp:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10202630c",
+      "metadata_offset": "0x16ec8b60"
+    },
+    {
+      "selector": "setRoomTopMsg:msgWrap:",
+      "encoding": "B32@0:8@16@24",
+      "imp": "0x1020266f4",
+      "metadata_offset": "0x16ec8b6c"
+    },
+    {
+      "selector": "unsetRoomTopMsg:msgSvrID:",
+      "encoding": "B32@0:8@16Q24",
+      "imp": "0x102026948",
+      "metadata_offset": "0x16ec8b78"
+    },
+    {
+      "selector": "setRoomTopMsg:topMsgOpType:msgSvrID:msgWrap:msgSummary:msgUserName:addMsgData:",
+      "encoding": "B68@0:8@16I24Q28@36@44@52@60",
+      "imp": "0x102026984",
+      "metadata_offset": "0x16ec8b84"
+    },
+    {
+      "selector": "OnSetRoomTopMsg:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x102026d5c",
+      "metadata_offset": "0x16ec8b90"
+    },
+    {
+      "selector": "getChatRoomTopMsgInfoListWithUserName:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x1020274fc",
+      "metadata_offset": "0x16ec8b9c"
+    },
+    {
+      "selector": "removeChatRoomTopMsgLocalWithUserName:topId:",
+      "encoding": "B28@0:8@16I24",
+      "imp": "0x102027934",
+      "metadata_offset": "0x16ec8ba8"
+    },
+    {
+      "selector": "updateChatRoomtTopMsgInfoListFromNetWork:topMsgInfoItemList:",
+      "encoding": "v32@0:8@16@24",
+      "imp": "0x102027a4c",
+      "metadata_offset": "0x16ec8bb4"
+    },
+    {
+      "selector": "getInsertTopMsgInfoListFromNetWork:topMsgInfoItemList:",
+      "encoding": "@32@0:8@16@24",
+      "imp": "0x102027ccc",
+      "metadata_offset": "0x16ec8bc0"
+    },
+    {
+      "selector": "setChatRoomTopMsgLocalRevokeWithUserName:msgSvrID:",
+      "encoding": "B32@0:8@16Q24",
+      "imp": "0x1020281ec",
+      "metadata_offset": "0x16ec8bcc"
+    },
+    {
+      "selector": "setChatRoomTopMsgExposureTimeWithUserName:msgSvrID:exposureTime:",
+      "encoding": "B36@0:8@16Q24I32",
+      "imp": "0x1020282ac",
+      "metadata_offset": "0x16ec8bd8"
+    },
+    {
+      "selector": "checkIsHadTopMsgWithUserName:msgSvrID:",
+      "encoding": "B32@0:8@16Q24",
+      "imp": "0x10202837c",
+      "metadata_offset": "0x16ec8be4"
+    },
+    {
+      "selector": "init",
+      "encoding": "@16@0:8",
+      "imp": "0x102036410",
+      "metadata_offset": "0x16ec8bf0"
+    },
+    {
+      "selector": "onServiceInit",
+      "encoding": "v16@0:8",
+      "imp": "0x102036524",
+      "metadata_offset": "0x16ec8bfc"
+    },
+    {
+      "selector": "dealloc",
+      "encoding": "v16@0:8",
+      "imp": "0x102036678",
+      "metadata_offset": "0x16ec8c08"
+    },
+    {
+      "selector": "initDB:withLock:",
+      "encoding": "v32@0:8@16@24",
+      "imp": "0x1020366d0",
+      "metadata_offset": "0x16ec8c14"
+    },
+    {
+      "selector": "CreateGroup:withMemberList:",
+      "encoding": "B32@0:8@16@24",
+      "imp": "0x1020366e8",
+      "metadata_offset": "0x16ec8c20"
+    },
+    {
+      "selector": "p_CreateGroup:withMemberList:",
+      "encoding": "B32@0:8@16@24",
+      "imp": "0x102036974",
+      "metadata_offset": "0x16ec8c2c"
+    },
+    {
+      "selector": "AddGroupMember:memberList:desp:historyInfo:",
+      "encoding": "B48@0:8@16@24@32@40",
+      "imp": "0x102036d2c",
+      "metadata_offset": "0x16ec8c38"
+    },
+    {
+      "selector": "p_AddGroupMember:memberList:desp:historyInfo:",
+      "encoding": "B48@0:8@16@24@32@40",
+      "imp": "0x102036e1c",
+      "metadata_offset": "0x16ec8c44"
+    },
+    {
+      "selector": "DeleteGroupMember:withMemberList:scene:",
+      "encoding": "B40@0:8@16@24Q32",
+      "imp": "0x102037284",
+      "metadata_offset": "0x16ec8c50"
+    },
+    {
+      "selector": "p_DeleteGroupMember:withMemberList:scene:",
+      "encoding": "B40@0:8@16@24Q32",
+      "imp": "0x102037340",
+      "metadata_offset": "0x16ec8c5c"
+    },
+    {
+      "selector": "SetShowDislayName:forGroup:sync:",
+      "encoding": "B32@0:8B16@20B28",
+      "imp": "0x1020377c0",
+      "metadata_offset": "0x16ec8c68"
+    },
+    {
+      "selector": "p_SetShowDislayName:forGroup:sync:",
+      "encoding": "B32@0:8B16@20B28",
+      "imp": "0x102037860",
+      "metadata_offset": "0x16ec8c74"
+    },
+    {
+      "selector": "SetGroupTopic:withTopic:",
+      "encoding": "B32@0:8@16@24",
+      "imp": "0x102037b08",
+      "metadata_offset": "0x16ec8c80"
+    },
+    {
+      "selector": "p_SetGroupTopic:withTopic:",
+      "encoding": "B32@0:8@16@24",
+      "imp": "0x102037bb0",
+      "metadata_offset": "0x16ec8c8c"
+    },
+    {
+      "selector": "QuitGroup:withUsrName:deleteAllMsg:",
+      "encoding": "B36@0:8@16@24B32",
+      "imp": "0x102037e90",
+      "metadata_offset": "0x16ec8c98"
+    },
+    {
+      "selector": "p_QuitGroup:withUsrName:",
+      "encoding": "B32@0:8@16@24",
+      "imp": "0x102037fa0",
+      "metadata_offset": "0x16ec8ca4"
+    },
+    {
+      "selector": "reconcileQuitGroupLocally:withUsrName:deleteAllMsg:",
+      "encoding": "B36@0:8@16@24B32",
+      "imp": "0x1020380f0",
+      "metadata_offset": "0x16ec8cb0"
+    },
+    {
+      "selector": "reconcileBatchQuitGroupLocally:withUsrName:deleteAllMsg:",
+      "encoding": "B36@0:8@16@24B32",
+      "imp": "0x102038104",
+      "metadata_offset": "0x16ec8cbc"
+    },
+    {
+      "selector": "reconcileQuitGroupLocally:withUsrName:deleteAllMsg:deleteSessionBeforeMessageCleanup:serverConfirmedQuit:",
+      "encoding": "B44@0:8@16@24B32B36B40",
+      "imp": "0x102038118",
+      "metadata_offset": "0x16ec8cc8"
+    },
+    {
+      "selector": "oplogRet:errMsg:eventID:cgiWrap:",
+      "encoding": "v40@0:8i16@20I28@32",
+      "imp": "0x1020387d0",
+      "metadata_offset": "0x16ec8cd4"
+    },
+    {
+      "selector": "GetGroupAdmin:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x102038efc",
+      "metadata_offset": "0x16ec8ce0"
+    },
+    {
+      "selector": "GetGroupSpecialAttentionMemList:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x102039328",
+      "metadata_offset": "0x16ec8cec"
+    },
+    {
+      "selector": "GetGroupAdminUserName:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x102039754",
+      "metadata_offset": "0x16ec8cf8"
+    },
+    {
+      "selector": "GetGroupMember:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x102039898",
+      "metadata_offset": "0x16ec8d04"
+    },
+    {
+      "selector": "GetGroupMemberUserListByContact:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x102039cc4",
+      "metadata_offset": "0x16ec8d10"
+    },
+    {
+      "selector": "GetChatRoomSpecialAttentionUserList:chatRoomMemList:",
+      "encoding": "@32@0:8@16@24",
+      "imp": "0x102039d80",
+      "metadata_offset": "0x16ec8d1c"
+    },
+    {
+      "selector": "GetGroupMemberWithOutMyself:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x102039df0",
+      "metadata_offset": "0x16ec8d28"
+    },
+    {
+      "selector": "IsUsrInChatRoom:Usr:",
+      "encoding": "B32@0:8@16@24",
+      "imp": "0x10203a1fc",
+      "metadata_offset": "0x16ec8d34"
+    },
+    {
+      "selector": "ShowInContactBook:sync:",
+      "encoding": "B28@0:8@16B24",
+      "imp": "0x10203a6e8",
+      "metadata_offset": "0x16ec8d40"
+    },
+    {
+      "selector": "UnShowInContactBook:sync:",
+      "encoding": "B28@0:8@16B24",
+      "imp": "0x10203a828",
+      "metadata_offset": "0x16ec8d4c"
+    },
+    {
+      "selector": "addChatMemberNeedVerifyMsg:ContactList:",
+      "encoding": "v32@0:8@16@24",
+      "imp": "0x10203a968",
+      "metadata_offset": "0x16ec8d58"
+    },
+    {
+      "selector": "addChatMemberSystemTipMsg:contactList:systemTipContentFormat:systemTipContent:",
+      "encoding": "v48@0:8@16@24@32@40",
+      "imp": "0x10203adf4",
+      "metadata_offset": "0x16ec8d64"
+    },
+    {
+      "selector": "genContactFromMemberResp:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x10203b35c",
+      "metadata_offset": "0x16ec8d70"
+    },
+    {
+      "selector": "OnAddChatRoomMember:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10203b60c",
+      "metadata_offset": "0x16ec8d7c"
+    },
+    {
+      "selector": "OnDeleteChatRoomMemberResponse:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10203c618",
+      "metadata_offset": "0x16ec8d88"
+    },
+    {
+      "selector": "addCreateMsg:ContactList:",
+      "encoding": "v32@0:8@16@24",
+      "imp": "0x10203cd38",
+      "metadata_offset": "0x16ec8d94"
+    },
+    {
+      "selector": "HandleCreateChatRoomOK:",
+      "encoding": "@24@0:8@16",
+      "imp": "0x10203d2e4",
+      "metadata_offset": "0x16ec8da0"
+    },
+    {
+      "selector": "OnCreateChatRoom:",
+      "encoding": "i24@0:8@16",
+      "imp": "0x10203e200",
+      "metadata_offset": "0x16ec8dac"
+    },
+    {
+      "selector": "OnUpgradeChatRoom:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10203e7fc",
+      "metadata_offset": "0x16ec8db8"
+    },
+    {
+      "selector": "OnGetChatRoomMemberDetail:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10203ed80",
+      "metadata_offset": "0x16ec8dc4"
+    },
+    {
+      "selector": "updateChatRoomSpecialAttentionMemList:chatRoomData:",
+      "encoding": "v32@0:8@16@24",
+      "imp": "0x10203f968",
+      "metadata_offset": "0x16ec8dd0"
+    },
+    {
+      "selector": "updateChatRoomMemList:withResponse:",
+      "encoding": "v32@0:8@16@24",
+      "imp": "0x10203fbc4",
+      "metadata_offset": "0x16ec8ddc"
+    },
+    {
+      "selector": "recordGetChatRoomMemberDetailCacheWithUserName:clientVersion:serverVersion:getChatRoomMemberDetailCache:",
+      "encoding": "v40@0:8@16I24I28@32",
+      "imp": "0x10204028c",
+      "metadata_offset": "0x16ec8de8"
+    },
+    {
+      "selector": "OnUpdateContact:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x102040438",
+      "metadata_offset": "0x16ec8df4"
+    },
+    {
+      "selector": "onGetChatRoomUpgradeStatus:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x102040954",
+      "metadata_offset": "0x16ec8e00"
+    },
+    {
+      "selector": "createProtoBufEvent:forCgi:andUserData:",
+      "encoding": "I36@0:8@16I24@28",
+      "imp": "0x102040b9c",
+      "metadata_offset": "0x16ec8e0c"
+    },
+    {
+      "selector": "createProtoBufEvent:forCgi:andUserData:eventHandler:",
+      "encoding": "I44@0:8@16I24@28#36",
+      "imp": "0x102040bac",
+      "metadata_offset": "0x16ec8e18"
+    },
+    {
+      "selector": "GetChatRoomMemberDetail:",
+      "encoding": "B24@0:8@16",
+      "imp": "0x102040d70",
+      "metadata_offset": "0x16ec8e24"
+    },
+    {
+      "selector": "p_GetChatRoomMemberDetail:",
+      "encoding": "B24@0:8@16",
+      "imp": "0x102040e20",
+      "metadata_offset": "0x16ec8e30"
+    },
+    {
+      "selector": "GetEntireChatRoomMemberDetail:",
+      "encoding": "B24@0:8@16",
+      "imp": "0x1020413dc",
+      "metadata_offset": "0x16ec8e3c"
+    },
+    {
+      "selector": "GetChatRoomInfo:",
+      "encoding": "B24@0:8@16",
+      "imp": "0x1020416bc",
+      "metadata_offset": "0x16ec8e48"
+    },
+    {
+      "selector": "p_GetChatRoomInfo:",
+      "encoding": "B24@0:8@16",
+      "imp": "0x102041760",
+      "metadata_offset": "0x16ec8e54"
+    },
+    {
+      "selector": "CanUpgradeChatRoom",
+      "encoding": "i16@0:8",
+      "imp": "0x102041a18",
+      "metadata_offset": "0x16ec8e60"
+    },
+    {
+      "selector": "CanDonateChatRoom",
+      "encoding": "i16@0:8",
+      "imp": "0x102041ab8",
+      "metadata_offset": "0x16ec8e6c"
+    },
+    {
+      "selector": "InviteGroupMember:withMemberList:",
+      "encoding": "B32@0:8@16@24",
+      "imp": "0x102041b58",
+      "metadata_offset": "0x16ec8e78"
+    },
+    {
+      "selector": "InviteGroupMember:withMemberList:withInviterScene:withTicket:withUserData:withMsgHistoryInfo:",
+      "encoding": "B60@0:8@16@24I32@36@44@52",
+      "imp": "0x102041b74",
+      "metadata_offset": "0x16ec8e84"
+    },
+    {
+      "selector": "p_InviteGroupMember:withMemberList:withInviterScene:withTicket:withUserData:withMsgHistoryInfo:",
+      "encoding": "B60@0:8@16@24I32@36@44@52",
+      "imp": "0x102041c8c",
+      "metadata_offset": "0x16ec8e90"
+    },
+    {
+      "selector": "OnInviteChatRoomMemberResp:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x102042018",
+      "metadata_offset": "0x16ec8e9c"
+    },
+    {
+      "selector": "ChangeChatRoomOwner:NewOwner:",
+      "encoding": "B32@0:8@16@24",
+      "imp": "0x102042818",
+      "metadata_offset": "0x16ec8ea8"
+    },
+    {
+      "selector": "p_ChangeChatRoomOwner:NewOwner:",
+      "encoding": "B32@0:8@16@24",
+      "imp": "0x1020428c0",
+      "metadata_offset": "0x16ec8eb4"
+    },
+    {
+      "selector": "SetChatRoomSelfDisplayName:DisplayName:",
+      "encoding": "I32@0:8@16@24",
+      "imp": "0x102042a3c",
+      "metadata_offset": "0x16ec8ec0"
+    },
+    {
+      "selector": "p_SetChatRoomSelfDisplayName:DisplayName:",
+      "encoding": "I32@0:8@16@24",
+      "imp": "0x102042ae4",
+      "metadata_offset": "0x16ec8ecc"
+    },
+    {
+      "selector": "OnChangeChatRoomOwnerResp:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x102042c64",
+      "metadata_offset": "0x16ec8ed8"
+    },
+    {
+      "selector": "ChangeChatRoomAccessType:type:qrCodeAccessType:",
+      "encoding": "B32@0:8@16I24I28",
+      "imp": "0x1020432d0",
+      "metadata_offset": "0x16ec8ee4"
+    },
+    {
+      "selector": "p_ChangeChatRoomAccessType:type:qrCodeAccessType:",
+      "encoding": "B32@0:8@16I24I28",
+      "imp": "0x10204337c",
+      "metadata_offset": "0x16ec8ef0"
+    },
+    {
+      "selector": "ChangeChatRoomOnlyAdminModTopic:on:",
+      "encoding": "B28@0:8@16B24",
+      "imp": "0x102043600",
+      "metadata_offset": "0x16ec8efc"
+    },
+    {
+      "selector": "ApproveGroupMember:withInviterName:withInviteeList:withTicket:withUserData:withApproveMsgid:",
+      "encoding": "B64@0:8@16@24@32@40@48Q56",
+      "imp": "0x1020438a0",
+      "metadata_offset": "0x16ec8f08"
+    },
+    {
+      "selector": "p_ApproveGroupMember:withInviterName:withInviteeList:withTicket:withUserData:withApproveMsgid:",
+      "encoding": "B64@0:8@16@24@32@40@48Q56",
+      "imp": "0x1020439c0",
+      "metadata_offset": "0x16ec8f14"
+    },
+    {
+      "selector": "OnApproveGroupMember:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x102043b8c",
+      "metadata_offset": "0x16ec8f20"
+    },
+    {
+      "selector": "AddGroupAdmin:withAdminList:",
+      "encoding": "B32@0:8@16@24",
+      "imp": "0x102043fa4",
+      "metadata_offset": "0x16ec8f2c"
+    },
+    {
+      "selector": "p_AddGroupAdmin:withAdminList:",
+      "encoding": "B32@0:8@16@24",
+      "imp": "0x10204404c",
+      "metadata_offset": "0x16ec8f38"
+    },
+    {
+      "selector": "OnAddGroupAdmin:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x102044344",
+      "metadata_offset": "0x16ec8f44"
+    },
+    {
+      "selector": "AddOpenIMGroupAdmin:withAdminList:",
+      "encoding": "B32@0:8@16@24",
+      "imp": "0x102044a68",
+      "metadata_offset": "0x16ec8f50"
+    },
+    {
+      "selector": "OnAddOpenIMGroupAdmin:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x102044d60",
+      "metadata_offset": "0x16ec8f5c"
+    },
+    {
+      "selector": "DeleteGroupAdmin:withAdminList:",
+      "encoding": "B32@0:8@16@24",
+      "imp": "0x102045484",
+      "metadata_offset": "0x16ec8f68"
+    },
+    {
+      "selector": "p_DeleteGroupAdmin:withAdminList:",
+      "encoding": "B32@0:8@16@24",
+      "imp": "0x10204552c",
+      "metadata_offset": "0x16ec8f74"
+    },
+    {
+      "selector": "OnDeleteGroupAdmin:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10204582c",
+      "metadata_offset": "0x16ec8f80"
+    },
+    {
+      "selector": "DeleteOpenIMGroupAdmin:withAdminList:",
+      "encoding": "B32@0:8@16@24",
+      "imp": "0x102045f50",
+      "metadata_offset": "0x16ec8f8c"
+    },
+    {
+      "selector": "OnDeleteOpenIMGroupAdmin:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x102046250",
+      "metadata_offset": "0x16ec8f98"
+    },
+    {
+      "selector": "OnGetChatRoomInfoResp:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x102046974",
+      "metadata_offset": "0x16ec8fa4"
+    },
+    {
+      "selector": "handleGetChatRoomInfoResp:response:request:",
+      "encoding": "v40@0:8@16@24@32",
+      "imp": "0x102046a10",
+      "metadata_offset": "0x16ec8fb0"
+    },
+    {
+      "selector": "clearUnshownRoomDesc:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10204782c",
+      "metadata_offset": "0x16ec8fbc"
+    },
+    {
+      "selector": "updateFamilyChatRoomtToolHadGetContactDetail:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x102047a20",
+      "metadata_offset": "0x16ec8fc8"
+    },
+    {
+      "selector": "updateOpenImChatRoomMigrate:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x102047b3c",
+      "metadata_offset": "0x16ec8fd4"
+    },
+    {
+      "selector": "SetChatRoomDesc:Desc:Flag:",
+      "encoding": "B36@0:8@16@24I32",
+      "imp": "0x102047cf4",
+      "metadata_offset": "0x16ec8fe0"
+    },
+    {
+      "selector": "p_SetChatRoomDesc:Desc:Flag:",
+      "encoding": "B36@0:8@16@24I32",
+      "imp": "0x102047db0",
+      "metadata_offset": "0x16ec8fec"
+    },
+    {
+      "selector": "OnSetChatRoomDescResp:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x102047f1c",
+      "metadata_offset": "0x16ec8ff8"
+    },
+    {
+      "selector": "OnDismissChatRoomResp:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x102048754",
+      "metadata_offset": "0x16ec9004"
+    },
+    {
+      "selector": "DismissChatRoom:",
+      "encoding": "B24@0:8@16",
+      "imp": "0x102048be4",
+      "metadata_offset": "0x16ec9010"
+    },
+    {
+      "selector": "reloadChatRoomInfoDetailCompatibleCGIDataWithUserName:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x102048dd0",
+      "metadata_offset": "0x16ec901c"
+    },
+    {
+      "selector": "didHandleChatRoomInfoDetailCompatibleCGIDataWithpbRequest:pbResponse:",
+      "encoding": "B32@0:8@16@24",
+      "imp": "0x1020490b0",
+      "metadata_offset": "0x16ec9028"
+    },
+    {
+      "selector": "OnOplogRespForModTopic:Resp:",
+      "encoding": "v32@0:8@16@24",
+      "imp": "0x102049760",
+      "metadata_offset": "0x16ec9034"
+    },
+    {
+      "selector": "OnOplogRespForChangeChatRoomAccessType:Resp:",
+      "encoding": "v32@0:8@16@24",
+      "imp": "0x102049ea8",
+      "metadata_offset": "0x16ec9040"
+    },
+    {
+      "selector": "OnOplogRespForChangeChatRoomOnlyAdminModTopic:Resp:",
+      "encoding": "v32@0:8@16@24",
+      "imp": "0x10204a640",
+      "metadata_offset": "0x16ec904c"
+    },
+    {
+      "selector": "OnOplogResp:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10204aefc",
+      "metadata_offset": "0x16ec9058"
+    },
+    {
+      "selector": "MessageReturn:Event:",
+      "encoding": "v28@0:8@16I24",
+      "imp": "0x10204b0d8",
+      "metadata_offset": "0x16ec9064"
+    },
+    {
+      "selector": "onModifyContact:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10204b370",
+      "metadata_offset": "0x16ec9070"
+    },
+    {
+      "selector": "chatRoomToolMgr",
+      "encoding": "@16@0:8",
+      "imp": "0x10204b520",
+      "metadata_offset": "0x16ec907c"
+    },
+    {
+      "selector": "openImChatRoomMigrateMgr",
+      "encoding": "@16@0:8",
+      "imp": "0x10204b530",
+      "metadata_offset": "0x16ec9088"
+    },
+    {
+      "selector": "getCreateGroupSessionId",
+      "encoding": "@16@0:8",
+      "imp": "0x10204b540",
+      "metadata_offset": "0x16ec9094"
+    },
+    {
+      "selector": "changeChatRoomChatBoxType:inChatBox:sync:",
+      "encoding": "B32@0:8@16B24B28",
+      "imp": "0x10204b550",
+      "metadata_offset": "0x16ec90a0"
+    },
+    {
+      "selector": "changeChatRoomMsgNeedPushFlag:needPushFlag:sync:",
+      "encoding": "B32@0:8@16I24B28",
+      "imp": "0x10204b870",
+      "metadata_offset": "0x16ec90ac"
+    },
+    {
+      "selector": "reportOnlyAdminModifyTopic:role:memberCount:action:",
+      "encoding": "v36@0:8@16I24I28I32",
+      "imp": "0x10204bbb8",
+      "metadata_offset": "0x16ec90b8"
+    },
+    {
+      "selector": "OnDelMsg:MsgWrap:",
+      "encoding": "v32@0:8@16@24",
+      "imp": "0x10204bc60",
+      "metadata_offset": "0x16ec90c4"
+    },
+    {
+      "selector": "OnDelMsg:DelAll:",
+      "encoding": "v28@0:8@16B24",
+      "imp": "0x10204bc70",
+      "metadata_offset": "0x16ec90d0"
+    },
+    {
+      "selector": "OnRevokeMsg:MsgWrap:ResultCode:ResultMsg:EducationMsg:",
+      "encoding": "v52@0:8@16@24I32@36@44",
+      "imp": "0x10204bc88",
+      "metadata_offset": "0x16ec90dc"
+    },
+    {
+      "selector": "m_panelDynamicWeAppAr",
+      "encoding": "@16@0:8",
+      "imp": "0x10204bc98",
+      "metadata_offset": "0x16ec90e8"
+    },
+    {
+      "selector": "setM_panelDynamicWeAppAr:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10204bca8",
+      "metadata_offset": "0x16ec90f4"
+    },
+    {
+      "selector": "m_panelDynamicUpdateTime",
+      "encoding": "d16@0:8",
+      "imp": "0x10204bcbc",
+      "metadata_offset": "0x16ec9100"
+    },
+    {
+      "selector": "setM_panelDynamicUpdateTime:",
+      "encoding": "v24@0:8d16",
+      "imp": "0x10204bccc",
+      "metadata_offset": "0x16ec910c"
+    },
+    {
+      "selector": "m_panelDynamicWeAppCache",
+      "encoding": "@16@0:8",
+      "imp": "0x10204bcdc",
+      "metadata_offset": "0x16ec9118"
+    },
+    {
+      "selector": "setM_panelDynamicWeAppCache:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10204bcec",
+      "metadata_offset": "0x16ec9124"
+    },
+    {
+      "selector": "m_dicQuitGroup",
+      "encoding": "@16@0:8",
+      "imp": "0x10204bd00",
+      "metadata_offset": "0x16ec9130"
+    },
+    {
+      "selector": "setM_dicQuitGroup:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10204bd10",
+      "metadata_offset": "0x16ec913c"
+    },
+    {
+      "selector": "dicShouldDeleteAllMsgAfterQuit",
+      "encoding": "@16@0:8",
+      "imp": "0x10204bd24",
+      "metadata_offset": "0x16ec9148"
+    },
+    {
+      "selector": "setDicShouldDeleteAllMsgAfterQuit:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10204bd34",
+      "metadata_offset": "0x16ec9154"
+    },
+    {
+      "selector": ".cxx_destruct",
+      "encoding": "v16@0:8",
+      "imp": "0x10204bd48",
+      "metadata_offset": "0x16ec9160"
+    }
+  ],
+  "ivars": [
+    {
+      "name": "m_oGroupDB",
+      "encoding": "@\"CGroupDB\""
+    },
+    {
+      "name": "m_oGroupOpLog",
+      "encoding": "@\"CGroupOpLog\""
+    },
+    {
+      "name": "m_gettingMemberDetailQueue",
+      "encoding": "@\"NSMutableArray\""
+    },
+    {
+      "name": "m_gettingInfoQueue",
+      "encoding": "@\"NSMutableArray\""
+    },
+    {
+      "name": "m_chatRoomToolMgr",
+      "encoding": "@\"ChatRoomToolMgr\""
+    },
+    {
+      "name": "m_openImChatRoomMigrateMgr",
+      "encoding": "@\"OpenImChatRoomMigrateMgr\""
+    },
+    {
+      "name": "m_createGroupSessionId",
+      "encoding": "@\"NSString\""
+    },
+    {
+      "name": "m_dicGetChatRoomMemberDetailCache",
+      "encoding": "@\"NSMutableDictionary\""
+    },
+    {
+      "name": "_m_panelDynamicWeAppAr",
+      "encoding": "@\"NSMutableArray\""
+    },
+    {
+      "name": "_m_panelDynamicUpdateTime",
+      "encoding": "d"
+    },
+    {
+      "name": "_m_panelDynamicWeAppCache",
+      "encoding": "@\"ChatRoomPanelDynamicWeAppCache\""
+    },
+    {
+      "name": "_m_dicQuitGroup",
+      "encoding": "@\"NSMutableDictionary\""
+    },
+    {
+      "name": "_dicShouldDeleteAllMsgAfterQuit",
+      "encoding": "@\"NSMutableDictionary\""
+    }
+  ]
+}

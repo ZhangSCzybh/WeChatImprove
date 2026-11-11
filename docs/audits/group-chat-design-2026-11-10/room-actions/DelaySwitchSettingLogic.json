@@ -1,0 +1,243 @@
+{
+  "name": "DelaySwitchSettingLogic",
+  "class_offset": "0x1ee6b228",
+  "superclass": "MMObject",
+  "methods": [
+    {
+      "selector": "init",
+      "encoding": "@16@0:8",
+      "imp": "0x10121b088",
+      "metadata_offset": "0x171a2050"
+    },
+    {
+      "selector": "dealloc",
+      "encoding": "v16@0:8",
+      "imp": "0x10121b12c",
+      "metadata_offset": "0x171a205c"
+    },
+    {
+      "selector": "enterBackground",
+      "encoding": "v16@0:8",
+      "imp": "0x10121b1c0",
+      "metadata_offset": "0x171a2068"
+    },
+    {
+      "selector": "commitAllSwitchSetting",
+      "encoding": "v16@0:8",
+      "imp": "0x10121b1cc",
+      "metadata_offset": "0x171a2074"
+    },
+    {
+      "selector": "chatProfileSwitchSetting:withType:andValue:",
+      "encoding": "v36@0:8@16Q24B32",
+      "imp": "0x10121b31c",
+      "metadata_offset": "0x171a2080"
+    },
+    {
+      "selector": "contactProfileSwitchSetting:withType:andValue:",
+      "encoding": "v36@0:8@16Q24B32",
+      "imp": "0x10121b408",
+      "metadata_offset": "0x171a208c"
+    },
+    {
+      "selector": "individualPrivacySwitchSetting:andValue:",
+      "encoding": "v28@0:8Q16B24",
+      "imp": "0x10121b4f4",
+      "metadata_offset": "0x171a2098"
+    },
+    {
+      "selector": "messageNotifycationSwitchSetting:andValue:",
+      "encoding": "v28@0:8Q16B24",
+      "imp": "0x10121b604",
+      "metadata_offset": "0x171a20a4"
+    },
+    {
+      "selector": "pluginSwitchSetting:andValue:",
+      "encoding": "v28@0:8Q16B24",
+      "imp": "0x10121b714",
+      "metadata_offset": "0x171a20b0"
+    },
+    {
+      "selector": "processChatProfileSetting:withType:andValue:",
+      "encoding": "v32@0:8@16i24B28",
+      "imp": "0x10121b824",
+      "metadata_offset": "0x171a20bc"
+    },
+    {
+      "selector": "setChatRoomMsgNeedPushFlag:needPushFlag:",
+      "encoding": "v28@0:8@16I24",
+      "imp": "0x10121be9c",
+      "metadata_offset": "0x171a20c8"
+    },
+    {
+      "selector": "processContactProfileSetting:withType:andValue:",
+      "encoding": "v32@0:8@16i24B28",
+      "imp": "0x10121bf7c",
+      "metadata_offset": "0x171a20d4"
+    },
+    {
+      "selector": "processIndividualPrivacySetting:withType:andValue:",
+      "encoding": "v32@0:8@16i24B28",
+      "imp": "0x10121c68c",
+      "metadata_offset": "0x171a20e0"
+    },
+    {
+      "selector": "processMessageNotifycationSetting:withType:andValue:",
+      "encoding": "v32@0:8@16i24B28",
+      "imp": "0x10121c908",
+      "metadata_offset": "0x171a20ec"
+    },
+    {
+      "selector": "processPluginSetting:withType:andValue:",
+      "encoding": "v32@0:8@16i24B28",
+      "imp": "0x10121cb04",
+      "metadata_offset": "0x171a20f8"
+    },
+    {
+      "selector": "setWCPayTransferDelaySwitch:",
+      "encoding": "v24@0:8Q16",
+      "imp": "0x10121cc08",
+      "metadata_offset": "0x171a2104"
+    },
+    {
+      "selector": "setWCPaySettingDelaySwitch:clearBitMask:",
+      "encoding": "v32@0:8Q16Q24",
+      "imp": "0x10121cef0",
+      "metadata_offset": "0x171a2110"
+    },
+    {
+      "selector": "discoverEntranceSwitchSetting:andValue:",
+      "encoding": "v28@0:8Q16B24",
+      "imp": "0x10121d130",
+      "metadata_offset": "0x171a211c"
+    },
+    {
+      "selector": "discoverEntrancePluginSwitchSetting:andValue:",
+      "encoding": "v28@0:8Q16B24",
+      "imp": "0x10121d308",
+      "metadata_offset": "0x171a2128"
+    },
+    {
+      "selector": "setExtStatusSwitchInvertedAtServerWithFunctionId:statusBit:andSetClose:",
+      "encoding": "v32@0:8I16Q20B28",
+      "imp": "0x10121d558",
+      "metadata_offset": "0x171a2134"
+    },
+    {
+      "selector": "setExtStatus2SwitchInvertedAtServerWithFunctionId:statusBit:andSetOpen:",
+      "encoding": "v32@0:8I16Q20B28",
+      "imp": "0x10121d580",
+      "metadata_offset": "0x171a2140"
+    },
+    {
+      "selector": "CreateSettingEventType:andValue:andBitset:",
+      "encoding": "v28@0:8I16B20I24",
+      "imp": "0x10121d5ac",
+      "metadata_offset": "0x171a214c"
+    },
+    {
+      "selector": "CreateSettingExtStautsEventType:andValue:andBitset:",
+      "encoding": "v32@0:8I16B20Q24",
+      "imp": "0x10121d660",
+      "metadata_offset": "0x171a2158"
+    },
+    {
+      "selector": "setDiscoverEtranceSettingFlagMask:setOpen:",
+      "encoding": "v28@0:8Q16B24",
+      "imp": "0x10121d714",
+      "metadata_offset": "0x171a2164"
+    },
+    {
+      "selector": "setApnsContentSetting:",
+      "encoding": "v20@0:8I16",
+      "imp": "0x10121d73c",
+      "metadata_offset": "0x171a2170"
+    },
+    {
+      "selector": "saveApnsContentLocalChange",
+      "encoding": "v16@0:8",
+      "imp": "0x10121d804",
+      "metadata_offset": "0x171a217c"
+    },
+    {
+      "selector": "commitApnsContentSettingChange",
+      "encoding": "v16@0:8",
+      "imp": "0x10121d93c",
+      "metadata_offset": "0x171a2188"
+    },
+    {
+      "selector": "setQuickReplySwitchOn:",
+      "encoding": "v20@0:8B16",
+      "imp": "0x10121da7c",
+      "metadata_offset": "0x171a2194"
+    },
+    {
+      "selector": "setQuickReplyContentSetting:",
+      "encoding": "v20@0:8I16",
+      "imp": "0x10121dbbc",
+      "metadata_offset": "0x171a21a0"
+    },
+    {
+      "selector": "saveQuickReplyLocalChange",
+      "encoding": "v16@0:8",
+      "imp": "0x10121dd50",
+      "metadata_offset": "0x171a21ac"
+    },
+    {
+      "selector": "commitQuickReplySettingChange",
+      "encoding": "v16@0:8",
+      "imp": "0x10121df88",
+      "metadata_offset": "0x171a21b8"
+    },
+    {
+      "selector": "processWCCommentInteractionsNotificationSetting:shouldOpen:",
+      "encoding": "v24@0:8i16B20",
+      "imp": "0x10121e0c8",
+      "metadata_offset": "0x171a21c4"
+    },
+    {
+      "selector": "quickReplyOplog",
+      "encoding": "@16@0:8",
+      "imp": "0x10121e164",
+      "metadata_offset": "0x171a21d0"
+    },
+    {
+      "selector": "setQuickReplyOplog:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10121e174",
+      "metadata_offset": "0x171a21dc"
+    },
+    {
+      "selector": "apnsContentOplog",
+      "encoding": "@16@0:8",
+      "imp": "0x10121e188",
+      "metadata_offset": "0x171a21e8"
+    },
+    {
+      "selector": "setApnsContentOplog:",
+      "encoding": "v24@0:8@16",
+      "imp": "0x10121e198",
+      "metadata_offset": "0x171a21f4"
+    },
+    {
+      "selector": ".cxx_destruct",
+      "encoding": "v16@0:8",
+      "imp": "0x10121e1ac",
+      "metadata_offset": "0x171a2200"
+    }
+  ],
+  "ivars": [
+    {
+      "name": "m_bNeedToSync",
+      "encoding": "B"
+    },
+    {
+      "name": "_quickReplyOplog",
+      "encoding": "@\"NotificationBannerDisplayContentSettingOplog\""
+    },
+    {
+      "name": "_apnsContentOplog",
+      "encoding": "@\"ApnsBannerDisplayContentSettingOplog\""
+    }
+  ]
+}

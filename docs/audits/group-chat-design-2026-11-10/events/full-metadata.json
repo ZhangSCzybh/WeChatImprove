@@ -1,0 +1,2757 @@
+{
+  "path": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/rea-extracted-4b6441f8-4e09-4a13-9071-759ca0cc225f/Payload/WeChat.app/WeChat",
+  "sha256": "1d626426df97058a8a87c661532b2801cd27b7d9fcc12e27609c751f5877b7ed",
+  "classes": [
+    {
+      "name": "CContactMgr",
+      "address": "0x11ee67f38",
+      "methods": [
+        {
+          "selector": "batchInsertContactTag:",
+          "types": "B24@0:8@16",
+          "imp": "0x100c7d7e8"
+        },
+        {
+          "selector": "batchUpdateContactTagName:",
+          "types": "B24@0:8@16",
+          "imp": "0x100c7d804"
+        },
+        {
+          "selector": "batchUpdateContactTagOrder:",
+          "types": "B24@0:8@16",
+          "imp": "0x100c7d820"
+        },
+        {
+          "selector": "batchDeleteContactTagWithArrTagId:",
+          "types": "B24@0:8@16",
+          "imp": "0x100c7d83c"
+        },
+        {
+          "selector": "batchInsertContactTagRelationWithUserName:arrContactTagID:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x100c7d8d4"
+        },
+        {
+          "selector": "getArrContactTagIDWithUserName:",
+          "types": "@24@0:8@16",
+          "imp": "0x100c7d8f0"
+        },
+        {
+          "selector": "saveArrSelectRecommTagForStrangerContact:arrSelectRecommTagName:",
+          "types": "v32@0:8@16@24",
+          "imp": "0x100c7d90c"
+        },
+        {
+          "selector": "getRecommendTag:arrHadTagID:",
+          "types": "@32@0:8@16@24",
+          "imp": "0x100c7dcf8"
+        },
+        {
+          "selector": "getArrContactTagWithUserName:arrIgnoreContactTagID:",
+          "types": "@32@0:8@16@24",
+          "imp": "0x100c7de08"
+        },
+        {
+          "selector": "DisabledShareCardMessageMsg:shareCardMessageState:",
+          "types": "v28@0:8@16I24",
+          "imp": "0x100c7d02c"
+        },
+        {
+          "selector": "DisabledShareCardMessageMsg:shareCardMessageState:isSyncExtDevice:",
+          "types": "v32@0:8@16I24B28",
+          "imp": "0x100c7d03c"
+        },
+        {
+          "selector": "OnModMsg:MsgWrap:",
+          "types": "v32@0:8@16@24",
+          "imp": "0x100c7d530"
+        },
+        {
+          "selector": "getMsgUserNameLocalID:",
+          "types": "@24@0:8@16",
+          "imp": "0x100c7d73c"
+        },
+        {
+          "selector": "udpateSendMsgActionFlag:",
+          "types": "v20@0:8I16",
+          "imp": "0x100c7c5c8"
+        },
+        {
+          "selector": "asynUdpateContactSendMsgTicketList:",
+          "types": "v24@0:8@16",
+          "imp": "0x100c7c6e8"
+        },
+        {
+          "selector": "getSendMsgActionFlag",
+          "types": "I16@0:8",
+          "imp": "0x100c7c92c"
+        },
+        {
+          "selector": "getSendMsgTicketWithUserName:",
+          "types": "@24@0:8@16",
+          "imp": "0x100c7c990"
+        },
+        {
+          "selector": "getContactSendMsgTicketFromDic:",
+          "types": "@24@0:8@16",
+          "imp": "0x100c7ca50"
+        },
+        {
+          "selector": "updateContactSendMsgTicketCache",
+          "types": "v16@0:8",
+          "imp": "0x100c7ccd0"
+        },
+        {
+          "selector": "updateContactSendMsgTicket:",
+          "types": "v24@0:8@16",
+          "imp": "0x100c7cde4"
+        },
+        {
+          "selector": "reportNewSyncCmdContactImportantChangeData:",
+          "types": "v24@0:8@16",
+          "imp": "0x100c7b228"
+        },
+        {
+          "selector": "reportGetContactFromServiceContactImportantChangeData:",
+          "types": "v24@0:8@16",
+          "imp": "0x100c7b238"
+        },
+        {
+          "selector": "reportContactImportantChangeData:actionScene:",
+          "types": "v28@0:8@16I24",
+          "imp": "0x100c7b248"
+        },
+        {
+          "selector": "reportContactImportantChangeData:actionCode:actionScene:",
+          "types": "v32@0:8@16I24I28",
+          "imp": "0x100c7b334"
+        },
+        {
+          "selector": "reportContactImportantChangeData:oldContact:actionCode:actionScene:",
+          "types": "v40@0:8@16@24I32I36",
+          "imp": "0x100c7b3e8"
+        },
+        {
+          "selector": "reportContactImportantChangeData:oldContact:actionCode:actionScene:isPrintContactInfo:",
+          "types": "v44@0:8@16@24I32I36B40",
+          "imp": "0x100c7b3f8"
+        },
+        {
+          "selector": "printContactImportantChangeData:oldContact:",
+          "types": "v32@0:8@16@24",
+          "imp": "0x100c7c048"
+        },
+        {
+          "selector": "reportContactImportantChangeData:actionCode:actionScene:oldValue:newValue:",
+          "types": "v48@0:8@16I24I28@32@40",
+          "imp": "0x100c7c1e0"
+        },
+        {
+          "selector": "makeSendMsgFailedWithSystemMsgWrap:",
+          "types": "v24@0:8@16",
+          "imp": "0x100c7a51c"
+        },
+        {
+          "selector": "makeUnavailableAccountTipWithSystemMsgWrap:",
+          "types": "v24@0:8@16",
+          "imp": "0x100c7acbc"
+        },
+        {
+          "selector": "OnGetNewXmlMsg:Type:MsgWrap:",
+          "types": "v40@0:8@16@24@32",
+          "imp": "0x100c7b168"
+        },
+        {
+          "selector": "modifyContact:Des:WithBlock:WithDoneBlock:",
+          "types": "B48@0:8@16@24@?32@?40",
+          "imp": "0x100c7448c"
+        },
+        {
+          "selector": "modifyOrAddContact:Des:WithAddBlock:AddDoneBlock:WithModBlock:ModDoneBlock:",
+          "types": "B64@0:8@16@24@?32@?40@?48@?56",
+          "imp": "0x100c746bc"
+        },
+        {
+          "selector": "modifyContact:Des:WithBlock:",
+          "types": "B40@0:8@16@24@?32",
+          "imp": "0x100c7494c"
+        },
+        {
+          "selector": "modifyContactForInternel:Des:WithBlock:",
+          "types": "B40@0:8@16@24@?32",
+          "imp": "0x100c749d0"
+        },
+        {
+          "selector": "internalNewContact:",
+          "types": "v24@0:8@16",
+          "imp": "0x100c74a54"
+        },
+        {
+          "selector": "setContact:remark:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x100c74bb0"
+        },
+        {
+          "selector": "setContact:chatState:",
+          "types": "B28@0:8@16I24",
+          "imp": "0x100c74f38"
+        },
+        {
+          "selector": "setHDHeadUpdated:Url:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x100c750f4"
+        },
+        {
+          "selector": "setChatRoomHeadImageUrlInLocal:Url:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x100c75368"
+        },
+        {
+          "selector": "setContact:antispamTicket:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x100c755a0"
+        },
+        {
+          "selector": "setContact:groupMemberTicket:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x100c7577c"
+        },
+        {
+          "selector": "setContact:remark:isLocal:",
+          "types": "B36@0:8@16@24B32",
+          "imp": "0x100c75958"
+        },
+        {
+          "selector": "startModifyContactUserName:remark:",
+          "types": "I32@0:8@16@24",
+          "imp": "0x100c75d0c"
+        },
+        {
+          "selector": "startModifyContactUserName:remark:isChangeRemark:arrPhone:isChangePhone:contactDesc:isChangecontactDesc:callbackBlock:",
+          "types": "v68@0:8@16@24B32@36B44@48B56@?60",
+          "imp": "0x100c75e48"
+        },
+        {
+          "selector": "setPhone:Contact:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x100c75fa4"
+        },
+        {
+          "selector": "setPhone:Contact:isLocal:",
+          "types": "B36@0:8@16@24B32",
+          "imp": "0x100c75fb4"
+        },
+        {
+          "selector": "setContact:cardDesc:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x100c7629c"
+        },
+        {
+          "selector": "setContact:cardDesc:isLocal:",
+          "types": "B36@0:8@16@24B32",
+          "imp": "0x100c762ac"
+        },
+        {
+          "selector": "setContact:cardUrl:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x100c76598"
+        },
+        {
+          "selector": "setContact:arrCardItem:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x100c766f4"
+        },
+        {
+          "selector": "setContact:nickName:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x100c76850"
+        },
+        {
+          "selector": "clearDraftForContact:",
+          "types": "B24@0:8@16",
+          "imp": "0x100c76990"
+        },
+        {
+          "selector": "setContact:mobileIdentify:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x100c76b24"
+        },
+        {
+          "selector": "setContact:labelIDList:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x100c76d04"
+        },
+        {
+          "selector": "setContact:snsBlack:",
+          "types": "B28@0:8@16B24",
+          "imp": "0x100c76de0"
+        },
+        {
+          "selector": "setContact:WeRunBlack:",
+          "types": "B28@0:8@16B24",
+          "imp": "0x100c7700c"
+        },
+        {
+          "selector": "setContact:owner:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x100c77238"
+        },
+        {
+          "selector": "setContact:chatRoomData:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x100c7742c"
+        },
+        {
+          "selector": "setContact:RoomDetail:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x100c7756c"
+        },
+        {
+          "selector": "setContact:chatRoomAccessType:qrCodeAccessType:",
+          "types": "B32@0:8@16I24I28",
+          "imp": "0x100c776ac"
+        },
+        {
+          "selector": "setContact:nsAdminList:nsMemberList:",
+          "types": "B40@0:8@16@24@32",
+          "imp": "0x100c77820"
+        },
+        {
+          "selector": "setContact:RoomSpecialAttentionList:isNotify:",
+          "types": "B36@0:8@16@24B32",
+          "imp": "0x100c779d8"
+        },
+        {
+          "selector": "setContact:chatRoomMemList:isNotify:",
+          "types": "B36@0:8@16@24B32",
+          "imp": "0x100c77bd0"
+        },
+        {
+          "selector": "setContact:chatRoomBusinessType:",
+          "types": "B32@0:8@16Q24",
+          "imp": "0x100c77d80"
+        },
+        {
+          "selector": "setContact:localBitFlag:",
+          "types": "B32@0:8@16Q24",
+          "imp": "0x100c77ea8"
+        },
+        {
+          "selector": "setContact:localAddContactTime:",
+          "types": "B28@0:8@16I24",
+          "imp": "0x100c77fd0"
+        },
+        {
+          "selector": "setBlackInLocal:blackFlag:",
+          "types": "B28@0:8@16B24",
+          "imp": "0x100c78168"
+        },
+        {
+          "selector": "setBlack:blackFlag:sync:",
+          "types": "B32@0:8@16B24B28",
+          "imp": "0x100c78394"
+        },
+        {
+          "selector": "setBlack:",
+          "types": "B24@0:8@16",
+          "imp": "0x100c787fc"
+        },
+        {
+          "selector": "setNoBlack:",
+          "types": "B24@0:8@16",
+          "imp": "0x100c78810"
+        },
+        {
+          "selector": "setBlack:sync:",
+          "types": "B28@0:8@16B24",
+          "imp": "0x100c78824"
+        },
+        {
+          "selector": "setNoBlack:sync:",
+          "types": "B28@0:8@16B24",
+          "imp": "0x100c78838"
+        },
+        {
+          "selector": "addFromMobileContact:",
+          "types": "B24@0:8@16",
+          "imp": "0x100c7884c"
+        },
+        {
+          "selector": "addContactInternal:",
+          "types": "v24@0:8@16",
+          "imp": "0x100c78aec"
+        },
+        {
+          "selector": "addLocalContact:listType:",
+          "types": "B28@0:8@16I24",
+          "imp": "0x100c78cc8"
+        },
+        {
+          "selector": "addContact:listType:opLog:callExt:",
+          "types": "B36@0:8@16I24B28B32",
+          "imp": "0x100c78f1c"
+        },
+        {
+          "selector": "addContact:listType:",
+          "types": "B28@0:8@16I24",
+          "imp": "0x100c79460"
+        },
+        {
+          "selector": "RemoveContactFromChatList:",
+          "types": "B24@0:8@16",
+          "imp": "0x100c79474"
+        },
+        {
+          "selector": "setContact:socialBlack:",
+          "types": "B28@0:8@16B24",
+          "imp": "0x100c7961c"
+        },
+        {
+          "selector": "setContactUserName:chatRoomLocalSendUpgradeType:",
+          "types": "B28@0:8@16I24",
+          "imp": "0x100c79864"
+        },
+        {
+          "selector": "setLocalPatSuffixWithUserName:patSuffix:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x100c79998"
+        },
+        {
+          "selector": "getLocalSelfPatSuffixJson",
+          "types": "@16@0:8",
+          "imp": "0x100c79b4c"
+        },
+        {
+          "selector": "setContactUserName:textStateId:extInfo:",
+          "types": "B40@0:8@16@24@32",
+          "imp": "0x100c79c4c"
+        },
+        {
+          "selector": "setLocalListTypeWithUserName:listType:addFlag:",
+          "types": "B32@0:8@16I24B28",
+          "imp": "0x100c79f58"
+        },
+        {
+          "selector": "setContact:isInChatBox:",
+          "types": "B28@0:8@16B24",
+          "imp": "0x100c7a154"
+        },
+        {
+          "selector": "setContact:isShowOpenIMStoragePopUp:openIMPrivacyAgreementUrl:",
+          "types": "B36@0:8@16B24@28",
+          "imp": "0x100c7a2f8"
+        },
+        {
+          "selector": "deleteChatRoomTopMsgWithUserName:insertNewTopMsgList:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x100c71fdc"
+        },
+        {
+          "selector": "getChatRoomTopMsgInfoListWithUserName:isAllResult:",
+          "types": "@28@0:8@16B24",
+          "imp": "0x100c720bc"
+        },
+        {
+          "selector": "removeChatRoomTopMsgLocalWithUserName:topId:",
+          "types": "B28@0:8@16I24",
+          "imp": "0x100c72194"
+        },
+        {
+          "selector": "removeChatRoomTopMsgLocalWithUserName:msgSvrID:",
+          "types": "B32@0:8@16Q24",
+          "imp": "0x100c72264"
+        },
+        {
+          "selector": "addChatRoomTopMsgLocalWithUserName:topMsgInfo:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x100c72334"
+        },
+        {
+          "selector": "setChatRoomTopMsgLocalRevokeWithUserName:msgSvrID:",
+          "types": "B32@0:8@16Q24",
+          "imp": "0x100c72414"
+        },
+        {
+          "selector": "setChatRoomTopMsgExposureTimeWithUserName:msgSvrID:exposureTime:",
+          "types": "B36@0:8@16Q24I32",
+          "imp": "0x100c724e4"
+        },
+        {
+          "selector": "insertOrUpdateNewTopMsgListWithUserName:newTopMsgList:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x100c725bc"
+        },
+        {
+          "selector": "checkIsHadTopMsgWithUserName:msgSvrID:",
+          "types": "B32@0:8@16Q24",
+          "imp": "0x100c7269c"
+        },
+        {
+          "selector": "updateContactInSequence:modContact:",
+          "types": "v32@0:8@16@24",
+          "imp": "0x100c7276c"
+        },
+        {
+          "selector": "updateContactInSequence:fieldUpdateCtrlInfoList:",
+          "types": "v32@0:8@16@24",
+          "imp": "0x100c727e4"
+        },
+        {
+          "selector": "rollbackContact:dbContact:svrFieldUpdateCtrlInfo:",
+          "types": "v40@0:8@16@24@32",
+          "imp": "0x100c7309c"
+        },
+        {
+          "selector": "copyValueToContact:fromContactProperty:",
+          "types": "v32@0:8@16@24",
+          "imp": "0x100c735a8"
+        },
+        {
+          "selector": "handleSynStrangerContactProperty:",
+          "types": "v24@0:8@16",
+          "imp": "0x100c73744"
+        },
+        {
+          "selector": "fullUpdateAllContactVerifyRecord:",
+          "types": "B24@0:8@16",
+          "imp": "0x100c73e0c"
+        },
+        {
+          "selector": "batchInsertOrUpdateContactVerifyRecord:",
+          "types": "B24@0:8@16",
+          "imp": "0x100c73e28"
+        },
+        {
+          "selector": "deleteContactVerifyRecordWithUserName:",
+          "types": "B24@0:8@16",
+          "imp": "0x100c73e44"
+        },
+        {
+          "selector": "deleteStaleContactVerifyRecordWithUserName:currentMsgId:",
+          "types": "B32@0:8@16Q24",
+          "imp": "0x100c73eb8"
+        },
+        {
+          "selector": "getContactVerifyRecordListWithlastVersion:limit:",
+          "types": "@32@0:8Q16q24",
+          "imp": "0x100c73f3c"
+        },
+        {
+          "selector": "getContactVerifyRecordWithUserName:",
+          "types": "@24@0:8@16",
+          "imp": "0x100c74110"
+        },
+        {
+          "selector": "hasContactVerifyRecordWithMsgSvrID:",
+          "types": "B24@0:8Q16",
+          "imp": "0x100c741d8"
+        },
+        {
+          "selector": "getUnreadContactVerifyRecordCountAfterVersion:",
+          "types": "I24@0:8Q16",
+          "imp": "0x100c741f4"
+        },
+        {
+          "selector": "setVerifyRecordSyncSuccessFlag:",
+          "types": "v20@0:8B16",
+          "imp": "0x100c743d4"
+        },
+        {
+          "selector": "getVerifyRecordSyncSuccessFlag",
+          "types": "B16@0:8",
+          "imp": "0x100c7442c"
+        },
+        {
+          "selector": "getContactFromDic:",
+          "types": "@24@0:8@16",
+          "imp": "0x100c6e428"
+        },
+        {
+          "selector": "setContactToDic:forKey:",
+          "types": "v32@0:8@16@24",
+          "imp": "0x100c6e9f0"
+        },
+        {
+          "selector": "removeContactFromDic:",
+          "types": "v24@0:8@16",
+          "imp": "0x100c6ed10"
+        },
+        {
+          "selector": "getContactFromDB:",
+          "types": "@24@0:8@16",
+          "imp": "0x100c6ee6c"
+        },
+        {
+          "selector": "removeContactFromDB:",
+          "types": "B24@0:8@16",
+          "imp": "0x100c6ef7c"
+        },
+        {
+          "selector": "addContactToDb:",
+          "types": "B24@0:8@16",
+          "imp": "0x100c6f0b0"
+        },
+        {
+          "selector": "updateContactToDb:",
+          "types": "B24@0:8@16",
+          "imp": "0x100c6f2fc"
+        },
+        {
+          "selector": "loadContactExtInfo:",
+          "types": "B24@0:8@16",
+          "imp": "0x100c6f5e4"
+        },
+        {
+          "selector": "setMigrationFinished",
+          "types": "v16@0:8",
+          "imp": "0x100c6f68c"
+        },
+        {
+          "selector": "splist_migrationContactList:",
+          "types": "B24@0:8@16",
+          "imp": "0x100c6f790"
+        },
+        {
+          "selector": "reportMigrationStat:status:",
+          "types": "v24@0:8I16I20",
+          "imp": "0x100c6fe94"
+        },
+        {
+          "selector": "migrationContacts:first:",
+          "types": "B24@0:8I16B20",
+          "imp": "0x100c6ffd4"
+        },
+        {
+          "selector": "getAllContactList:listType:",
+          "types": "B28@0:8@16I24",
+          "imp": "0x100c70388"
+        },
+        {
+          "selector": "getAllContactNoExtInfoList:listType:",
+          "types": "B28@0:8@16I24",
+          "imp": "0x100c70874"
+        },
+        {
+          "selector": "getAllContactNoExtInfoList:listType:typeExt:",
+          "types": "B36@0:8@16I24Q28",
+          "imp": "0x100c70ca8"
+        },
+        {
+          "selector": "getAllUserName:",
+          "types": "B24@0:8@16",
+          "imp": "0x100c70cc4"
+        },
+        {
+          "selector": "getAllRemarkList:listType:",
+          "types": "B28@0:8@16I24",
+          "imp": "0x100c70dfc"
+        },
+        {
+          "selector": "addOrUpdateContactToDB:listType:add:modify:",
+          "types": "@44@0:8@16I24^B28^B36",
+          "imp": "0x100c70f4c"
+        },
+        {
+          "selector": "thread_BatchModifyContact:isInit:",
+          "types": "B28@0:8@16B24",
+          "imp": "0x100c712a0"
+        },
+        {
+          "selector": "thread_BatchModifyContact:",
+          "types": "B24@0:8@16",
+          "imp": "0x100c7175c"
+        },
+        {
+          "selector": "thread_onPushModifyContact:isInit:arrNewContact:",
+          "types": "B36@0:8@16B24@28",
+          "imp": "0x100c7176c"
+        },
+        {
+          "selector": "ModifyNotifyStatus:withStatus:",
+          "types": "B28@0:8@16I24",
+          "imp": "0x100c71d48"
+        },
+        {
+          "selector": "SetFriendMetaFlag:ForUser:",
+          "types": "B28@0:8I16@20",
+          "imp": "0x100c71dcc"
+        },
+        {
+          "selector": "ModifyContactEncryptSecret:withEncryptSecretInfo:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x100c71e54"
+        },
+        {
+          "selector": "deleteChatRoomToolWeAppInDBWithUserName:insertNewWeAppItemList:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x100c6e280"
+        },
+        {
+          "selector": "getChatRoomToolWeAppListInDBWithUserName:",
+          "types": "@24@0:8@16",
+          "imp": "0x100c6e360"
+        },
+        {
+          "selector": "getBestCacheOptimizeStrategyFromTime:",
+          "types": "@24@0:8d16",
+          "imp": "0x100c6e0a0"
+        },
+        {
+          "selector": "getMatchStrategyFeatureRecordCountFromTime:strategyFeature:",
+          "types": "I32@0:8d16@24",
+          "imp": "0x100c6e0bc"
+        },
+        {
+          "selector": "addContactCacheAccessUserFeatureRecrods:",
+          "types": "B24@0:8@16",
+          "imp": "0x100c6e0d8"
+        },
+        {
+          "selector": "removeContactCacheAccessUserFeatureRecrodsToTime:",
+          "types": "B20@0:8I16",
+          "imp": "0x100c6e0f4"
+        },
+        {
+          "selector": "getAllChatRoomStrangerCount",
+          "types": "I16@0:8",
+          "imp": "0x100c6e110"
+        },
+        {
+          "selector": "getFirstRecordCacheOptimizeInfoTime",
+          "types": "I16@0:8",
+          "imp": "0x100c6e12c"
+        },
+        {
+          "selector": "addChatRoomStrangerRemark:",
+          "types": "v24@0:8@16",
+          "imp": "0x100c6e148"
+        },
+        {
+          "selector": "onServiceInit",
+          "types": "v16@0:8",
+          "imp": "0x1010b18f4"
+        },
+        {
+          "selector": "initLock",
+          "types": "v16@0:8",
+          "imp": "0x1010b1c3c"
+        },
+        {
+          "selector": "initListen",
+          "types": "v16@0:8",
+          "imp": "0x1010b1c98"
+        },
+        {
+          "selector": "removeListen",
+          "types": "v16@0:8",
+          "imp": "0x1010b1de4"
+        },
+        {
+          "selector": "dealloc",
+          "types": "v16@0:8",
+          "imp": "0x1010b1f30"
+        },
+        {
+          "selector": "isCacheAllLoaded",
+          "types": "B16@0:8",
+          "imp": "0x1010b1fdc"
+        },
+        {
+          "selector": "addSelfContactToCache",
+          "types": "@16@0:8",
+          "imp": "0x1010b1ff8"
+        },
+        {
+          "selector": "autoreloadContacts:",
+          "types": "i20@0:8I16",
+          "imp": "0x1010b2070"
+        },
+        {
+          "selector": "autoreloadContacts:needLoadExt:",
+          "types": "i24@0:8I16B20",
+          "imp": "0x1010b2080"
+        },
+        {
+          "selector": "addDictoryDataToCache:listType:",
+          "types": "v28@0:8@16I24",
+          "imp": "0x1010b20c4"
+        },
+        {
+          "selector": "refreshPluginNickName:",
+          "types": "v20@0:8B16",
+          "imp": "0x1010b231c"
+        },
+        {
+          "selector": "refreshContactLocalData",
+          "types": "v16@0:8",
+          "imp": "0x1010b2494"
+        },
+        {
+          "selector": "internalUpdateContactLocalDataWithUserName:",
+          "types": "v24@0:8@16",
+          "imp": "0x1010b2650"
+        },
+        {
+          "selector": "generatePluginContact:uiType:",
+          "types": "@28@0:8@16I24",
+          "imp": "0x1010b2760"
+        },
+        {
+          "selector": "generatePluginContact:",
+          "types": "@24@0:8@16",
+          "imp": "0x1010b28dc"
+        },
+        {
+          "selector": "generatePluginContactNoListContact:",
+          "types": "@24@0:8@16",
+          "imp": "0x1010b28ec"
+        },
+        {
+          "selector": "generateOfficialContact:",
+          "types": "@24@0:8@16",
+          "imp": "0x1010b28fc"
+        },
+        {
+          "selector": "addAddHardcodeContact:selector:",
+          "types": "v32@0:8@16:24",
+          "imp": "0x1010b2b60"
+        },
+        {
+          "selector": "addHardCodeContacts",
+          "types": "v16@0:8",
+          "imp": "0x1010b2f00"
+        },
+        {
+          "selector": "addHardcodeOfficialContactWithUsrName:",
+          "types": "v24@0:8@16",
+          "imp": "0x1010b36dc"
+        },
+        {
+          "selector": "isHardCodeContact:",
+          "types": "B24@0:8@16",
+          "imp": "0x1010b37b8"
+        },
+        {
+          "selector": "interalReloadContacts:needLoadExt:",
+          "types": "i24@0:8I16B20",
+          "imp": "0x1010b3800"
+        },
+        {
+          "selector": "isContactMatch:listType:contactType:",
+          "types": "B32@0:8@16I24I28",
+          "imp": "0x1010b3b7c"
+        },
+        {
+          "selector": "handleOfficalContactName:",
+          "types": "v24@0:8@16",
+          "imp": "0x1010b3c74"
+        },
+        {
+          "selector": "handleWeChatTeamNickName:",
+          "types": "v24@0:8@16",
+          "imp": "0x1010b3f2c"
+        },
+        {
+          "selector": "mergeChatRoomData:oldContact:",
+          "types": "v32@0:8@16@24",
+          "imp": "0x1010b40d0"
+        },
+        {
+          "selector": "isChatRoomMember:",
+          "types": "B24@0:8@16",
+          "imp": "0x1010b4744"
+        },
+        {
+          "selector": "internalModifyContact:CallExt:",
+          "types": "v28@0:8@16B24",
+          "imp": "0x1010b4944"
+        },
+        {
+          "selector": "callOnModifyExt:",
+          "types": "v24@0:8@16",
+          "imp": "0x1010b4b00"
+        },
+        {
+          "selector": "callOnDeleteExt:",
+          "types": "v24@0:8@16",
+          "imp": "0x1010b4efc"
+        },
+        {
+          "selector": "callOnModifyContactHeadImageExt:",
+          "types": "v24@0:8@16",
+          "imp": "0x1010b5258"
+        },
+        {
+          "selector": "callOnRemoveContactFromAddressBook:",
+          "types": "v24@0:8@16",
+          "imp": "0x1010b546c"
+        },
+        {
+          "selector": "callOnDeleteContactIsShouldKeep:",
+          "types": "v24@0:8@16",
+          "imp": "0x1010b5630"
+        },
+        {
+          "selector": "reloadContact:mergeImage:",
+          "types": "@32@0:8@16@24",
+          "imp": "0x1010b5724"
+        },
+        {
+          "selector": "handleLocalField:oldContact:",
+          "types": "v32@0:8@16@24",
+          "imp": "0x1010b582c"
+        },
+        {
+          "selector": "handleNotChatRoomMemberField:oldContact:",
+          "types": "v32@0:8@16@24",
+          "imp": "0x1010b6ad0"
+        },
+        {
+          "selector": "main_onPushModifyContact:",
+          "types": "v24@0:8@16",
+          "imp": "0x1010b6ee4"
+        },
+        {
+          "selector": "onPushModifyContact:",
+          "types": "v24@0:8@16",
+          "imp": "0x1010b6ef0"
+        },
+        {
+          "selector": "onPushDeleteContact:",
+          "types": "v24@0:8@16",
+          "imp": "0x1010b74a8"
+        },
+        {
+          "selector": "isUserNewDB",
+          "types": "B16@0:8",
+          "imp": "0x1010b7cd4"
+        },
+        {
+          "selector": "checkHadLoadContactDB",
+          "types": "B16@0:8",
+          "imp": "0x1010b7da0"
+        },
+        {
+          "selector": "updateNewDB:NewUser:",
+          "types": "v28@0:8@16B24",
+          "imp": "0x1010b7db0"
+        },
+        {
+          "selector": "initDB:",
+          "types": "v24@0:8@16",
+          "imp": "0x1010b81e0"
+        },
+        {
+          "selector": "updateCache:",
+          "types": "v24@0:8@16",
+          "imp": "0x1010b8270"
+        },
+        {
+          "selector": "getContactByName:",
+          "types": "@24@0:8@16",
+          "imp": "0x1010b864c"
+        },
+        {
+          "selector": "getContactByNameFromDB:",
+          "types": "@24@0:8@16",
+          "imp": "0x1010b8bec"
+        },
+        {
+          "selector": "getContactByNameFromCache:",
+          "types": "@24@0:8@16",
+          "imp": "0x1010b8d90"
+        },
+        {
+          "selector": "getMessageChatContactByMessageWrap:",
+          "types": "@24@0:8@16",
+          "imp": "0x1010b8ec0"
+        },
+        {
+          "selector": "isContactBlack:",
+          "types": "B24@0:8@16",
+          "imp": "0x1010b9c40"
+        },
+        {
+          "selector": "isContactExistLocal:",
+          "types": "B24@0:8@16",
+          "imp": "0x1010b9cd0"
+        },
+        {
+          "selector": "isInContactList:",
+          "types": "B24@0:8@16",
+          "imp": "0x1010b9df8"
+        },
+        {
+          "selector": "isBelongToMMContactInCache:",
+          "types": "B24@0:8@16",
+          "imp": "0x1010b9ee8"
+        },
+        {
+          "selector": "getContactList:contactType:",
+          "types": "@24@0:8I16I20",
+          "imp": "0x1010b9f48"
+        },
+        {
+          "selector": "getContactList:contactType:needLoadExt:",
+          "types": "@28@0:8I16I20B24",
+          "imp": "0x1010b9f58"
+        },
+        {
+          "selector": "getCustAsstContactList",
+          "types": "@16@0:8",
+          "imp": "0x1010ba298"
+        },
+        {
+          "selector": "getContactListByTypeExt:listType:",
+          "types": "@28@0:8Q16I24",
+          "imp": "0x1010ba2e4"
+        },
+        {
+          "selector": "getAllEnterpriseMainBrandContacts",
+          "types": "@16@0:8",
+          "imp": "0x1010ba394"
+        },
+        {
+          "selector": "getAllBrandContacts",
+          "types": "@16@0:8",
+          "imp": "0x1010ba6d4"
+        },
+        {
+          "selector": "getAllSubscriptionBrandContacts",
+          "types": "@16@0:8",
+          "imp": "0x1010baa14"
+        },
+        {
+          "selector": "getAllPhotoBrandContacts",
+          "types": "@16@0:8",
+          "imp": "0x1010bad54"
+        },
+        {
+          "selector": "getAllPhotoAndServiceContacts",
+          "types": "@16@0:8",
+          "imp": "0x1010bb094"
+        },
+        {
+          "selector": "deleteContactLocal:listType:",
+          "types": "B28@0:8@16I24",
+          "imp": "0x1010bb3e8"
+        },
+        {
+          "selector": "deleteContact:listType:",
+          "types": "B28@0:8@16I24",
+          "imp": "0x1010bb400"
+        },
+        {
+          "selector": "deleteContact:listType:sync:",
+          "types": "B32@0:8@16I24B28",
+          "imp": "0x1010bb418"
+        },
+        {
+          "selector": "deleteContact:listType:andScene:sync:",
+          "types": "B36@0:8@16I24I28B32",
+          "imp": "0x1010bb430"
+        },
+        {
+          "selector": "deleteContact:listType:andScene:sync:local:",
+          "types": "B40@0:8@16I24I28B32B36",
+          "imp": "0x1010bb440"
+        },
+        {
+          "selector": "modifyContactNickName:nickName:callMod:",
+          "types": "v36@0:8@16@24B32",
+          "imp": "0x1010bbc44"
+        },
+        {
+          "selector": "setContact:typeBit:set:sync:localSet:",
+          "types": "B40@0:8@16I24B28B32B36",
+          "imp": "0x1010bbe84"
+        },
+        {
+          "selector": "setContact:typeBit:set:sync:",
+          "types": "B36@0:8@16I24B28B32",
+          "imp": "0x1010bc598"
+        },
+        {
+          "selector": "setLocalContact:notifyOpen:",
+          "types": "B28@0:8@16B24",
+          "imp": "0x1010bc5a8"
+        },
+        {
+          "selector": "setContact:favour:sync:",
+          "types": "B32@0:8@16B24B28",
+          "imp": "0x1010bc63c"
+        },
+        {
+          "selector": "setContact:watchContact:sync:",
+          "types": "B32@0:8@16B24B28",
+          "imp": "0x1010bc6c8"
+        },
+        {
+          "selector": "setContact:notifyOpen:sync:",
+          "types": "B32@0:8@16B24B28",
+          "imp": "0x1010bc754"
+        },
+        {
+          "selector": "setContact:notifyOpen:sync:localSet:",
+          "types": "B36@0:8@16B24B28B32",
+          "imp": "0x1010bc764"
+        },
+        {
+          "selector": "setContact:sessionTop:sync:",
+          "types": "B32@0:8@16B24B28",
+          "imp": "0x1010bc824"
+        },
+        {
+          "selector": "setContact:sessionTop:sync:localSet:",
+          "types": "B36@0:8@16B24B28B32",
+          "imp": "0x1010bc834"
+        },
+        {
+          "selector": "setLocalContactToUntopSession:",
+          "types": "B24@0:8@16",
+          "imp": "0x1010bc974"
+        },
+        {
+          "selector": "reloadContactImageStatus:Status:Image:",
+          "types": "v40@0:8@16@24@32",
+          "imp": "0x1010bc990"
+        },
+        {
+          "selector": "thread_saveContactImageStatus:Status:Image:Url:",
+          "types": "v48@0:8@16@24@32@40",
+          "imp": "0x1010bcbe8"
+        },
+        {
+          "selector": "reportIDKey:stranger:",
+          "types": "v32@0:8@16@24",
+          "imp": "0x1010bd0fc"
+        },
+        {
+          "selector": "doReportIDKeyWithUiFriendInAddr:andUiFriendNotInAddr:andUiChatRoomInAddr:andUiChatRoomNotInAddr:andUiAll:andCacheCount:",
+          "types": "v44@0:8I16I20I24I28I32Q36",
+          "imp": "0x1010bd364"
+        },
+        {
+          "selector": "optimizeReportIDKey:stranger:",
+          "types": "v32@0:8@16@24",
+          "imp": "0x1010bd798"
+        },
+        {
+          "selector": "delayLoadAllContactInBackGround",
+          "types": "B16@0:8",
+          "imp": "0x1010bda28"
+        },
+        {
+          "selector": "reloadContact:",
+          "types": "v24@0:8@16",
+          "imp": "0x1010be570"
+        },
+        {
+          "selector": "tryLoadExtInfoForContact:",
+          "types": "v24@0:8@16",
+          "imp": "0x1010be624"
+        },
+        {
+          "selector": "checkIfForbiddenGetContact:",
+          "types": "B24@0:8@16",
+          "imp": "0x1010be768"
+        },
+        {
+          "selector": "addToGetContactMap:",
+          "types": "v24@0:8@16",
+          "imp": "0x1010be8bc"
+        },
+        {
+          "selector": "internalGetContactsFromSvr:chatContact:withScene:usrData:",
+          "types": "B44@0:8@16@24i32@36",
+          "imp": "0x1010be940"
+        },
+        {
+          "selector": "getContactsFromSvrForTempChat:",
+          "types": "B24@0:8@16",
+          "imp": "0x1010be954"
+        },
+        {
+          "selector": "getContactsFromServer:chatContact:withScene:",
+          "types": "B36@0:8@16@24I32",
+          "imp": "0x1010be9c4"
+        },
+        {
+          "selector": "getContactsFromServer:withScene:",
+          "types": "B28@0:8@16I24",
+          "imp": "0x1010be9d4"
+        },
+        {
+          "selector": "getInviteeContactsFromServer:withTicket:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x1010be9e8"
+        },
+        {
+          "selector": "getContactsFromServer:chatContact:withScene:withTicket:",
+          "types": "B44@0:8@16@24I32@36",
+          "imp": "0x1010bea08"
+        },
+        {
+          "selector": "getContactsFromServer:chatContact:withScene:withTicket:usrData:",
+          "types": "B52@0:8@16@24i32@36@44",
+          "imp": "0x1010bea1c"
+        },
+        {
+          "selector": "getGroupCardMemberList:",
+          "types": "@24@0:8@16",
+          "imp": "0x1010bf6e8"
+        },
+        {
+          "selector": "fixContactPluginOldData",
+          "types": "v16@0:8",
+          "imp": "0x1010bfa0c"
+        },
+        {
+          "selector": "updateContactLocalData",
+          "types": "v16@0:8",
+          "imp": "0x1010bfc14"
+        },
+        {
+          "selector": "getSocialBlackList",
+          "types": "@16@0:8",
+          "imp": "0x1010bfe18"
+        },
+        {
+          "selector": "getLimitedModeGuardianContact",
+          "types": "@16@0:8",
+          "imp": "0x1010c0020"
+        },
+        {
+          "selector": "getFinderBlackList",
+          "types": "@16@0:8",
+          "imp": "0x1010c0250"
+        },
+        {
+          "selector": "getContactActiveTLastTime:",
+          "types": "I24@0:8@16",
+          "imp": "0x1010c0458"
+        },
+        {
+          "selector": "setContact:typeExtBit:set:sync:localSet:",
+          "types": "B40@0:8@16I24B28B32B36",
+          "imp": "0x1010c0640"
+        },
+        {
+          "selector": "setContact:typeExtBit:set:sync:",
+          "types": "B36@0:8@16I24B28B32",
+          "imp": "0x1010c0990"
+        },
+        {
+          "selector": "batchUpdateContactBasicInfo:",
+          "types": "v24@0:8@16",
+          "imp": "0x1010c09a0"
+        },
+        {
+          "selector": "setContact:foldSingleChat:sync:",
+          "types": "B32@0:8@16B24B28",
+          "imp": "0x1010c0e98"
+        },
+        {
+          "selector": "setContact:foldSingleChat:sync:localSet:",
+          "types": "B36@0:8@16B24B28B32",
+          "imp": "0x1010c0ea8"
+        },
+        {
+          "selector": "onServiceMemoryWarning",
+          "types": "v16@0:8",
+          "imp": "0x1010c0f44"
+        },
+        {
+          "selector": "onServiceClearData",
+          "types": "v16@0:8",
+          "imp": "0x1010c0f5c"
+        },
+        {
+          "selector": "onServiceEnterBackground",
+          "types": "v16@0:8",
+          "imp": "0x1010c0fc4"
+        },
+        {
+          "selector": "updateSelfContactLocalPatSuffix",
+          "types": "v16@0:8",
+          "imp": "0x1010c1004"
+        },
+        {
+          "selector": "onLanguageChange",
+          "types": "v16@0:8",
+          "imp": "0x1010c1240"
+        },
+        {
+          "selector": "onRegCountryChange",
+          "types": "v16@0:8",
+          "imp": "0x1010c1280"
+        },
+        {
+          "selector": "main_onPushBatchModContact:",
+          "types": "v24@0:8@16",
+          "imp": "0x1010c12c0"
+        },
+        {
+          "selector": "onNewSyncDeleteContact:",
+          "types": "v24@0:8@16",
+          "imp": "0x1010c1d9c"
+        },
+        {
+          "selector": "onProfilePreChange",
+          "types": "v16@0:8",
+          "imp": "0x1010c1ea8"
+        },
+        {
+          "selector": "onProfileChange",
+          "types": "v16@0:8",
+          "imp": "0x1010c1f04"
+        },
+        {
+          "selector": "onNewSyncBatchModContacts:",
+          "types": "v24@0:8@16",
+          "imp": "0x1010c1fac"
+        },
+        {
+          "selector": "thread_HandleMemContact:",
+          "types": "@24@0:8@16",
+          "imp": "0x1010c1fb8"
+        },
+        {
+          "selector": "thread_ReloadMemConact:ChatRoom:",
+          "types": "v32@0:8@16@24",
+          "imp": "0x1010c2800"
+        },
+        {
+          "selector": "MainThread_ReloadMemContact:",
+          "types": "v24@0:8@16",
+          "imp": "0x1010c28d4"
+        },
+        {
+          "selector": "onGetContact:",
+          "types": "v24@0:8@16",
+          "imp": "0x1010c2ac4"
+        },
+        {
+          "selector": "MessageReturn:Event:",
+          "types": "v28@0:8@16I24",
+          "imp": "0x1010c3ccc"
+        },
+        {
+          "selector": "shouldUpdateContact:",
+          "types": "B24@0:8@16",
+          "imp": "0x1010c3d4c"
+        },
+        {
+          "selector": "updateLimitDuration",
+          "types": "d16@0:8",
+          "imp": "0x1010c3ef8"
+        },
+        {
+          "selector": "updateContactToCache:",
+          "types": "B24@0:8@16",
+          "imp": "0x1010c3f04"
+        },
+        {
+          "selector": "getSelfContact",
+          "types": "@16@0:8",
+          "imp": "0x1010c3f98"
+        },
+        {
+          "selector": "setSelfContactUpdated",
+          "types": "v16@0:8",
+          "imp": "0x1010c4714"
+        },
+        {
+          "selector": "main_onPushDeleteContact:",
+          "types": "v24@0:8@16",
+          "imp": "0x1010c4738"
+        },
+        {
+          "selector": "main_onPushAddContact:",
+          "types": "v24@0:8@16",
+          "imp": "0x1010c4b10"
+        },
+        {
+          "selector": "main_onPushAddBrandContact:",
+          "types": "v24@0:8@16",
+          "imp": "0x1010c4cd4"
+        },
+        {
+          "selector": "thread_onpushBatchModContact:",
+          "types": "@24@0:8@16",
+          "imp": "0x1010c4e98"
+        },
+        {
+          "selector": "thread_onBatchModifyChatRoomMember:",
+          "types": "@24@0:8@16",
+          "imp": "0x1010c4f6c"
+        },
+        {
+          "selector": "ChangeNotifyStatusForChatRoom:withStatus:sync:",
+          "types": "B32@0:8@16B24B28",
+          "imp": "0x1010c5d6c"
+        },
+        {
+          "selector": "ChangeNotifyStatus:withStatus:sync:",
+          "types": "B32@0:8@16B24B28",
+          "imp": "0x1010c5e9c"
+        },
+        {
+          "selector": "ChangeUnfoldSns:withStatus:",
+          "types": "B28@0:8@16B24",
+          "imp": "0x1010c60a8"
+        },
+        {
+          "selector": "setChatRoomDataJoinInfo:andModContact:getContactScene:",
+          "types": "v36@0:8@16@24I32",
+          "imp": "0x1010c6150"
+        },
+        {
+          "selector": "canDeleteContactInNewSyn:",
+          "types": "B24@0:8@16",
+          "imp": "0x1010c6700"
+        },
+        {
+          "selector": "onBrandContactModified:withAttrChanged:",
+          "types": "v32@0:8@16@24",
+          "imp": "0x1010c6760"
+        },
+        {
+          "selector": "isHeadImgUpdated:Local:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x1010c6c00"
+        },
+        {
+          "selector": "callModifyContactForCPState:",
+          "types": "v24@0:8@16",
+          "imp": "0x1010c6dcc"
+        },
+        {
+          "selector": "getContactForSearchByName:",
+          "types": "@24@0:8@16",
+          "imp": "0x1010c6de0"
+        },
+        {
+          "selector": "getAllContactUserName",
+          "types": "@16@0:8",
+          "imp": "0x1010c6f2c"
+        },
+        {
+          "selector": "getAllContactUserNameFromCache",
+          "types": "@16@0:8",
+          "imp": "0x1010c6f70"
+        },
+        {
+          "selector": "getContactCount",
+          "types": "I16@0:8",
+          "imp": "0x1010c6fd8"
+        },
+        {
+          "selector": "getContactByAlias:",
+          "types": "@24@0:8@16",
+          "imp": "0x1010c7064"
+        },
+        {
+          "selector": "getAddsceneChatRoomContactSource:fromMe:",
+          "types": "@28@0:8@16B24",
+          "imp": "0x1010c72e4"
+        },
+        {
+          "selector": "openIMMgr",
+          "types": "@16@0:8",
+          "imp": "0x1010c761c"
+        },
+        {
+          "selector": "contactUpdateMgr",
+          "types": "@16@0:8",
+          "imp": "0x1010c762c"
+        },
+        {
+          "selector": "contactCacheOptimizeMgr",
+          "types": "@16@0:8",
+          "imp": "0x1010c763c"
+        },
+        {
+          "selector": "contactConfigMgr",
+          "types": "@16@0:8",
+          "imp": "0x1010c764c"
+        },
+        {
+          "selector": "getIndexRecordOfTypeForFTS:",
+          "types": "@20@0:8i16",
+          "imp": "0x1010c765c"
+        },
+        {
+          "selector": "getUnIndexRecordCountOfType:",
+          "types": "I20@0:8i16",
+          "imp": "0x1010c76a0"
+        },
+        {
+          "selector": "getUnIndexContactOfType:limit:",
+          "types": "@24@0:8i16I20",
+          "imp": "0x1010c76cc"
+        },
+        {
+          "selector": "markIndexUpdatedOfType:success:",
+          "types": "B24@0:8i16B20",
+          "imp": "0x1010c7710"
+        },
+        {
+          "selector": "clearFTSIndexRecord",
+          "types": "v16@0:8",
+          "imp": "0x1010c773c"
+        },
+        {
+          "selector": "reloadSkipContactDictionary",
+          "types": "v16@0:8",
+          "imp": "0x1010c7754"
+        },
+        {
+          "selector": "botContactMgr",
+          "types": "@16@0:8",
+          "imp": "0x1010c7760"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "types": "v16@0:8",
+          "imp": "0x1010c7770"
+        }
+      ],
+      "ivars": [
+        {
+          "name": "m_oLock",
+          "type": "@\"NSRecursiveLock\"",
+          "offset": 8
+        },
+        {
+          "name": "m_uiLoadedType",
+          "type": "I",
+          "offset": 16
+        },
+        {
+          "name": "m_oContactDB",
+          "type": "@\"CContactDB\"",
+          "offset": 24
+        },
+        {
+          "name": "m_oNewContactDB",
+          "type": "@\"NewContactDB\"",
+          "offset": 32
+        },
+        {
+          "name": "m_oContactOPLog",
+          "type": "@\"CContactOPLog\"",
+          "offset": 40
+        },
+        {
+          "name": "m_openImContactMgr",
+          "type": "@\"OpenImContactMgr\"",
+          "offset": 48
+        },
+        {
+          "name": "m_contactUpdateMgr",
+          "type": "@\"CContactUpdateMgr\"",
+          "offset": 56
+        },
+        {
+          "name": "m_botContactMgr",
+          "type": "@\"BotContactMgr\"",
+          "offset": 64
+        },
+        {
+          "name": "m_contactCacheOptimizeMgr",
+          "type": "@\"CContactCacheOptimizeMgr\"",
+          "offset": 72
+        },
+        {
+          "name": "m_contactConfigMgr",
+          "type": "@\"CContactConfigMgr\"",
+          "offset": 80
+        },
+        {
+          "name": "m_dicRemark",
+          "type": "@\"NSMutableDictionary\"",
+          "offset": 88
+        },
+        {
+          "name": "m_dicLastAccessTime",
+          "type": "@\"NSMutableDictionary\"",
+          "offset": 96
+        },
+        {
+          "name": "m_dicContacts",
+          "type": "@\"NSMutableDictionary\"",
+          "offset": 104
+        },
+        {
+          "name": "m_dicEncodeContacts",
+          "type": "@\"NSMutableDictionary\"",
+          "offset": 112
+        },
+        {
+          "name": "m_mapLastGetTime",
+          "type": "@\"NSMutableDictionary\"",
+          "offset": 120
+        },
+        {
+          "name": "m_dicHardCodeUsers",
+          "type": "@\"NSMutableDictionary\"",
+          "offset": 128
+        },
+        {
+          "name": "m_uiDBVersion",
+          "type": "I",
+          "offset": 136
+        },
+        {
+          "name": "m_bFirstContactDBMigration",
+          "type": "B",
+          "offset": 140
+        },
+        {
+          "name": "m_bHadLoadContactDBMigration",
+          "type": "B",
+          "offset": 141
+        },
+        {
+          "name": "m_bContactDBMigrationFinished",
+          "type": "B",
+          "offset": 142
+        },
+        {
+          "name": "m_dicContactSendMsgTickets",
+          "type": "@\"NSMutableDictionary\"",
+          "offset": 144
+        },
+        {
+          "name": "m_dicLastSendMsgTicketAccessTime",
+          "type": "@\"NSMutableDictionary\"",
+          "offset": 152
+        },
+        {
+          "name": "m_dicSyncShareCardMessageStatus",
+          "type": "@\"NSMutableDictionary\"",
+          "offset": 160
+        },
+        {
+          "name": "m_arrNotExistUserName",
+          "type": "@\"NSMutableArray\"",
+          "offset": 168
+        },
+        {
+          "name": "m_cacheOptimizeDataLock",
+          "type": "@\"NSRecursiveLock\"",
+          "offset": 176
+        },
+        {
+          "name": "m_uiMaxStrangerCache",
+          "type": "I",
+          "offset": 184
+        },
+        {
+          "name": "m_bOpenStrangerCache",
+          "type": "B",
+          "offset": 188
+        },
+        {
+          "name": "m_bFinishDelayLoadAllContact",
+          "type": "B",
+          "offset": 189
+        },
+        {
+          "name": "m_loadAllDataLock",
+          "type": "@\"NSRecursiveLock\"",
+          "offset": 192
+        }
+      ]
+    },
+    {
+      "name": "CGroupMgr",
+      "address": "0x11ee973c8",
+      "methods": [
+        {
+          "selector": "CreateOpenIMGroupWithMemberList:",
+          "types": "B24@0:8@16",
+          "imp": "0x10202d624"
+        },
+        {
+          "selector": "OnOpenIMCreateChatRoom:",
+          "types": "i24@0:8@16",
+          "imp": "0x10202d820"
+        },
+        {
+          "selector": "HandleCreateOpenIMChatRoomOK:",
+          "types": "@24@0:8@16",
+          "imp": "0x10202dc60"
+        },
+        {
+          "selector": "AddOpenIMGroupMember:withMemberList:withDesp:",
+          "types": "B40@0:8@16@24@32",
+          "imp": "0x10202e6c0"
+        },
+        {
+          "selector": "OnAddOpenIMChatRoomMember:",
+          "types": "v24@0:8@16",
+          "imp": "0x10202e8b8"
+        },
+        {
+          "selector": "DeleteOpenIMGroupMember:withMemberList:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x10202f944"
+        },
+        {
+          "selector": "OnDeleteOpenIMChatRoomMemberResponse:",
+          "types": "v24@0:8@16",
+          "imp": "0x10202fb6c"
+        },
+        {
+          "selector": "InviteOpenIMGroupMember:withMemberList:withUserData:",
+          "types": "B40@0:8@16@24@32",
+          "imp": "0x10203028c"
+        },
+        {
+          "selector": "OnInviteOpenIMChatRoomMemberResp:",
+          "types": "v24@0:8@16",
+          "imp": "0x102030500"
+        },
+        {
+          "selector": "ChangeOpenIMChatRoomOwner:NewOwner:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x102030ce8"
+        },
+        {
+          "selector": "OnChangeOpenIMChatRoomOwnerResp:",
+          "types": "v24@0:8@16",
+          "imp": "0x102030e9c"
+        },
+        {
+          "selector": "ApproveOpenIMGroupMember:withInviterName:withInviteeList:withTicket:withUserData:",
+          "types": "B56@0:8@16@24@32@40@48",
+          "imp": "0x1020315cc"
+        },
+        {
+          "selector": "OnApproveOpenIMGroupMember:",
+          "types": "v24@0:8@16",
+          "imp": "0x10203187c"
+        },
+        {
+          "selector": "GetOpenIMChatRoomInfo:",
+          "types": "B24@0:8@16",
+          "imp": "0x102031c94"
+        },
+        {
+          "selector": "OnGetOpenIMChatRoomInfoResp:",
+          "types": "v24@0:8@16",
+          "imp": "0x102031ed0"
+        },
+        {
+          "selector": "GetOpenIMChatRoomMemberDetail:",
+          "types": "B24@0:8@16",
+          "imp": "0x1020326e4"
+        },
+        {
+          "selector": "OnOpenIMGetChatRoomMemberDetail:",
+          "types": "v24@0:8@16",
+          "imp": "0x1020329e4"
+        },
+        {
+          "selector": "SetOpenIMGroupTopic:withTopic:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x10203380c"
+        },
+        {
+          "selector": "QuitOpenIMGroup:withUsrName:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x102033948"
+        },
+        {
+          "selector": "OnOpenIMOplogRespForOpenIMQuitGroup:Resp:",
+          "types": "v32@0:8@16@24",
+          "imp": "0x102033ae4"
+        },
+        {
+          "selector": "SetOpenIMChatRoomAnnouncement:Announcement:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x10203408c"
+        },
+        {
+          "selector": "SetOpenIMGroupSelfDisplayName:DisplayName:",
+          "types": "I32@0:8@16@24",
+          "imp": "0x1020341d8"
+        },
+        {
+          "selector": "SetOpenIMGroupShowDislayName:forGroup:sync:",
+          "types": "B32@0:8B16@20B28",
+          "imp": "0x102034320"
+        },
+        {
+          "selector": "setOpenImChatRoom:inContactBook:sync:",
+          "types": "B32@0:8@16B24B28",
+          "imp": "0x1020345c0"
+        },
+        {
+          "selector": "setOpenImChatRoom:top:sync:",
+          "types": "B32@0:8@16B24B28",
+          "imp": "0x102034674"
+        },
+        {
+          "selector": "setOpenImChatRoom:mute:sync:",
+          "types": "B32@0:8@16B24B28",
+          "imp": "0x102034728"
+        },
+        {
+          "selector": "changeOpenImChatRoomAccessType:type:",
+          "types": "B28@0:8@16I24",
+          "imp": "0x1020347dc"
+        },
+        {
+          "selector": "OnOpenIMOplogRespForSetChatRoomAnnouncement:Resp:",
+          "types": "v32@0:8@16@24",
+          "imp": "0x102034888"
+        },
+        {
+          "selector": "OnOpenIMOplogRespForModTopic:Resp:",
+          "types": "v32@0:8@16@24",
+          "imp": "0x1020350cc"
+        },
+        {
+          "selector": "OnOpenIMOplogRespForChangeChatRoomAccessType:Resp:",
+          "types": "v32@0:8@16@24",
+          "imp": "0x1020355a0"
+        },
+        {
+          "selector": "OnOpenIMOplogResp:",
+          "types": "v24@0:8@16",
+          "imp": "0x102035ba8"
+        },
+        {
+          "selector": "OpenIMMessageReturn:Event:",
+          "types": "v28@0:8@16I24",
+          "imp": "0x102035c70"
+        },
+        {
+          "selector": "p_handleMemContact:",
+          "types": "@24@0:8@16",
+          "imp": "0x102035d98"
+        },
+        {
+          "selector": "p_genContactFromMemberResp:",
+          "types": "@24@0:8@16",
+          "imp": "0x102035f4c"
+        },
+        {
+          "selector": "p_createOpenIMProtoBufEvent:forCgi:andUserData:eventHandler:",
+          "types": "I44@0:8@16I24@28#36",
+          "imp": "0x102036030"
+        },
+        {
+          "selector": "p_startOplogType:buffer:isSelfHandle:",
+          "types": "I32@0:8I16@20B28",
+          "imp": "0x1020361f4"
+        },
+        {
+          "selector": "p_addOplogType:buffer:needSync:",
+          "types": "B32@0:8I16@20B28",
+          "imp": "0x102036318"
+        },
+        {
+          "selector": "isShowUpgradeChatRoomEntranceWithGroupUserName:andFuncFlag:",
+          "types": "B28@0:8@16I24",
+          "imp": "0x10202b3cc"
+        },
+        {
+          "selector": "handleUpgradeChatRoomNeedShowSystemMessageAndRedDotWithGroupUserName:",
+          "types": "v24@0:8@16",
+          "imp": "0x10202b580"
+        },
+        {
+          "selector": "reportUpgradeChatRoomNeedShowSystemMessageWithGroupUserName:upgradeChatRoomShowSystemMessageTyp:",
+          "types": "v28@0:8@16I24",
+          "imp": "0x10202b8b4"
+        },
+        {
+          "selector": "updateChatRoomLocalSendUpgradeTypeWithGroupUserName:",
+          "types": "v24@0:8@16",
+          "imp": "0x10202b958"
+        },
+        {
+          "selector": "requestUpgradeChatRoomRedDot",
+          "types": "v16@0:8",
+          "imp": "0x10202ba08"
+        },
+        {
+          "selector": "sendUpgradeChatRoomNeedShowSystemMessageWithGroupUserName:",
+          "types": "v24@0:8@16",
+          "imp": "0x10202ba94"
+        },
+        {
+          "selector": "sendUpgradeChatRoomNeedShowSystemMessageWithGroupUserName:andMessageContent:",
+          "types": "v32@0:8@16@24",
+          "imp": "0x10202bc80"
+        },
+        {
+          "selector": "CheckForwardUpgradeChatRoomSwitch",
+          "types": "B16@0:8",
+          "imp": "0x10202beb0"
+        },
+        {
+          "selector": "simpleCheckUpgradeChatRoomNeedShowSystemMessageAndRedDot:",
+          "types": "B24@0:8@16",
+          "imp": "0x10202bf54"
+        },
+        {
+          "selector": "isCheckShowUpgradeChatRoomRedDot:",
+          "types": "B24@0:8@16",
+          "imp": "0x10202c020"
+        },
+        {
+          "selector": "checkToBeUpgradeHadNotUpgradeChatRoom:",
+          "types": "B24@0:8@16",
+          "imp": "0x10202c104"
+        },
+        {
+          "selector": "checkHadUpgradeHadChatRoom:",
+          "types": "B24@0:8@16",
+          "imp": "0x10202c198"
+        },
+        {
+          "selector": "checkToBeUpgradeChatRoomMemberMoreThanMax:",
+          "types": "B24@0:8@16",
+          "imp": "0x10202c1e8"
+        },
+        {
+          "selector": "checkUpgradeChatRoomNeedShowSystemMessageAndRedDotWithGroupUserName:",
+          "types": "B24@0:8@16",
+          "imp": "0x10202c2f4"
+        },
+        {
+          "selector": "checkIsCanUpgradeOpenIMGroupContact",
+          "types": "B16@0:8",
+          "imp": "0x10202c450"
+        },
+        {
+          "selector": "GetUpgradeAssociateAtRoomManageInfo:",
+          "types": "B24@0:8@16",
+          "imp": "0x10202c6e8"
+        },
+        {
+          "selector": "GetUpgradeAssociateAtRoomManageInfo:andTicket:andScene:",
+          "types": "B36@0:8@16@24I32",
+          "imp": "0x10202c890"
+        },
+        {
+          "selector": "OnGetUpgradeAssociateAtRoomManageInfo:",
+          "types": "v24@0:8@16",
+          "imp": "0x10202ca78"
+        },
+        {
+          "selector": "UpgradeAssociateChatRoom:andTicket:andScene:",
+          "types": "B36@0:8@16@24I32",
+          "imp": "0x10202cf88"
+        },
+        {
+          "selector": "OnUpgradeAssociateChatRoom:",
+          "types": "v24@0:8@16",
+          "imp": "0x10202d170"
+        },
+        {
+          "selector": "processNewXMLInApproveScene:",
+          "types": "v24@0:8@16",
+          "imp": "0x10202843c"
+        },
+        {
+          "selector": "getResultWithRegularInString:WithPatterns:",
+          "types": "@32@0:8@16@24",
+          "imp": "0x102028ec0"
+        },
+        {
+          "selector": "disableChatRoomAccessVerifyWithSystemMsgWrap:andNsUsrName:",
+          "types": "v32@0:8@16@24",
+          "imp": "0x102028f7c"
+        },
+        {
+          "selector": "processNewXmlUpgradeAssociateChatRoom:andNsUsrName:",
+          "types": "v32@0:8@16@24",
+          "imp": "0x102029600"
+        },
+        {
+          "selector": "processNewXmlChatRoomTopMsg:andNsUsrName:",
+          "types": "v32@0:8@16@24",
+          "imp": "0x1020299dc"
+        },
+        {
+          "selector": "OnGetNewXmlMsg:Type:MsgWrap:",
+          "types": "v40@0:8@16@24@32",
+          "imp": "0x10202a840"
+        },
+        {
+          "selector": "processRoomAnnouncement:userName:",
+          "types": "v32@0:8@16@24",
+          "imp": "0x10202aa24"
+        },
+        {
+          "selector": "getChatRoomPanelDynamicWeAppArWithBusinessType:",
+          "types": "@24@0:8Q16",
+          "imp": "0x10202429c"
+        },
+        {
+          "selector": "getInputToolWeAppNotShowIndexWithBusinessType:",
+          "types": "q24@0:8Q16",
+          "imp": "0x102024540"
+        },
+        {
+          "selector": "getChatRoomPanelDynamicWeAppAr",
+          "types": "@16@0:8",
+          "imp": "0x102024730"
+        },
+        {
+          "selector": "changPanelDynamicWeAppJSONToItemAr:",
+          "types": "@24@0:8@16",
+          "imp": "0x102024b24"
+        },
+        {
+          "selector": "isShowPanelDynamicWeAppRedDotInAttachmentButtonWithBusinessType:",
+          "types": "B24@0:8Q16",
+          "imp": "0x102025114"
+        },
+        {
+          "selector": "saveHadShowPanelDynamicWeAppRedDotInAttachmentButtonWithBusinessType:",
+          "types": "v24@0:8Q16",
+          "imp": "0x10202533c"
+        },
+        {
+          "selector": "clearRemoveDWeAppInRedDotHadShowArWithAllPanelDynamicWeAppAr:",
+          "types": "v24@0:8@16",
+          "imp": "0x102025704"
+        },
+        {
+          "selector": "getPanelDynamicWeAppHadRedDotAr",
+          "types": "@16@0:8",
+          "imp": "0x102025ae4"
+        },
+        {
+          "selector": "getMMKVpanelDynamicWeAppHadRedDotArKey",
+          "types": "@16@0:8",
+          "imp": "0x102025e58"
+        },
+        {
+          "selector": "setRoomtToolSalterWXapp:withWeAppInfoList:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x102025edc"
+        },
+        {
+          "selector": "OnSetRoomtToolSalterWXapp:",
+          "types": "v24@0:8@16",
+          "imp": "0x10202630c"
+        },
+        {
+          "selector": "setRoomTopMsg:msgWrap:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x1020266f4"
+        },
+        {
+          "selector": "unsetRoomTopMsg:msgSvrID:",
+          "types": "B32@0:8@16Q24",
+          "imp": "0x102026948"
+        },
+        {
+          "selector": "setRoomTopMsg:topMsgOpType:msgSvrID:msgWrap:msgSummary:msgUserName:addMsgData:",
+          "types": "B68@0:8@16I24Q28@36@44@52@60",
+          "imp": "0x102026984"
+        },
+        {
+          "selector": "OnSetRoomTopMsg:",
+          "types": "v24@0:8@16",
+          "imp": "0x102026d5c"
+        },
+        {
+          "selector": "getChatRoomTopMsgInfoListWithUserName:",
+          "types": "@24@0:8@16",
+          "imp": "0x1020274fc"
+        },
+        {
+          "selector": "removeChatRoomTopMsgLocalWithUserName:topId:",
+          "types": "B28@0:8@16I24",
+          "imp": "0x102027934"
+        },
+        {
+          "selector": "updateChatRoomtTopMsgInfoListFromNetWork:topMsgInfoItemList:",
+          "types": "v32@0:8@16@24",
+          "imp": "0x102027a4c"
+        },
+        {
+          "selector": "getInsertTopMsgInfoListFromNetWork:topMsgInfoItemList:",
+          "types": "@32@0:8@16@24",
+          "imp": "0x102027ccc"
+        },
+        {
+          "selector": "setChatRoomTopMsgLocalRevokeWithUserName:msgSvrID:",
+          "types": "B32@0:8@16Q24",
+          "imp": "0x1020281ec"
+        },
+        {
+          "selector": "setChatRoomTopMsgExposureTimeWithUserName:msgSvrID:exposureTime:",
+          "types": "B36@0:8@16Q24I32",
+          "imp": "0x1020282ac"
+        },
+        {
+          "selector": "checkIsHadTopMsgWithUserName:msgSvrID:",
+          "types": "B32@0:8@16Q24",
+          "imp": "0x10202837c"
+        },
+        {
+          "selector": "init",
+          "types": "@16@0:8",
+          "imp": "0x102036410"
+        },
+        {
+          "selector": "onServiceInit",
+          "types": "v16@0:8",
+          "imp": "0x102036524"
+        },
+        {
+          "selector": "dealloc",
+          "types": "v16@0:8",
+          "imp": "0x102036678"
+        },
+        {
+          "selector": "initDB:withLock:",
+          "types": "v32@0:8@16@24",
+          "imp": "0x1020366d0"
+        },
+        {
+          "selector": "CreateGroup:withMemberList:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x1020366e8"
+        },
+        {
+          "selector": "p_CreateGroup:withMemberList:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x102036974"
+        },
+        {
+          "selector": "AddGroupMember:memberList:desp:historyInfo:",
+          "types": "B48@0:8@16@24@32@40",
+          "imp": "0x102036d2c"
+        },
+        {
+          "selector": "p_AddGroupMember:memberList:desp:historyInfo:",
+          "types": "B48@0:8@16@24@32@40",
+          "imp": "0x102036e1c"
+        },
+        {
+          "selector": "DeleteGroupMember:withMemberList:scene:",
+          "types": "B40@0:8@16@24Q32",
+          "imp": "0x102037284"
+        },
+        {
+          "selector": "p_DeleteGroupMember:withMemberList:scene:",
+          "types": "B40@0:8@16@24Q32",
+          "imp": "0x102037340"
+        },
+        {
+          "selector": "SetShowDislayName:forGroup:sync:",
+          "types": "B32@0:8B16@20B28",
+          "imp": "0x1020377c0"
+        },
+        {
+          "selector": "p_SetShowDislayName:forGroup:sync:",
+          "types": "B32@0:8B16@20B28",
+          "imp": "0x102037860"
+        },
+        {
+          "selector": "SetGroupTopic:withTopic:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x102037b08"
+        },
+        {
+          "selector": "p_SetGroupTopic:withTopic:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x102037bb0"
+        },
+        {
+          "selector": "QuitGroup:withUsrName:deleteAllMsg:",
+          "types": "B36@0:8@16@24B32",
+          "imp": "0x102037e90"
+        },
+        {
+          "selector": "p_QuitGroup:withUsrName:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x102037fa0"
+        },
+        {
+          "selector": "reconcileQuitGroupLocally:withUsrName:deleteAllMsg:",
+          "types": "B36@0:8@16@24B32",
+          "imp": "0x1020380f0"
+        },
+        {
+          "selector": "reconcileBatchQuitGroupLocally:withUsrName:deleteAllMsg:",
+          "types": "B36@0:8@16@24B32",
+          "imp": "0x102038104"
+        },
+        {
+          "selector": "reconcileQuitGroupLocally:withUsrName:deleteAllMsg:deleteSessionBeforeMessageCleanup:serverConfirmedQuit:",
+          "types": "B44@0:8@16@24B32B36B40",
+          "imp": "0x102038118"
+        },
+        {
+          "selector": "oplogRet:errMsg:eventID:cgiWrap:",
+          "types": "v40@0:8i16@20I28@32",
+          "imp": "0x1020387d0"
+        },
+        {
+          "selector": "GetGroupAdmin:",
+          "types": "@24@0:8@16",
+          "imp": "0x102038efc"
+        },
+        {
+          "selector": "GetGroupSpecialAttentionMemList:",
+          "types": "@24@0:8@16",
+          "imp": "0x102039328"
+        },
+        {
+          "selector": "GetGroupAdminUserName:",
+          "types": "@24@0:8@16",
+          "imp": "0x102039754"
+        },
+        {
+          "selector": "GetGroupMember:",
+          "types": "@24@0:8@16",
+          "imp": "0x102039898"
+        },
+        {
+          "selector": "GetGroupMemberUserListByContact:",
+          "types": "@24@0:8@16",
+          "imp": "0x102039cc4"
+        },
+        {
+          "selector": "GetChatRoomSpecialAttentionUserList:chatRoomMemList:",
+          "types": "@32@0:8@16@24",
+          "imp": "0x102039d80"
+        },
+        {
+          "selector": "GetGroupMemberWithOutMyself:",
+          "types": "@24@0:8@16",
+          "imp": "0x102039df0"
+        },
+        {
+          "selector": "IsUsrInChatRoom:Usr:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x10203a1fc"
+        },
+        {
+          "selector": "ShowInContactBook:sync:",
+          "types": "B28@0:8@16B24",
+          "imp": "0x10203a6e8"
+        },
+        {
+          "selector": "UnShowInContactBook:sync:",
+          "types": "B28@0:8@16B24",
+          "imp": "0x10203a828"
+        },
+        {
+          "selector": "addChatMemberNeedVerifyMsg:ContactList:",
+          "types": "v32@0:8@16@24",
+          "imp": "0x10203a968"
+        },
+        {
+          "selector": "addChatMemberSystemTipMsg:contactList:systemTipContentFormat:systemTipContent:",
+          "types": "v48@0:8@16@24@32@40",
+          "imp": "0x10203adf4"
+        },
+        {
+          "selector": "genContactFromMemberResp:",
+          "types": "@24@0:8@16",
+          "imp": "0x10203b35c"
+        },
+        {
+          "selector": "OnAddChatRoomMember:",
+          "types": "v24@0:8@16",
+          "imp": "0x10203b60c"
+        },
+        {
+          "selector": "OnDeleteChatRoomMemberResponse:",
+          "types": "v24@0:8@16",
+          "imp": "0x10203c618"
+        },
+        {
+          "selector": "addCreateMsg:ContactList:",
+          "types": "v32@0:8@16@24",
+          "imp": "0x10203cd38"
+        },
+        {
+          "selector": "HandleCreateChatRoomOK:",
+          "types": "@24@0:8@16",
+          "imp": "0x10203d2e4"
+        },
+        {
+          "selector": "OnCreateChatRoom:",
+          "types": "i24@0:8@16",
+          "imp": "0x10203e200"
+        },
+        {
+          "selector": "OnUpgradeChatRoom:",
+          "types": "v24@0:8@16",
+          "imp": "0x10203e7fc"
+        },
+        {
+          "selector": "OnGetChatRoomMemberDetail:",
+          "types": "v24@0:8@16",
+          "imp": "0x10203ed80"
+        },
+        {
+          "selector": "updateChatRoomSpecialAttentionMemList:chatRoomData:",
+          "types": "v32@0:8@16@24",
+          "imp": "0x10203f968"
+        },
+        {
+          "selector": "updateChatRoomMemList:withResponse:",
+          "types": "v32@0:8@16@24",
+          "imp": "0x10203fbc4"
+        },
+        {
+          "selector": "recordGetChatRoomMemberDetailCacheWithUserName:clientVersion:serverVersion:getChatRoomMemberDetailCache:",
+          "types": "v40@0:8@16I24I28@32",
+          "imp": "0x10204028c"
+        },
+        {
+          "selector": "OnUpdateContact:",
+          "types": "v24@0:8@16",
+          "imp": "0x102040438"
+        },
+        {
+          "selector": "onGetChatRoomUpgradeStatus:",
+          "types": "v24@0:8@16",
+          "imp": "0x102040954"
+        },
+        {
+          "selector": "createProtoBufEvent:forCgi:andUserData:",
+          "types": "I36@0:8@16I24@28",
+          "imp": "0x102040b9c"
+        },
+        {
+          "selector": "createProtoBufEvent:forCgi:andUserData:eventHandler:",
+          "types": "I44@0:8@16I24@28#36",
+          "imp": "0x102040bac"
+        },
+        {
+          "selector": "GetChatRoomMemberDetail:",
+          "types": "B24@0:8@16",
+          "imp": "0x102040d70"
+        },
+        {
+          "selector": "p_GetChatRoomMemberDetail:",
+          "types": "B24@0:8@16",
+          "imp": "0x102040e20"
+        },
+        {
+          "selector": "GetEntireChatRoomMemberDetail:",
+          "types": "B24@0:8@16",
+          "imp": "0x1020413dc"
+        },
+        {
+          "selector": "GetChatRoomInfo:",
+          "types": "B24@0:8@16",
+          "imp": "0x1020416bc"
+        },
+        {
+          "selector": "p_GetChatRoomInfo:",
+          "types": "B24@0:8@16",
+          "imp": "0x102041760"
+        },
+        {
+          "selector": "CanUpgradeChatRoom",
+          "types": "i16@0:8",
+          "imp": "0x102041a18"
+        },
+        {
+          "selector": "CanDonateChatRoom",
+          "types": "i16@0:8",
+          "imp": "0x102041ab8"
+        },
+        {
+          "selector": "InviteGroupMember:withMemberList:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x102041b58"
+        },
+        {
+          "selector": "InviteGroupMember:withMemberList:withInviterScene:withTicket:withUserData:withMsgHistoryInfo:",
+          "types": "B60@0:8@16@24I32@36@44@52",
+          "imp": "0x102041b74"
+        },
+        {
+          "selector": "p_InviteGroupMember:withMemberList:withInviterScene:withTicket:withUserData:withMsgHistoryInfo:",
+          "types": "B60@0:8@16@24I32@36@44@52",
+          "imp": "0x102041c8c"
+        },
+        {
+          "selector": "OnInviteChatRoomMemberResp:",
+          "types": "v24@0:8@16",
+          "imp": "0x102042018"
+        },
+        {
+          "selector": "ChangeChatRoomOwner:NewOwner:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x102042818"
+        },
+        {
+          "selector": "p_ChangeChatRoomOwner:NewOwner:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x1020428c0"
+        },
+        {
+          "selector": "SetChatRoomSelfDisplayName:DisplayName:",
+          "types": "I32@0:8@16@24",
+          "imp": "0x102042a3c"
+        },
+        {
+          "selector": "p_SetChatRoomSelfDisplayName:DisplayName:",
+          "types": "I32@0:8@16@24",
+          "imp": "0x102042ae4"
+        },
+        {
+          "selector": "OnChangeChatRoomOwnerResp:",
+          "types": "v24@0:8@16",
+          "imp": "0x102042c64"
+        },
+        {
+          "selector": "ChangeChatRoomAccessType:type:qrCodeAccessType:",
+          "types": "B32@0:8@16I24I28",
+          "imp": "0x1020432d0"
+        },
+        {
+          "selector": "p_ChangeChatRoomAccessType:type:qrCodeAccessType:",
+          "types": "B32@0:8@16I24I28",
+          "imp": "0x10204337c"
+        },
+        {
+          "selector": "ChangeChatRoomOnlyAdminModTopic:on:",
+          "types": "B28@0:8@16B24",
+          "imp": "0x102043600"
+        },
+        {
+          "selector": "ApproveGroupMember:withInviterName:withInviteeList:withTicket:withUserData:withApproveMsgid:",
+          "types": "B64@0:8@16@24@32@40@48Q56",
+          "imp": "0x1020438a0"
+        },
+        {
+          "selector": "p_ApproveGroupMember:withInviterName:withInviteeList:withTicket:withUserData:withApproveMsgid:",
+          "types": "B64@0:8@16@24@32@40@48Q56",
+          "imp": "0x1020439c0"
+        },
+        {
+          "selector": "OnApproveGroupMember:",
+          "types": "v24@0:8@16",
+          "imp": "0x102043b8c"
+        },
+        {
+          "selector": "AddGroupAdmin:withAdminList:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x102043fa4"
+        },
+        {
+          "selector": "p_AddGroupAdmin:withAdminList:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x10204404c"
+        },
+        {
+          "selector": "OnAddGroupAdmin:",
+          "types": "v24@0:8@16",
+          "imp": "0x102044344"
+        },
+        {
+          "selector": "AddOpenIMGroupAdmin:withAdminList:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x102044a68"
+        },
+        {
+          "selector": "OnAddOpenIMGroupAdmin:",
+          "types": "v24@0:8@16",
+          "imp": "0x102044d60"
+        },
+        {
+          "selector": "DeleteGroupAdmin:withAdminList:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x102045484"
+        },
+        {
+          "selector": "p_DeleteGroupAdmin:withAdminList:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x10204552c"
+        },
+        {
+          "selector": "OnDeleteGroupAdmin:",
+          "types": "v24@0:8@16",
+          "imp": "0x10204582c"
+        },
+        {
+          "selector": "DeleteOpenIMGroupAdmin:withAdminList:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x102045f50"
+        },
+        {
+          "selector": "OnDeleteOpenIMGroupAdmin:",
+          "types": "v24@0:8@16",
+          "imp": "0x102046250"
+        },
+        {
+          "selector": "OnGetChatRoomInfoResp:",
+          "types": "v24@0:8@16",
+          "imp": "0x102046974"
+        },
+        {
+          "selector": "handleGetChatRoomInfoResp:response:request:",
+          "types": "v40@0:8@16@24@32",
+          "imp": "0x102046a10"
+        },
+        {
+          "selector": "clearUnshownRoomDesc:",
+          "types": "v24@0:8@16",
+          "imp": "0x10204782c"
+        },
+        {
+          "selector": "updateFamilyChatRoomtToolHadGetContactDetail:",
+          "types": "v24@0:8@16",
+          "imp": "0x102047a20"
+        },
+        {
+          "selector": "updateOpenImChatRoomMigrate:",
+          "types": "v24@0:8@16",
+          "imp": "0x102047b3c"
+        },
+        {
+          "selector": "SetChatRoomDesc:Desc:Flag:",
+          "types": "B36@0:8@16@24I32",
+          "imp": "0x102047cf4"
+        },
+        {
+          "selector": "p_SetChatRoomDesc:Desc:Flag:",
+          "types": "B36@0:8@16@24I32",
+          "imp": "0x102047db0"
+        },
+        {
+          "selector": "OnSetChatRoomDescResp:",
+          "types": "v24@0:8@16",
+          "imp": "0x102047f1c"
+        },
+        {
+          "selector": "OnDismissChatRoomResp:",
+          "types": "v24@0:8@16",
+          "imp": "0x102048754"
+        },
+        {
+          "selector": "DismissChatRoom:",
+          "types": "B24@0:8@16",
+          "imp": "0x102048be4"
+        },
+        {
+          "selector": "reloadChatRoomInfoDetailCompatibleCGIDataWithUserName:",
+          "types": "v24@0:8@16",
+          "imp": "0x102048dd0"
+        },
+        {
+          "selector": "didHandleChatRoomInfoDetailCompatibleCGIDataWithpbRequest:pbResponse:",
+          "types": "B32@0:8@16@24",
+          "imp": "0x1020490b0"
+        },
+        {
+          "selector": "OnOplogRespForModTopic:Resp:",
+          "types": "v32@0:8@16@24",
+          "imp": "0x102049760"
+        },
+        {
+          "selector": "OnOplogRespForChangeChatRoomAccessType:Resp:",
+          "types": "v32@0:8@16@24",
+          "imp": "0x102049ea8"
+        },
+        {
+          "selector": "OnOplogRespForChangeChatRoomOnlyAdminModTopic:Resp:",
+          "types": "v32@0:8@16@24",
+          "imp": "0x10204a640"
+        },
+        {
+          "selector": "OnOplogResp:",
+          "types": "v24@0:8@16",
+          "imp": "0x10204aefc"
+        },
+        {
+          "selector": "MessageReturn:Event:",
+          "types": "v28@0:8@16I24",
+          "imp": "0x10204b0d8"
+        },
+        {
+          "selector": "onModifyContact:",
+          "types": "v24@0:8@16",
+          "imp": "0x10204b370"
+        },
+        {
+          "selector": "chatRoomToolMgr",
+          "types": "@16@0:8",
+          "imp": "0x10204b520"
+        },
+        {
+          "selector": "openImChatRoomMigrateMgr",
+          "types": "@16@0:8",
+          "imp": "0x10204b530"
+        },
+        {
+          "selector": "getCreateGroupSessionId",
+          "types": "@16@0:8",
+          "imp": "0x10204b540"
+        },
+        {
+          "selector": "changeChatRoomChatBoxType:inChatBox:sync:",
+          "types": "B32@0:8@16B24B28",
+          "imp": "0x10204b550"
+        },
+        {
+          "selector": "changeChatRoomMsgNeedPushFlag:needPushFlag:sync:",
+          "types": "B32@0:8@16I24B28",
+          "imp": "0x10204b870"
+        },
+        {
+          "selector": "reportOnlyAdminModifyTopic:role:memberCount:action:",
+          "types": "v36@0:8@16I24I28I32",
+          "imp": "0x10204bbb8"
+        },
+        {
+          "selector": "OnDelMsg:MsgWrap:",
+          "types": "v32@0:8@16@24",
+          "imp": "0x10204bc60"
+        },
+        {
+          "selector": "OnDelMsg:DelAll:",
+          "types": "v28@0:8@16B24",
+          "imp": "0x10204bc70"
+        },
+        {
+          "selector": "OnRevokeMsg:MsgWrap:ResultCode:ResultMsg:EducationMsg:",
+          "types": "v52@0:8@16@24I32@36@44",
+          "imp": "0x10204bc88"
+        },
+        {
+          "selector": "m_panelDynamicWeAppAr",
+          "types": "@16@0:8",
+          "imp": "0x10204bc98"
+        },
+        {
+          "selector": "setM_panelDynamicWeAppAr:",
+          "types": "v24@0:8@16",
+          "imp": "0x10204bca8"
+        },
+        {
+          "selector": "m_panelDynamicUpdateTime",
+          "types": "d16@0:8",
+          "imp": "0x10204bcbc"
+        },
+        {
+          "selector": "setM_panelDynamicUpdateTime:",
+          "types": "v24@0:8d16",
+          "imp": "0x10204bccc"
+        },
+        {
+          "selector": "m_panelDynamicWeAppCache",
+          "types": "@16@0:8",
+          "imp": "0x10204bcdc"
+        },
+        {
+          "selector": "setM_panelDynamicWeAppCache:",
+          "types": "v24@0:8@16",
+          "imp": "0x10204bcec"
+        },
+        {
+          "selector": "m_dicQuitGroup",
+          "types": "@16@0:8",
+          "imp": "0x10204bd00"
+        },
+        {
+          "selector": "setM_dicQuitGroup:",
+          "types": "v24@0:8@16",
+          "imp": "0x10204bd10"
+        },
+        {
+          "selector": "dicShouldDeleteAllMsgAfterQuit",
+          "types": "@16@0:8",
+          "imp": "0x10204bd24"
+        },
+        {
+          "selector": "setDicShouldDeleteAllMsgAfterQuit:",
+          "types": "v24@0:8@16",
+          "imp": "0x10204bd34"
+        },
+        {
+          "selector": ".cxx_destruct",
+          "types": "v16@0:8",
+          "imp": "0x10204bd48"
+        }
+      ],
+      "ivars": [
+        {
+          "name": "m_oGroupDB",
+          "type": "@\"CGroupDB\"",
+          "offset": 8
+        },
+        {
+          "name": "m_oGroupOpLog",
+          "type": "@\"CGroupOpLog\"",
+          "offset": 16
+        },
+        {
+          "name": "m_gettingMemberDetailQueue",
+          "type": "@\"NSMutableArray\"",
+          "offset": 24
+        },
+        {
+          "name": "m_gettingInfoQueue",
+          "type": "@\"NSMutableArray\"",
+          "offset": 32
+        },
+        {
+          "name": "m_chatRoomToolMgr",
+          "type": "@\"ChatRoomToolMgr\"",
+          "offset": 40
+        },
+        {
+          "name": "m_openImChatRoomMigrateMgr",
+          "type": "@\"OpenImChatRoomMigrateMgr\"",
+          "offset": 48
+        },
+        {
+          "name": "m_createGroupSessionId",
+          "type": "@\"NSString\"",
+          "offset": 56
+        },
+        {
+          "name": "m_dicGetChatRoomMemberDetailCache",
+          "type": "@\"NSMutableDictionary\"",
+          "offset": 64
+        },
+        {
+          "name": "_m_panelDynamicWeAppAr",
+          "type": "@\"NSMutableArray\"",
+          "offset": 72
+        },
+        {
+          "name": "_m_panelDynamicUpdateTime",
+          "type": "d",
+          "offset": 80
+        },
+        {
+          "name": "_m_panelDynamicWeAppCache",
+          "type": "@\"ChatRoomPanelDynamicWeAppCache\"",
+          "offset": 88
+        },
+        {
+          "name": "_m_dicQuitGroup",
+          "type": "@\"NSMutableDictionary\"",
+          "offset": 96
+        },
+        {
+          "name": "_dicShouldDeleteAllMsgAfterQuit",
+          "type": "@\"NSMutableDictionary\"",
+          "offset": 104
+        }
+      ]
+    }
+  ]
+}

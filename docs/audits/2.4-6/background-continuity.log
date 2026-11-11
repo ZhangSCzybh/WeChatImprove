@@ -1,0 +1,9 @@
+2.4-6 settings source: 4 headers and matching footers, welcome/monitor/quit row gating, and no independent toggle
+2.4-6 group audit variables: 9 checks passed
+2.4-6 group audit global-on-no-key: 15 checks passed
+2.4-6 group audit global-on-legacy-off: 15 checks passed
+2.4-6 group audit global-off-no-key: 12 checks passed
+2.4-6 group audit global-off-legacy-on: 12 checks passed
+2.4-6 group audit budget-lost: 8 checks passed
+2.4-6 group audit departure-budget-lost: 8 checks passed
+2.4-6 group audit settings-and-backup: 37 checks passed
