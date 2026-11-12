@@ -1,0 +1,203 @@
+--- a/Controllers/CSAutomationDiagnostics.m
++++ b/Controllers/CSAutomationDiagnostics.m
+@@ -610,7 +610,7 @@
+     @try {
+         NSTimeInterval now=CSDiagNow();CSDiagExpireLocked(now);BOOL active=CSAutoDiagIsActive();
+         NSTimeInterval duration=CSDiagRecords?MAX(0,(active?now:CSDiagStopped)-CSDiagStarted):0;
+-        return @{@"schema":@2,@"version":@"2.5-13+online.1",@"active":@(active),@"stop_reason":CSDiagStopReason,@"duration_ms":@(llround(duration*1000)),@"max_duration_ms":@600000,@"max_records":@(CSDiagMaximumRecords),@"discarded_at_stop":@(CSDiagDiscarded),@"records":[CSDiagRecords copy]?:@[]};
++        return @{@"schema":@2,@"version":@"2.5-13+online.2",@"active":@(active),@"stop_reason":CSDiagStopReason,@"duration_ms":@(llround(duration*1000)),@"max_duration_ms":@600000,@"max_records":@(CSDiagMaximumRecords),@"discarded_at_stop":@(CSDiagDiscarded),@"records":[CSDiagRecords copy]?:@[]};
+     }@finally {os_unfair_lock_unlock(&CSDiagLock);}
+ }
+ NSString *CSAutoDiagStatus(void) {
+--- a/Controllers/CSAutomationOnlineExperiment.m
++++ b/Controllers/CSAutomationOnlineExperiment.m
+@@ -198,8 +198,11 @@
+     return self.enabled && [CSAutomationManager.sharedManager hasEligibleGroupPatConfigurationAtEpoch:self.epoch];
+ }
+ - (BOOL)executionAvailable {
+-    CSBackgroundRunManager *run=CSBackgroundRunManager.sharedManager;
+-    return run.canAttemptBackgroundWork || run.canAttemptGroupChatBackgroundWork;
++    // This callback already has execution time. Our resource manager describes
++    // only resources owned by this plugin; false says nothing about another
++    // plugin keeping WeChat alive. Do not create or claim background resources.
++    // Suspension still prevents this code from running at all.
++    return NSThread.isMainThread && [self background];
+ }
+ - (BOOL)desiredOnline {
+     @try {return [self background] && [self groupEligible] && [self executionAvailable];}
+--- a/Controllers/CSAutomationSettingsViewController.m
++++ b/Controllers/CSAutomationSettingsViewController.m
+@@ -391,7 +391,7 @@
+     CSAutoDiagStop();NSDictionary *snapshot=CSAutoDiagSnapshot();[self reloadSettings];
+     if(![snapshot[@"records"] count]){CSAutoAlert(self,@"暂无采样。请先开始新一轮采样，再复现拍动延迟。");return;}
+     NSError *error=nil;NSData *data=[NSJSONSerialization dataWithJSONObject:snapshot options:NSJSONWritingPrettyPrinted|NSJSONWritingSortedKeys error:&error];
+-    NSURL *url=[NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"WeChatImprove-2.5-13-online1-%@.json",NSUUID.UUID.UUIDString]]];
++    NSURL *url=[NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"WeChatImprove-2.5-13-online2-%@.json",NSUUID.UUID.UUIDString]]];
+     if(!data || ![data writeToURL:url options:NSDataWritingAtomic error:&error]){CSAutoAlert(self,@"导出失败，内存采样仍保留，可再次导出。");return;}
+     UIActivityViewController *share=[[UIActivityViewController alloc]initWithActivityItems:@[url] applicationActivities:nil];
+     share.popoverPresentationController.sourceView=self.view;share.popoverPresentationController.sourceRect=self.view.bounds;
+@@ -408,7 +408,7 @@
+ - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section { (void)tableView;return self.sections[section].header; }
+ - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
+     (void)tableView;
+-    if(section==4)return [NSString stringWithFormat:@"%@\n%@\n测试默认关闭，仅本次微信运行有效，10 分钟后自动关闭，切换账号也会关闭。需要已配置有效群回拍或回复，并保持后台运行可用。测试会改变微信向服务器报告的在线状态，可能影响耗电及通知表现；关闭或回到前台后恢复微信正常管理。请先开始采样再开启测试，锁屏后仅在群内拍我，暂不发送私聊；观察后停止并导出。\n仅本临时包提供。最多保存 4000 条，10 分钟到期后停止；采样期间只保存在内存，微信退出会丢失。本版记录原生通知、同步阻塞、拍动入站及发送回调；每 2 秒记录一次本地运行时刻，不产生网络请求。回调不代表对方已收到。复现后停止并导出。记录时间、阶段、匿名关联键与状态，不记录账号、群号、成员、正文或 XML。受保护数据状态不等同于锁屏状态。",CSAutomationOnlineExperimentStatus(),CSAutoDiagStatus()];
++    if(section==4)return [NSString stringWithFormat:@"%@\n%@\n测试默认关闭，仅本次微信运行有效，10 分钟后自动关闭，切换账号也会关闭。需要已配置有效群回拍或回复。可使用本插件或其他方式保活，不要求开启本插件的后台运行；微信被系统挂起时无法实时执行。测试会改变微信向服务器报告的在线状态，可能影响耗电及通知表现；关闭或回到前台后恢复微信正常管理。请先开始采样再开启测试，锁屏后仅在群内拍我，暂不发送私聊；观察后停止并导出。\n仅本临时包提供。最多保存 4000 条，10 分钟到期后停止；采样期间只保存在内存，微信退出会丢失。本版记录原生通知、同步阻塞、拍动入站及发送回调；每 2 秒记录一次本地运行时刻，不产生网络请求。回调不代表对方已收到。复现后停止并导出。记录时间、阶段、匿名关联键与状态，不记录账号、群号、成员、正文或 XML。受保护数据状态不等同于锁屏状态。",CSAutomationOnlineExperimentStatus(),CSAutoDiagStatus()];
+     if(!CSAutomationManager.sharedManager.ready)return section==0?(CSAutomationManager.sharedManager.statusText.length?CSAutomationManager.sharedManager.statusText:@"当前账号尚未就绪，请稍后重试。"):nil;
+     NSArray *details=@[@"仅处理拍到自己的新拍一拍。撤回只针对本功能本次自动发出的回拍，从微信确认发送成功后开始计时，并受微信允许的撤回时间限制。",
+         @"每次从本模块的回复内容中随机选一条。@ 仅在群聊生效；私聊发送普通回复。名单和延迟与其他模块独立。",
+--- a/Controllers/CSReleaseNotesViewController.m
++++ b/Controllers/CSReleaseNotesViewController.m
+@@ -4,10 +4,10 @@
+ // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
+ static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
+     NSDictionary *releases = @{
+-        @"2.5-13+online.1": @[
+-            @{@"title": @"群拍动后台接收验证", @"detail": @"新增默认关闭的后台在线模式测试开关。配置有效的群回拍或回复且后台运行可用时，尝试提交在线状态，验证群拍动能否自行触发接收。本包尚未确认解决锁屏延迟。"},
+-            @{@"title": @"临时启用与恢复", @"detail": @"开关只在本次微信运行生效，10 分钟后自动关闭，切换账号也会关闭。配置或后台资源失效时尝试恢复；回到前台后由微信正常接管。可能影响耗电与通知表现。"},
+-            @{@"title": @"验证方式", @"detail": @"在自动功能底部先开始采样，再打开测试开关，锁屏后仅在群内拍我，暂不发送私聊。观察后停止并导出。本实验没有新增定时补拉，日志记录不包含账号、群号或消息正文。"}
++        @"2.5-13+online.2": @[
++            @{@"title": @"兼容其他后台保活方式", @"detail": @"修正在线模式实验必须由本插件提供后台运行资源的限制。实验开启且群配置、账号、授权有效时，微信实际执行后台回调即可尝试在线上报，可沿用其他插件保活。"},
++            @{@"title": @"保留关闭与账号保护", @"detail": @"测试默认关闭，仅本次微信运行有效，10 分钟自动关闭；关闭、配置失效时恢复后台模式，回到前台由微信接管，切换账号废弃旧请求。不会启动本插件后台保活或新增定时补拉。"},
++            @{@"title": @"验证范围", @"detail": @"上一版在启用本插件后台运行时已由用户反馈立即回复。本版用于验证其他保活方式下的同一路径；需保持微信有执行机会，实际通知和回复效果仍以手机为准。"}
+         ],
+         @"2.5-13+diag.1": @[
+             @{@"title": @"群后台拍动临时定位", @"detail": @"基于 2.5-13 记录通知到达、同步条件、拍动入站、群资料检查及发送回调。本包用于定位回到前台才回复的问题，尚不代表已修复。"},
+--- a/Headers/CSUserInfoHelper.h
++++ b/Headers/CSUserInfoHelper.h
+@@ -14,7 +14,7 @@
+ extern NSString * const kChatAvatarURLKey;    // 聊天对象头像URL缓存键
+ 
+ // 插件信息相关常量
+-#define kPluginVersionString @"2.5-13+online.1"  // 插件版本号
++#define kPluginVersionString @"2.5-13+online.2"  // 插件版本号
+ 
+ #pragma mark - 类定义
+ 
+--- a/Tests/AutomationDiagnosticsTests.m
++++ b/Tests/AutomationDiagnosticsTests.m
+@@ -28,7 +28,7 @@
+ static void CheckSchema(NSDictionary *snapshot){
+     NSSet *top=[NSSet setWithArray:@[@"schema",@"version",@"active",@"stop_reason",@"duration_ms",@"max_duration_ms",@"max_records",@"discarded_at_stop",@"records"]];
+     CHECK([[NSSet setWithArray:snapshot.allKeys] isEqual:top]);
+-    CHECK([snapshot[@"schema"] isEqual:@2] && [snapshot[@"version"] isEqual:@"2.5-13+online.1"]);
++    CHECK([snapshot[@"schema"] isEqual:@2] && [snapshot[@"version"] isEqual:@"2.5-13+online.2"]);
+     CHECK([snapshot[@"max_duration_ms"] isEqual:@600000] && [snapshot[@"max_records"] isEqual:@4000]);
+     NSSet *fields=[NSSet setWithArray:@[@"t_ms",@"stage",@"key",@"epoch",@"flags",@"main",@"app_state",@"protected_available"]];
+     for(NSDictionary *row in snapshot[@"records"]){
+--- a/Tests/AutomationOnlineExperimentTests.m
++++ b/Tests/AutomationOnlineExperimentTests.m
+@@ -12,7 +12,7 @@
+ // Exercise the real online experiment, ABI dispatcher and environment. Only
+ // account boundaries, group configuration, execution opportunity and native
+ // services are fixtures; all storage stays in memory.
+-static NSUInteger checks,hooks,epoch=10,defaultsWrites,changeNotifications;
++static NSUInteger checks,hooks,epoch=10,defaultsWrites,changeNotifications,backgroundResourceQueries;
+ static BOOL backupReady=YES,suspended,authorized=YES,groupEligible=YES;
+ static BOOL globalOpportunity=YES,groupOpportunity,accountAvailable=YES;
+ static NSString *account=@"alice",*nativeContext=@"outside-context",*hostVersion=@"8.0.80";
+@@ -62,8 +62,8 @@
+ @end
+ @implementation CSBackgroundRunManager
+ + (instancetype)sharedManager {static id value;static dispatch_once_t once;dispatch_once(&once,^{value=[self new];});return value;}
+-- (BOOL)canAttemptBackgroundWork{return globalOpportunity;}
+-- (BOOL)canAttemptGroupChatBackgroundWork{return groupOpportunity;}
++- (BOOL)canAttemptBackgroundWork{backgroundResourceQueries++;return globalOpportunity;}
++- (BOOL)canAttemptGroupChatBackgroundWork{backgroundResourceQueries++;return groupOpportunity;}
+ - (BOOL)enabled{return globalOpportunity;}
+ @end
+ 
+@@ -257,7 +257,13 @@
+ }
+ static void QualificationAndSingleRestore(void) {
+     OnlineNativeService *service=Setup();groupEligible=NO;Background();CSAutomationOnlineExperimentSetEnabled(YES);Drain();CHECK(service.modes.count==0);
+-    service=Setup();globalOpportunity=NO;Background();CSAutomationOnlineExperimentSetEnabled(YES);Drain();CHECK(service.modes.count==0);
++    // Regression from online.1: both plugin-owned resources are unavailable,
++    // yet WeChat is executing background callbacks via another keepalive.
++    service=Setup();globalOpportunity=NO;groupOpportunity=NO;Background();Enable();
++    CHECK([service.modes isEqual:@[@1]] && [service.addedModes isEqual:@[@1]]);
++    for(NSUInteger i=0;i<32;i++){Post(CSBackgroundRunStateChangedNotification);Post(CSBackgroundRunSettingsChangedNotification);}
++    Drain();CHECK([service.modes isEqual:@[@1]]);
++    CSAutomationOnlineExperimentSetEnabled(NO);Drain();CHECK([service.addedModes isEqual:(@[@1,@2])]);
+     service=Setup();authorized=NO;Background();CSAutomationOnlineExperimentSetEnabled(YES);Drain();CHECK(service.modes.count==0);
+     service=Setup();accountAvailable=NO;Background();CSAutomationOnlineExperimentSetEnabled(YES);Drain();CHECK(service.modes.count==0);
+     service=Setup();globalOpportunity=NO;groupOpportunity=YES;Background();Enable();CHECK([service.modes isEqual:@[@1]]);
+@@ -269,7 +275,10 @@
+     Drain();CHECK([service.modes isEqual:@[@1]]);
+     groupEligible=NO;Post(CSAutomationConfigurationDidChange);Drain();CHECK([service.modes isEqual:(@[@1,@2])]);
+     for(NSUInteger i=0;i<12;i++)Post(CSAutomationConfigurationDidChange);Drain();CHECK(CountMode(service,2)==1);
+-    service=Setup();Background();Enable();globalOpportunity=NO;Post(CSBackgroundRunStateChangedNotification);Drain();CHECK([service.modes isEqual:(@[@1,@2])]);
++    service=Setup();Background();Enable();globalOpportunity=NO;Post(CSBackgroundRunStateChangedNotification);Drain();CHECK([service.modes isEqual:@[@1]]);
++    // Losing our own resources cannot disprove execution provided elsewhere.
++    // Explicit experiment close must still restore mode 2 without those resources.
++    CSAutomationOnlineExperimentSetEnabled(NO);Drain();CHECK([service.modes isEqual:(@[@1,@2])]);
+ }
+ static void ForegroundOrdering(void) {
+     OnlineNativeService *service=Setup();Enable();CHECK(service.modes.count==0);
+@@ -306,7 +315,7 @@
+     service=Setup();Background();duringForward=^{groupEligible=NO;Post(CSAutomationConfigurationDidChange);};
+     CSAutomationOnlineExperimentSetEnabled(YES);Drain();CHECK(CountMode(service,1)==0 && CountMode(service,2)<=1);
+     service=Setup();Background();duringForward=^{globalOpportunity=NO;Post(CSBackgroundRunStateChangedNotification);};
+-    CSAutomationOnlineExperimentSetEnabled(YES);Drain();CHECK(CountMode(service,1)==0 && CountMode(service,2)<=1);
++    CSAutomationOnlineExperimentSetEnabled(YES);Drain();CHECK([service.addedModes isEqual:@[@1]] && CountMode(service,2)==0);
+     service=Setup();Background();duringForward=^{UIApplication.sharedApplication.applicationState=UIApplicationStateInactive;Post(UIApplicationWillEnterForegroundNotification);};
+     CSAutomationOnlineExperimentSetEnabled(YES);Drain();CHECK(service.modes.count==0);
+     service=Setup();Background();duringForward=^{UIApplication.sharedApplication.applicationState=UIApplicationStateInactive;};
+@@ -335,7 +344,7 @@
+     CHECK(!caught && CountMode(service,1)==1);NSUInteger count=service.modes.count;Drain();CHECK(service.modes.count==count);
+     throwNative=NO;UIApplication.sharedApplication.applicationState=UIApplicationStateActive;Post(UIApplicationWillEnterForegroundNotification);
+     CSAutomationOnlineExperimentSetEnabled(NO);Host(INT_MIN);CHECK([service.modes.lastObject isEqual:@(INT_MIN)]);
+-    CHECK(defaultsWrites==0);CHECK(changeNotifications<500);
++    CHECK(defaultsWrites==0);CHECK(backgroundResourceQueries==0);CHECK(changeNotifications<500);
+ }
+ static void QueuedEventsStopBeforeHostCancellation(void) {
+     for(NSUInteger route=0;route<2;route++){
+@@ -363,7 +372,7 @@
+ 
+         service=Setup();nativeQueueRoute=route;holdNativeQueue=YES;Background();Enable();
+         globalOpportunity=NO;Post(CSBackgroundRunStateChangedNotification);Drain();ReleaseNativeQueue();
+-        CHECK([service.addedModes isEqual:@[@2]] && service.hostCancellations==1);
++        CHECK([service.addedModes isEqual:@[@1]] && service.hostCancellations==1);
+ 
+         service=Setup();nativeQueueRoute=route;Background();Enable();CHECK([service.addedModes isEqual:@[@1]]);
+         [service.addedModes removeAllObjects];service.hostCancellations=0;holdNativeQueue=YES;
+@@ -472,7 +481,7 @@
+         CHECK(hooks==0);DefaultOffAndNativeTransparency();QualificationAndSingleRestore();ForegroundOrdering();
+         AccountAndServiceBoundaries();ForwardingAndLookupReentry();ExceptionsAndDisabledHostCalls();
+         QueuedEventsStopBeforeHostCancellation();NaturalQueueOrderingAndNestedCalls();ExpirationAndGeneration();CHECK(hooks==4);
+-        printf("Automation online experiment: %lu checks passed; real environment/NSProxy context, ephemeral opt-in, group/execution gates, restoration, lifecycle/account/service boundaries, forwarding reentry, native arguments and exception identity\n",(unsigned long)checks);
++        printf("Automation online experiment: %lu checks passed; real environment/NSProxy context, ephemeral opt-in, group/account gates, external keepalive callback compatibility, restoration, lifecycle/account/service boundaries, forwarding reentry, native arguments and exception identity\n",(unsigned long)checks);
+     }
+     [NSNotificationCenter.defaultCenter removeObserver:token];return 0;
+ }}
+--- a/Tests/AutomationReplyDiagnosticsTests.m
++++ b/Tests/AutomationReplyDiagnosticsTests.m
+@@ -56,7 +56,7 @@
+ static void Start(NSTimeInterval time){CSAutoDiagSetTestTime(time);CSAutoDiagStart();CHECK(CSAutoDiagIsActive());CHECK(CSAutoDiagReplyTrackedCountForTest()==0);}
+ static void ExpectNoNativeReads(NSUInteger before){CHECK(nativeReads==before);}
+ static void CheckPrivateExport(void){
+-    NSDictionary *snapshot=CSAutoDiagSnapshot();CHECK([snapshot[@"schema"] isEqual:@2] && [snapshot[@"version"] isEqual:@"2.5-13+online.1"]);
++    NSDictionary *snapshot=CSAutoDiagSnapshot();CHECK([snapshot[@"schema"] isEqual:@2] && [snapshot[@"version"] isEqual:@"2.5-13+online.2"]);
+     NSError *error=nil;NSData *data=[NSJSONSerialization dataWithJSONObject:snapshot options:0 error:&error];CHECK(data && !error);
+     NSString *json=[[NSString alloc]initWithData:data encoding:NSUTF8StringEncoding];
+     for(NSString *forbidden in @[@"PRIVATE_REPLY_",@"PRIVATE_CLIENT_UUID",@"1700000123",@"7654321",@"12345000000000000",@"m_ui",@"m_ns",@"patServer",@"client",@"from",@"metadata",@"generation"])
+--- a/Tests/verify-automation-native-sync-integration.sh
++++ b/Tests/verify-automation-native-sync-integration.sh
+@@ -47,7 +47,7 @@
+             if(++next==expected.count)break;
+         }
+         BOOL passed=[snapshot[@"active"] boolValue] && [snapshot[@"schema"] isEqual:@2] &&
+-            [snapshot[@"version"] isEqual:@"2.5-13+online.1"] && capturedEpoch && next==expected.count;
++            [snapshot[@"version"] isEqual:@"2.5-13+online.2"] && capturedEpoch && next==expected.count;
+         fprintf(stdout,"Active native sync diagnostics: %lu records; ordered need begin/end -> queued -> manager scope -> request/return in one epoch=%s; original group/private assertions preserved\n",(unsigned long)rows.count,passed?"yes":"no");
+         fflush(stdout);if(!passed)_Exit(1);
+     }
+--- a/control
++++ b/control
+@@ -1,6 +1,6 @@
+ Package: com.wechat.improve
+ Name: WeChatImprove
+-Version: 2.5-13+online.1
++Version: 2.5-13+online.2
+ Architecture: iphoneos-arm
+ Description: 微信插件，支持聊天按钮布局自定义等。
+ Maintainer: 再也不会

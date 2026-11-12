@@ -1,0 +1,44 @@
+{
+  "version": "2.5-13+online.2",
+  "baseline": "3af45015ce464b7f1feb029ec362a98db274df9f",
+  "online_experiment": {
+    "main_checks": 8110,
+    "rejection_processes": 22,
+    "rejection_checks": 960,
+    "total_checks": 9070,
+    "result": "passed",
+    "strict_ios_objects": [
+      "arm64",
+      "arm64e"
+    ]
+  },
+  "diagnostics": {
+    "recorder_checks": 16285,
+    "reply_checks": 639,
+    "result": "passed",
+    "strict_ios_objects": [
+      "arm64",
+      "arm64e"
+    ]
+  },
+  "input_sha256": {
+    "Controllers/CSAutomationOnlineExperiment.m": "0279bc2f4751c792e21a8bb65b9a6e7fcfddb962eace010aaefe568677aa31de",
+    "Tests/AutomationOnlineExperimentTests.m": "4a53b2b6b5bc3d1232db95c4df155e9187ce5ab7a3e58bc0c371e519cf9e4d98",
+    "Tests/verify-automation-online-experiment.sh": "34483502c967cbeab8c6affd65a881d0f0099050684f28f8bc18c016d389a896"
+  },
+  "phone_effect": "User reports online.1 immediate with this plugin keepalive; online.2 with external keepalive not yet tested.",
+  "build": {
+    "result": "passed",
+    "production_inputs": 453,
+    "archs": [
+      "arm64",
+      "arm64e"
+    ],
+    "scheme": "Rootless",
+    "min_ios": "15.0",
+    "historical_files_unchanged": 86,
+    "official_baseline_paths_unchanged": 791,
+    "full_patch_replay": "passed",
+    "previous_experiment_delta_replay": "passed"
+  }
+}

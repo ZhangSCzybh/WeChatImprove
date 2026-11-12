@@ -1,0 +1,2279 @@
+--- /dev/null
++++ b/Controllers/CSAutomationDiagnostics.h
+@@ -0,0 +1,24 @@
++#import <Foundation/Foundation.h>
++#include <stdint.h>
++
++// Temporary 2.5-13 diagnostic build only. Never pass user data as stage names.
++FOUNDATION_EXPORT void CSAutoDiagRecord(NSString *stage, unsigned long long serverID, NSUInteger epoch, uint64_t flags);
++typedef struct { unsigned long long serverID; NSUInteger epoch; } CSAutoDiagContext;
++FOUNDATION_EXPORT CSAutoDiagContext CSAutoDiagPushContext(unsigned long long serverID, NSUInteger epoch);
++FOUNDATION_EXPORT void CSAutoDiagPopContext(CSAutoDiagContext previous);
++FOUNDATION_EXPORT void CSAutoDiagRecordContext(NSString *stage, uint64_t flags);
++FOUNDATION_EXPORT BOOL CSAutoDiagIsActive(void);
++FOUNDATION_EXPORT NSUInteger CSAutoDiagCaptureGeneration(void);
++FOUNDATION_EXPORT void CSAutoDiagRecordGeneration(NSString *stage, NSUInteger generation, uint64_t flags);
++FOUNDATION_EXPORT NSUInteger CSAutoDiagCurrentEpoch(void);
++FOUNDATION_EXPORT void CSAutoDiagRecordEvent(NSString *stage, NSDictionary *event, NSUInteger epoch, uint64_t flags);
++FOUNDATION_EXPORT CSAutoDiagContext CSAutoDiagPushEventContext(NSDictionary *event, NSUInteger epoch);
++FOUNDATION_EXPORT void CSAutoDiagStart(void);
++FOUNDATION_EXPORT void CSAutoDiagStop(void);
++FOUNDATION_EXPORT void CSAutoDiagReset(void);
++FOUNDATION_EXPORT NSDictionary *CSAutoDiagSnapshot(void);
++FOUNDATION_EXPORT NSString *CSAutoDiagStatus(void);
++
++#if CS_AUTODIAG_HOST_TEST
++FOUNDATION_EXPORT void CSAutoDiagSetTestTime(NSTimeInterval time);
++#endif
+--- /dev/null
++++ b/Controllers/CSAutomationDiagnostics.m
+@@ -0,0 +1,625 @@
++#import "CSAutomationDiagnostics.h"
++#import "CSAutomationReplyDiagnostics.h"
++#import "CSMessageNativeActionAdapter.h"
++#import <CommonCrypto/CommonDigest.h>
++#import <mach/mach_time.h>
++#import <os/lock.h>
++#import <math.h>
++#include <errno.h>
++#include <stdlib.h>
++#include <string.h>
++#if !CS_AUTODIAG_HOST_TEST
++#import <UIKit/UIKit.h>
++#import "CSAutomationNativeDiagnostics.h"
++#import "CSAutomationNativeSync.h"
++#import "CSAutomationOnlineExperiment.h"
++static dispatch_source_t CSDiagPulse;
++static void CSDiagCancelPulse(void) {if(CSDiagPulse){dispatch_source_cancel(CSDiagPulse);CSDiagPulse=nil;}}
++#endif
++
++static os_unfair_lock CSDiagLock=OS_UNFAIR_LOCK_INIT;
++static BOOL CSDiagActive=NO;
++static NSMutableArray *CSDiagRecords;
++static NSString *CSDiagStopReason=@"not_started";
++static NSTimeInterval CSDiagStarted=0,CSDiagStopped=0;
++static uint8_t CSDiagSalt[32];
++static NSUInteger CSDiagDiscarded=0;
++static NSUInteger CSDiagGeneration=0;
++static NSMutableArray *CSDiagReplies;
++static uint8_t CSDiagReplyHooksKnown=0,CSDiagReplyHooksInstalled=0;
++static uint8_t CSDiagReplyUnmatched[2]={0,0};
++// State is cached on main lifecycle callbacks; recording never queries UIKit,
++// an account service, contacts, a message object or any native getter.
++static NSInteger CSDiagAppState=-1;
++static BOOL CSDiagProtected=NO;
++static __thread CSAutoDiagContext CSDiagContext;
++static const NSUInteger CSDiagMaximumRecords=4000;
++static const NSTimeInterval CSDiagMaximumDuration=600;
++#if CS_AUTODIAG_HOST_TEST
++static NSTimeInterval CSDiagTestTime=0;
++void CSAutoDiagSetTestTime(NSTimeInterval time) {CSDiagTestTime=time;}
++#endif
++static NSTimeInterval CSDiagNow(void) {
++#if CS_AUTODIAG_HOST_TEST
++    return CSDiagTestTime;
++#else
++    static mach_timebase_info_data_t scale;static dispatch_once_t once;
++    dispatch_once(&once,^{mach_timebase_info(&scale);});
++    return scale.denom?(NSTimeInterval)mach_continuous_time()*scale.numer/scale.denom/1e9:0;
++#endif
++}
++BOOL CSAutoDiagIsActive(void) {return __atomic_load_n(&CSDiagActive,__ATOMIC_RELAXED);}
++static void CSDiagSetActive(BOOL value) {__atomic_store_n(&CSDiagActive,value,__ATOMIC_RELAXED);}
++static void CSDiagExpireLocked(NSTimeInterval now) {
++    if(CSAutoDiagIsActive() && now-CSDiagStarted>=CSDiagMaximumDuration){
++        CSDiagSetActive(NO);CSDiagStopped=CSDiagStarted+CSDiagMaximumDuration;CSDiagStopReason=@"expired";
++        CSDiagReplies=nil;
++    }
++}
++static BOOL CSDiagStageAllowed(NSString *stage) {
++    if(![stage isKindOfClass:NSString.class])return NO;
++    static NSSet *allowed;static dispatch_once_t once;
++    dispatch_once(&once,^{
++        allowed=[NSSet setWithArray:@[
++            @"admit.begin",
++            @"admit.existing",
++            @"capture.start",
++            @"runtime.pulse",
++            @"online.event.queued",
++            @"online.event.cancelled",
++            @"online.event.return",
++            @"online.account.reset",
++            @"online.switch",
++            @"online.expired",
++            @"online.native.takeover",
++            @"online.request.begin",
++            @"online.request.end",
++            @"online.reconcile",
++            @"online.snapshot",
++
++            @"sync.feature.installed",
++            @"native.hook.state",
++            @"sync.manager.begin",
++            @"sync.manager.reject",
++            @"sync.manager.authorized",
++            @"sync.manager.scope",
++            @"sync.drain.begin",
++            @"sync.drain.service",
++            @"sync.drain.no_need",
++            @"sync.drain.busy",
++            @"sync.drain.request",
++            @"sync.drain.return",
++            @"sync.wake.enter",
++            @"sync.wake.main",
++            @"sync.wake.queued",
++            @"sync.event.need.begin",
++            @"sync.event.need.end",
++            @"sync.event.handle.begin",
++            @"sync.event.handle.end",
++            @"sync.event.resume.begin",
++            @"sync.event.resume.end",
++            @"sync.event.reset.begin",
++            @"sync.event.reset.end",
++            @"native.notify.begin",
++            @"native.notify.end",
++            @"native.apns.begin",
++            @"native.apns.end",
++            @"native.push.begin",
++            @"native.push.end",
++            @"native.push64.begin",
++            @"native.push64.end",
++            @"native.response.begin",
++            @"native.response.end",
++            @"native.request.begin",
++            @"native.request.end",
++            @"native.online.begin",
++            @"native.online.end",
++            @"native.action.begin",
++            @"native.action.end",
++
++            @"capture.stop",
++            @"claim.io_begin",
++            @"claim.io_end",
++            @"claim.main",
++            @"claim.no_storage",
++            @"claim.queued",
++            @"claim.retry_5s",
++            @"event.decisions",
++            @"event.invalid",
++            @"event.stale",
++            @"gate.begin",
++            @"gate.exception",
++            @"gate.final",
++            @"gate.group_pass",
++            @"gate.not_member",
++            @"gate.quitting",
++            @"gate.room_unavailable",
++            @"gate.task_invalid",
++            @"group.account.precheck",
++            @"group.account.unavailable",
++            @"group.contact.class.missing",
++            @"group.contact.exception",
++            @"group.contact.getter.empty",
++            @"group.contact.getter.unsupported",
++            @"group.contact.identity.mismatch",
++            @"group.contact.missing",
++            @"group.contact.precheck",
++            @"group.contact.service.missing",
++            @"group.contact.type.invalid",
++            @"group.member.account.changed",
++            @"group.member.account.unavailable",
++            @"group.member.contact.missing",
++            @"group.member.exception",
++            @"group.member.false",
++            @"group.member.service.missing",
++            @"group.member.unsupported",
++            @"group.room.blocked.true",
++            @"group.room.blocked.unsupported",
++            @"group.room.contact.missing",
++            @"group.room.dismissed.true",
++            @"group.room.dismissed.unsupported",
++            @"group.room.identity.mismatch",
++            @"group.room.state.exception",
++            @"group.room.type.exception",
++            @"group.room.type.false",
++            @"group.room.type.unsupported",
++            @"hook.add.enter",
++            @"hook.add.return",
++            @"hook.async.enter",
++            @"hook.async.return",
++            @"hook.batch.deliver",
++            @"hook.batch.enqueue",
++            @"hook.batch.enter",
++            @"hook.batch.identity.reject",
++            @"hook.batch.main",
++            @"hook.batch.native.before",
++            @"hook.batch.native.return",
++            @"hook.batch.raw.accept",
++            @"hook.batch.raw.reject",
++            @"hook.batch.raw.snapshot",
++            @"hook.batch.revoke.unavailable",
++            @"hook.batch.revoked",
++            @"hook.compound.accept",
++            @"hook.compound.reject",
++            @"hook.direct.deliver",
++            @"hook.direct.identity.reject",
++            @"hook.direct.main",
++            @"hook.direct.native.before",
++            @"hook.direct.native.return",
++            @"hook.notadd.enter",
++            @"hook.notadd.return",
++            @"hook.publish.enqueue",
++            @"hook.publish.epoch.reject",
++            @"hook.publish.main",
++            @"hook.raw.accept",
++            @"hook.raw.deliver",
++            @"hook.raw.reject",
++            @"hook.sessions.enter",
++            @"hook.sessions.return",
++            @"hook.sync.enter",
++            @"hook.sync.return",
++            @"lifecycle.active",
++            @"lifecycle.background",
++            @"lifecycle.foreground",
++            @"lifecycle.protected_available",
++            @"lifecycle.protected_unavailable",
++            @"manager.changed",
++            @"manager.configuration_changed",
++            @"manager.epoch_changed",
++            @"parse.pat.abi.reject",
++            @"parse.pat.accept",
++            @"parse.pat.context.reject",
++            @"parse.pat.exception",
++            @"parse.pat.identity.reject",
++            @"parse.pat.own.reject",
++            @"parse.pat.private.route.reject",
++            @"parse.pat.sender.reject",
++            @"parse.pat.target.reject",
++            @"parse.raw.abi.reject",
++            @"parse.raw.accept",
++            @"parse.raw.context.reject",
++            @"parse.raw.envelope.reject",
++            @"parse.raw.exception",
++            @"parse.raw.group.route.reject",
++            @"parse.raw.identity",
++            @"parse.raw.identity.reject",
++            @"parse.raw.names.reject",
++            @"parse.raw.prefix.reject",
++            @"parse.raw.private.route.reject",
++            @"parse.raw.session.reject",
++            @"parse.raw.size.reject",
++            @"parse.raw.specified.reject",
++            @"parse.raw.structure.reject",
++            @"parse.raw.target.reject",
++            @"parse.raw.template.reject",
++            @"parse.raw.xml.reject",
++            @"pat.convert_failed",
++            @"pat.converted",
++            @"pat.queued",
++            @"pat.receive",
++            @"pat.reject_epoch",
++            @"pat_action.begin",
++            @"pat_action.invoke_begin",
++            @"pat_action.invoke_return",
++            @"reply.track",
++            @"reply.update",
++            @"reply.callback.begin",
++            @"reply.callback.end",
++            @"reply.callback.unmatched",
++            @"reply.hook.state",
++            @"sync.busy",
++            @"sync.native_begin",
++            @"sync.native_exception",
++            @"sync.native_return",
++            @"sync.tick",
++            @"task.availability_blocked",
++            @"task.created",
++            @"task.exception",
++            @"task.retry_5s",
++            @"text.begin",
++            @"text.invoke_begin",
++            @"text.invoke_return",
++            @"text.no_route"
++#if CS_AUTODIAG_HOST_TEST
++            ,@"capture.test",@"group.pass"
++#endif
++        ]];
++    });
++    return [allowed containsObject:stage];
++}
++
++static NSString *CSDiagKey(unsigned long long serverID,NSUInteger epoch) {
++    if(!serverID)return @"";
++    // Only the salted digest is retained. Neither the raw SID nor the salt is
++    // exported. A new capture uses a new salt and cannot be joined to the old.
++    uint8_t bytes[sizeof(CSDiagSalt)+sizeof(serverID)+sizeof(epoch)],digest[CC_SHA256_DIGEST_LENGTH];
++    memcpy(bytes,CSDiagSalt,sizeof(CSDiagSalt));memcpy(bytes+sizeof(CSDiagSalt),&serverID,sizeof(serverID));
++    memcpy(bytes+sizeof(CSDiagSalt)+sizeof(serverID),&epoch,sizeof(epoch));
++    CC_SHA256(bytes,(CC_LONG)sizeof(bytes),digest);
++    return [NSString stringWithFormat:@"%02x%02x%02x%02x%02x%02x%02x%02x",digest[0],digest[1],digest[2],digest[3],digest[4],digest[5],digest[6],digest[7]];
++}
++static void CSDiagAppendLocked(NSString *stage,unsigned long long serverID,NSUInteger epoch,uint64_t flags) {
++    NSTimeInterval now=CSDiagNow();CSDiagExpireLocked(now);
++    if(!CSAutoDiagIsActive() || !CSDiagStageAllowed(stage))return;
++    if(CSDiagRecords.count>=CSDiagMaximumRecords){CSDiagDiscarded++;CSDiagStopped=now;CSDiagStopReason=@"capacity";CSDiagSetActive(NO);CSDiagReplies=nil;return;}
++    [CSDiagRecords addObject:@{@"t_ms":@(llround(MAX(0,now-CSDiagStarted)*1000)),@"stage":[stage copy],@"key":CSDiagKey(serverID,epoch),@"epoch":@(epoch),@"flags":@(flags),@"main":@(NSThread.isMainThread),@"app_state":@(CSDiagAppState),@"protected_available":@(CSDiagProtected)}];
++}
++void CSAutoDiagRecord(NSString *stage,unsigned long long serverID,NSUInteger epoch,uint64_t flags) {
++    if(!CSAutoDiagIsActive())return;
++    // Diagnostics must never unwind through an original/native call.
++    os_unfair_lock_lock(&CSDiagLock);
++    @try {
++        CSDiagAppendLocked(stage,serverID,epoch,flags);
++    }@catch(__unused NSException *exception) {CSDiagSetActive(NO);CSDiagStopReason=@"record_error";CSDiagStopped=CSDiagNow();}
++    @finally {os_unfair_lock_unlock(&CSDiagLock);}
++}
++static unsigned long long CSDiagEventServerID(NSDictionary *event) {
++    if(!CSAutoDiagIsActive())return 0;
++    @try {
++        if(![event isKindOfClass:NSDictionary.class])return 0;
++        id identifiers=event[@"identifiers"];if(![identifiers isKindOfClass:NSArray.class])return 0;
++        // Inspect the existing immutable event only; never source.serverId.
++        for(id identifier in identifiers){
++            if(![identifier isKindOfClass:NSString.class])continue;
++            NSRange range=[identifier rangeOfString:@"|pat:" options:NSBackwardsSearch];
++            if(range.location==NSNotFound)continue;
++            NSString *number=[identifier substringFromIndex:NSMaxRange(range)];
++            if(!number.length || number.length>20)return 0;
++            for(NSUInteger i=0;i<number.length;i++){unichar c=[number characterAtIndex:i];if(c<'0' || c>'9')return 0;}
++            errno=0;char *end=NULL;unsigned long long value=strtoull(number.UTF8String,&end,10);
++            return errno==ERANGE || !end || *end?0:value;
++        }
++    }@catch(__unused NSException *exception) {}
++    return 0;
++}
++void CSAutoDiagRecordEvent(NSString *stage,NSDictionary *event,NSUInteger epoch,uint64_t flags) {
++    if(!CSAutoDiagIsActive())return;
++    unsigned long long serverID=CSDiagEventServerID(event);
++    if(serverID)CSAutoDiagRecord(stage,serverID,epoch,flags);
++}
++CSAutoDiagContext CSAutoDiagPushContext(unsigned long long serverID,NSUInteger epoch) {
++    CSAutoDiagContext previous=CSDiagContext;CSDiagContext=(CSAutoDiagContext){serverID,epoch};return previous;
++}
++CSAutoDiagContext CSAutoDiagPushEventContext(NSDictionary *event,NSUInteger epoch) {return CSAutoDiagPushContext(CSDiagEventServerID(event),epoch);}
++NSUInteger CSAutoDiagCurrentEpoch(void) {return CSDiagContext.epoch;}
++void CSAutoDiagPopContext(CSAutoDiagContext previous) {CSDiagContext=previous;}
++void CSAutoDiagRecordContext(NSString *stage,uint64_t flags) {
++    if(CSDiagContext.serverID)CSAutoDiagRecord(stage,CSDiagContext.serverID,CSDiagContext.epoch,flags);
++}
++
++// This registry shares the capture lock and generation with the recorder. No
++// native getter runs under that lock: a stopped/restarted capture invalidates
++// the metadata read before it can be committed or turned into a callback token.
++@interface CSDiagReplyMetadata : NSObject
++@property(nonatomic,copy) NSString *from,*to,*client;
++@property(nonatomic) unsigned int local,created;
++@property(nonatomic) unsigned long long server;
++@end
++@implementation CSDiagReplyMetadata @end
++@interface CSDiagReplyEntry : NSObject
++@property(nonatomic,strong) CSDiagReplyMetadata *metadata;
++@property(nonatomic,weak) id wrap;
++@property(nonatomic) unsigned long long patServer;
++@property(nonatomic) NSUInteger epoch,generation;
++@end
++@implementation CSDiagReplyEntry @end
++@interface CSDiagReplyToken : NSObject
++@property(nonatomic) unsigned long long patServer;
++@property(nonatomic) NSUInteger epoch,generation;
++@property(nonatomic) uint64_t flags;
++@property(nonatomic) BOOL consumed;
++@end
++@implementation CSDiagReplyToken @end
++static const NSUInteger CSDiagMaximumReplies=128;
++static BOOL CSDiagReplyCurrentLocked(NSUInteger generation) {
++    CSDiagExpireLocked(CSDiagNow());
++    return CSAutoDiagIsActive() && generation && generation==CSDiagGeneration;
++}
++static BOOL CSDiagReplyCurrent(NSUInteger generation) {
++    if(!CSAutoDiagIsActive())return NO;
++    os_unfair_lock_lock(&CSDiagLock);
++    BOOL current=CSDiagReplyCurrentLocked(generation);
++    os_unfair_lock_unlock(&CSDiagLock);return current;
++}
++static NSUInteger CSDiagReplyGeneration(NSUInteger epoch,BOOL needsEntry,BOOL needsCapacity) {
++    if(!CSAutoDiagIsActive())return 0;
++    os_unfair_lock_lock(&CSDiagLock);
++    @try {
++        if(!CSDiagReplyCurrentLocked(CSDiagGeneration) || (needsCapacity && CSDiagReplies.count>=CSDiagMaximumReplies))return 0;
++        if(needsEntry){
++            BOOL found=NO;
++            for(CSDiagReplyEntry *entry in CSDiagReplies)if(entry.epoch==epoch && entry.generation==CSDiagGeneration){found=YES;break;}
++            if(!found)return 0;
++        }
++        return CSDiagGeneration;
++    }@finally {os_unfair_lock_unlock(&CSDiagLock);}
++}
++static id CSDiagReplyRead(id message,NSString *name,NSString *type,NSUInteger generation) {
++    if(!CSDiagReplyCurrent(generation) || !CSMessageNativeSupports(message,name,type,@[]) || !CSDiagReplyCurrent(generation))return nil;
++    return CSMessageNativeInvoke(message,name,@[]);
++}
++static NSString *CSDiagReplyString(id value) {
++    return [value isKindOfClass:NSString.class] && [value length]>0 && [value length]<=512?[value copy]:nil;
++}
++static CSDiagReplyMetadata *CSDiagReplyReadMetadata(id message,NSUInteger generation) {
++    if(!message || !CSDiagReplyCurrent(generation))return nil;
++    CSDiagReplyMetadata *metadata=[CSDiagReplyMetadata new];
++    metadata.from=CSDiagReplyString(CSDiagReplyRead(message,@"m_nsFromUsr",@"@",generation));
++    if(!metadata.from)return nil;
++    metadata.to=CSDiagReplyString(CSDiagReplyRead(message,@"m_nsToUsr",@"@",generation));
++    if(!metadata.to)return nil;
++    metadata.created=[CSDiagReplyRead(message,@"m_uiCreateTime",@"I",generation) unsignedIntValue];
++    metadata.local=[CSDiagReplyRead(message,@"m_uiMesLocalID",@"I",generation) unsignedIntValue];
++    long long server=[CSDiagReplyRead(message,@"m_n64MesSvrID",@"q",generation) longLongValue];
++    metadata.server=server>0?(unsigned long long)server:0;
++    metadata.client=CSDiagReplyString(CSDiagReplyRead(message,@"m_nsClientMsgID",@"@",generation));
++    return CSDiagReplyCurrent(generation)?metadata:nil;
++}
++static uint64_t CSDiagReplyPresence(CSDiagReplyMetadata *metadata) {
++    return (metadata.local?(1ULL<<2):0) | (metadata.server?(1ULL<<3):0) | (metadata.client.length?(1ULL<<4):0);
++}
++static uint64_t CSDiagReplyMatch(CSDiagReplyEntry *entry,CSDiagReplyMetadata *metadata,id message) {
++    CSDiagReplyMetadata *known=entry.metadata;
++    // Even a matching numeric/client alias cannot bridge a different envelope.
++    // Conflicting nonempty aliases are never resolved by choosing a stronger ID.
++    if(![known.from isEqual:metadata.from] || ![known.to isEqual:metadata.to] ||
++       (known.created && metadata.created && known.created!=metadata.created) ||
++       (known.local && metadata.local && known.local!=metadata.local) ||
++       (known.server && metadata.server && known.server!=metadata.server) ||
++       (known.client.length && metadata.client.length && ![known.client isEqual:metadata.client]))return 0;
++    uint64_t flags=0;
++    BOOL creation=known.created && known.created==metadata.created;
++    if(entry.wrap==message && creation)flags|=1ULL<<5;
++    if(known.local && known.local==metadata.local && creation)flags|=1ULL<<6;
++    if(known.server && known.server==metadata.server)flags|=1ULL<<7;
++    if(known.client.length && [known.client isEqual:metadata.client])flags|=1ULL<<8;
++    return flags;
++}
++static CSDiagReplyEntry *CSDiagReplyFindLocked(CSDiagReplyMetadata *metadata,id message,NSUInteger epoch,NSUInteger generation,uint64_t *match,BOOL *ambiguous) {
++    CSDiagReplyEntry *found=nil;uint64_t foundMatch=0;
++    for(CSDiagReplyEntry *entry in CSDiagReplies){
++        if(entry.epoch!=epoch || entry.generation!=generation)continue;
++        uint64_t flags=CSDiagReplyMatch(entry,metadata,message);
++        if(!flags)continue;
++        if(found){if(ambiguous)*ambiguous=YES;return nil;} // Two tasks: fail closed.
++        found=entry;foundMatch=flags;
++    }
++    if(match)*match=foundMatch;return found;
++}
++static void CSDiagReplyMerge(CSDiagReplyEntry *entry,CSDiagReplyMetadata *metadata,id message) {
++    CSDiagReplyMetadata *known=entry.metadata;
++    if(!known.local)known.local=metadata.local;
++    if(!known.created)known.created=metadata.created;
++    if(!known.server)known.server=metadata.server;
++    if(!known.client.length)known.client=metadata.client;
++    entry.wrap=message;
++}
++void CSAutoDiagReplyTrack(id wrap,NSDictionary *patEvent,NSUInteger epoch) {
++    if(!CSAutoDiagIsActive())return;
++    @try {
++        NSUInteger generation=CSDiagReplyGeneration(epoch,NO,YES);if(!generation)return;
++        unsigned long long server=CSDiagEventServerID(patEvent);if(!server)return;
++        NSString *account=CSDiagReplyString(patEvent[@"account"]),*conversation=CSDiagReplyString(patEvent[@"conversation"]);
++        if(!account || !conversation)return;
++        CSDiagReplyMetadata *metadata=CSDiagReplyReadMetadata(wrap,generation);
++        if(!metadata || ![metadata.from isEqual:account] || ![metadata.to isEqual:conversation])return;
++        os_unfair_lock_lock(&CSDiagLock);
++        @try {
++            if(!CSDiagReplyCurrentLocked(generation) || CSDiagReplies.count>=CSDiagMaximumReplies)return;
++            for(CSDiagReplyEntry *entry in CSDiagReplies){
++                if(entry.epoch==epoch && entry.patServer==server && entry.wrap==wrap && CSDiagReplyMatch(entry,metadata,wrap))return;
++            }
++            CSDiagReplyEntry *entry=[CSDiagReplyEntry new];entry.metadata=metadata;entry.wrap=wrap;entry.patServer=server;entry.epoch=epoch;entry.generation=generation;
++            if(!CSDiagReplies)CSDiagReplies=[NSMutableArray array];
++            [CSDiagReplies addObject:entry];
++            CSDiagAppendLocked(@"reply.track",server,epoch,CSDiagReplyPresence(metadata));
++        }@finally {os_unfair_lock_unlock(&CSDiagLock);}
++    }@catch(__unused NSException *exception) {}
++}
++void CSAutoDiagReplyUpdate(id wrap,NSUInteger epoch) {
++    if(!CSAutoDiagIsActive())return;
++    @try {
++        NSUInteger generation=CSDiagReplyGeneration(epoch,YES,NO);if(!generation)return;
++        CSDiagReplyMetadata *metadata=CSDiagReplyReadMetadata(wrap,generation);if(!metadata)return;
++        os_unfair_lock_lock(&CSDiagLock);
++        @try {
++            if(!CSDiagReplyCurrentLocked(generation))return;
++            uint64_t match=0;CSDiagReplyEntry *entry=CSDiagReplyFindLocked(metadata,wrap,epoch,generation,&match,NULL);if(!entry)return;
++            CSDiagReplyMerge(entry,metadata,wrap);
++            CSDiagAppendLocked(@"reply.update",entry.patServer,epoch,CSDiagReplyPresence(metadata)|match);
++        }@finally {os_unfair_lock_unlock(&CSDiagLock);}
++    }@catch(__unused NSException *exception) {}
++}
++id CSAutoDiagReplyCallbackBegin(id message,BOOL success,NSUInteger epoch) {
++    if(!CSAutoDiagIsActive())return nil;
++    @try {
++        NSUInteger generation=CSDiagReplyGeneration(epoch,YES,NO);if(!generation)return nil;
++        CSDiagReplyMetadata *metadata=nil;
++        @try {metadata=CSDiagReplyReadMetadata(message,generation);}@catch(__unused NSException *exception) {}
++        os_unfair_lock_lock(&CSDiagLock);
++        @try {
++            if(!CSDiagReplyCurrentLocked(generation))return nil;
++            uint64_t match=0;BOOL ambiguous=NO;
++            CSDiagReplyEntry *entry=metadata?CSDiagReplyFindLocked(metadata,message,epoch,generation,&match,&ambiguous):nil;
++            if(!entry){
++                NSUInteger selector=success?1:0;
++                if(CSDiagReplyUnmatched[selector]<8){
++                    CSDiagReplyUnmatched[selector]++;
++                    CSDiagAppendLocked(@"reply.callback.unmatched",0,epoch,(success?1:0)|CSDiagReplyPresence(metadata)|(ambiguous?(1ULL<<9):0));
++                }
++                return nil;
++            }
++            CSDiagReplyMerge(entry,metadata,message);
++            CSDiagReplyToken *token=[CSDiagReplyToken new];token.patServer=entry.patServer;token.epoch=epoch;token.generation=generation;
++            token.flags=(success?1:0)|CSDiagReplyPresence(metadata)|match;
++            CSDiagAppendLocked(@"reply.callback.begin",token.patServer,epoch,token.flags);
++            return token;
++        }@finally {os_unfair_lock_unlock(&CSDiagLock);}
++    }@catch(__unused NSException *exception) {return nil;}
++}
++void CSAutoDiagReplyCallbackEnd(id value,BOOL originalReturned) {
++    if(!CSAutoDiagIsActive())return;
++    @try {
++        if(![value isMemberOfClass:CSDiagReplyToken.class])return;
++        CSDiagReplyToken *token=value;
++        os_unfair_lock_lock(&CSDiagLock);
++        @try {
++            if(!CSDiagReplyCurrentLocked(token.generation) || token.consumed)return;
++            token.consumed=YES;
++            CSDiagAppendLocked(@"reply.callback.end",token.patServer,token.epoch,token.flags|(originalReturned?(1ULL<<1):0));
++        }@finally {os_unfair_lock_unlock(&CSDiagLock);}
++    }@catch(__unused NSException *exception) {}
++}
++void CSAutoDiagReplyHookState(BOOL success,BOOL installed) {
++    os_unfair_lock_lock(&CSDiagLock);
++    @try {
++        uint8_t bit=success?2:1;CSDiagReplyHooksKnown|=bit;
++        if(installed)CSDiagReplyHooksInstalled|=bit;else CSDiagReplyHooksInstalled&=(uint8_t)~bit;
++        CSDiagAppendLocked(@"reply.hook.state",0,0,(success?1:0)|(installed?2:0));
++    }@catch(__unused NSException *exception) {}
++    @finally {os_unfair_lock_unlock(&CSDiagLock);}
++}
++#if CS_AUTODIAG_HOST_TEST
++NSUInteger CSAutoDiagReplyTrackedCountForTest(void) {
++    os_unfair_lock_lock(&CSDiagLock);NSUInteger count=CSDiagReplies.count;os_unfair_lock_unlock(&CSDiagLock);return count;
++}
++#endif
++#if !CS_AUTODIAG_HOST_TEST
++@interface CSAutomationDiagnosticLifecycle : NSObject @end
++@implementation CSAutomationDiagnosticLifecycle
++- (void)changed:(NSNotification *)note {
++    if(!NSThread.isMainThread){dispatch_async(dispatch_get_main_queue(),^{[self changed:note];});return;}
++    NSString *stage=@"lifecycle.active";
++    if([note.name isEqual:UIApplicationDidEnterBackgroundNotification])stage=@"lifecycle.background";
++    else if([note.name isEqual:UIApplicationWillEnterForegroundNotification])stage=@"lifecycle.foreground";
++    else if([note.name isEqual:UIApplicationProtectedDataWillBecomeUnavailable])stage=@"lifecycle.protected_unavailable";
++    else if([note.name isEqual:UIApplicationProtectedDataDidBecomeAvailable])stage=@"lifecycle.protected_available";
++    os_unfair_lock_lock(&CSDiagLock);
++    CSDiagAppState=UIApplication.sharedApplication.applicationState;
++    CSDiagProtected=[note.name isEqual:UIApplicationProtectedDataWillBecomeUnavailable]?NO:UIApplication.sharedApplication.protectedDataAvailable;
++    os_unfair_lock_unlock(&CSDiagLock);
++    CSAutoDiagRecord(stage,0,0,0);
++}
++@end
++#endif
++NSUInteger CSAutoDiagCaptureGeneration(void) {
++    if(!CSAutoDiagIsActive())return 0;
++    os_unfair_lock_lock(&CSDiagLock);CSDiagExpireLocked(CSDiagNow());
++    NSUInteger generation=CSAutoDiagIsActive()?CSDiagGeneration:0;
++    os_unfair_lock_unlock(&CSDiagLock);return generation;
++}
++void CSAutoDiagRecordGeneration(NSString *stage,NSUInteger generation,uint64_t flags) {
++    if(!generation || !CSAutoDiagIsActive())return;
++    os_unfair_lock_lock(&CSDiagLock);
++    @try {if(generation==CSDiagGeneration)CSDiagAppendLocked(stage,0,0,flags);}
++    @catch(__unused NSException *exception) {}
++    @finally {os_unfair_lock_unlock(&CSDiagLock);}
++}
++void CSAutoDiagStart(void) {
++#if !CS_AUTODIAG_HOST_TEST
++    if(!NSThread.isMainThread)return;
++    CSDiagCancelPulse();CSAutoDiagNativeInstall();
++    static CSAutomationDiagnosticLifecycle *observer;static dispatch_once_t once;
++    dispatch_once(&once,^{
++        observer=[CSAutomationDiagnosticLifecycle new];
++        for(NSString *name in @[UIApplicationDidEnterBackgroundNotification,UIApplicationWillEnterForegroundNotification,UIApplicationDidBecomeActiveNotification,UIApplicationProtectedDataWillBecomeUnavailable,UIApplicationProtectedDataDidBecomeAvailable])
++            [NSNotificationCenter.defaultCenter addObserver:observer selector:@selector(changed:) name:name object:nil];
++    });
++#endif
++    os_unfair_lock_lock(&CSDiagLock);
++    CSDiagSetActive(NO);CSDiagReplies=nil;memset(CSDiagReplyUnmatched,0,sizeof(CSDiagReplyUnmatched));if(++CSDiagGeneration==0)CSDiagGeneration++;
++    CSDiagRecords=[NSMutableArray array];CSDiagStarted=CSDiagNow();CSDiagStopped=0;CSDiagDiscarded=0;CSDiagStopReason=@"running";
++    arc4random_buf(CSDiagSalt,sizeof(CSDiagSalt));
++#if !CS_AUTODIAG_HOST_TEST
++    CSDiagAppState=UIApplication.sharedApplication.applicationState;CSDiagProtected=UIApplication.sharedApplication.protectedDataAvailable;
++#endif
++    CSDiagSetActive(YES);CSDiagAppendLocked(@"capture.start",0,0,0);
++    for(NSUInteger success=0;success<2;success++)if(CSDiagReplyHooksKnown&(1U<<success))
++        CSDiagAppendLocked(@"reply.hook.state",0,0,success|((CSDiagReplyHooksInstalled&(1U<<success))?2:0));
++    os_unfair_lock_unlock(&CSDiagLock);
++#if !CS_AUTODIAG_HOST_TEST
++    CSAutoDiagNativeReportHooks();CSAutomationOnlineExperimentReport();
++    CSAutoDiagRecord(@"sync.feature.installed",0,0,CSAutomationNativeSyncAvailable()?1:0);
++    CSDiagPulse=dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER,0,0,dispatch_get_main_queue());
++    dispatch_source_set_timer(CSDiagPulse,dispatch_time(DISPATCH_TIME_NOW,2*NSEC_PER_SEC),2*NSEC_PER_SEC,NSEC_PER_SEC/10);
++    dispatch_source_set_event_handler(CSDiagPulse,^{
++        CSAutoDiagRecord(@"runtime.pulse",0,0,0);
++        if(!CSAutoDiagIsActive())CSDiagCancelPulse();
++    });
++    dispatch_resume(CSDiagPulse);
++#endif
++}
++void CSAutoDiagStop(void) {
++#if !CS_AUTODIAG_HOST_TEST
++    if(NSThread.isMainThread)CSDiagCancelPulse();
++#endif
++    CSAutoDiagRecord(@"capture.stop",0,0,0);
++    os_unfair_lock_lock(&CSDiagLock);CSDiagExpireLocked(CSDiagNow());
++    if(CSAutoDiagIsActive()){CSDiagStopped=CSDiagNow();CSDiagStopReason=@"manual";CSDiagSetActive(NO);}
++    CSDiagReplies=nil;os_unfair_lock_unlock(&CSDiagLock);
++}
++void CSAutoDiagReset(void) {
++#if !CS_AUTODIAG_HOST_TEST
++    if(NSThread.isMainThread)CSDiagCancelPulse();
++#endif
++    os_unfair_lock_lock(&CSDiagLock);CSDiagSetActive(NO);CSDiagReplies=nil;memset(CSDiagReplyUnmatched,0,sizeof(CSDiagReplyUnmatched));if(++CSDiagGeneration==0)CSDiagGeneration++;
++    CSDiagRecords=nil;CSDiagStarted=0;CSDiagStopped=0;CSDiagDiscarded=0;CSDiagStopReason=@"not_started";memset(CSDiagSalt,0,sizeof(CSDiagSalt));os_unfair_lock_unlock(&CSDiagLock);
++}
++NSDictionary *CSAutoDiagSnapshot(void) {
++    os_unfair_lock_lock(&CSDiagLock);
++    @try {
++        NSTimeInterval now=CSDiagNow();CSDiagExpireLocked(now);BOOL active=CSAutoDiagIsActive();
++        NSTimeInterval duration=CSDiagRecords?MAX(0,(active?now:CSDiagStopped)-CSDiagStarted):0;
++        return @{@"schema":@2,@"version":@"2.5-13+online.2",@"active":@(active),@"stop_reason":CSDiagStopReason,@"duration_ms":@(llround(duration*1000)),@"max_duration_ms":@600000,@"max_records":@(CSDiagMaximumRecords),@"discarded_at_stop":@(CSDiagDiscarded),@"records":[CSDiagRecords copy]?:@[]};
++    }@finally {os_unfair_lock_unlock(&CSDiagLock);}
++}
++NSString *CSAutoDiagStatus(void) {
++    os_unfair_lock_lock(&CSDiagLock);
++    @try {
++        NSTimeInterval now=CSDiagNow();CSDiagExpireLocked(now);BOOL active=CSAutoDiagIsActive();
++        NSString *reason=CSDiagStopReason;
++        NSString *state=active?@"采样中":[reason isEqual:@"not_started"]?@"未开始":[reason isEqual:@"expired"]?@"已到 10 分钟上限":[reason isEqual:@"capacity"]?@"已到条数上限":@"已停止";
++        NSTimeInterval duration=CSDiagRecords?MAX(0,(active?now:CSDiagStopped)-CSDiagStarted):0;
++        return [NSString stringWithFormat:@"%@ · %lu 条 · %.0f 秒",state,(unsigned long)CSDiagRecords.count,duration];
++    }@finally {os_unfair_lock_unlock(&CSDiagLock);}
++}
+--- a/Controllers/CSAutomationEventAdapter.m
++++ b/Controllers/CSAutomationEventAdapter.m
+@@ -1,5 +1,6 @@
+ #import "CSAutomationEventAdapter.h"
+ #import "CSAutomationOwnership.h"
++#import "CSAutomationDiagnostics.h"
+ #import "CSAutomationStore.h"
+ #import "CSMessageNativeActionAdapter.h"
+ #import <objc/runtime.h>
+@@ -105,17 +106,27 @@
+ static BOOL CSAutomationPatUsername(NSString *name){
+     return name.length && name.length<=256 && [name rangeOfCharacterFromSet:NSCharacterSet.whitespaceAndNewlineCharacterSet].location==NSNotFound && [name rangeOfCharacterFromSet:NSCharacterSet.controlCharacterSet].location==NSNotFound && [name rangeOfString:@"|"].location==NSNotFound;
+ }
++// Account epoch is inherited from the caller through diagnostic TLS only.
++// SID is recorded only after the pre-existing native read has happened.
++static void CSAutomationEventDiag(NSString *stage,long long server,NSUInteger epoch,uint64_t flags) {
++    @try {CSAutoDiagRecord(stage,server>0?(unsigned long long)server:0,epoch,flags);} @catch(__unused NSException *exception) {}
++}
++static id CSAutomationEventDiagReject(NSString *stage,long long server,NSUInteger epoch) {
++    CSAutomationEventDiag(stage,server,epoch,0);return nil;
++}
+ NSDictionary *CSAutomationPatFromXMLMessage(id wrap,NSString *session){
+-    if(!NSThread.isMainThread || !wrap || ![session isKindOfClass:NSString.class])return nil;
++    long long diagnosticServer=0;NSUInteger diagnosticEpoch=CSAutoDiagCurrentEpoch();
++    if(!NSThread.isMainThread || !wrap || ![session isKindOfClass:NSString.class])return CSAutomationEventDiagReject(@"parse.raw.context.reject",0,diagnosticEpoch);
+     @try{
+         if(!CSMessageNativeSupports(wrap,@"m_uiMessageType",@"I",@[]) || CSMessageNativeUnsigned(wrap,@"m_uiMessageType")!=10002 ||
+-           !CSMessageNativeSupports(wrap,@"m_n64MesSvrID",@"q",@[]) || !CSMessageNativeSupports(wrap,@"m_uiCreateTime",@"I",@[]))return nil;
+-        long long server=[CSMessageNativeInvoke(wrap,@"m_n64MesSvrID",@[]) longLongValue];
+-        unsigned long long seconds=CSMessageNativeUnsigned(wrap,@"m_uiCreateTime");if(server<=0 || !seconds)return nil;
++           !CSMessageNativeSupports(wrap,@"m_n64MesSvrID",@"q",@[]) || !CSMessageNativeSupports(wrap,@"m_uiCreateTime",@"I",@[]))return CSAutomationEventDiagReject(@"parse.raw.abi.reject",0,diagnosticEpoch);
++        long long server=[CSMessageNativeInvoke(wrap,@"m_n64MesSvrID",@[]) longLongValue];diagnosticServer=server;
++        CSAutomationEventDiag(@"parse.raw.identity",server,diagnosticEpoch,0);
++        unsigned long long seconds=CSMessageNativeUnsigned(wrap,@"m_uiCreateTime");if(server<=0 || !seconds)return CSAutomationEventDiagReject(@"parse.raw.identity.reject",server,diagnosticEpoch);
+         NSString *from=String(wrap,@"m_nsFromUsr"),*to=String(wrap,@"m_nsToUsr"),*text=String(wrap,@"m_nsContent");
+         if(!CSAutomationPatUsername(from) || !CSAutomationPatUsername(to) || !text.length || text.length>65536 ||
+-           [text rangeOfString:@"<!DOCTYPE" options:NSCaseInsensitiveSearch].location!=NSNotFound || [text rangeOfString:@"<!ENTITY" options:NSCaseInsensitiveSearch].location!=NSNotFound)return nil;
+-        NSData *data=[text dataUsingEncoding:NSUTF8StringEncoding];if(!data.length || data.length>65536)return nil;
++           [text rangeOfString:@"<!DOCTYPE" options:NSCaseInsensitiveSearch].location!=NSNotFound || [text rangeOfString:@"<!ENTITY" options:NSCaseInsensitiveSearch].location!=NSNotFound)return CSAutomationEventDiagReject(@"parse.raw.envelope.reject",server,diagnosticEpoch);
++        NSData *data=[text dataUsingEncoding:NSUTF8StringEncoding];if(!data.length || data.length>65536)return CSAutomationEventDiagReject(@"parse.raw.size.reject",server,diagnosticEpoch);
+         // Native ChangeForChatRoom splits exactly sender + ":\n". Group
+         // type10002 bypasses that conversion in ChangeForDisplay; the native
+         // XML reader tolerates its leading text, whereas NSXMLParser does not.
+@@ -140,32 +151,33 @@
+         }
+         NSXMLParser *parser=[[NSXMLParser alloc]initWithData:data];CSAutomationPatXML *xml=[CSAutomationPatXML new];parser.delegate=xml;parser.shouldProcessNamespaces=YES;parser.shouldResolveExternalEntities=NO;
+         BOOL parsed=[parser parse];
+-        if(!parsed || !xml.valid)return nil;
+-        if(!xml.sawRoot || !xml.sawPat || xml.path.count)return nil;
++        if(!parsed || !xml.valid)return CSAutomationEventDiagReject(@"parse.raw.xml.reject",server,diagnosticEpoch);
++        if(!xml.sawRoot || !xml.sawPat || xml.path.count)return CSAutomationEventDiagReject(@"parse.raw.structure.reject",server,diagnosticEpoch);
+         NSString *sender=xml.fields[@"fromusername"],*chat=xml.fields[@"chatusername"],*target=xml.fields[@"pattedusername"];
+-        if(![xml.fields[@"template"] stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet].length)return nil;
+-        if(!CSAutomationPatUsername(sender) || !CSAutomationPatUsername(chat) || !CSAutomationPatUsername(target) || [sender hasSuffix:@"@chatroom"] || [target hasSuffix:@"@chatroom"])return nil;
++        if(![xml.fields[@"template"] stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet].length)return CSAutomationEventDiagReject(@"parse.raw.template.reject",server,diagnosticEpoch);
++        if(!CSAutomationPatUsername(sender) || !CSAutomationPatUsername(chat) || !CSAutomationPatUsername(target) || [sender hasSuffix:@"@chatroom"] || [target hasSuffix:@"@chatroom"])return CSAutomationEventDiagReject(@"parse.raw.names.reject",server,diagnosticEpoch);
+         BOOL group=[chat hasSuffix:@"@chatroom"];
+         if(prefixSender){
+-            if(!group || ![prefixSender isEqual:sender])return nil;
++            if(!group || ![prefixSender isEqual:sender])return CSAutomationEventDiagReject(@"parse.raw.prefix.reject",server,diagnosticEpoch);
+         }
+         NSString *specified=String(wrap,@"m_nsSpecifiedChatName");
+         NSString *route=specified.length?specified:(session.length?session:from);
+         // Only incoming pats addressed to this envelope's recipient can be
+         // admitted. EventFromPat subsequently binds that target to the account.
+-        if(![to isEqual:target])return nil;
++        if(![to isEqual:target])return CSAutomationEventDiagReject(@"parse.raw.target.reject",server,diagnosticEpoch);
+         if(group){
+             // HandleSvrCmd prefers m_nsSpecifiedChatName to the outer sender.
+             // Accept a member sender only when that native/session route binds
+             // it to the same room as the XML; never substitute the active chat.
+-            if((![from isEqual:chat] && ![from isEqual:sender]) || ![route isEqual:chat])return nil;
+-        }else if(![from isEqual:sender] || (![chat isEqual:sender] && ![chat isEqual:target]))return nil;
++            if((![from isEqual:chat] && ![from isEqual:sender]) || ![route isEqual:chat])return CSAutomationEventDiagReject(@"parse.raw.group.route.reject",server,diagnosticEpoch);
++        }else if(![from isEqual:sender] || (![chat isEqual:sender] && ![chat isEqual:target]))return CSAutomationEventDiagReject(@"parse.raw.private.route.reject",server,diagnosticEpoch);
+         NSString *conversation=group?chat:sender;
+-        if(session.length && ![session isEqual:conversation] && (group || ![session isEqual:chat]))return nil;
+-        if(specified.length && ![specified isEqual:conversation] && (group || ![specified isEqual:chat]))return nil;
++        if(session.length && ![session isEqual:conversation] && (group || ![session isEqual:chat]))return CSAutomationEventDiagReject(@"parse.raw.session.reject",server,diagnosticEpoch);
++        if(specified.length && ![specified isEqual:conversation] && (group || ![specified isEqual:chat]))return CSAutomationEventDiagReject(@"parse.raw.specified.reject",server,diagnosticEpoch);
+         CSAutomationPatSnapshot *pat=[[CSAutomationPatSnapshot alloc]initWithSender:sender target:target server:server milliseconds:seconds*1000ULL];
++        CSAutomationEventDiag(@"parse.raw.accept",server,diagnosticEpoch,(group?1:0)|(prefixSender?2:0));
+         return @{@"pat":pat,@"conversation":[conversation copy]};
+-    }@catch(__unused NSException *exception){return nil;}
++    }@catch(__unused NSException *exception){return CSAutomationEventDiagReject(@"parse.raw.exception",diagnosticServer,diagnosticEpoch);}
+ }
+ NSDictionary *CSAutomationEventFromWrap(id wrap,NSString *account,NSString *session){
+     if(!NSThread.isMainThread || !account.length || !wrap)return nil;
+@@ -190,17 +202,19 @@
+     }@catch(__unused NSException *exception){return nil;}
+ }
+ NSDictionary *CSAutomationEventFromPat(id pat,NSString *account,NSString *conversation){
+-    if(!NSThread.isMainThread || !account.length || !conversation.length || !pat)return nil;
++    long long diagnosticServer=0;NSUInteger diagnosticEpoch=CSAutoDiagCurrentEpoch();
++    if(!NSThread.isMainThread || !account.length || !conversation.length || !pat)return CSAutomationEventDiagReject(@"parse.pat.context.reject",0,diagnosticEpoch);
+     @try{
+         NSString *sender=String(pat,@"fromUserName"),*target=String(pat,@"pattedUserName");
+-        if(!sender.length)return nil;
+-        if(![target isEqual:account])return nil;
+-        if([sender isEqual:account])return nil;
+-        BOOL group=[conversation hasSuffix:@"@chatroom"];if(!group && ![conversation isEqual:sender])return nil;
+-        if(!CSMessageNativeSupports(pat,@"serverId",@"q",@[]) || !CSMessageNativeSupports(pat,@"createTime",@"Q",@[]))return nil;
+-        long long server=[CSMessageNativeInvoke(pat,@"serverId",@[]) longLongValue];unsigned long long created=CSMessageNativeUnsigned(pat,@"createTime");if(server<=0 || !created)return nil;
++        if(!sender.length)return CSAutomationEventDiagReject(@"parse.pat.sender.reject",0,diagnosticEpoch);
++        if(![target isEqual:account])return CSAutomationEventDiagReject(@"parse.pat.target.reject",0,diagnosticEpoch);
++        if([sender isEqual:account])return CSAutomationEventDiagReject(@"parse.pat.own.reject",0,diagnosticEpoch);
++        BOOL group=[conversation hasSuffix:@"@chatroom"];if(!group && ![conversation isEqual:sender])return CSAutomationEventDiagReject(@"parse.pat.private.route.reject",0,diagnosticEpoch);
++        if(!CSMessageNativeSupports(pat,@"serverId",@"q",@[]) || !CSMessageNativeSupports(pat,@"createTime",@"Q",@[]))return CSAutomationEventDiagReject(@"parse.pat.abi.reject",0,diagnosticEpoch);
++        long long server=[CSMessageNativeInvoke(pat,@"serverId",@[]) longLongValue];diagnosticServer=server;unsigned long long created=CSMessageNativeUnsigned(pat,@"createTime");if(server<=0 || !created)return CSAutomationEventDiagReject(@"parse.pat.identity.reject",server,diagnosticEpoch);
++        CSAutomationEventDiag(@"parse.pat.accept",server,diagnosticEpoch,group?1:0);
+         // Native OnGetNewXmlMsg multiplies m_uiCreateTime seconds by 1000;
+         // compound-message pats retain that unsigned 64-bit millisecond value.
+         return @{@"account":account,@"conversation":conversation,@"sender":sender,@"own":@NO,@"group":@(group),@"text":@"",@"mentioned":@NO,@"created":@((NSTimeInterval)created/1000.0),@"identifiers":@[[NSString stringWithFormat:@"%@|%@|pat:%lld",account,conversation,server]],@"source":pat};
+-    }@catch(__unused NSException *exception){return nil;}
+-}
++    }@catch(__unused NSException *exception){return CSAutomationEventDiagReject(@"parse.pat.exception",diagnosticServer,diagnosticEpoch);}
++}
+--- a/Controllers/CSAutomationManager.h
++++ b/Controllers/CSAutomationManager.h
+@@ -11,6 +11,8 @@
+ - (void)start;
+ - (void)refresh;
+ // Main-thread, current-service/account/configuration guard for native sync wakes.
++// Experiment eligibility can be queried in foreground; does not send or load contacts.
++- (BOOL)hasEligibleGroupPatConfigurationAtEpoch:(NSUInteger)epoch;
+ - (void)performNativeSyncForService:(id)service epoch:(NSUInteger)epoch request:(void (^)(id receiver))request;
+ - (void)updateConfiguration:(NSDictionary *)changes completion:(void (^)(BOOL success,NSError *_Nullable error))completion;
+ - (void)receiveNativeSession:(id)session wrap:(id)wrap epoch:(NSUInteger)epoch;
+--- a/Controllers/CSAutomationManager.m
++++ b/Controllers/CSAutomationManager.m
+@@ -1,4 +1,6 @@
+ #import "CSAutomationManager.h"
++#import "CSAutomationDiagnostics.h"
++#import "CSAutomationReplyDiagnostics.h"
+ #import "CSAutomationStore.h"
+ #import "CSAutomationTiming.h"
+ #import "CSAutomationEventAdapter.h"
+@@ -70,7 +72,15 @@
+     return [NSError errorWithDomain:@"CSAutomationManager" code:1 userInfo:@{NSLocalizedDescriptionKey:message}];
+ }
+ static NSString *AdmissionKey(NSString *action,NSString *identifier) {return [NSString stringWithFormat:@"%@|%@",action,identifier];}
+-
++static uint64_t AutoDiagFlags(NSDictionary *event,NSDictionary *decision) {
++    return ([decision[@"action"] isEqual:@"patBack"]?1ULL:2ULL) | ([event[@"group"] boolValue]?4ULL:0ULL) | ((uint64_t)MIN(300,MAX(0,[decision[@"delay"] integerValue]))<<16);
++}
++
++static NSDictionary *AutoDiagEventFromPat(id pat,NSString *account,NSString *conversation,NSUInteger epoch) {
++    CSAutoDiagContext previous=CSAutoDiagPushContext(0,epoch);
++    @try {return CSAutomationEventFromPat(pat,account,conversation);}
++    @finally {CSAutoDiagPopContext(previous);}
++}
+ @implementation CSAutomationManager
+ + (instancetype)sharedManager {static id manager;static dispatch_once_t once;dispatch_once(&once,^{manager=[self new];});return manager;}
+ - (instancetype)init {
+@@ -129,6 +139,7 @@
+ }
+ - (void)changed:(NSNotification *)note {
+     if(!NSThread.isMainThread){dispatch_async(dispatch_get_main_queue(),^{[self changed:note];});return;}
++    CSAutoDiagRecord(@"manager.changed",0,self.accountEpoch,0);
+     if([note.name isEqual:@"UIApplicationWillEnterForegroundNotification"]){self.enteringForeground=YES;[self stopBackgroundSync];return;}
+     if([note.name isEqual:@"UIApplicationDidEnterBackgroundNotification"] || [note.name isEqual:UIApplicationDidBecomeActiveNotification])self.enteringForeground=NO;
+     if([note.name isEqual:@"CSAutomationRestoreDidComplete"]){
+@@ -142,6 +153,21 @@
+     [self drainWaitingIngress];[self processPending];[self refreshBackgroundSync];
+ }
+ 
++- (BOOL)hasEligibleGroupPatConfigurationAtEpoch:(NSUInteger)epoch {
++    @try {
++        if(!NSThread.isMainThread || !self.ready || self.loading || self.saving || epoch!=self.accountEpoch)return NO;
++        NSDictionary *configuration=self.configuration;NSString *account=self.accountID;
++        NSUInteger generation=self.configurationGeneration;
++        if(![self accountValid:account epoch:epoch] || !CSAuthorizationManager.sharedManager.isAuthorized)return NO;
++        if(configuration!=self.configuration || generation!=self.configurationGeneration || !self.ready || self.loading || self.saving ||
++           epoch!=self.accountEpoch || epoch!=CSBackupAccountEpoch() || CSBackupAccountIsSuspended() || ![account isEqual:self.accountID])return NO;
++        for(NSString *module in @[@"patBack",@"patReply"]){
++            NSDictionary *item=configuration[module];
++            if([item[@"enabled"] boolValue] && [item[@"groups"] count] && (![module isEqual:@"patReply"] || [item[@"contents"] count]))return YES;
++        }
++        return NO;
++    } @catch(__unused NSException *exception){return NO;}
++}
+ - (BOOL)backgroundSyncDemand {
+     @try {
+     if(!NSThread.isMainThread || self.enteringForeground || UIApplication.sharedApplication.applicationState!=UIApplicationStateBackground || !self.ready || self.loading || self.saving)return NO;
+@@ -164,22 +190,25 @@
+     } @catch(__unused NSException *exception) {return NO;}
+ }
+ - (void)performNativeSyncForService:(id)service epoch:(NSUInteger)epoch request:(void (^)(id receiver))request {
+-    if(!NSThread.isMainThread || !service || !request || epoch!=self.accountEpoch)return;
++    CSAutoDiagRecord(@"sync.manager.begin",0,epoch,(self.ready?1:0)|(self.loading?2:0)|(self.saving?4:0)|(self.enteringForeground?8:0));
++    if(!NSThread.isMainThread || !service || !request || epoch!=self.accountEpoch){CSAutoDiagRecord(@"sync.manager.reject",0,epoch,1);return;}
+     NSDictionary *configuration=self.configuration;NSString *account=self.accountID;
+     NSUInteger generation=self.configurationGeneration;
+     @try {
+-        if(![self backgroundSyncEligible])return;
++        if(![self backgroundSyncEligible]){CSAutoDiagRecord(@"sync.manager.reject",0,epoch,2);return;}
+         id current=[self.environment serviceNamed:@"NewSyncService"];
+         if((current!=service && CSMessageNativeServiceIdentity(current,@"NewSyncService")!=service) || configuration!=self.configuration || generation!=self.configurationGeneration ||
+-           epoch!=self.accountEpoch || ![account isEqual:self.accountID])return;
+-        if(![self backgroundSyncEligible])return;
++           epoch!=self.accountEpoch || ![account isEqual:self.accountID]){CSAutoDiagRecord(@"sync.manager.reject",0,epoch,3);return;}
++        if(![self backgroundSyncEligible]){CSAutoDiagRecord(@"sync.manager.reject",0,epoch,4);return;}
+         current=[self.environment serviceNamed:@"NewSyncService"];
+         if((current!=service && CSMessageNativeServiceIdentity(current,@"NewSyncService")!=service) || configuration!=self.configuration || generation!=self.configurationGeneration ||
+-           epoch!=self.accountEpoch || ![account isEqual:self.accountID])return;
++           epoch!=self.accountEpoch || ![account isEqual:self.accountID]){CSAutoDiagRecord(@"sync.manager.reject",0,epoch,5);return;}
+         // Native/account getters can reenter configuration or lifecycle handling.
+         if(configuration!=self.configuration || generation!=self.configurationGeneration || epoch!=self.accountEpoch ||
+-           ![account isEqual:self.accountID] || ![self backgroundSyncDemand])return;
++           ![account isEqual:self.accountID] || ![self backgroundSyncDemand]){CSAutoDiagRecord(@"sync.manager.reject",0,epoch,6);return;}
++        CSAutoDiagRecord(@"sync.manager.authorized",0,epoch,0);
+         CSBackupPerformAtAccountEpoch(epoch,^{
++            CSAutoDiagRecord(@"sync.manager.scope",0,epoch,0);
+             // The hook's self is the underlying service, whereas current is
+             // usually MMServiceWrapper. Keep its account-context forwarding.
+             @try {request(current);} @catch(__unused NSException *exception) {}
+@@ -226,6 +255,7 @@
+ }
+ - (void)backgroundSyncTick {
+     if(!NSThread.isMainThread)return;
++    CSAutoDiagRecord(@"sync.tick",0,self.accountEpoch,0);
+     if(CSAutomationNativeSyncAvailable()){
+         @try {
+             id service=[self.environment serviceNamed:@"NewSyncService"];
+@@ -252,7 +282,7 @@
+         if(![self backgroundSyncEligible] || wakeGeneration!=self.backgroundSyncGeneration)return;
+         id service=[self.environment serviceNamed:@"NewSyncService"];
+         if(!CSMessageNativeSupports(service,@"isGettingData",@"B",@[]) || !CSMessageNativeSupports(service,@"BackGroundFetchToSync",@"B",@[]))return;
+-        if([CSMessageNativeInvoke(service,@"isGettingData",@[]) boolValue])return;
++        if([CSMessageNativeInvoke(service,@"isGettingData",@[]) boolValue]){CSAutoDiagRecord(@"sync.busy",0,epoch,0);return;}
+         if(![self backgroundSyncEligible] || wakeGeneration!=self.backgroundSyncGeneration || configuration!=self.configuration || generation!=self.configurationGeneration || ![self.accountID isEqual:account] || epoch!=self.accountEpoch)return;
+         checkedBudget=YES;
+         [CSBackgroundSyncBudget.sharedBudget performForEpoch:epoch minimumInterval:CSAutomationPatSyncInterval request:^{
+@@ -260,8 +290,8 @@
+                 if(wakeGeneration!=self.backgroundSyncGeneration || configuration!=self.configuration || generation!=self.configurationGeneration || !self.ready || self.loading || self.saving || ![self.accountID isEqual:account] || self.accountEpoch!=epoch || self.enteringForeground || UIApplication.sharedApplication.applicationState!=UIApplicationStateBackground)return;
+                 CSBackupPerformAtAccountEpoch(epoch,^{
+                     // Do not unwind through the account handoff's lock boundary.
+-                    @try {[CSMessageNativeInvoke(service,@"BackGroundFetchToSync",@[]) boolValue];}
+-                    @catch(__unused NSException *exception) {return;}
++                    @try {CSAutoDiagRecord(@"sync.native_begin",0,epoch,0);BOOL result=[CSMessageNativeInvoke(service,@"BackGroundFetchToSync",@[]) boolValue];CSAutoDiagRecord(@"sync.native_return",0,epoch,result?1:0);}
++                    @catch(__unused NSException *exception) {CSAutoDiagRecord(@"sync.native_exception",0,epoch,0);return;}
+                 });
+             });
+         }];
+@@ -290,7 +320,7 @@
+     for(NSDictionary *entry in pending){void (^completion)(BOOL)=entry[@"completion"];
+         if([entry[@"epoch"] unsignedIntegerValue]!=self.accountEpoch || self.elapsedTime>[entry[@"expires"] doubleValue]){self.statusText=@"入站事件已超过等待窗口或账号已切换，本次不补发。";[self notify];completion(NO);continue;}
+         BOOL pat=[entry[@"pat"] boolValue];NSString *session=[entry[@"session"] isKindOfClass:NSString.class]?entry[@"session"]:@"";
+-        NSDictionary *event=pat?CSAutomationEventFromPat(entry[@"wrap"],self.accountID,session):CSAutomationEventFromWrap(entry[@"wrap"],self.accountID,session);
++        NSDictionary *event=pat?AutoDiagEventFromPat(entry[@"wrap"],self.accountID,session,self.accountEpoch):CSAutomationEventFromWrap(entry[@"wrap"],self.accountID,session);
+         NSMutableDictionary *snapshot=[event mutableCopy];snapshot[@"arrivalElapsed"]=entry[@"arrivalElapsed"];snapshot[@"arrivalWall"]=entry[@"arrivalWall"];
+         [self receiveEvent:snapshot pat:pat completion:completion];
+     }[self scheduleWakeup];
+@@ -303,6 +333,7 @@
+     BOOL initial=self.accountID.length==0;
+     BOOL changed=self.accountEpoch!=epoch || (!initial && actual.length && ![actual isEqual:self.accountID]);
+     if(changed){
++        CSAutoDiagRecord(@"manager.epoch_changed",0,epoch,0);
+         self.nextLoadAttempt=0;self.configurationGeneration++;self.ready=NO;self.loading=NO;self.saving=NO;
+         if(!initial){[self cancelWaitingIngress:@"账号已切换，旧入站事件已取消。"];self.admissionBoundary=self.currentDate.timeIntervalSince1970;self.hasExplicitAdmissionBoundary=YES;}
+         else for(NSDictionary *entry in [self.waitingIngress copy])if([entry[@"epoch"] unsignedIntegerValue]!=epoch){[self.waitingIngress removeObjectIdenticalTo:entry];void (^completion)(BOOL)=entry[@"completion"];completion(NO);self.statusText=@"账号代次已变化，旧入站事件已取消。";[self notify];}
+@@ -347,6 +378,7 @@
+     NSDictionary *frozen=data?[NSPropertyListSerialization propertyListWithData:data options:NSPropertyListImmutable format:NULL error:NULL]:nil;
+     if(!frozen){if(completion)completion(NO,AutomationError(@"设置内容无效，本次未保存。"));return;}
+     NSString *account=self.accountID;NSUInteger epoch=self.accountEpoch,generation=++self.configurationGeneration;NSURL *url=self.configurationURL;
++    CSAutoDiagRecord(@"manager.configuration_changed",0,epoch,generation);
+     self.saving=YES;self.admissionBoundary=self.currentDate.timeIntervalSince1970;self.hasExplicitAdmissionBoundary=YES;[self cancelWaitingIngress:@"设置已变化，旧入站事件已取消。"];[self cancelAdmissions:@"设置已变化，旧认领等待已取消。"];
+     BOOL keepCleanup=[frozen[@"patBack"][@"enabled"] boolValue] && [frozen[@"patBack"][@"revoke"] boolValue];
+     [self cancelTasksIncludingCleanup:!keepCleanup];[self notify];
+@@ -365,15 +397,15 @@
+ - (BOOL)supportsConversation:(NSString *)conversation {
+     @try {
+         if([conversation hasSuffix:@"@chatroom"]){
+-            if(CSGroupChatRoomUnavailable(conversation)){return NO;}
+-            if(!CSGroupChatIsMember(conversation,self.accountID)){return NO;}
+-            if([CSGroupChatQuitCoordinator.sharedCoordinator isQuittingRoom:conversation]){return NO;}
+-            return YES;
++            if(CSGroupChatRoomUnavailable(conversation)){CSAutoDiagRecordContext(@"gate.room_unavailable",0);return NO;}
++            if(!CSGroupChatIsMember(conversation,self.accountID)){CSAutoDiagRecordContext(@"gate.not_member",0);return NO;}
++            if([CSGroupChatQuitCoordinator.sharedCoordinator isQuittingRoom:conversation]){CSAutoDiagRecordContext(@"gate.quitting",0);return NO;}
++            CSAutoDiagRecordContext(@"gate.group_pass",0);return YES;
+         }
+         id contacts=[self.environment serviceNamed:@"CContactMgr"],contact=nil;
+         for(NSString *selector in @[@"getContactByName:",@"getContactByNameFromDB:"]){if(CSMessageNativeSupports(contacts,selector,@"@",@[@"@"]))contact=CSMessageNativeInvoke(contacts,selector,@[conversation]);if(contact)break;}
+         return [CSMessageActionNativeObject(contact,@"m_nsUsrName") isEqual:conversation] && CSGroupCategoryForContact(contact)==CSGroupRowCategoryPrivate;
+-    }@catch(__unused NSException *exception){return NO;}
++    }@catch(__unused NSException *exception){CSAutoDiagRecordContext(@"gate.exception",0);return NO;}
+ }
+ - (NSString *)permanentReasonForTask:(CSAutomationTask *)task cleanup:(BOOL)cleanup {
+     if(task.epoch!=self.accountEpoch || task.epoch!=CSBackupAccountEpoch() || (self.accountID.length && ![self.accountID isEqual:task.account]))return @"账号已切换，自动任务已取消。";
+@@ -388,14 +420,20 @@
+ }
+ - (void)pauseTask:(CSAutomationTask *)task reason:(NSString *)reason {
+     task.wakeAt=MAX(task.due,MIN(task.deadline+0.01,self.elapsedTime+CSAutomationCapabilityRetry));
++    CSAutoDiagRecordEvent(@"task.retry_5s",task.event,task.epoch,AutoDiagFlags(task.event,task.decision));
+     self.statusText=[reason stringByAppendingString:@"；保留至延迟到期后 5 分钟，恢复时重试。"];
+     [self notify];
+ }
+ 
+ - (BOOL)canSubmitTask:(CSAutomationTask *)task cleanup:(BOOL)cleanup {
+-    if(![self taskValid:task cleanup:cleanup] || ![self supportsConversation:task.event[@"conversation"]])return NO;
+-    // Native getters above may synchronously reenter account/configuration changes.
+-    return [self taskValid:task cleanup:cleanup];
++    CSAutoDiagContext previous=CSAutoDiagPushEventContext(task.event,task.epoch);
++    @try {
++        CSAutoDiagRecordEvent(@"gate.begin",task.event,task.epoch,AutoDiagFlags(task.event,task.decision));
++        if(![self taskValid:task cleanup:cleanup]){CSAutoDiagRecordContext(@"gate.task_invalid",0);return NO;}
++        if(![self supportsConversation:task.event[@"conversation"]])return NO;
++        // Native getters above may synchronously reenter account/configuration changes.
++        BOOL valid=[self taskValid:task cleanup:cleanup];CSAutoDiagRecordContext(@"gate.final",valid?1:0);return valid;
++    }@finally {CSAutoDiagPopContext(previous);}
+ }
+ - (void)receiveNativeSession:(id)session wrap:(id)wrap epoch:(NSUInteger)epoch {[self receiveNativeSession:session wrap:wrap epoch:epoch completion:^(__unused BOOL claimed){}];}
+ - (void)enqueueSession:(id)session wrap:(id)wrap epoch:(NSUInteger)epoch pat:(BOOL)pat completion:(void (^)(BOOL))completion {
+@@ -415,28 +453,32 @@
+ 
+ - (void)receivePat:(id)pat conversation:(NSString *)conversation epoch:(NSUInteger)epoch {
+     if(!NSThread.isMainThread){dispatch_async(dispatch_get_main_queue(),^{[self receivePat:pat conversation:conversation epoch:epoch];});return;}
++    CSAutoDiagRecord(@"pat.receive",0,epoch,0);
+     if(!self.started)[self start];else if(!self.ready || !self.accountID.length)[self refresh];
+-    if(epoch!=CSBackupAccountEpoch() || epoch!=self.accountEpoch){self.statusText=@"拍动事件所属账号已切换，本次未接收。";[self notify];return;}
+-    if(!self.ready || self.loading || self.saving || ![self accountValid:self.accountID epoch:epoch]){[self enqueueSession:conversation wrap:pat epoch:epoch pat:YES completion:nil];return;}
+-    NSMutableDictionary *event=[CSAutomationEventFromPat(pat,self.accountID,conversation) mutableCopy];
++    if(epoch!=CSBackupAccountEpoch() || epoch!=self.accountEpoch){CSAutoDiagRecord(@"pat.reject_epoch",0,epoch,0);self.statusText=@"拍动事件所属账号已切换，本次未接收。";[self notify];return;}
++    if(!self.ready || self.loading || self.saving || ![self accountValid:self.accountID epoch:epoch]){CSAutoDiagRecord(@"pat.queued",0,epoch,(self.ready?1:0)|(self.loading?2:0)|(self.saving?4:0));[self enqueueSession:conversation wrap:pat epoch:epoch pat:YES completion:nil];return;}
++    NSMutableDictionary *event=[AutoDiagEventFromPat(pat,self.accountID,conversation,epoch) mutableCopy];
++    if(event)CSAutoDiagRecordEvent(@"pat.converted",event,epoch,[event[@"group"] boolValue]?1:0);else CSAutoDiagRecord(@"pat.convert_failed",0,epoch,0);
+     event[@"arrivalElapsed"]=@(self.elapsedTime);event[@"arrivalWall"]=@(self.currentDate.timeIntervalSince1970);
+     [self receiveEvent:event pat:YES completion:nil];
+ }
+ 
+ - (void)receiveEvent:(NSDictionary *)event pat:(BOOL)pat completion:(void (^)(BOOL))completion {
+     NSTimeInterval now=event[@"arrivalWall"]?[event[@"arrivalWall"] doubleValue]:self.currentDate.timeIntervalSince1970,created=[event[@"created"] doubleValue];
+-    if(!event || !self.ready || ![event[@"account"] isEqual:self.accountID] || ![event[@"identifiers"] isKindOfClass:NSArray.class] || ![event[@"identifiers"] count]){if(completion)completion(NO);return;}
++    if(!event || !self.ready || ![event[@"account"] isEqual:self.accountID] || ![event[@"identifiers"] isKindOfClass:NSArray.class] || ![event[@"identifiers"] count]){CSAutoDiagRecordEvent(@"event.invalid",event,self.accountEpoch,0);if(completion)completion(NO);return;}
+     BOOL own=[event[@"own"] boolValue];NSTimeInterval boundary=own?ceil(self.admissionBoundary):floor(self.admissionBoundary);
+     // Native push/sync can instantiate the manager seconds after the incoming
+     // message was created. Startup accepts that existing freshness window;
+     // edits/restores/account changes still impose a new strict boundary. Own
+     // callbacks always keep the startup boundary to avoid replaying our sends.
+     if(!isfinite(created) || !isfinite(now) || ((own || self.hasExplicitAdmissionBoundary) && created<boundary) || created<now-120 || created>now+30){
++        CSAutoDiagRecordEvent(@"event.stale",event,self.accountEpoch,0);
+         // An old event cannot create work, but a claim made before editing or
+         // restoring must still keep AI from taking over its duplicate callback.
+         if(!pat && completion)[self checkExistingTextClaim:event completion:completion];else if(completion)completion(NO);return;
+     }
+     NSArray *decisions=self.saving?@[]:CSAutomationDecisions(self.configuration,event,pat);
++    CSAutoDiagRecordEvent(@"event.decisions",event,self.accountEpoch,decisions.count);
+     if(!decisions.count){if(!pat && completion)[self checkExistingTextClaim:event completion:completion];else if(completion)completion(NO);return;}
+     // Pure decisions currently return at most one text action, or the two
+     // independent pat actions. AI waits only on the text admission completion.
+@@ -451,6 +493,7 @@
+     });
+ }
+ - (void)admitEvent:(NSDictionary *)event decision:(NSDictionary *)decision completion:(void (^)(BOOL))completion {
++    CSAutoDiagRecordEvent(@"admit.begin",event,self.accountEpoch,AutoDiagFlags(event,decision));
+     NSString *action=decision[@"action"];NSArray *identifiers=event[@"identifiers"];
+     NSMutableSet *owners=[NSMutableSet set];NSMutableArray *relatedTasks=[NSMutableArray array];
+     for(NSString *identifier in identifiers){CSAutomationAdmission *candidate=self.admissions[AdmissionKey(action,identifier)];if(candidate)[owners addObject:candidate];}
+@@ -465,6 +508,7 @@
+     }
+     CSAutomationAdmission *admission=owners.anyObject;
+     if(admission){
++        CSAutoDiagRecordEvent(@"admit.existing",event,self.accountEpoch,AutoDiagFlags(event,decision));
+         if(completion)[admission.completions addObject:[completion copy]];
+         NSUInteger before=admission.identifiers.count;[admission.identifiers addObjectsFromArray:identifiers];if(before!=admission.identifiers.count)admission.revision++;
+         for(NSString *identifier in identifiers)self.admissions[AdmissionKey(action,identifier)]=admission;return;
+@@ -481,22 +525,27 @@
+     // Storage capability is established by the configuration/ledger reads and
+     // the durable claim itself. The application's protected-data flag can be
+     // NO while these files remain usable after the device's first unlock.
+-    if(!self.ready || !self.ledger){admission.wakeAt=self.elapsedTime+CSAutomationCapabilityRetry;[self scheduleWakeup];return;}
++    if(!self.ready || !self.ledger){CSAutoDiagRecordEvent(@"claim.no_storage",admission.event,admission.epoch,AutoDiagFlags(admission.event,admission.decision));admission.wakeAt=self.elapsedTime+CSAutomationCapabilityRetry;[self scheduleWakeup];return;}
+     admission.persisting=YES;
++    CSAutoDiagRecordEvent(@"claim.queued",admission.event,admission.epoch,AutoDiagFlags(admission.event,admission.decision));
+     CSAutomationLedger *ledger=self.ledger;NSArray *identifiers=admission.identifiers.array;NSUInteger revision=admission.revision;NSDate *now=self.currentDate;
+     dispatch_async(self.io,^{
++        CSAutoDiagRecordEvent(@"claim.io_begin",admission.event,admission.epoch,AutoDiagFlags(admission.event,admission.decision));
+         NSError *error=nil;BOOL fresh=NO,claimed=NO;
+         if(ledger && CSBackupIsReady() && !CSBackupAccountIsSuspended() && CSBackupAccountEpoch()==admission.epoch){
+             fresh=[ledger claimIdentifiers:identifiers action:admission.action now:now error:&error];
+             claimed=fresh || (!error && [ledger hasIdentifiers:identifiers action:admission.action]);
+         }
++        CSAutoDiagRecordEvent(@"claim.io_end",admission.event,admission.epoch,(fresh?1:0)|(claimed?2:0)|(error?4:0));
+         dispatch_async(dispatch_get_main_queue(),^{
++            CSAutoDiagRecordEvent(@"claim.main",admission.event,admission.epoch,AutoDiagFlags(admission.event,admission.decision));
+             admission.persisting=NO;
+             admission.ownsClaim|=fresh;admission.claimed|=claimed;
+             BOOL sameToken=admission.epoch==self.accountEpoch && admission.epoch==CSBackupAccountEpoch() && admission.generation==self.configurationGeneration && [admission.event[@"account"] isEqual:self.accountID] && !admission.suppressed;
+             BOOL storageBlocked=CSAutomationStorageErrorIsRetryable(error);
+             BOOL temporarilyBlocked=!CSBackupIsReady() || CSBackupAccountIsSuspended() || ![self accountValid:self.accountID epoch:self.accountEpoch];
+             if(!claimed && sameToken && (storageBlocked || (!error && temporarilyBlocked)) && self.elapsedTime<=admission.deadline){
++                CSAutoDiagRecordEvent(@"claim.retry_5s",admission.event,admission.epoch,(storageBlocked?1:0)|(temporarilyBlocked?2:0));
+                 if(storageBlocked){self.ready=NO;self.ledger=nil;self.nextLoadAttempt=self.elapsedTime+CSAutomationCapabilityRetry;}
+                 admission.wakeAt=self.elapsedTime+CSAutomationCapabilityRetry;self.statusText=storageBlocked?@"自动功能运行记录暂不可写，保留事件等待恢复。":@"持久认领前账号暂不可用，保留事件等待恢复。";[self notify];[self scheduleWakeup];return;
+             }
+@@ -511,6 +560,7 @@
+                 NSArray *contents=admission.decision[@"contents"];if(contents.count)task.text=contents[arc4random_uniform((uint32_t)contents.count)];
+                 task.revokeDelay=[self.configuration[@"patBack"][@"revokeDelay"] doubleValue];
+                 self.tasks[task.identifier]=task;
++                CSAutoDiagRecordEvent(@"task.created",task.event,task.epoch,AutoDiagFlags(task.event,task.decision));
+             }else if(error && current){self.ready=NO;self.ledger=nil;self.nextLoadAttempt=self.elapsedTime+CSAutomationCapabilityRetry;self.statusText=error.localizedDescription?:@"自动动作认领失败，已认领任务保留等待配置恢复。";[self notify];}
+             NSArray *waiters=[admission.completions copy];[admission.completions removeAllObjects];
+             for(void (^waiter)(BOOL) in waiters)waiter(admission.claimed);
+@@ -536,6 +586,7 @@
+     }return source;
+ }
+ - (void)submitTextTask:(CSAutomationTask *)task {
++    CSAutoDiagRecordEvent(@"text.begin",task.event,task.epoch,AutoDiagFlags(task.event,task.decision));
+     if(!task.text.length){[self.tasks removeObjectForKey:task.identifier];self.statusText=@"回复文案为空，本次自动任务已取消。";[self notify];return;}
+     if(![self canSubmitTask:task cleanup:NO]){[self pauseTask:task reason:[self availabilityReason]?:@"会话资料暂不可用"];return;}
+     BOOL mention=[task.event[@"group"] boolValue] && [task.decision[@"mention"] boolValue];
+@@ -547,11 +598,15 @@
+         route=[self.sender prepareAutomationQuote:text source:source targetID:task.event[@"conversation"] accountID:task.account];
+     }else if(mention)route=[self.sender prepareGroupText:text mentions:@[task.event[@"sender"]] targetID:task.event[@"conversation"] accountID:task.account];
+     else route=[self.sender prepareScheduledText:text targetID:task.event[@"conversation"] accountID:task.account];
+-    if(!route){[self pauseTask:task reason:@"原生发送接口或引用条件暂不可用"];return;}
++    if(!route){CSAutoDiagRecordEvent(@"text.no_route",task.event,task.epoch,0);[self pauseTask:task reason:@"原生发送接口或引用条件暂不可用"];return;}
++    CSAutoDiagReplyTrack(route.outputWrap,task.event,task.epoch);
+     CSAutomationMarkOwnedSend(route.outputWrap);CSAutomationRememberOwnedSend(route.outputWrap,task.account,task.event[@"conversation"]);
+     __weak typeof(self) weakSelf=self;route.submissionStillAuthorized=^BOOL{return [weakSelf canSubmitTask:task cleanup:NO] && weakSelf.elapsedTime<=task.deadline;};
+     __block CSMessageActionSubmissionState result=CSMessageActionSubmissionStateFailedBeforeAcceptance;
++    CSAutoDiagRecordEvent(@"text.invoke_begin",task.event,task.epoch,0);
+     CSBackupPerformAtAccountEpoch(task.epoch,^{if(route.submissionStillAuthorized())result=[route submit];});
++    CSAutoDiagRecordEvent(@"text.invoke_return",task.event,task.epoch,result);
++    CSAutoDiagReplyUpdate(route.outputWrap,task.epoch);
+     CSAutomationRememberOwnedSend(route.outputWrap,task.account,task.event[@"conversation"]);
+     if(!route.nativeHandoffReturned && result==CSMessageActionSubmissionStateFailedBeforeAcceptance && ![self permanentReasonForTask:task cleanup:NO]){[self pauseTask:task reason:[self availabilityReason]?:@"微信发送条件暂不可用"];return;}
+     [self.tasks removeObjectForKey:task.identifier];
+@@ -569,10 +624,13 @@
+ }
+ 
+ - (void)submitPatTask:(CSAutomationTask *)task {
++    CSAutoDiagRecordEvent(@"pat_action.begin",task.event,task.epoch,AutoDiagFlags(task.event,task.decision));
+     if(![self canSubmitTask:task cleanup:NO]){[self pauseTask:task reason:[self availabilityReason]?:@"会话资料暂不可用"];return;}
+     __weak typeof(self) weakSelf=self;__block BOOL denied=NO;BOOL (^valid)(void)=^BOOL{BOOL allowed=[weakSelf canSubmitTask:task cleanup:NO] && weakSelf.elapsedTime<=task.deadline;if(!allowed)denied=YES;return allowed;};
+     __block id sendPat=nil;__block BOOL deferred=NO;
++    CSAutoDiagRecordEvent(@"pat_action.invoke_begin",task.event,task.epoch,0);
+     CSBackupPerformAtAccountEpoch(task.epoch,^{if(valid())sendPat=[self.native sendPatTo:task.event[@"sender"] conversation:task.event[@"conversation"] account:task.account valid:valid deferred:&deferred];});
++    CSAutoDiagRecordEvent(@"pat_action.invoke_return",task.event,task.epoch,(sendPat?1:0)|(denied?2:0)|(deferred?4:0));
+     if(!sendPat && (denied || deferred) && ![self permanentReasonForTask:task cleanup:NO]){[self pauseTask:task reason:[self availabilityReason]?:@"回拍提交前条件暂不可用"];return;}
+     [self.tasks removeObjectForKey:task.identifier];
+     if(!sendPat){self.statusText=@"微信未确认接受本次回拍（原生限频、接口或结果不明），不会盲目重发。";[self notify];return;}
+@@ -604,7 +662,7 @@
+             self.statusText=invalid?:task.observing?@"30 秒内未确认回拍结果，本次不安排撤回。":@"自动任务超过延迟到期后 5 分钟，未补发（账号、授权或微信发送条件未恢复）。";[self notify];continue;
+         }
+         if(task.observing){if(now>=task.deadline){CSAutomationCancelPatObservation(task.sendPat);[self.tasks removeObjectForKey:task.identifier];self.statusText=@"30 秒内未确认回拍结果，本次不安排撤回。";[self notify];}continue;}
+-        NSString *unavailable=[self availabilityReason];if(unavailable){[self pauseTask:task reason:unavailable];continue;}
++        NSString *unavailable=[self availabilityReason];if(unavailable){CSAutoDiagRecordEvent(@"task.availability_blocked",task.event,task.epoch,0);[self pauseTask:task reason:unavailable];continue;}
+         if(now<task.wakeAt)continue;
+         @try {
+             if(task.revoking){
+@@ -614,7 +672,7 @@
+                 if(!revoked && (denied || deferred) && ![self permanentReasonForTask:task cleanup:YES]){[self pauseTask:task reason:[self availabilityReason]?:@"撤回提交前条件暂不可用"];continue;}
+                 [self.tasks removeObjectForKey:task.identifier];self.statusText=revoked?@"本次回拍的撤回已交给微信处理。":@"本次回拍已不符合原生撤回条件或结果不明，未撤回其他拍动且不会盲目重试。";[self notify];
+             }else if([task.decision[@"action"] isEqual:@"patBack"])[self submitPatTask:task];else [self submitTextTask:task];
+-        }@catch(__unused NSException *exception){if(task.observing)CSAutomationCancelPatObservation(task.sendPat);[self.tasks removeObjectForKey:task.identifier];self.statusText=@"原生操作结果不明，不会自动重试。";[self notify];}
++        }@catch(__unused NSException *exception){CSAutoDiagRecordEvent(@"task.exception",task.event,task.epoch,0);if(task.observing)CSAutomationCancelPatObservation(task.sendPat);[self.tasks removeObjectForKey:task.identifier];self.statusText=@"原生操作结果不明，不会自动重试。";[self notify];}
+     }
+     self.processing=NO;[self scheduleWakeup];
+ }
+--- /dev/null
++++ b/Controllers/CSAutomationNativeDiagnostics.h
+@@ -0,0 +1,23 @@
++#import <Foundation/Foundation.h>
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++// Passive, temporary 2.5-13 diagnostic hooks. Installation is main-thread only
++// and restricted to WeChat 8.0.80; no native service is acquired or requested.
++FOUNDATION_EXPORT void CSAutoDiagNativeInstall(void);
++FOUNDATION_EXPORT void CSAutoDiagNativeReportHooks(void);
++
++// native.hook.state: low 8 bits = hook ID, bit 8 = installed.
++// IDs: 1 NotifyFromEvent, 2 ApnsNotifySync, 3 HandleNewSyncPush,
++// 4 HandleNewSyncPush64, 5 NotifyToSync, 6 online mode, 7 sync response,
++// 8 handleAddMessageActionNotifyData. Unsupported/missing ABI reports failure.
++// notify begin/end: low 32 bits = native message code.
++// online begin/end: low 32 bits = native int mode's original bit pattern.
++// request end: bit 0 = native BOOL return. Every end: bit 63 = original threw.
++// All records have empty event key and epoch 0. No payload getter is called.
++
++#ifdef __cplusplus
++}
++#endif
+--- /dev/null
++++ b/Controllers/CSAutomationNativeDiagnostics.m
+@@ -0,0 +1,98 @@
++#import "CSAutomationNativeDiagnostics.h"
++#import "CSAutomationDiagnostics.h"
++#import <objc/runtime.h>
++#import <substrate.h>
++#include <stdint.h>
++#include <string.h>
++
++static BOOL CSDiagNativeInstalled[9];
++static const uint64_t CSDiagNativeThrew=UINT64_C(1)<<63;
++
++static NSUInteger CSDiagNativeEmit(NSString *stage,uint64_t flags) {
++    @try {
++        if(!CSAutoDiagIsActive())return 0;
++        NSUInteger generation=CSAutoDiagCaptureGeneration();
++        if(generation)CSAutoDiagRecordGeneration(stage,generation,flags);
++        return generation;
++    } @catch(__unused NSException *exception) {return NO;}
++}
++static void CSDiagNativeEnd(NSUInteger began,NSString *stage,uint64_t flags,BOOL returned) {
++    @try {if(began)CSAutoDiagRecordGeneration(stage,began,flags|(returned?0:CSDiagNativeThrew));}
++    @catch(__unused NSException *exception) {}
++}
++static BOOL CSDiagNativeABI(Class cls,SEL selector,const char *result,NSArray<NSString *> *arguments) {
++    Method method=class_getInstanceMethod(cls,selector);
++    if(!method || method_getNumberOfArguments(method)!=arguments.count+2)return NO;
++    char type[64]={0};method_getReturnType(method,type,sizeof(type));
++    if(strcmp(type,result))return NO;
++    method_getArgumentType(method,0,type,sizeof(type));if(strcmp(type,"@"))return NO;
++    method_getArgumentType(method,1,type,sizeof(type));if(strcmp(type,":"))return NO;
++    for(NSUInteger i=0;i<arguments.count;i++){
++        method_getArgumentType(method,(unsigned)i+2,type,sizeof(type));
++        if(strcmp(type,arguments[i].UTF8String))return NO;
++    }
++    return YES;
++}
++void CSAutoDiagNativeReportHooks(void) {
++    if(!NSThread.isMainThread)return;
++    for(NSUInteger identifier=1;identifier<=8;identifier++)
++        CSDiagNativeEmit(@"native.hook.state",identifier|(CSDiagNativeInstalled[identifier]?UINT64_C(256):0));
++}
++void CSAutoDiagNativeInstall(void) {
++    if(!NSThread.isMainThread)return;
++    @try {
++        if(![NSBundle.mainBundle.infoDictionary[@"CFBundleShortVersionString"] isEqual:@"8.0.80"])return;
++        NSArray<NSString *> *classes=@[@"CMainControll",@"NewSyncService",@"NewSyncService",@"NewSyncService",@"NewSyncService",@"NewSyncService",@"NewSyncService",@"SyncCmdHandler"];
++        NSArray<NSString *> *selectors=@[@"NotifyFromEvent:Message:MessageInfo:",@"ApnsNotifySync",@"HandleNewSyncPush:",@"HandleNewSyncPush64:",@"NotifyToSync",@"sendBgFgRequestWithOnlineMode:",@"__handleNewSyncResponse:flag:beginTime:",@"handleAddMessageActionNotifyData:"];
++        NSArray<NSArray<NSString *> *> *arguments=@[@[@"@",@"I",@"@"],@[],@[@"@"],@[@"@"],@[],@[@"i"],@[@"@",@"I",@"Q"],@[@"@"]];
++        NSArray<NSString *> *begins=@[@"native.notify.begin",@"native.apns.begin",@"native.push.begin",@"native.push64.begin",@"native.request.begin",@"native.online.begin",@"native.response.begin",@"native.action.begin"];
++        NSArray<NSString *> *ends=@[@"native.notify.end",@"native.apns.end",@"native.push.end",@"native.push64.end",@"native.request.end",@"native.online.end",@"native.response.end",@"native.action.end"];
++        for(NSUInteger index=0;index<8;index++){
++            NSUInteger identifier=index+1;if(CSDiagNativeInstalled[identifier])continue;
++            Class cls=NSClassFromString(classes[index]);SEL selector=NSSelectorFromString(selectors[index]);
++            const char *result=identifier==5?"B":identifier==8?"i":"v";
++            if(!CSDiagNativeABI(cls,selector,result,arguments[index]))continue;
++            NSString *begin=begins[index],*end=ends[index];__block IMP original=NULL;IMP replacement=NULL;
++            switch(identifier){
++                case 1: { replacement=imp_implementationWithBlock(^(id object,id event,unsigned int message,id info){
++                    NSUInteger began=CSDiagNativeEmit(begin,message);BOOL returned=NO;
++                    @try {((void(*)(id,SEL,id,unsigned int,id))original)(object,selector,event,message,info);returned=YES;}
++                    @finally {CSDiagNativeEnd(began,end,message,returned);}
++                });break; }
++                case 2: { replacement=imp_implementationWithBlock(^(id object){
++                    NSUInteger began=CSDiagNativeEmit(begin,0);BOOL returned=NO;
++                    @try {((void(*)(id,SEL))original)(object,selector);returned=YES;}
++                    @finally {CSDiagNativeEnd(began,end,0,returned);}
++                });break; }
++                case 3: case 4: { replacement=imp_implementationWithBlock(^(id object,id data){
++                    NSUInteger began=CSDiagNativeEmit(begin,0);BOOL returned=NO;
++                    @try {((void(*)(id,SEL,id))original)(object,selector,data);returned=YES;}
++                    @finally {CSDiagNativeEnd(began,end,0,returned);}
++                });break; }
++                case 5: { replacement=imp_implementationWithBlock(^_Bool(id object){
++                    NSUInteger began=CSDiagNativeEmit(begin,0);BOOL returned=NO;_Bool accepted=0;
++                    @try {accepted=((_Bool(*)(id,SEL))original)(object,selector);returned=YES;}
++                    @finally {CSDiagNativeEnd(began,end,accepted?1:0,returned);}
++                    return accepted;
++                });break; }
++                case 6: { replacement=imp_implementationWithBlock(^(id object,int mode){
++                    uint64_t flags=(uint32_t)mode;NSUInteger began=CSDiagNativeEmit(begin,flags);BOOL returned=NO;
++                    @try {((void(*)(id,SEL,int))original)(object,selector,mode);returned=YES;}
++                    @finally {CSDiagNativeEnd(began,end,flags,returned);}
++                });break; }
++                case 7: { replacement=imp_implementationWithBlock(^(id object,id response,unsigned int flag,unsigned long long time){
++                    NSUInteger began=CSDiagNativeEmit(begin,0);BOOL returned=NO;
++                    @try {((void(*)(id,SEL,id,unsigned int,unsigned long long))original)(object,selector,response,flag,time);returned=YES;}
++                    @finally {CSDiagNativeEnd(began,end,0,returned);}
++                });break; }
++                case 8: { replacement=imp_implementationWithBlock(^int(id object,id data){
++                    NSUInteger began=CSDiagNativeEmit(begin,0);BOOL returned=NO;int result=0;
++                    @try {result=((int(*)(id,SEL,id))original)(object,selector,data);returned=YES;}
++                    @finally {CSDiagNativeEnd(began,end,0,returned);}
++                    return result;
++                });break; }
++            }
++            if(replacement){MSHookMessageEx(cls,selector,replacement,&original);CSDiagNativeInstalled[identifier]=original!=NULL;}
++        }
++    } @catch(__unused NSException *exception) {}
++}
+--- a/Controllers/CSAutomationNativeSync.m
++++ b/Controllers/CSAutomationNativeSync.m
+@@ -1,4 +1,5 @@
+ #import "CSAutomationNativeSync.h"
++#import "CSAutomationDiagnostics.h"
+ #import "CSAutomationManager.h"
+ #import "CSBackupBootstrap.h"
+ #import "CSMessageNativeActionAdapter.h"
+@@ -35,6 +36,27 @@
+     memcpy(&value,(const unsigned char *)(__bridge const void *)service+ivar_getOffset(ivar),sizeof(value));
+     return value;
+ }
++// Temporary passive snapshot: no native getter, service lookup, flag mutation or request.
++static void CSAutomationSyncDiag(NSString *stage,id service,CSAutomationSyncState *state,NSUInteger epoch,uint64_t extra) {
++    if(!CSAutoDiagIsActive())return;
++    uint64_t flags=extra|(CSAutomationSyncInstalled?1ULL:0);
++    @try {
++        if(CSAutomationSyncConcrete(service)){
++            flags|=1ULL<<1;
++            const char *names[]={"m_bNeedSync","m_bHasInit","m_bSyncOperating","m_bIsSyncPause","m_bSyncOpError","m_isGettingData"};
++            for(NSUInteger i=0;i<sizeof(names)/sizeof(*names);i++)
++                if(CSAutomationSyncIvar(object_getClass(service),names[i],"B",sizeof(bool)) && CSAutomationSyncFlag(service,names[i]))flags|=1ULL<<(i+2);
++            if(CSAutomationSyncIvar(object_getClass(service),"m_syncEventID","I",sizeof(unsigned int))){
++                unsigned int event=0;Ivar ivar=class_getInstanceVariable(object_getClass(service),"m_syncEventID");
++                memcpy(&event,(const unsigned char *)(__bridge const void *)service+ivar_getOffset(ivar),sizeof(event));
++                if(event)flags|=1ULL<<8;
++            }
++        }
++        if(state.pending)flags|=1ULL<<9;if(state.queued)flags|=1ULL<<10;if(state.driving)flags|=1ULL<<11;
++        if(CSAutomationSyncDriveDepth)flags|=1ULL<<12;if(CSAutomationSyncHandleDepth)flags|=1ULL<<13;
++        CSAutoDiagRecord(stage,0,epoch,flags);
++    } @catch(__unused NSException *exception) {}
++}
+ static BOOL CSAutomationSyncIdle(id service) {
+     if(!CSAutomationSyncFlag(service,"m_bHasInit"))return NO;
+     // isGettingData remains true across a successful continuation page. The
+@@ -49,32 +71,38 @@
+     return event==0;
+ }
+ static void CSAutomationSyncDrain(id service,CSAutomationSyncState *state) {
++    CSAutomationSyncDiag(@"sync.drain.begin",service,state,state.epoch,0);
+     state.queued=NO;
+     if(!state.pending || state.driving || state.epoch!=CSBackupAccountEpoch() ||
+        objc_getAssociatedObject(service,CSAutomationSyncStateKey)!=state)return;
+     @try {
+         [CSAutomationManager.sharedManager performNativeSyncForService:service epoch:state.epoch request:^(id receiver){
++            CSAutomationSyncDiag(@"sync.drain.service",service,state,state.epoch,0);
+             if(state.epoch!=CSBackupAccountEpoch() || !state.pending || state.driving)return;
+             if(CSMessageNativeServiceIdentity(receiver,@"NewSyncService")!=service)return;
+-            if(!CSAutomationSyncFlag(service,"m_bNeedSync")){state.pending=NO;return;}
++            if(!CSAutomationSyncFlag(service,"m_bNeedSync")){CSAutomationSyncDiag(@"sync.drain.no_need",service,state,state.epoch,0);state.pending=NO;return;}
+             // Never clear busy/pause/error flags to force a request. Busy needs
+             // stay pending until a native completion/resume readiness event.
+-            if(!CSAutomationSyncIdle(service))return;
++            if(!CSAutomationSyncIdle(service)){CSAutomationSyncDiag(@"sync.drain.busy",service,state,state.epoch,0);return;}
+             state.pending=NO;state.driving=YES;CSAutomationSyncDriveDepth++;
+             @try {
+                 // Uses the scene selected by WeChat; unlike BackGroundFetch it
+                 // consumes an existing notification, with no 10/45-second gate.
+-                [CSMessageNativeInvoke(receiver,@"NotifyToSync",@[]) boolValue];
++                CSAutomationSyncDiag(@"sync.drain.request",service,state,state.epoch,0);
++                BOOL accepted=[CSMessageNativeInvoke(receiver,@"NotifyToSync",@[]) boolValue];
++                CSAutomationSyncDiag(@"sync.drain.return",service,state,state.epoch,accepted?(1ULL<<16):0);
+             } @catch(__unused NSException *exception) {}
+             @finally {CSAutomationSyncDriveDepth--;state.driving=NO;}
+         }];
+     } @catch(__unused NSException *exception) {}
+ }
+ static void CSAutomationSyncWake(id service,NSUInteger epoch,BOOL newNeed) {
++    CSAutomationSyncDiag(@"sync.wake.enter",service,nil,epoch,newNeed?(1ULL<<16):0);
+     if(CSAutomationSyncDriveDepth || !CSAutomationSyncConcrete(service))return;
+     if(!NSThread.isMainThread){
+         dispatch_async(dispatch_get_main_queue(),^{CSAutomationSyncWake(service,epoch,newNeed);});return;
+     }
++    CSAutomationSyncDiag(@"sync.wake.main",service,nil,epoch,newNeed?(1ULL<<16):0);
+     if(!CSAutomationSyncInstalled || epoch!=CSBackupAccountEpoch())return;
+     CSAutomationSyncState *state=objc_getAssociatedObject(service,CSAutomationSyncStateKey);
+     if(!state || state.epoch!=epoch){
+@@ -85,6 +113,7 @@
+     if(newNeed)state.pending=YES;
+     if(!state.pending || state.queued || state.driving)return;
+     state.queued=YES;
++    CSAutomationSyncDiag(@"sync.wake.queued",service,state,epoch,0);
+     // Leave the entire native callback (including key/status/extension updates)
+     // before consuming its need; bursts in this run-loop turn share one wake.
+     dispatch_async(dispatch_get_main_queue(),^{CSAutomationSyncDrain(service,state);});
+@@ -127,16 +156,19 @@
+     SEL need=NSSelectorFromString(@"setNeedSyncWithScene:");__block IMP originalNeed=NULL;
+     IMP needReplacement=imp_implementationWithBlock(^(id service,int scene){
+         NSUInteger epoch=CSBackupAccountEpoch();
++        CSAutomationSyncDiag(@"sync.event.need.begin",service,nil,epoch,0);
+         ((void(*)(id,SEL,int))originalNeed)(service,need,scene);
++        CSAutomationSyncDiag(@"sync.event.need.end",service,nil,epoch,0);
+         CSAutomationWakePendingNativeSync(service,epoch);
+     });
+     MSHookMessageEx(cls,need,needReplacement,&originalNeed);
+     SEL handle=NSSelectorFromString(@"HandleSyncResp:handleResult:");__block IMP originalHandle=NULL;
+     IMP handleReplacement=imp_implementationWithBlock(^(id service,id response,bool processed){
+         NSUInteger epoch=CSBackupAccountEpoch();
++        CSAutomationSyncDiag(@"sync.event.handle.begin",service,nil,epoch,processed?(1ULL<<16):0);
+         CSAutomationSyncHandleDepth++;
+         @try {((void(*)(id,SEL,id,bool))originalHandle)(service,handle,response,processed);}
+-        @finally {CSAutomationSyncHandleDepth--;}
++        @finally {CSAutomationSyncHandleDepth--;CSAutomationSyncDiag(@"sync.event.handle.end",service,nil,epoch,processed?(1ULL<<16):0);}
+         // Failed completion alone must not manufacture another request. On a
+         // successful continuation WeChat itself has set m_bNeedSync again.
+         @try {CSAutomationSyncWake(service,epoch,processed);} @catch(__unused NSException *exception) {}
+@@ -144,13 +176,17 @@
+     MSHookMessageEx(cls,handle,handleReplacement,&originalHandle);
+     SEL resume=NSSelectorFromString(@"makeSyncResume");__block IMP originalResume=NULL;
+     IMP resumeReplacement=imp_implementationWithBlock(^(id service){
+-        NSUInteger epoch=CSBackupAccountEpoch();((void(*)(id,SEL))originalResume)(service,resume);
++        NSUInteger epoch=CSBackupAccountEpoch();CSAutomationSyncDiag(@"sync.event.resume.begin",service,nil,epoch,0);
++        ((void(*)(id,SEL))originalResume)(service,resume);
++        CSAutomationSyncDiag(@"sync.event.resume.end",service,nil,epoch,0);
+         CSAutomationWakePendingNativeSync(service,epoch);
+     });
+     MSHookMessageEx(cls,resume,resumeReplacement,&originalResume);
+     SEL reset=NSSelectorFromString(@"resetGettingData");__block IMP originalReset=NULL;
+     IMP resetReplacement=imp_implementationWithBlock(^(id service){
+-        NSUInteger epoch=CSBackupAccountEpoch();((void(*)(id,SEL))originalReset)(service,reset);
++        NSUInteger epoch=CSBackupAccountEpoch();CSAutomationSyncDiag(@"sync.event.reset.begin",service,nil,epoch,0);
++        ((void(*)(id,SEL))originalReset)(service,reset);
++        CSAutomationSyncDiag(@"sync.event.reset.end",service,nil,epoch,0);
+         // HandleSyncResp has not finished updating its selector/key yet. Let its
+         // outer hook enqueue after those updates instead of queuing from here.
+         if(!CSAutomationSyncHandleDepth){
+--- /dev/null
++++ b/Controllers/CSAutomationOnlineExperiment.h
+@@ -0,0 +1,9 @@
++#import <Foundation/Foundation.h>
++NS_ASSUME_NONNULL_BEGIN
++FOUNDATION_EXPORT NSNotificationName const CSAutomationOnlineExperimentDidChange;
++FOUNDATION_EXPORT void CSAutomationOnlineExperimentStart(void);
++FOUNDATION_EXPORT BOOL CSAutomationOnlineExperimentEnabled(void);
++FOUNDATION_EXPORT BOOL CSAutomationOnlineExperimentSetEnabled(BOOL enabled);
++FOUNDATION_EXPORT NSString *CSAutomationOnlineExperimentStatus(void);
++FOUNDATION_EXPORT void CSAutomationOnlineExperimentReport(void);
++NS_ASSUME_NONNULL_END
+--- /dev/null
++++ b/Controllers/CSAutomationOnlineExperiment.m
+@@ -0,0 +1,344 @@
++#import "CSAutomationOnlineExperiment.h"
++#import "CSAutomationDiagnostics.h"
++#import "CSAutomationManager.h"
++#import "CSBackgroundRunManager.h"
++#import "CSBackupBootstrap.h"
++#import "CSAuthorizationManager.h"
++#import "CSMessageNativeActionAdapter.h"
++#import <UIKit/UIKit.h>
++#import <objc/runtime.h>
++#import <objc/message.h>
++#import <substrate.h>
++#import <string.h>
++
++NSNotificationName const CSAutomationOnlineExperimentDidChange=@"CSAutomationOnlineExperimentDidChange";
++static const void *CSOnlineTokenKey=&CSOnlineTokenKey;
++static const void *CSOnlineNaturalKey=&CSOnlineNaturalKey;
++static BOOL CSOnlineHooksInstalled;
++@class CSAutomationOnlineExperiment;
++@interface CSOnlineRequest : NSObject
++@property(nonatomic,weak) id service;
++@property(nonatomic) NSUInteger epoch,revision;
++@property(nonatomic) int mode;
++@property(nonatomic) BOOL queued,consumed,entered;
++@end
++@implementation CSOnlineRequest @end
++// Scoped only to construction. The token attached to the native event guards
++// the separate queued add boundary, before native cancelBgFgEvent can run.
++static _Thread_local void *CSOnlineConstructing;
++static _Thread_local void *CSOnlineNaturalConstructing;
++
++@interface CSAutomationOnlineExperiment : NSObject
++@property(nonatomic) BOOL started,enabled,enteringForeground,reconciling,reconcileQueued;
++@property(nonatomic) NSUInteger epoch,revision,enableGeneration,lastAttemptRevision;
++@property(nonatomic,copy) NSString *account,*status;
++@property(nonatomic,strong) id boundService,leaseService;
++@property(nonatomic) int naturalMode,submittedMode;
++@property(nonatomic,strong) CSOnlineRequest *pending;
++@property(nonatomic,strong) CSMessageNativeEnvironment *environment;
+++ (instancetype)shared;
++- (void)schedule;
++- (BOOL)desiredOnline;
++- (BOOL)background;
++- (id)currentReceiver;
++- (void)reconcile;
++- (BOOL)setTestEnabled:(BOOL)enabled;
++- (void)naturalMode:(int)mode service:(id)service epoch:(NSUInteger)epoch;
++- (BOOL)acceptQueued:(CSOnlineRequest *)token service:(id)service;
++- (void)completedQueued:(CSOnlineRequest *)token returned:(BOOL)returned;
++- (void)expireIfGeneration:(NSUInteger)generation;
++@end
++static void CSOnlineRecord(NSString *stage,NSUInteger epoch,uint64_t flags) {
++    @try {CSAutoDiagRecord(stage,0,epoch,flags);} @catch(__unused NSException *exception) {}
++}
++static BOOL CSOnlineMethod(Class cls,NSString *name,const char *result,NSArray<NSString *> *arguments) {
++    Method method=class_getInstanceMethod(cls,NSSelectorFromString(name));
++    if(!method || method_getNumberOfArguments(method)!=arguments.count+2)return NO;
++    char type[64]={0};method_getReturnType(method,type,sizeof(type));if(strcmp(type,result))return NO;
++    for(NSUInteger i=0;i<arguments.count;i++){
++        method_getArgumentType(method,(unsigned int)i+2,type,sizeof(type));
++        if(strcmp(type,arguments[i].UTF8String))return NO;
++    }
++    return YES;
++}
++static void CSOnlineInstall(void) {
++    if(CSOnlineHooksInstalled || !NSThread.isMainThread)return;
++    if(![NSBundle.mainBundle.infoDictionary[@"CFBundleShortVersionString"] isEqual:@"8.0.80"])return;
++    Class cls=NSClassFromString(@"NewSyncService");if(!cls)return;
++    if(!CSOnlineMethod(cls,@"sendBgFgRequestWithOnlineMode:","v",@[@"i"]) ||
++       !CSOnlineMethod(cls,@"addBgFgLongLinkEvent:","v",@[@"@"]) ||
++       !CSOnlineMethod(cls,@"addBgFgSendOnlyEvent:","v",@[@"@"]) ||
++       !CSOnlineMethod(cls,@"performSelectorOnMainThread:withObject:waitUntilDone:","v",@[@":",@"@",@"B"]))return;
++    SEL send=NSSelectorFromString(@"sendBgFgRequestWithOnlineMode:");__block IMP originalSend=NULL;
++    IMP replacementSend=imp_implementationWithBlock(^(id service,int mode){
++        CSOnlineRequest *token=(__bridge CSOnlineRequest *)CSOnlineConstructing;
++        BOOL owned=token && !token.entered && token.service==service && token.mode==mode;
++        if(owned){
++            // Forwarding can execute native context getters after the outer
++            // check. Reject stale plugin construction at the raw service edge.
++            if(token.epoch!=CSBackupAccountEpoch() || CSBackupAccountIsSuspended() ||
++               token.revision!=CSAutomationOnlineExperiment.shared.revision)return;
++            // Claim before any native getter: a same-mode nested natural send
++            // must use its own observation frame, never this owned token.
++            token.entered=YES;
++            CSAutomationOnlineExperiment *owner=CSAutomationOnlineExperiment.shared;
++            BOOL desired=[owner desiredOnline];
++            id current=[owner currentReceiver];
++            if(!current || CSMessageNativeServiceIdentity(current,@"NewSyncService")!=service)return;
++            if(![owner background] || (token.mode==1)!=desired || token.revision!=owner.revision || token.epoch!=CSBackupAccountEpoch() || CSBackupAccountIsSuspended())return;
++        }else {
++            void *previous=CSOnlineConstructing,*previousNatural=CSOnlineNaturalConstructing;
++            CSOnlineConstructing=NULL;
++            CSOnlineRequest *natural=[CSOnlineRequest new];natural.service=service;natural.epoch=CSBackupAccountEpoch();natural.mode=mode;
++            CSOnlineNaturalConstructing=(__bridge void *)natural;
++            @try {
++                @try {[CSAutomationOnlineExperiment.shared naturalMode:mode service:service epoch:natural.epoch];} @catch(__unused NSException *exception) {}
++                ((void(*)(id,SEL,int))originalSend)(service,send,mode);
++            } @finally {
++                CSOnlineConstructing=previous;CSOnlineNaturalConstructing=previousNatural;
++                if(!natural.queued)[CSAutomationOnlineExperiment.shared schedule];
++            }
++            return;
++        }
++        ((void(*)(id,SEL,int))originalSend)(service,send,mode);
++    });
++    MSHookMessageEx(cls,send,replacementSend,&originalSend);
++    SEL schedule=NSSelectorFromString(@"performSelectorOnMainThread:withObject:waitUntilDone:");__block IMP originalSchedule=NULL;
++    IMP replacementSchedule=imp_implementationWithBlock(^(id service,SEL action,id event,bool wait){
++        CSOnlineRequest *token=(__bridge CSOnlineRequest *)CSOnlineConstructing;
++        if(token && token.service==service && event &&
++           (action==NSSelectorFromString(@"addBgFgLongLinkEvent:") || action==NSSelectorFromString(@"addBgFgSendOnlyEvent:"))){
++            objc_setAssociatedObject(event,CSOnlineTokenKey,token,OBJC_ASSOCIATION_RETAIN_NONATOMIC);token.queued=YES;
++            CSOnlineRecord(@"online.event.queued",token.epoch,(uint64_t)token.mode);
++        }
++        CSOnlineRequest *natural=(__bridge CSOnlineRequest *)CSOnlineNaturalConstructing;
++        if(!token && natural && natural.service==service && event &&
++           (action==NSSelectorFromString(@"addBgFgLongLinkEvent:") || action==NSSelectorFromString(@"addBgFgSendOnlyEvent:"))){
++            objc_setAssociatedObject(event,CSOnlineNaturalKey,natural,OBJC_ASSOCIATION_RETAIN_NONATOMIC);natural.queued=YES;
++        }
++        ((void(*)(id,SEL,SEL,id,bool))originalSchedule)(service,schedule,action,event,wait);
++    });
++    MSHookMessageEx(cls,schedule,replacementSchedule,&originalSchedule);
++    for(NSString *name in @[@"addBgFgLongLinkEvent:",@"addBgFgSendOnlyEvent:"]){
++        SEL add=NSSelectorFromString(name);__block IMP originalAdd=NULL;
++        IMP replacementAdd=imp_implementationWithBlock(^(id service,id event){
++            CSOnlineRequest *token=objc_getAssociatedObject(event,CSOnlineTokenKey);
++            if(!token){
++                CSOnlineRequest *natural=objc_getAssociatedObject(event,CSOnlineNaturalKey);
++                @try {((void(*)(id,SEL,id))originalAdd)(service,add,event);}
++                @finally {
++                    if(natural){@try {
++                        [CSAutomationOnlineExperiment.shared naturalMode:natural.mode service:service epoch:natural.epoch];
++                        [CSAutomationOnlineExperiment.shared schedule];
++                    } @catch(__unused NSException *exception) {}}
++                }
++                return;
++            }
++            CSAutomationOnlineExperiment *owner=CSAutomationOnlineExperiment.shared;
++            if(![owner acceptQueued:token service:service])return;
++            __block BOOL returned=NO;
++            // Preserve native ordering and context. No old account event may
++            // reach its original add (which cancels an existing event first).
++            CSBackupPerformAtAccountEpoch(token.epoch,^{
++                if(token.revision!=owner.revision || token.epoch!=CSBackupAccountEpoch() || CSBackupAccountIsSuspended())return;
++                @try {((void(*)(id,SEL,id))originalAdd)(service,add,event);returned=YES;}
++                @catch(__unused NSException *exception) {}
++            });
++            [owner completedQueued:token returned:returned];
++        });
++        MSHookMessageEx(cls,add,replacementAdd,&originalAdd);
++    }
++    CSOnlineHooksInstalled=YES;
++}
++@implementation CSAutomationOnlineExperiment
+++ (instancetype)shared {static id owner;static dispatch_once_t once;dispatch_once(&once,^{owner=[self new];});return owner;}
++- (instancetype)init {if((self=[super init])){_environment=[CSMessageNativeEnvironment new];_status=@"已关闭 · 重启微信或切换账号后自动关闭";_revision=1;_lastAttemptRevision=NSUIntegerMax;}return self;}
++- (void)publish:(NSString *)text {
++    BOOL changed=![self.status isEqual:text];self.status=text;
++    if(changed)[NSNotificationCenter.defaultCenter postNotificationName:CSAutomationOnlineExperimentDidChange object:self];
++}
++- (void)start {
++    if(self.started || !NSThread.isMainThread)return;self.started=YES;
++    for(NSString *name in @[CSAutomationConfigurationDidChange,CSBackgroundRunStateChangedNotification,CSBackgroundRunSettingsChangedNotification,@"CSBackupAccountChanged",UIApplicationDidEnterBackgroundNotification,UIApplicationWillEnterForegroundNotification,UIApplicationDidBecomeActiveNotification])
++        [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(changed:) name:name object:nil];
++}
++- (void)clearLease {self.pending=nil;self.leaseService=nil;self.submittedMode=0;self.lastAttemptRevision=NSUIntegerMax;}
++- (void)resetForAccount {
++    self.enabled=NO;self.enableGeneration++;self.revision++;self.account=nil;self.boundService=nil;self.naturalMode=0;[self clearLease];
++    CSOnlineRecord(@"online.account.reset",CSBackupAccountEpoch(),0);[self publish:@"已关闭 · 账号或服务已变化"];
++}
++- (void)changed:(NSNotification *)note {
++    if(!NSThread.isMainThread){dispatch_async(dispatch_get_main_queue(),^{[self changed:note];});return;}
++    BOOL lifecycle=NO;
++    if([note.name isEqual:UIApplicationWillEnterForegroundNotification]){
++        lifecycle=YES;self.enteringForeground=YES;[self clearLease];
++    }else if([note.name isEqual:UIApplicationDidEnterBackgroundNotification]){
++        lifecycle=YES;self.enteringForeground=NO;self.naturalMode=0;
++    }else if([note.name isEqual:UIApplicationDidBecomeActiveNotification]){
++        lifecycle=YES;self.enteringForeground=NO;
++    }
++    if(self.account.length && (self.epoch!=CSBackupAccountEpoch() || CSBackupAccountIsSuspended())){[self resetForAccount];return;}
++    // Keep a pending request across duplicate status publications. Invalidate
++    // only an actual intent change, and allow one retry on a new external event.
++    if(lifecycle || !self.pending)self.revision++;
++    else {
++        NSUInteger revision=self.revision;CSOnlineRequest *pending=self.pending;
++        BOOL desired=[self desiredOnline];
++        if(revision==self.revision && pending==self.pending && ((pending.mode==1)!=desired))self.revision++;
++    }
++    [self schedule];
++}
++- (void)schedule {
++    if(!NSThread.isMainThread){dispatch_async(dispatch_get_main_queue(),^{[self schedule];});return;}
++    if(self.reconcileQueued)return;self.reconcileQueued=YES;
++    dispatch_async(dispatch_get_main_queue(),^{self.reconcileQueued=NO;[self reconcile];});
++}
++- (BOOL)background {return !self.enteringForeground && UIApplication.sharedApplication.applicationState==UIApplicationStateBackground;}
++- (BOOL)groupEligible {
++    return self.enabled && [CSAutomationManager.sharedManager hasEligibleGroupPatConfigurationAtEpoch:self.epoch];
++}
++- (BOOL)executionAvailable {
++    // This callback already has execution time. Our resource manager describes
++    // only resources owned by this plugin; false says nothing about another
++    // plugin keeping WeChat alive. Do not create or claim background resources.
++    // Suspension still prevents this code from running at all.
++    return NSThread.isMainThread && [self background];
++}
++- (BOOL)desiredOnline {
++    @try {return [self background] && [self groupEligible] && [self executionAvailable];}
++    @catch(__unused NSException *exception){return NO;}
++}
++- (id)currentReceiver {
++    if(!self.account.length || !CSBackupIsReady() || CSBackupAccountIsSuspended() || self.epoch!=CSBackupAccountEpoch())return nil;
++    NSUInteger revision=self.revision;
++    NSString *account=[self.environment currentAccountID];
++    if(revision!=self.revision || self.epoch!=CSBackupAccountEpoch())return nil;
++    if(account.length && ![account isEqual:self.account]){[self resetForAccount];return nil;}
++    if(!account.length)return nil;
++    id receiver=[self.environment serviceNamed:@"NewSyncService"];
++    id raw=CSMessageNativeServiceIdentity(receiver,@"NewSyncService");
++    if(revision!=self.revision || self.epoch!=CSBackupAccountEpoch() || CSBackupAccountIsSuspended())return nil;
++    if(raw && raw!=self.boundService){[self resetForAccount];return nil;}
++    if(!raw)return nil;
++    if(!CSMessageNativeSupports(receiver,@"sendBgFgRequestWithOnlineMode:",@"v",@[@"i"]))return nil;
++    return revision==self.revision?receiver:nil;
++}
++- (BOOL)setTestEnabled:(BOOL)enabled {
++    if(!NSThread.isMainThread)return NO;[self start];
++    if(!enabled){self.enabled=NO;self.enableGeneration++;self.revision++;CSOnlineRecord(@"online.switch",self.epoch,0);[self reconcile];return YES;}
++    if(self.enabled)return YES;
++    CSOnlineInstall();
++    if(!CSOnlineHooksInstalled){[self publish:@"未开启 · 当前微信原生接口未通过校验"];return NO;}
++    NSUInteger epoch=CSBackupAccountEpoch();
++    if(![CSAutomationManager.sharedManager hasEligibleGroupPatConfigurationAtEpoch:epoch]){[self publish:@"未开启 · 请先配置有效的群回拍或群拍动回复"];return NO;}
++    NSString *account=[self.environment currentAccountID];id receiver=[self.environment serviceNamed:@"NewSyncService"];
++    id raw=CSMessageNativeServiceIdentity(receiver,@"NewSyncService");
++    if(!account.length || !raw || ![account isEqual:CSAutomationManager.sharedManager.accountID] || epoch!=CSBackupAccountEpoch() || CSBackupAccountIsSuspended() || !CSBackupIsReady() ||
++       ![CSAutomationManager.sharedManager hasEligibleGroupPatConfigurationAtEpoch:epoch]){[self publish:@"未开启 · 当前账号或服务暂不可用"];return NO;}
++    // Re-read after eligibility/native getters: they may reenter account setup.
++    NSUInteger revision=self.revision;
++    NSString *verifiedAccount=[self.environment currentAccountID];
++    id verifiedReceiver=[self.environment serviceNamed:@"NewSyncService"];
++    if(revision!=self.revision || ![verifiedAccount isEqual:account] || CSMessageNativeServiceIdentity(verifiedReceiver,@"NewSyncService")!=raw ||
++       epoch!=CSBackupAccountEpoch() || CSBackupAccountIsSuspended() || ![CSAutomationManager.sharedManager hasEligibleGroupPatConfigurationAtEpoch:epoch] || revision!=self.revision){
++        [self publish:@"未开启 · 账号或配置正在变化"];return NO;
++    }
++    self.account=account;self.epoch=epoch;self.boundService=raw;self.naturalMode=0;self.enabled=YES;self.revision++;self.enableGeneration++;
++    // One local expiration, no repeated sync or network poll. It bounds the
++    // experiment if the user forgets to turn it off after collecting a trace.
++    NSUInteger generation=self.enableGeneration;
++    dispatch_after(dispatch_time(DISPATCH_TIME_NOW,600LL*NSEC_PER_SEC),dispatch_get_main_queue(),^{[self expireIfGeneration:generation];});
++    CSOnlineRecord(@"online.switch",epoch,1);[self reconcile];return YES;
++}
++- (void)expireIfGeneration:(NSUInteger)generation {
++    if(!NSThread.isMainThread || generation!=self.enableGeneration || !self.enabled)return;
++    CSOnlineRecord(@"online.expired",self.epoch,0);[self setTestEnabled:NO];
++}
++- (void)naturalMode:(int)mode service:(id)service epoch:(NSUInteger)epoch {
++    if(!NSThread.isMainThread){dispatch_async(dispatch_get_main_queue(),^{[self naturalMode:mode service:service epoch:epoch];});return;}
++    if(!self.account.length || epoch!=self.epoch || epoch!=CSBackupAccountEpoch() || service!=self.boundService)return;
++    self.revision++;self.naturalMode=mode;[self clearLease];
++    CSOnlineRecord(@"online.native.takeover",epoch,(uint64_t)(uint32_t)mode);
++    if(mode!=1 && mode!=2){self.enabled=NO;self.enableGeneration++;[self publish:@"已关闭 · 微信采用其他在线模式"];}
++}
++- (void)drive:(int)mode receiver:(id)receiver {
++    CSOnlineRequest *token=[CSOnlineRequest new];token.service=self.boundService;token.epoch=self.epoch;token.revision=self.revision;token.mode=mode;
++    self.pending=token;self.leaseService=self.boundService;self.lastAttemptRevision=self.revision;
++    CSOnlineRecord(@"online.request.begin",self.epoch,(uint64_t)mode);
++    __block BOOL returned=NO;
++    CSBackupPerformAtAccountEpoch(token.epoch,^{
++        if(token.revision!=self.revision || token.epoch!=CSBackupAccountEpoch() || CSBackupAccountIsSuspended())return;
++        void *previous=CSOnlineConstructing;CSOnlineConstructing=(__bridge void *)token;
++        @try {((void(*)(id,SEL,int))objc_msgSend)(receiver,NSSelectorFromString(@"sendBgFgRequestWithOnlineMode:"),mode);returned=YES;}
++        @catch(__unused NSException *exception) {}
++        @finally {CSOnlineConstructing=previous;}
++    });
++    CSOnlineRecord(@"online.request.end",token.epoch,(uint64_t)mode|(returned?1ULL<<8:0)|(token.queued?1ULL<<9:0));
++    if(self.pending!=token)return;
++    if(!returned || !token.entered || !token.queued){
++        self.pending=nil;[self publish:@"请求未确认排入原生队列 · 等待下一次状态变化或返回前台恢复"];
++    }else if(!token.consumed)[self publish:mode==1?@"测试在线请求已排队 · 等待原生提交":@"恢复后台请求已排队"];
++}
++- (void)reconcile {
++    if(!NSThread.isMainThread || self.reconciling)return;self.reconciling=YES;
++    @try {
++        if(!self.account.length){if(!self.enabled)[self publish:@"已关闭 · 重启微信或切换账号后自动关闭"];return;}
++        if(self.epoch!=CSBackupAccountEpoch() || CSBackupAccountIsSuspended()){[self resetForAccount];return;}
++        if(![self background]){[self clearLease];[self publish:self.enabled?@"已开启 · 等待进入后台，10 分钟自动关闭":@"已关闭 · 前台由微信接管"];return;}
++        NSUInteger revision=self.revision;id receiver=[self currentReceiver];
++        if(revision!=self.revision)return;
++        if(!receiver){[self publish:self.leaseService?@"当前服务暂不可用 · 待恢复后台模式":@"等待当前账号服务可用"];return;}
++        BOOL eligible=[self groupEligible];BOOL execution=eligible && [self executionAvailable];
++        if(revision!=self.revision || self.epoch!=CSBackupAccountEpoch())return;
++        BOOL desired=eligible && execution;
++        CSOnlineRecord(@"online.reconcile",self.epoch,(self.enabled?1:0)|(eligible?2:0)|(execution?4:0)|(self.leaseService?8:0));
++        if(desired){
++            if(!self.leaseService && self.naturalMode==1){[self publish:@"微信已请求在线模式 · 等待群拍动验证"];return;}
++            if(self.submittedMode==1 && self.leaseService){[self publish:@"测试在线请求已提交 · 群拍动效果待验证"];return;}
++            if(self.pending && self.pending.mode==1 && self.pending.revision==revision)return;
++            if(self.lastAttemptRevision!=revision)[self drive:1 receiver:receiver];
++        }else if(self.leaseService){
++            if(self.pending && self.pending.mode==2 && self.pending.revision==revision)return;
++            if(self.lastAttemptRevision!=revision)[self drive:2 receiver:receiver];
++        }else [self publish:!self.enabled?@"已关闭 · 未持有测试在线请求":!eligible?@"已开启 · 等待有效群拍动配置":@"已开启 · 等待后台运行机会"];
++    } @catch(__unused NSException *exception){[self publish:@"原生状态暂不可用 · 等待下一次状态变化"];}
++    @finally {self.reconciling=NO;}
++}
++- (BOOL)acceptQueued:(CSOnlineRequest *)token service:(id)service {
++    if(!NSThread.isMainThread || token.consumed)return NO;
++    token.consumed=YES;
++    BOOL valid=token==self.pending && token.service==service && service==self.boundService && token.epoch==self.epoch &&
++        token.epoch==CSBackupAccountEpoch() && !CSBackupAccountIsSuspended() && token.revision==self.revision && [self background];
++    @try {
++        if(valid){id receiver=[self currentReceiver];valid=receiver!=nil && CSMessageNativeServiceIdentity(receiver,@"NewSyncService")==service;}
++        if(valid){BOOL desired=[self desiredOnline];valid=token.mode==1?desired:(!desired && self.leaseService==service);}
++        valid=valid && token.revision==self.revision && token.epoch==CSBackupAccountEpoch() && !CSBackupAccountIsSuspended();
++    } @catch(__unused NSException *exception){valid=NO;}
++    if(!valid){
++        CSOnlineRecord(@"online.event.cancelled",token.epoch,(uint64_t)token.mode);
++        if(self.pending==token){self.pending=nil;[self schedule];}
++    }
++    return valid;
++}
++- (void)completedQueued:(CSOnlineRequest *)token returned:(BOOL)returned {
++    CSOnlineRecord(@"online.event.return",token.epoch,(uint64_t)token.mode|(returned?1ULL<<8:0));
++    if(self.pending!=token)return;self.pending=nil;
++    if(token.revision!=self.revision || token.epoch!=CSBackupAccountEpoch()){[self schedule];return;}
++    if(!returned){[self publish:@"原生提交结果不明 · 待状态变化或返回前台恢复"];return;}
++    if(token.mode==2){[self clearLease];[self publish:self.enabled?@"测试条件暂停 · 已提交恢复后台请求":@"已关闭 · 已提交恢复后台请求"];}
++    else {self.submittedMode=1;[self publish:@"测试在线请求已提交 · 群拍动效果待验证"];}
++}
++@end
++void CSAutomationOnlineExperimentStart(void) {if(NSThread.isMainThread)[CSAutomationOnlineExperiment.shared start];}
++BOOL CSAutomationOnlineExperimentEnabled(void) {return NSThread.isMainThread && CSAutomationOnlineExperiment.shared.enabled;}
++BOOL CSAutomationOnlineExperimentSetEnabled(BOOL enabled) {
++    @try {return [CSAutomationOnlineExperiment.shared setTestEnabled:enabled];}
++    @catch(__unused NSException *exception){[CSAutomationOnlineExperiment.shared publish:@"状态暂不可用 · 请返回前台后重试"];return NO;}
++}
++NSString *CSAutomationOnlineExperimentStatus(void) {return NSThread.isMainThread?CSAutomationOnlineExperiment.shared.status:@"请在主线程查看测试状态";}
++
++void CSAutomationOnlineExperimentReport(void) {
++    if(!NSThread.isMainThread)return;
++    CSAutomationOnlineExperiment *owner=CSAutomationOnlineExperiment.shared;
++    CSOnlineRecord(@"online.snapshot",owner.epoch,(owner.enabled?1:0)|(owner.leaseService?2:0)|(owner.pending?4:0)|(CSOnlineHooksInstalled?8:0)|((uint64_t)owner.submittedMode<<8));
++}
+--- /dev/null
++++ b/Controllers/CSAutomationReplyDiagnostics.h
+@@ -0,0 +1,37 @@
++#import <Foundation/Foundation.h>
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++// Temporary diag.2 observer. Message observation is a no-op when inactive.
++// Track immediately before the native submit and Update immediately after it.
++// Only normalized pat events are tracked; no native service or setter is used.
++FOUNDATION_EXPORT void CSAutoDiagReplyTrack(id wrap, NSDictionary *patEvent, NSUInteger epoch);
++FOUNDATION_EXPORT void CSAutoDiagReplyUpdate(id wrap, NSUInteger epoch);
++// Invoke Begin before the existing success/failure original. End consumes only
++// its cached token, even if the original threw or replaced/mutated its argument.
++FOUNDATION_EXPORT id CSAutoDiagReplyCallbackBegin(id message, BOOL success, NSUInteger epoch);
++FOUNDATION_EXPORT void CSAutoDiagReplyCallbackEnd(id token, BOOL originalReturned);
++// Cached scalar capability only. Start reports each selector whose installation
++// has been attempted; calling this never forces native initialization.
++FOUNDATION_EXPORT void CSAutoDiagReplyHookState(BOOL success, BOOL installed);
++
++// reply.track/update/callback flags: bit 0 success selector (callbacks only),
++// bit 1 original returned (end only), bit 2 local ID present, bit 3 server ID
++// present, bit 4 client ID present, bit 5 exact wrapper + creation time match,
++// bit 6 local ID + creation time match, bit 7 server ID match, bit 8 client ID
++// match. reply.hook.state: bit 0 success selector, bit 1 installed.
++// IDs and envelope strings exist only in a maximum of 128 memory entries.
++// Callback records retain the originating capture generation and account epoch.
++// reply.callback.unmatched has an empty key; bits 0/2/3/4 have the same meaning,
++// bit 9 marks multiple matching tasks. It is limited to eight per selector per
++// capture, and is omitted without tracked entries for the supplied epoch.
++
++#if CS_AUTODIAG_HOST_TEST
++FOUNDATION_EXPORT NSUInteger CSAutoDiagReplyTrackedCountForTest(void);
++#endif
++
++#ifdef __cplusplus
++}
++#endif
+--- a/Controllers/CSAutomationSettingsViewController.m
++++ b/Controllers/CSAutomationSettingsViewController.m
+@@ -1,5 +1,7 @@
+ #import "CSAutomationSettingsViewController.h"
+ #import "CSAutomationManager.h"
++#import "CSAutomationDiagnostics.h"
++#import "CSAutomationOnlineExperiment.h"
+ #import "CSAutomationTiming.h"
+ #import "CSAutomationStore.h"
+ #import "CSAutomationNativeAdapter.h"
+@@ -323,8 +325,8 @@
+ - (void)viewDidLoad {
+     [super viewDidLoad];self.title=@"自动功能";CSAutoConfigureTable(self.tableView);
+     self.nativeAdapter=[[CSAutomationNativeAdapter alloc]initWithEnvironment:[CSMessageNativeEnvironment new]];
+-    for(NSString *name in @[CSAutomationConfigurationDidChange,@"CSBackupAccountChanged"])[NSNotificationCenter.defaultCenter addObserver:self selector:@selector(changed:) name:name object:nil];
+-    [CSAutomationManager.sharedManager start];[self reloadSettings];
++    for(NSString *name in @[CSAutomationConfigurationDidChange,@"CSBackupAccountChanged",CSAutomationOnlineExperimentDidChange])[NSNotificationCenter.defaultCenter addObserver:self selector:@selector(changed:) name:name object:nil];
++    [CSAutomationManager.sharedManager start];CSAutomationOnlineExperimentStart();[self reloadSettings];
+ }
+ - (void)dealloc { [NSNotificationCenter.defaultCenter removeObserver:self]; }
+ - (void)viewWillAppear:(BOOL)animated { [super viewWillAppear:animated];[CSAutomationManager.sharedManager refresh];[self reloadSettings]; }
+@@ -372,9 +374,32 @@
+         }
+         [sections addObject:[CSSettingSection sectionWithHeader:CSAutoTitles()[index] items:rows]];
+     }
++    [sections addObject:[CSSettingSection sectionWithHeader:@"群拍动接收模式验证" items:@[
++        [CSSettingItem switchItemWithTitle:@"测试后台在线模式" iconName:@"antenna.radiowaves.left.and.right" iconColor:UIColor.systemOrangeColor switchValue:CSAutomationOnlineExperimentEnabled() valueChangedBlock:^(BOOL on){
++            BOOL changed=CSAutomationOnlineExperimentSetEnabled(on);[weakSelf reloadSettings];
++            if(!changed)CSAutoAlert(weakSelf,CSAutomationOnlineExperimentStatus());
++        }],
++        CSAutoRow(@"开始新一轮采样",@"record.circle",@"覆盖上一轮，最多 10 分钟",^{CSAutoDiagStart();[weakSelf reloadSettings];}),
++        CSAutoRow(@"停止采样",@"stop.circle",CSAutoDiagStatus(),^{CSAutoDiagStop();[weakSelf reloadSettings];}),
++        CSAutoRow(@"停止并导出",@"square.and.arrow.up",@"导出本轮时间记录",^{[weakSelf exportPatDiagnostics];}),
++        CSAutoRow(@"清空采样",@"trash",@"清除本轮内存记录",^{CSAutoDiagReset();[weakSelf reloadSettings];})
++    ]]];
+     self.sections=sections;[self.tableView reloadData];
+ }
++- (void)exportPatDiagnostics {
++    if(!CSSettingsCanPresentFrom(self))return;
++    CSAutoDiagStop();NSDictionary *snapshot=CSAutoDiagSnapshot();[self reloadSettings];
++    if(![snapshot[@"records"] count]){CSAutoAlert(self,@"暂无采样。请先开始新一轮采样，再复现拍动延迟。");return;}
++    NSError *error=nil;NSData *data=[NSJSONSerialization dataWithJSONObject:snapshot options:NSJSONWritingPrettyPrinted|NSJSONWritingSortedKeys error:&error];
++    NSURL *url=[NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"WeChatImprove-2.5-13-online2-%@.json",NSUUID.UUID.UUIDString]]];
++    if(!data || ![data writeToURL:url options:NSDataWritingAtomic error:&error]){CSAutoAlert(self,@"导出失败，内存采样仍保留，可再次导出。");return;}
++    UIActivityViewController *share=[[UIActivityViewController alloc]initWithActivityItems:@[url] applicationActivities:nil];
++    share.popoverPresentationController.sourceView=self.view;share.popoverPresentationController.sourceRect=self.view.bounds;
++    share.completionWithItemsHandler=^(__unused UIActivityType type,__unused BOOL complete,__unused NSArray *items,__unused NSError *shareError){[NSFileManager.defaultManager removeItemAtURL:url error:NULL];};
++    [self presentViewController:share animated:YES completion:nil];
++}
+ - (BOOL)rowEnabled:(NSIndexPath *)path {
++    if(path.section==4)return YES;
+     if(self.saving || !CSAutoValid(CSAutoContext()))return NO;
+     (void)path;return YES;
+ }
+@@ -383,6 +408,7 @@
+ - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section { (void)tableView;return self.sections[section].header; }
+ - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
+     (void)tableView;
++    if(section==4)return [NSString stringWithFormat:@"%@\n%@\n测试默认关闭，仅本次微信运行有效，10 分钟后自动关闭，切换账号也会关闭。需要已配置有效群回拍或回复。可使用本插件或其他方式保活，不要求开启本插件的后台运行；微信被系统挂起时无法实时执行。测试会改变微信向服务器报告的在线状态，可能影响耗电及通知表现；关闭或回到前台后恢复微信正常管理。请先开始采样再开启测试，锁屏后仅在群内拍我，暂不发送私聊；观察后停止并导出。\n仅本临时包提供。最多保存 4000 条，10 分钟到期后停止；采样期间只保存在内存，微信退出会丢失。本版记录原生通知、同步阻塞、拍动入站及发送回调；每 2 秒记录一次本地运行时刻，不产生网络请求。回调不代表对方已收到。复现后停止并导出。记录时间、阶段、匿名关联键与状态，不记录账号、群号、成员、正文或 XML。受保护数据状态不等同于锁屏状态。",CSAutomationOnlineExperimentStatus(),CSAutoDiagStatus()];
+     if(!CSAutomationManager.sharedManager.ready)return section==0?(CSAutomationManager.sharedManager.statusText.length?CSAutomationManager.sharedManager.statusText:@"当前账号尚未就绪，请稍后重试。"):nil;
+     NSArray *details=@[@"仅处理拍到自己的新拍一拍。撤回只针对本功能本次自动发出的回拍，从微信确认发送成功后开始计时，并受微信允许的撤回时间限制。",
+         @"每次从本模块的回复内容中随机选一条。@ 仅在群聊生效；私聊发送普通回复。名单和延迟与其他模块独立。",
+@@ -396,7 +422,9 @@
+     BOOL enabled=[self rowEnabled:path];cell.userInteractionEnabled=enabled;cell.contentView.alpha=enabled?1:0.45;return cell;
+ }
+ - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)path {
+-    [tableView deselectRowAtIndexPath:path animated:YES];if(![self rowEnabled:path]||!CSAutoRequire(self,CSAutoContext()))return;
++    [tableView deselectRowAtIndexPath:path animated:YES];
++    if(path.section==4){CSSettingItem *diagnostic=self.sections[path.section].items[path.row];if(diagnostic.actionBlock)diagnostic.actionBlock();return;}
++    if(![self rowEnabled:path]||!CSAutoRequire(self,CSAutoContext()))return;
+     CSSettingItem *item=self.sections[path.section].items[path.row];if(item.actionBlock)item.actionBlock();
+ }
+ - (void)chooseConversations:(NSString *)module groups:(BOOL)groups {
+--- a/Controllers/CSGroupChatNativeAdapter.m
++++ b/Controllers/CSGroupChatNativeAdapter.m
+@@ -3,6 +3,7 @@
+ #import "CSGroupNativeBridge.h"
+ #import "CSBackupBootstrap.h"
+ #import "CSAuthorizationManager.h"
++#import "CSAutomationDiagnostics.h"
+ 
+ static CSMessageNativeEnvironment *CSGCEnvironment(void) {
+     static CSMessageNativeEnvironment *environment; static dispatch_once_t once;
+@@ -10,9 +11,11 @@
+ }
+ static NSString *CSGCString(id value) { return [value isKindOfClass:NSString.class] ? value : nil; }
+ static BOOL CSGCAccountValid(NSString *account, NSUInteger epoch) {
+-    if (!NSThread.isMainThread || !account.length || !CSBackupIsReady() || CSBackupAccountIsSuspended() || epoch!=CSBackupAccountEpoch()) return NO;
++    if (!NSThread.isMainThread || !account.length || !CSBackupIsReady() || CSBackupAccountIsSuspended() || epoch!=CSBackupAccountEpoch()) { CSAutoDiagRecordContext(@"group.account.precheck",0); return NO; }
+     NSString *actual=[CSGCEnvironment() currentAccountID];
+-    return [actual isEqual:account] && epoch==CSBackupAccountEpoch() && !CSBackupAccountIsSuspended() && CSBackupIsReady();
++    BOOL valid=[actual isEqual:account] && epoch==CSBackupAccountEpoch() && !CSBackupAccountIsSuspended() && CSBackupIsReady();
++    if (!valid) CSAutoDiagRecordContext(@"group.account.unavailable",0);
++    return valid;
+ }
+ static BOOL CSGCCanAct(NSString *account, NSUInteger epoch) {
+     return CSGCAccountValid(account,epoch) && CSAuthorizationManager.sharedManager.isAuthorized;
+@@ -21,27 +24,34 @@
+     return [NSError errorWithDomain:@"CSGroupChatNative" code:code userInfo:@{NSLocalizedDescriptionKey:message}];
+ }
+ static id CSGCContact(NSString *userName) {
+-    if (!NSThread.isMainThread || ![userName isKindOfClass:NSString.class] || !userName.length || !CSBackupIsReady() || CSBackupAccountIsSuspended()) return nil;
++    if (!NSThread.isMainThread || ![userName isKindOfClass:NSString.class] || !userName.length || !CSBackupIsReady() || CSBackupAccountIsSuspended()) { CSAutoDiagRecordContext(@"group.contact.precheck",0); return nil; }
+     id manager=[CSGCEnvironment() serviceNamed:@"CContactMgr"], contact=nil;
++    if (!manager) CSAutoDiagRecordContext(@"group.contact.service.missing",0);
+     Class contactClass=NSClassFromString(@"CContact");
+-    if (!contactClass) return nil;
++    if (!contactClass) { CSAutoDiagRecordContext(@"group.contact.class.missing",0); return nil; }
++    uint64_t getter=0;
+     @try {
+         for (NSString *selector in @[@"getContactByName:",@"getContactByNameFromDB:"]) {
+-            if (!CSMessageNativeSupports(manager,selector,@"@",@[@"@"])) continue;
++            getter++;
++            if (!CSMessageNativeSupports(manager,selector,@"@",@[@"@"])) { CSAutoDiagRecordContext(@"group.contact.getter.unsupported",getter); continue; }
+             contact=CSMessageNativeInvoke(manager,selector,@[userName]);
+             if (contact) break;
++            CSAutoDiagRecordContext(@"group.contact.getter.empty",getter);
+         }
+-        if (![contact isKindOfClass:contactClass] || ![CSGCString(CSGroupReadObject(contact,@"m_nsUsrName")) isEqual:userName]) return nil;
+-    } @catch (__unused NSException *exception) { return nil; }
++        if (![contact isKindOfClass:contactClass]) { CSAutoDiagRecordContext(contact?@"group.contact.type.invalid":@"group.contact.missing",0); return nil; }
++        if (![CSGCString(CSGroupReadObject(contact,@"m_nsUsrName")) isEqual:userName]) { CSAutoDiagRecordContext(@"group.contact.identity.mismatch",0); return nil; }
++    } @catch (__unused NSException *exception) { CSAutoDiagRecordContext(@"group.contact.exception",getter); return nil; }
+     return contact;
+ }
+ id CSGroupChatRoomContact(NSString *roomID) {
+     @try {
+         id contact=CSGCContact(roomID); Class cls=NSClassFromString(@"CContact");
+         // IsChatRoomContact: receives CContact, then calls its isChatroom.
+-        if (!contact || !CSMessageNativeSupports(cls,@"IsChatRoomContact:",@"B",@[@"@"]) || ![CSMessageNativeInvoke(cls,@"IsChatRoomContact:",@[contact]) boolValue]) return nil;
++        if (!contact) { CSAutoDiagRecordContext(@"group.room.contact.missing",0); return nil; }
++        if (!CSMessageNativeSupports(cls,@"IsChatRoomContact:",@"B",@[@"@"])) { CSAutoDiagRecordContext(@"group.room.type.unsupported",0); return nil; }
++        if (![CSMessageNativeInvoke(cls,@"IsChatRoomContact:",@[contact]) boolValue]) { CSAutoDiagRecordContext(@"group.room.type.false",0); return nil; }
+         return contact;
+-    } @catch (__unused NSException *exception) { return nil; }
++    } @catch (__unused NSException *exception) { CSAutoDiagRecordContext(@"group.room.type.exception",0); return nil; }
+ }
+ NSString *CSGroupChatRoomName(NSString *roomID) {
+     id contact=CSGroupChatRoomContact(roomID);
+@@ -71,22 +81,32 @@
+ }
+ BOOL CSGroupChatIsMember(NSString *roomID, NSString *accountID) {
+     NSUInteger epoch=CSBackupAccountEpoch();
+-    if (!CSGCAccountValid(accountID,epoch) || !CSGroupChatRoomContact(roomID)) return NO;
++    if (!CSGCAccountValid(accountID,epoch)) { CSAutoDiagRecordContext(@"group.member.account.unavailable",0); return NO; }
++    if (!CSGroupChatRoomContact(roomID)) { CSAutoDiagRecordContext(@"group.member.contact.missing",0); return NO; }
+     @try {
+         id manager=[CSGCEnvironment() serviceNamed:@"CGroupMgr"];
+-        if (!CSMessageNativeSupports(manager,@"IsUsrInChatRoom:Usr:",@"B",@[@"@",@"@"])) return NO;
++        if (!manager) CSAutoDiagRecordContext(@"group.member.service.missing",0);
++        if (!CSMessageNativeSupports(manager,@"IsUsrInChatRoom:Usr:",@"B",@[@"@",@"@"])) { CSAutoDiagRecordContext(@"group.member.unsupported",0); return NO; }
+         BOOL member=[CSMessageNativeInvoke(manager,@"IsUsrInChatRoom:Usr:",@[roomID,accountID]) boolValue];
+-        return member && CSGCAccountValid(accountID,epoch);
+-    } @catch (__unused NSException *exception) { return NO; }
++        if (!member) { CSAutoDiagRecordContext(@"group.member.false",0); return NO; }
++        BOOL valid=CSGCAccountValid(accountID,epoch);
++        if (!valid) CSAutoDiagRecordContext(@"group.member.account.changed",0);
++        return valid;
++    } @catch (__unused NSException *exception) { CSAutoDiagRecordContext(@"group.member.exception",0); return NO; }
+ }
+ BOOL CSGroupChatRoomUnavailable(NSString *roomID) {
+     id contact=CSGroupChatRoomContact(roomID);
++    uint64_t state=0;
+     @try {
+         for (NSString *selector in @[@"isChatRoomDismissed",@"isChatRoomBlocked"]) {
+-            if (!CSMessageNativeSupports(contact,selector,@"B",@[]) || [CSMessageNativeInvoke(contact,selector,@[]) boolValue]) return YES;
++            state++;
++            if (!CSMessageNativeSupports(contact,selector,@"B",@[])) { CSAutoDiagRecordContext(state==1?@"group.room.dismissed.unsupported":@"group.room.blocked.unsupported",0); return YES; }
++            if ([CSMessageNativeInvoke(contact,selector,@[]) boolValue]) { CSAutoDiagRecordContext(state==1?@"group.room.dismissed.true":@"group.room.blocked.true",0); return YES; }
+         }
+-        return ![CSGCString(CSGroupReadObject(contact,@"m_nsUsrName")) isEqual:roomID];
+-    } @catch (__unused NSException *exception) { return YES; }
++        BOOL unavailable=![CSGCString(CSGroupReadObject(contact,@"m_nsUsrName")) isEqual:roomID];
++        if (unavailable) CSAutoDiagRecordContext(@"group.room.identity.mismatch",0);
++        return unavailable;
++    } @catch (__unused NSException *exception) { CSAutoDiagRecordContext(@"group.room.state.exception",state); return YES; }
+ }
+ NSString *CSGroupChatMemberName(NSString *roomID, NSString *memberID) {
+     (void)roomID;
+--- a/Controllers/CSReleaseNotesViewController.m
++++ b/Controllers/CSReleaseNotesViewController.m
+@@ -4,6 +4,16 @@
+ // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
+ static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
+     NSDictionary *releases = @{
++        @"2.5-13+online.2": @[
++            @{@"title": @"兼容其他后台保活方式", @"detail": @"修正在线模式实验必须由本插件提供后台运行资源的限制。实验开启且群配置、账号、授权有效时，微信实际执行后台回调即可尝试在线上报，可沿用其他插件保活。"},
++            @{@"title": @"保留关闭与账号保护", @"detail": @"测试默认关闭，仅本次微信运行有效，10 分钟自动关闭；关闭、配置失效时恢复后台模式，回到前台由微信接管，切换账号废弃旧请求。不会启动本插件后台保活或新增定时补拉。"},
++            @{@"title": @"验证范围", @"detail": @"上一版在启用本插件后台运行时已由用户反馈立即回复。本版用于验证其他保活方式下的同一路径；需保持微信有执行机会，实际通知和回复效果仍以手机为准。"}
++        ],
++        @"2.5-13+diag.1": @[
++            @{@"title": @"群后台拍动临时定位", @"detail": @"基于 2.5-13 记录通知到达、同步条件、拍动入站、群资料检查及发送回调。本包用于定位回到前台才回复的问题，尚不代表已修复。"},
++            @{@"title": @"采样入口与范围", @"detail": @"在自动功能页面底部开始采样，复现后停止并导出。仅在内存保存本轮记录，最多 10 分钟；每 2 秒的本地运行记录不发起网络请求。"},
++            @{@"title": @"保持当前处理规则", @"detail": @"沿用现有回拍、回复、原生事件同步及兼容策略，保留名单、账号、授权、去重与延迟检查。导出不包含账号、群号、消息正文或 XML。"}
++        ],
+         @"2.5-13": @[
+             @{@"title": @"修复后台群拍动同步被拦截", @"detail": @"修正微信服务代理与实际同步服务被误判为不同服务的问题，恢复后台群拍动事件触发；同步调用经过微信服务代理，保留正确账号上下文。"},
+             @{@"title": @"补齐恢复与能力检查", @"detail": @"配置或生命周期恢复时同样识别服务代理。只有当前账号的服务实际支持新路径才停用兼容补拉；正常事件路径继续即时处理，不等待 10 秒轮询。"},
+--- a/Headers/CSUserInfoHelper.h
++++ b/Headers/CSUserInfoHelper.h
+@@ -14,7 +14,7 @@
+ extern NSString * const kChatAvatarURLKey;    // 聊天对象头像URL缓存键
+ 
+ // 插件信息相关常量
+-#define kPluginVersionString @"2.5-13"  // 插件版本号
++#define kPluginVersionString @"2.5-13+online.2"  // 插件版本号
+ 
+ #pragma mark - 类定义
+ 
+--- a/Hooks/AutomationHooks.xm
++++ b/Hooks/AutomationHooks.xm
+@@ -3,6 +3,7 @@
+ #import "../Controllers/CSAutomationNativeAdapter.h"
+ #import "../Controllers/CSAutomationNativeSync.h"
+ #import "../Controllers/CSBackupBootstrap.h"
++#import "../Controllers/CSAutomationDiagnostics.h"
+ #import <objc/runtime.h>
+ #import <substrate.h>
+ #if __has_include(<UIKit/UIApplication.h>)
+@@ -16,6 +17,10 @@
+ static BOOL CSAutomationAsyncHookInstalled,CSAutomationAddHookInstalled,CSAutomationPatIngressInstalled;
+ static BOOL CSAutomationSyncHookInstalled,CSAutomationNotAddDBHookInstalled,CSAutomationBatchHookInstalled;
+ static BOOL CSAutomationUnifiedBatchInstalled;
++// Diagnostic calls cannot replace native exceptions or introduce native reads.
++static void CSAutomationIngressDiag(NSString *stage,long long server,NSUInteger epoch,uint64_t flags) {
++    @try {CSAutoDiagRecord(stage,server>0?(unsigned long long)server:0,epoch,flags);} @catch(__unused NSException *exception) {}
++}
+ 
+ @interface CSAutomationIngressPatSnapshot : NSObject
+ @property(nonatomic,copy) NSString *fromUserName,*pattedUserName;
+@@ -29,6 +34,16 @@
+ @property(nonatomic) long long m_n64MesSvrID;
+ @end
+ @implementation CSAutomationIngressXMLSnapshot @end
++static NSDictionary *CSAutomationIngressParseRaw(id wrap,NSString *session,NSUInteger epoch) {
++    CSAutoDiagContext previous=CSAutoDiagPushContext(0,epoch);
++    @try {return CSAutomationPatFromXMLMessage(wrap,session);}
++    @finally {CSAutoDiagPopContext(previous);}
++}
++static void CSAutomationIngressDeliverPat(CSAutomationManager *manager,id pat,NSString *conversation,NSUInteger epoch) {
++    CSAutoDiagContext previous=CSAutoDiagPushContext(0,epoch);
++    @try {[manager receivePat:pat conversation:conversation epoch:epoch];}
++    @finally {CSAutoDiagPopContext(previous);}
++}
+ static BOOL CSAutomationIngressMethod(Class cls,NSString *name,NSString *result,NSArray<NSString *> *arguments) {
+     Method method=class_getInstanceMethod(cls,NSSelectorFromString(name));
+     if(!method || method_getNumberOfArguments(method)!=arguments.count+2)return NO;
+@@ -56,7 +71,7 @@
+     }
+     @catch(__unused NSException *exception) {return NO;}
+ }
+-static NSArray<NSDictionary *> *CSAutomationPatsInMessage(id session,id wrap,BOOL snapshot) {
++static NSArray<NSDictionary *> *CSAutomationPatsInMessage(id session,id wrap,BOOL snapshot,NSUInteger epoch) {
+     // Synced app-message 62 already contains native PatWraps. It can reach the
+     // per-wrap/session batch callbacks without another addPatWrap/XML insertion.
+     if(!CSMessageNativeSupports(wrap,@"m_uiMessageType",@"I",@[]) ||
+@@ -76,10 +91,12 @@
+     NSMutableArray *result=[NSMutableArray array];
+     NSArray *observed=snapshot?[pats subarrayWithRange:NSMakeRange(0,MIN([pats count],128UL))]:[pats copy];
+     for(id pat in observed){
++        long long server=0;
+         if(!CSMessageNativeSupports(pat,@"serverId",@"q",@[]) ||
+            !CSMessageNativeSupports(pat,@"createTime",@"Q",@[]) ||
+-           [CSMessageNativeInvoke(pat,@"serverId",@[]) longLongValue]<=0 ||
+-           !CSMessageNativeUnsigned(pat,@"createTime"))continue;
++           (server=[CSMessageNativeInvoke(pat,@"serverId",@[]) longLongValue])<=0 ||
++           !CSMessageNativeUnsigned(pat,@"createTime")){CSAutomationIngressDiag(@"hook.compound.reject",server,epoch,snapshot?1:0);continue;}
++        CSAutomationIngressDiag(@"hook.compound.accept",server,epoch,(snapshot?1:0)|([conversation hasSuffix:@"@chatroom"]?2:0));
+         // Keep each native pat identity; the manager applies target/account/age
+         // checks and its durable ledger deduplicates XML, sync and batch overlap.
+         id retainedPat=pat;
+@@ -94,12 +111,13 @@
+     return [result copy];
+ }
+ static void CSAutomationPublishPatsInMessage(CSAutomationManager *manager,id session,id wrap,NSUInteger epoch) {
+-    for(NSDictionary *entry in CSAutomationPatsInMessage(session,wrap,NO)){
+-        [manager receivePat:entry[@"pat"] conversation:entry[@"conversation"] epoch:epoch];
++    for(NSDictionary *entry in CSAutomationPatsInMessage(session,wrap,NO,epoch)){
++        CSAutomationIngressDeliverPat(manager,entry[@"pat"],entry[@"conversation"],epoch);
+     }
+ }
+ static void CSAutomationPublishMessage(id service,id session,id wrap,NSUInteger epoch,BOOL owned) {
+-    BOOL revokedRawPat=NO;
++    BOOL revokedRawPat=NO;long long diagnosticServer=0;
++    CSAutomationIngressDiag(@"hook.publish.enqueue",0,epoch,owned?1:0);
+     @try {
+         // Native OnGetNewXmlMsg ignores pats already present in the revoke
+         // table. Query on the original service/caller context before queuing;
+@@ -107,12 +125,13 @@
+         if(epoch==CSBackupAccountEpoch() && !CSBackupAccountIsSuspended() &&
+            CSMessageNativeSupports(wrap,@"m_uiMessageType",@"I",@[]) && CSMessageNativeUnsigned(wrap,@"m_uiMessageType")==10002 &&
+            CSMessageNativeSupports(wrap,@"m_n64MesSvrID",@"q",@[]) && CSMessageNativeSupports(service,@"GetRevokeMsgBySvrId:",@"@",@[@"q"])){
+-            NSNumber *server=CSMessageNativeInvoke(wrap,@"m_n64MesSvrID",@[]);
++            NSNumber *server=CSMessageNativeInvoke(wrap,@"m_n64MesSvrID",@[]);diagnosticServer=server.longLongValue;
+             if(server.longLongValue>0)revokedRawPat=CSMessageNativeInvoke(service,@"GetRevokeMsgBySvrId:",@[server])!=nil;
+         }
+     } @catch(__unused NSException *exception) {}
+     dispatch_async(dispatch_get_main_queue(),^{
+-        if(epoch!=CSBackupAccountEpoch() || CSBackupAccountIsSuspended())return;
++        CSAutomationIngressDiag(@"hook.publish.main",diagnosticServer,epoch,revokedRawPat?1:0);
++        if(epoch!=CSBackupAccountEpoch() || CSBackupAccountIsSuspended()){CSAutomationIngressDiag(@"hook.publish.epoch.reject",diagnosticServer,epoch,0);return;}
+         @try {
+             CSAutomationManager *manager=CSAutomationManager.sharedManager;
+             if(owned)CSAutomationRememberOwnedMessage(session,wrap,epoch);
+@@ -123,10 +142,13 @@
+             // insertion is needed; all routes retain the same pat server ID.
+             if(!revokedRawPat && CSMessageNativeSupports(wrap,@"m_uiMessageType",@"I",@[]) &&
+                CSMessageNativeUnsigned(wrap,@"m_uiMessageType")==10002){
+-                NSDictionary *event=CSAutomationPatFromXMLMessage(wrap,session);
++                NSDictionary *event=CSAutomationIngressParseRaw(wrap,session,epoch);
++                CSAutomationIngressDiag(event?@"hook.raw.accept":@"hook.raw.reject",diagnosticServer,epoch,0);
+                 id pat=event[@"pat"],conversation=event[@"conversation"];
+-                if(pat && [conversation isKindOfClass:NSString.class] && [conversation length])
+-                    [manager receivePat:pat conversation:conversation epoch:epoch];
++                if(pat && [conversation isKindOfClass:NSString.class] && [conversation length]){
++                    CSAutomationIngressDiag(@"hook.raw.deliver",diagnosticServer,epoch,[conversation hasSuffix:@"@chatroom"]?1:0);
++                    CSAutomationIngressDeliverPat(manager,pat,conversation,epoch);
++                }
+             }
+         } @catch(__unused NSException *exception) {}
+     });
+@@ -140,7 +162,9 @@
+         if(detectsOwned){@try {owned=CSAutomationIsOwnedSend(wrap);} @catch(__unused NSException *exception) {}}
+         // Preserve original arguments, return and exceptions. Native reception
+         // finishes before any automation normalization, storage or scheduling.
++        CSAutomationIngressDiag(detectsOwned?@"hook.add.enter":@"hook.async.enter",0,epoch,wrap?1:0);
+         ((void(*)(id,SEL,id,id))original)(service,selector,session,wrap);
++        CSAutomationIngressDiag(detectsOwned?@"hook.add.return":@"hook.async.return",0,epoch,0);
+         // The original can enqueue AsyncOnAddMsg with a rebuilt wrapper. On
+         // main, remember its native IDs before any queued consumer can run.
+         if(owned && NSThread.isMainThread && CSAutomationRememberOwnedMessage(session,wrap,epoch))owned=NO;
+@@ -155,7 +179,9 @@
+         SEL selector=NSSelectorFromString(@"onNewSyncAddMessage:");__block IMP original=NULL;
+         IMP replacement=imp_implementationWithBlock(^(id service,id wrap){
+             NSUInteger epoch=CSBackupAccountEpoch();
++            CSAutomationIngressDiag(@"hook.sync.enter",0,epoch,wrap?1:0);
+             ((void(*)(id,SEL,id))original)(service,selector,wrap);
++            CSAutomationIngressDiag(@"hook.sync.return",0,epoch,0);
+             // SyncCmdHandler notifies every decoded wrap here, including the
+             // m_bNew=NO branch which never calls AsyncOnAddMsg:MsgWrap:.
+             // An empty session lets the event adapter derive the exact peer
+@@ -168,7 +194,9 @@
+         SEL selector=NSSelectorFromString(@"onNewSyncNotAddDBMessage:");__block IMP original=NULL;
+         IMP replacement=imp_implementationWithBlock(^(id service,id wrap){
+             NSUInteger epoch=CSBackupAccountEpoch();
++            CSAutomationIngressDiag(@"hook.notadd.enter",0,epoch,wrap?1:0);
+             ((void(*)(id,SEL,id))original)(service,selector,wrap);
++            CSAutomationIngressDiag(@"hook.notadd.return",0,epoch,0);
+             // SyncCmdHandler dispatches non-database wraps separately from
+             // onNewSyncAddMessage:. Type 10002 reaches HandleSvrCmd here.
+             CSAutomationPublishMessage(service,@"",wrap,epoch,NO);
+@@ -179,7 +207,9 @@
+         SEL selector=NSSelectorFromString(@"AsyncOnAddMsgListForSession:NotifyUsrName:");__block IMP original=NULL;
+         IMP replacement=imp_implementationWithBlock(^(id service,id sessions,id users){
+             NSUInteger epoch=CSBackupAccountEpoch();
++            CSAutomationIngressDiag(@"hook.sessions.enter",0,epoch,0);
+             ((void(*)(id,SEL,id,id))original)(service,selector,sessions,users);
++            CSAutomationIngressDiag(@"hook.sessions.return",0,epoch,0);
+             // 8.0.80 also publishes session->wrap batches without either old
+             // AddMsg callback. The per-message hook above covers full batches
+             // even when this map contains only the last wrap for each session.
+@@ -197,7 +227,7 @@
+         MSHookMessageEx(cls,selector,replacement,&original);CSAutomationBatchHookInstalled=YES;
+     }
+ }
+-static id CSAutomationSnapshotRawEnvelope(id wrap) {
++static id CSAutomationSnapshotRawEnvelope(id wrap,NSUInteger epoch) {
+     if(!CSMessageNativeSupports(wrap,@"m_uiMessageType",@"I",@[]) ||
+        !CSMessageNativeSupports(wrap,@"m_uiCreateTime",@"I",@[]) || !CSMessageNativeSupports(wrap,@"m_n64MesSvrID",@"q",@[]))return nil;
+     CSAutomationIngressXMLSnapshot *snapshot=[CSAutomationIngressXMLSnapshot new];snapshot.m_uiMessageType=10002;
+@@ -210,6 +240,7 @@
+         }
+         [snapshot setValue:[value copy]?:@"" forKey:key];
+     }
++    CSAutomationIngressDiag(@"hook.batch.raw.snapshot",snapshot.m_n64MesSvrID,epoch,[snapshot.m_nsFromUsr hasSuffix:@"@chatroom"]?1:0);
+     return snapshot;
+ }
+ // Snapshot before BatchAddMsg's display conversion and deferred extension
+@@ -231,13 +262,13 @@
+                 id content=CSMessageActionNativeObject(wrap,@"m_nsContent");
+                 NSUInteger bytes=[content isKindOfClass:NSString.class]?MIN([content length],65537UL)*sizeof(unichar):0;
+                 if(events.count>=128 || bytes>524288UL-snapshotBytes){continue;}
+-                id envelope=CSAutomationSnapshotRawEnvelope(wrap);
++                id envelope=CSAutomationSnapshotRawEnvelope(wrap,epoch);
+                 // Copy on the native caller's context; the strict parser keeps
+                 // its original main-thread boundary after native acceptance.
+                 if(envelope){snapshotBytes+=bytes;[events addObject:@{@"xmlEnvelope":envelope}];}
+             }else if(type==49 && CSMessageNativeUnsigned(wrap,@"m_uiAppMsgInnerType")==62){
+                 if(events.count>=128){continue;}
+-                NSArray *pats=CSAutomationPatsInMessage(@"",wrap,YES);NSUInteger count=MIN(pats.count,128-events.count);
++                NSArray *pats=CSAutomationPatsInMessage(@"",wrap,YES,epoch);NSUInteger count=MIN(pats.count,128-events.count);
+                 [events addObjectsFromArray:[pats subarrayWithRange:NSMakeRange(0,count)]];
+             }
+         }
+@@ -246,7 +277,9 @@
+ }
+ static void CSAutomationPublishDecodedPats(NSArray<NSDictionary *> *events,NSUInteger epoch) {
+     if(!events.count)return;
++    CSAutomationIngressDiag(@"hook.batch.enqueue",0,epoch,events.count);
+     dispatch_async(dispatch_get_main_queue(),^{
++        CSAutomationIngressDiag(@"hook.batch.main",0,epoch,events.count);
+         if(epoch!=CSBackupAccountEpoch() || CSBackupAccountIsSuspended())return;
+         @try {
+             CSAutomationManager *manager=CSAutomationManager.sharedManager;
+@@ -259,18 +292,21 @@
+                 if(epoch!=CSBackupAccountEpoch() || CSBackupAccountIsSuspended())return;
+                 NSDictionary *event=entry;
+                 if(entry[@"xmlEnvelope"]){
+-                    event=CSAutomationPatFromXMLMessage(entry[@"xmlEnvelope"],@"");
++                    event=CSAutomationIngressParseRaw(entry[@"xmlEnvelope"],@"",epoch);
++                    CSAutomationIngressXMLSnapshot *cached=entry[@"xmlEnvelope"];
++                    CSAutomationIngressDiag(event?@"hook.batch.raw.accept":@"hook.batch.raw.reject",cached.m_n64MesSvrID,epoch,0);
+                 }
+                 if(!event)continue;
+-                if(!supportsRevoke){continue;}
++                if(!supportsRevoke){CSAutomationIngressDiag(@"hook.batch.revoke.unavailable",0,epoch,0);continue;}
+                 id pat=event[@"pat"];NSString *conversation=event[@"conversation"];
+                 if(![conversation isKindOfClass:NSString.class] || !conversation.length || !CSMessageNativeSupports(pat,@"serverId",@"q",@[]))continue;
+-                long long server=[CSMessageNativeInvoke(pat,@"serverId",@[]) longLongValue];if(server<=0)continue;
++                long long server=[CSMessageNativeInvoke(pat,@"serverId",@[]) longLongValue];if(server<=0){CSAutomationIngressDiag(@"hook.batch.identity.reject",server,epoch,0);continue;}
+                 if(CSMessageNativeInvoke(service,@"GetRevokeMsgBySvrId:",@[@(server)])){
+-                    continue;
++                    CSAutomationIngressDiag(@"hook.batch.revoked",server,epoch,0);continue;
+                 }
+                 if(epoch!=CSBackupAccountEpoch() || CSBackupAccountIsSuspended())return;
+-                [manager receivePat:pat conversation:conversation epoch:epoch];
++                CSAutomationIngressDiag(@"hook.batch.deliver",server,epoch,[conversation hasSuffix:@"@chatroom"]?1:0);
++                CSAutomationIngressDeliverPat(manager,pat,conversation,epoch);
+             }
+         } @catch(__unused NSException *exception) {}
+     });
+@@ -281,8 +317,11 @@
+         SEL selector=NSSelectorFromString(@"BatchAddMsg:ShowPush:");__block IMP original=NULL;
+         IMP replacement=imp_implementationWithBlock(^BOOL(id service,BOOL fromPush,BOOL showPush){
+             NSUInteger epoch=CSBackupAccountEpoch();
++            CSAutomationIngressDiag(@"hook.batch.enter",0,epoch,(fromPush?1:0)|(showPush?2:0));
+             NSArray *events=CSAutomationSnapshotDecodedBatch(service,epoch);
++            CSAutomationIngressDiag(@"hook.batch.native.before",0,epoch,events.count);
+             BOOL accepted=((BOOL(*)(id,SEL,BOOL,BOOL))original)(service,selector,fromPush,showPush);
++            CSAutomationIngressDiag(@"hook.batch.native.return",0,epoch,accepted?1:0);
+             // YES proves native batch acceptance only. It does not establish
+             // delivery or a server response belonging to our local request.
+             if(accepted)CSAutomationPublishDecodedPats(events,epoch);
+@@ -303,16 +342,21 @@
+         SEL selector=NSSelectorFromString(@"addPatWrap:toChat:newXMLMessageWrap:index:");__block IMP original=NULL;
+         IMP replacement=imp_implementationWithBlock(^unsigned int(id service,id pat,id conversation,id newXML,unsigned long long *index){
+             NSUInteger epoch=CSBackupAccountEpoch();
++            CSAutomationIngressDiag(@"hook.direct.native.before",0,epoch,(pat?1:0)|(newXML?2:0));
+             unsigned int localID=((unsigned int(*)(id,SEL,id,id,id,unsigned long long *))original)(service,selector,pat,conversation,newXML,index);
++            CSAutomationIngressDiag(@"hook.direct.native.return",0,epoch,(localID?1:0)|(newXML?2:0)|(pat?4:0));
+             // Native outgoing sends pass nil XML. The outer message can merge
+             // several pats; the event adapter uses each PatWrap.serverId.
+             if(localID && newXML && pat && [conversation isKindOfClass:NSString.class]){
+                 dispatch_async(dispatch_get_main_queue(),^{
++                    CSAutomationIngressDiag(@"hook.direct.main",0,epoch,0);
+                     if(epoch!=CSBackupAccountEpoch() || CSBackupAccountIsSuspended())return;
+                     @try {
++                        long long server=0;
+                         if(!CSMessageNativeSupports(pat,@"serverId",@"q",@[]) ||
+-                           [CSMessageNativeInvoke(pat,@"serverId",@[]) longLongValue]<=0)return;
+-                        [CSAutomationManager.sharedManager receivePat:pat conversation:conversation epoch:epoch];
++                           (server=[CSMessageNativeInvoke(pat,@"serverId",@[]) longLongValue])<=0){CSAutomationIngressDiag(@"hook.direct.identity.reject",server,epoch,0);return;}
++                        CSAutomationIngressDiag(@"hook.direct.deliver",server,epoch,[conversation hasSuffix:@"@chatroom"]?1:0);
++                        CSAutomationIngressDeliverPat(CSAutomationManager.sharedManager,pat,conversation,epoch);
+                     } @catch(__unused NSException *exception) {}
+                 });
+             }
+--- a/Hooks/CloseFriendCallReplyHooks.xm
++++ b/Hooks/CloseFriendCallReplyHooks.xm
+@@ -1,12 +1,28 @@
+ #import "../Controllers/CSCloseFriendCallReply.h"
+ #import "../Controllers/CSCloseFriendBridge.h"
++#import "../Controllers/CSAutomationReplyDiagnostics.h"
++#import "../Controllers/CSBackupBootstrap.h"
+ %ctor {dispatch_async(dispatch_get_main_queue(),^{
+     for(NSString *name in @[@"OnSendMessageSuccess:",@"OnSendMessageFail:"]) {
++        BOOL success=[name isEqual:@"OnSendMessageSuccess:"];
+         __block IMP original=NULL;SEL selector=NSSelectorFromString(name);
+         IMP replacement=imp_implementationWithBlock(^(id manager,id message){
+-            ((void(*)(id,SEL,id))original)(manager,selector,message);
++            id diagnosticToken=nil;
++            @try { diagnosticToken=CSAutoDiagReplyCallbackBegin(message,success,CSBackupAccountEpoch()); }
++            @catch (__unused NSException *diagnosticException) {}
++            @try { ((void(*)(id,SEL,id))original)(manager,selector,message); }
++            @catch (__unused NSException *originalException) {
++                @try { CSAutoDiagReplyCallbackEnd(diagnosticToken,NO); }
++                @catch (__unused NSException *diagnosticException) {}
++                @throw;
++            }
++            @try { CSAutoDiagReplyCallbackEnd(diagnosticToken,YES); }
++            @catch (__unused NSException *diagnosticException) {}
+             CSCFCallReplyMessageDidChange(message);
+         });
+-        if(!CSCloseFriendInstallHook(@"CMessageMgr",name,replacement,&original,"v@:@"))imp_removeBlock(replacement);
++        BOOL installed=CSCloseFriendInstallHook(@"CMessageMgr",name,replacement,&original,"v@:@");
++        @try { CSAutoDiagReplyHookState(success,installed); }
++        @catch (__unused NSException *diagnosticException) {}
++        if(!installed)imp_removeBlock(replacement);
+     }
+ });}
+--- a/control
++++ b/control
+@@ -1,6 +1,6 @@
+ Package: com.wechat.improve
+ Name: WeChatImprove
+-Version: 2.5-13
++Version: 2.5-13+online.2
+ Architecture: iphoneos-arm
+ Description: 微信插件，支持聊天按钮布局自定义等。
+ Maintainer: 再也不会
