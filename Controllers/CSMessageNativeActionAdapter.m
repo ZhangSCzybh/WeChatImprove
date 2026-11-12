@@ -14,7 +14,7 @@ static BOOL CSNativeTypeMatches(const char *actual, NSString *expected) {
 }
 // MMServiceCenter returns MMServiceWrapper:NSProxy unless the service opts into raw
 // access. Its forwardInvocation: installs the service's account context, so do not
-// unwrap it for invocation or invoke the service IMP directly. Trust only wrappers obtained from
+// unwrap it or invoke the service IMP directly. Trust only wrappers obtained from
 // our service lookup, and obtain ABI evidence from the requested concrete class.
 static const void *CSNativeServiceClassKey=&CSNativeServiceClassKey;
 static BOOL CSNativeClassDescendsFrom(Class cls, Class ancestor) {
@@ -33,21 +33,6 @@ static Method CSNativeMethod(id receiver, SEL selector) {
         return serviceClass ? class_getInstanceMethod(serviceClass,selector) : NULL;
     }
     return class_getInstanceMethod(object_getClass(receiver),selector);
-}
-id CSMessageNativeServiceIdentity(id receiver,NSString *className) {
-    Class expected=NSClassFromString(className);if(!receiver || !expected)return nil;
-    if(!CSNativeIsServiceWrapper(receiver))return CSNativeClassDescendsFrom(object_getClass(receiver),expected)?receiver:nil;
-    // Only serviceNamed: establishes this registration. Do not trust an arbitrary
-    // NSProxy or a wrapper registered for a different service/account lookup.
-    if(objc_getAssociatedObject(receiver,CSNativeServiceClassKey)!=expected)return nil;
-    Ivar ivar=class_getInstanceVariable(object_getClass(receiver),"m_service");
-    if(!ivar || CSNativeType(ivar_getTypeEncoding(ivar))[0]!='@')return nil;
-    ptrdiff_t offset=ivar_getOffset(ivar);size_t length=class_getInstanceSize(object_getClass(receiver));
-    if(offset<0 || (size_t)offset>length || sizeof(id)>length-(size_t)offset)return nil;
-    // 8.0.80 MMServiceWrapper.unsafeUnwrap is this same read. No getter or
-    // forwarding runs here; the target is used only for identity and ivars.
-    id target=object_getIvar(receiver,ivar);
-    return CSNativeClassDescendsFrom(object_getClass(target),expected)?target:nil;
 }
 // Only the evidenced CMessageWrap -> type-extension forwarding path is eligible.
 // Never trust a synthetic method signature or follow an arbitrary forwarding chain.

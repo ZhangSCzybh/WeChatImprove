@@ -5,7 +5,6 @@
 #import "CSAutomationNativeAdapter.h"
 #import "CSBackgroundSyncBudget.h"
 #import "CSAINativeSyncObserver.h"
-#import "CSAutomationNativeSync.h"
 #import "CSMessageSendAdapter.h"
 #import "CSBackupBootstrap.h"
 #import "CSAuthorizationManager.h"
@@ -163,29 +162,6 @@ static NSString *AdmissionKey(NSString *action,NSString *identifier) {return [NS
     return configuration==self.configuration && [self backgroundSyncDemand];
     } @catch(__unused NSException *exception) {return NO;}
 }
-- (void)performNativeSyncForService:(id)service epoch:(NSUInteger)epoch request:(void (^)(id receiver))request {
-    if(!NSThread.isMainThread || !service || !request || epoch!=self.accountEpoch)return;
-    NSDictionary *configuration=self.configuration;NSString *account=self.accountID;
-    NSUInteger generation=self.configurationGeneration;
-    @try {
-        if(![self backgroundSyncEligible])return;
-        id current=[self.environment serviceNamed:@"NewSyncService"];
-        if((current!=service && CSMessageNativeServiceIdentity(current,@"NewSyncService")!=service) || configuration!=self.configuration || generation!=self.configurationGeneration ||
-           epoch!=self.accountEpoch || ![account isEqual:self.accountID])return;
-        if(![self backgroundSyncEligible])return;
-        current=[self.environment serviceNamed:@"NewSyncService"];
-        if((current!=service && CSMessageNativeServiceIdentity(current,@"NewSyncService")!=service) || configuration!=self.configuration || generation!=self.configurationGeneration ||
-           epoch!=self.accountEpoch || ![account isEqual:self.accountID])return;
-        // Native/account getters can reenter configuration or lifecycle handling.
-        if(configuration!=self.configuration || generation!=self.configurationGeneration || epoch!=self.accountEpoch ||
-           ![account isEqual:self.accountID] || ![self backgroundSyncDemand])return;
-        CSBackupPerformAtAccountEpoch(epoch,^{
-            // The hook's self is the underlying service, whereas current is
-            // usually MMServiceWrapper. Keep its account-context forwarding.
-            @try {request(current);} @catch(__unused NSException *exception) {}
-        });
-    } @catch(__unused NSException *exception) {}
-}
 - (void)stopBackgroundSync {
     self.backgroundSyncGeneration++;if(self.backgroundSyncTimer){dispatch_source_cancel(self.backgroundSyncTimer);self.backgroundSyncTimer=nil;}
 }
@@ -204,16 +180,6 @@ static NSString *AdmissionKey(NSString *action,NSString *identifier) {return [NS
         BOOL demand=[self backgroundSyncDemand];
         if(wakeGeneration!=self.backgroundSyncGeneration)return;
         if(!demand){[self stopBackgroundSync];return;}
-        CSAutomationInstallNativeSync();
-        if(CSAutomationNativeSyncAvailable()){
-            id service=nil;
-            @try {service=[self.environment serviceNamed:@"NewSyncService"];} @catch(__unused NSException *exception) {}
-            if(CSAutomationNativeSyncCanWake(service)){
-                [self stopBackgroundSync];
-                CSAutomationWakePendingNativeSync(service,self.accountEpoch);
-                return;
-            }
-        }
         if(self.backgroundSyncTimer)return;
         NSUInteger epoch=self.accountEpoch;
         NSTimeInterval delay=[CSBackgroundSyncBudget.sharedBudget nextDelayForEpoch:epoch minimumInterval:CSAutomationPatSyncInterval];
@@ -226,15 +192,6 @@ static NSString *AdmissionKey(NSString *action,NSString *identifier) {return [NS
 }
 - (void)backgroundSyncTick {
     if(!NSThread.isMainThread)return;
-    if(CSAutomationNativeSyncAvailable()){
-        @try {
-            id service=[self.environment serviceNamed:@"NewSyncService"];
-            if(CSAutomationNativeSyncCanWake(service)){
-                [self stopBackgroundSync];
-                CSAutomationWakePendingNativeSync(service,self.accountEpoch);return;
-            }
-        } @catch(__unused NSException *exception) {}
-    }
     NSUInteger wakeGeneration=self.backgroundSyncGeneration;
     BOOL demand=[self backgroundSyncDemand];
     if(wakeGeneration!=self.backgroundSyncGeneration)return;

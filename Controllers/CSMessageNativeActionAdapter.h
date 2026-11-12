@@ -3,9 +3,6 @@ NS_ASSUME_NONNULL_BEGIN
 // A checked concrete ABI boundary shared by production adapters and invocation-recording host tests.
 FOUNDATION_EXPORT BOOL CSMessageNativeSupports(id _Nullable receiver, NSString *selector, NSString *resultType, NSArray<NSString *> *argumentTypes);
 FOUNDATION_EXPORT id _Nullable CSMessageNativeInvoke(id receiver, NSString *selector, NSArray *arguments);
-// Read-only identity/state inspection of a concrete service or a registered
-// MMServiceWrapper. Invoke methods on the original receiver to retain context.
-FOUNDATION_EXPORT id _Nullable CSMessageNativeServiceIdentity(id _Nullable receiver, NSString *className);
 FOUNDATION_EXPORT NSString * _Nullable CSMessageNativeAppDataPath(CSMessageActionContext *context);
 FOUNDATION_EXPORT id _Nullable CSMessageActionNativeObject(id _Nullable receiver, NSString *selector);
 FOUNDATION_EXPORT unsigned long long CSMessageNativeUnsigned(id _Nullable receiver, NSString *selector);

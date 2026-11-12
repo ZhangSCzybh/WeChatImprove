@@ -10,7 +10,6 @@
 #import "CSGroupChatNativeAdapter.h"
 #import "CSBackgroundRunManager.h"
 #import "CSAINativeSyncObserver.h"
-#import "CSAutomationNativeSync.h"
 #import <objc/runtime.h>
 #include <sys/file.h>
 #include <fcntl.h>
@@ -45,19 +44,6 @@ NSNotificationName const CSBackgroundRunStateChangedNotification=@"background-wo
 - (BOOL)backgroundAudioActive{return NO;}
 @end
 void CSAIObserveBackgroundSyncRequest(NSUInteger expectedEpoch,void (^request)(void)){(void)expectedEpoch;if(request)request();}
-// These manager fixtures exercise the compatibility pull. The native hook
-// fixture links the real event coordinator and checks its independent contract.
-#ifndef CS_AUTOMATION_REAL_NATIVE_SYNC
-static BOOL nativeSyncAvailable;
-static NSUInteger nativeSyncWakes;
-void CSAutomationInstallNativeSync(void){}
-BOOL CSAutomationNativeSyncAvailable(void){return nativeSyncAvailable;}
-BOOL CSAutomationNativeSyncCanWake(id receiver){return nativeSyncAvailable && receiver;}
-void CSAutomationWakePendingNativeSync(id service,NSUInteger expectedEpoch){(void)service;(void)expectedEpoch;nativeSyncWakes++;}
-#endif
-#if !defined(CS_AUTOMATION_REAL_SERVICE_IDENTITY) && !defined(CS_AUTOMATION_REAL_EVENT_ADAPTER)
-id CSMessageNativeServiceIdentity(id receiver,NSString *className){(void)receiver;(void)className;return nil;}
-#endif
 @implementation CSAuthorizationManager
 + (instancetype)sharedManager{static id value;static dispatch_once_t once;dispatch_once(&once,^{value=[self new];});return value;}
 - (BOOL)isAuthorized{return authorized;}
@@ -83,13 +69,11 @@ BOOL CSBackupPerformAtAccountEpoch(NSUInteger expected,void(^handoff)(void)){if(
 @implementation AutomationMessages
 - (id)GetMsg:(NSString *)name LocalID:(unsigned int)local{(void)name;(void)local;return updatedQuoteSource;}
 @end
-#ifndef CS_AUTOMATION_REAL_NATIVE_ENVIRONMENT
 @implementation CSMessageNativeEnvironment
 - (NSString *)currentAccountID{return accountAvailable?account:nil;}
 - (id)serviceNamed:(NSString *)name{return [name isEqual:@"CContactMgr"]?[AutomationContacts new]:[AutomationMessages new];}
 - (id)controllerForCell:(id)cell{(void)cell;return nil;}
 @end
-#endif
 CSGroupRowCategory CSGroupCategoryForContact(id contact){return contact?CSGroupRowCategoryPrivate:CSGroupRowCategoryUnknown;}
 BOOL CSGroupChatRoomUnavailable(NSString *room){(void)room;return !contactsAvailable;}
 BOOL CSGroupChatIsMember(NSString *room,NSString *member){(void)room;(void)member;return contactsAvailable;}

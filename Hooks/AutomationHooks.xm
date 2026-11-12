@@ -1,7 +1,6 @@
 #import "../Controllers/CSAutomationManager.h"
 #import "../Controllers/CSAutomationEventAdapter.h"
 #import "../Controllers/CSAutomationNativeAdapter.h"
-#import "../Controllers/CSAutomationNativeSync.h"
 #import "../Controllers/CSBackupBootstrap.h"
 #import <objc/runtime.h>
 #import <substrate.h>
@@ -324,7 +323,6 @@ static void CSAutomationInstallIngressHooks(void) {
 }
 static void CSAutomationBootstrapIngress(void) {
     if(!NSThread.isMainThread)return;
-    CSAutomationInstallNativeSync();
     static BOOL bootstrapped=NO;if(bootstrapped)return;bootstrapped=YES;
     // Install read-only ingress before backup/config readiness. The manager
     // retains raw events until ready and still owns all send authorization.
