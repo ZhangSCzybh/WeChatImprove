@@ -10,6 +10,7 @@
 #import "CSGroupChatNativeAdapter.h"
 #import "CSBackgroundRunManager.h"
 #import "CSAINativeSyncObserver.h"
+#import "CSAutomationNativeSync.h"
 #import <objc/runtime.h>
 #include <sys/file.h>
 #include <fcntl.h>
@@ -44,6 +45,13 @@ NSNotificationName const CSBackgroundRunStateChangedNotification=@"background-wo
 - (BOOL)backgroundAudioActive{return NO;}
 @end
 void CSAIObserveBackgroundSyncRequest(NSUInteger expectedEpoch,void (^request)(void)){(void)expectedEpoch;if(request)request();}
+// These manager fixtures exercise the compatibility pull. The native hook
+// fixture links the real event coordinator and checks its independent contract.
+static BOOL nativeSyncAvailable;
+static NSUInteger nativeSyncWakes;
+void CSAutomationInstallNativeSync(void){}
+BOOL CSAutomationNativeSyncAvailable(void){return nativeSyncAvailable;}
+void CSAutomationWakePendingNativeSync(id service,NSUInteger expectedEpoch){(void)service;(void)expectedEpoch;nativeSyncWakes++;}
 @implementation CSAuthorizationManager
 + (instancetype)sharedManager{static id value;static dispatch_once_t once;dispatch_once(&once,^{value=[self new];});return value;}
 - (BOOL)isAuthorized{return authorized;}

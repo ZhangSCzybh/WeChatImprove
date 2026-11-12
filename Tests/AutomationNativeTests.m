@@ -23,6 +23,9 @@ static BOOL xmlParserThrows;
 #define CHECK(c) do {checks++;if(!(c)){fprintf(stderr,"FAIL %d: %s\n",__LINE__,#c);exit(1);}}while(0)
 void CSAutomationTestInstallIngressHooks(void);
 void CSAutomationTestBootstrapIngress(void);
+// This fixture covers message/pat ingress and send hooks; sync wake hooks have
+// their own runtime fixture in AutomationNativeSyncTests.m.
+void CSAutomationInstallNativeSync(void){}
 NSUInteger CSBackupAccountEpoch(void){return epoch;}
 BOOL CSBackupAccountIsSuspended(void){return suspended;}
 BOOL CSBackupPerformAtAccountEpoch(NSUInteger expected,void (^handoff)(void)){

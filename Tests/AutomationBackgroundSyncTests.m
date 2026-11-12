@@ -46,6 +46,7 @@
 @interface TestSyncEnvironment : CSMessageNativeEnvironment
 @property(nonatomic,strong) TestNewSyncService *sync;
 @property(nonatomic) BOOL throwsAccount;
+@property(nonatomic,copy) dispatch_block_t duringService;
 @end
 @implementation TestSyncEnvironment
 - (NSString *)currentAccountID {
@@ -53,6 +54,7 @@
     return [super currentAccountID];
 }
 - (id)serviceNamed:(NSString *)name {
+    dispatch_block_t action=self.duringService;self.duringService=nil;if(action)action();
     return [name isEqual:@"NewSyncService"]?self.sync:[super serviceNamed:name];
 }
 @end
@@ -272,6 +274,45 @@ int main(int argc,const char **argv) {@autoreleasepool {
     CHECK([manager valueForKey:@"backgroundSyncTimer"]==nil);
     [manager backgroundSyncTick];CHECK(service.requests==previous+1);
     printf("Native request foreground reentry: completed request keeps cooldown, stopped timer stays stopped\n");
+
+    // The validated host uses native events, so even a due compatibility tick
+    // must not issue a fetch or recreate the old 10-second timer.
+    nativeSyncAvailable=YES;
+    [NSNotificationCenter.defaultCenter postNotificationName:UIApplicationDidEnterBackgroundNotification object:nil];
+    [manager refreshBackgroundSync];previous=service.requests;
+    CHECK(nativeSyncWakes>0 && [manager valueForKey:@"backgroundSyncTimer"]==nil);
+    SyncAdvance(50);[manager backgroundSyncTick];
+    CHECK(service.requests==previous && [manager valueForKey:@"backgroundSyncTimer"]==nil);
+    __block NSUInteger immediate=0;
+    void (^immediateRequest)(void)=^{immediate++;};
+    // A native notification does not wait for the fallback budget, including
+    // immediately after a different caller reserved its 45-second interval.
+    CHECK([CSBackgroundSyncBudget.sharedBudget performForEpoch:epoch request:^{}]);
+    [manager performNativeSyncForService:service epoch:epoch request:immediateRequest];
+    CHECK(immediate==1 && !protectedAvailable);
+    [manager performNativeSyncForService:[TestNewSyncService new] epoch:epoch request:immediateRequest];
+    [manager performNativeSyncForService:service epoch:epoch-1 request:immediateRequest];
+    CHECK(immediate==1);
+    authorized=NO;[manager performNativeSyncForService:service epoch:epoch request:immediateRequest];authorized=YES;
+    accountAvailable=NO;[manager performNativeSyncForService:service epoch:epoch request:immediateRequest];accountAvailable=YES;
+    suspended=YES;[manager performNativeSyncForService:service epoch:epoch request:immediateRequest];suspended=NO;
+    CHECK(immediate==1);
+    environment.duringService=^{[NSNotificationCenter.defaultCenter postNotificationName:UIApplicationWillEnterForegroundNotification object:nil];};
+    [manager performNativeSyncForService:service epoch:epoch request:immediateRequest];CHECK(immediate==1);
+    [NSNotificationCenter.defaultCenter postNotificationName:UIApplicationDidEnterBackgroundNotification object:nil];
+    environment.duringService=^{epoch++;[manager refresh];};
+    [manager performNativeSyncForService:service epoch:epoch request:immediateRequest];CHECK(immediate==1);
+    Wait(^BOOL{return manager.ready;});
+    SyncConfigure(manager,YES,YES,0);
+    pulledEvent=Event(81003,YES,NO,NO);textBefore=sendCount;patBefore=patCount;zeroDelayTime=uptime;
+    [manager performNativeSyncForService:service epoch:epoch request:^{
+        immediate++;[manager receivePat:pulledEvent conversation:@"room@chatroom" epoch:epoch];
+    }];
+    Wait(^BOOL{return sendCount==textBefore+1 && patCount==patBefore+1;});
+    CHECK(immediate==2 && uptime==zeroDelayTime && [manager valueForKey:@"backgroundSyncTimer"]==nil);
+    [manager receivePat:pulledEvent conversation:@"room@chatroom" epoch:epoch];Drain();
+    CHECK(sendCount==textBefore+1 && patCount==patBefore+1);
+    printf("Native event path: no polling timer/budget delay, account/service/config guards, zero-delay durable dual action and dedup\n");
 
     CHECK(!protectedAvailable && UIApplication.sharedApplication.applicationState==UIApplicationStateBackground);
     [manager stopBackgroundSync];[NSNotificationCenter.defaultCenter removeObserver:manager];
