@@ -1,0 +1,31 @@
+{
+  "uuid": "7E4A8171-5ACC-3A72-A76A-3ACE52D3D895",
+  "binary": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-crash-141902-g68h12mb/WeChat",
+  "sha256": "e484889f7e32adce054e6b19bef373e2d1c3eb6984bc01176bbd40906373f317",
+  "records": [
+    {
+      "file": "BgFg_response_decoder.asm",
+      "start": "0x105461ab0",
+      "end": "0x105461b68",
+      "method": "BgFg_response_decoder",
+      "block": "0x11c2fde68",
+      "flags": "0x50000000",
+      "descriptor": "0x11c2fde48",
+      "descriptor_size": 32,
+      "signature": "i24@?0@\"NSData\"8^i16",
+      "sha256": "8caea4fdc542d769e3a7207c5e72e72f31f4b2b73e9cc31f7e42874276f43380"
+    },
+    {
+      "file": "BgFg_response_handler.asm",
+      "start": "0x105461b68",
+      "end": "0x105461b7c",
+      "method": "BgFg_response_handler",
+      "block": "0x11c2fdea8",
+      "flags": "0x50000000",
+      "descriptor": "0x11c2fde88",
+      "descriptor_size": 32,
+      "signature": "v24@?0@\"NSData\"8i16i20",
+      "sha256": "f2c66b61a9f6bf3b49e202f8756a1569ef4a1576591b0d8cddb838e644001a86"
+    }
+  ]
+}

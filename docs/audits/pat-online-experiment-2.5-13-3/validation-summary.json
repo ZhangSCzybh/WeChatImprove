@@ -1,0 +1,117 @@
+{
+  "version": "2.5-13+online.3",
+  "baseline": "3f0d383a4d1e0da49473bae67cf3831531430cb5",
+  "network": {
+    "verified_at_utc": "2026-11-12T11:41:36.078189+00:00",
+    "source_root": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/audits/2.5-13-online.3/source",
+    "command": "bash Tests/verify-automation-network-activity.sh --ios",
+    "exit_code": 0,
+    "checks_passed": 2771,
+    "host": "macOS Foundation + real production Objective-C++ module; UIKit/application/eligibility/native originals/hook acquisition fixtures",
+    "production_architectures_compiled": [
+      "arm64-apple-ios15.0",
+      "arm64e-apple-ios15.0"
+    ],
+    "strict_warnings": [
+      "-Wall",
+      "-Wextra",
+      "-Werror"
+    ],
+    "sha256": {
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/audits/2.5-13-online.3/source/Controllers/CSAutomationNetworkActivity.mm": "03a71d855c247152165b61a8c534b508d326ae0bb6dd7c580c9a5ed8ce423f6d",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/audits/2.5-13-online.3/source/Controllers/CSAutomationNetworkActivity.h": "7ad849618cdec9185755456175702d72415a76b2fab65217e5c882679eb4a729",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/audits/2.5-13-online.3/source/Tests/AutomationNetworkActivityTests.mm": "a8e282b7b292d61f93a094598db1632c75e85f20c1658c60b990513474c27769",
+      "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/audits/2.5-13-online.3/source/Tests/verify-automation-network-activity.sh": "5a13409177cb722d5154fbc96067b3169e696085abc72ea7a5e3c38698dccf69"
+    },
+    "coverage": [
+      "Real Mach-O UUID and exact code/callsite byte validation; malformed images fail closed before hook acquisition",
+      "Two independent native C++ channels, complete installation gate, retry and idempotence",
+      "Exact background source/default-context/main-thread/eligibility gates; native foreground and other contexts remain transparent",
+      "Native false ownership, independent channel restoration, natural main/worker takeover and context-reference preservation",
+      "Eligibility/native/original/diagnostic reentry with Objective-C and C++ exception isolation and native exception identity",
+      "Deterministic deferred synthetic commit after worker true/false; main-queue repair produces latest natural intent",
+      "Multiple collision coalescing; ordinary traffic and drained settled queues emit no extra repair calls",
+      "UIKit Active natural-foreground compensation, explicit Foreground fence, and Foreground during repair eligibility",
+      "Nested Refresh(NO) during repair synthetic emission releases after the outer native stack",
+      "Account epoch change still releases process-level transport override; newer natural true owns the process-level repair"
+    ],
+    "limitations": [
+      "Offline host fixtures and strict iOS object compilation do not prove execution on a device, account availability, or backend delivery.",
+      "No full project build, package signing, device installation, database access or service restart performed by this validation task.",
+      "Native target fingerprint is pinned; other UUID/code images intentionally remain unmodified."
+    ],
+    "log": "/Users/zhangshichao/Documents/Workspace/WeChatImprove-local-archive/audits/2.5-13-online.3/test-results/automation-network-activity.log"
+  },
+  "online": {
+    "checks": 8465,
+    "rejection_processes": 22,
+    "rejection_checks": 960,
+    "result": "passed"
+  },
+  "diagnostics": {
+    "recorder_checks": 16322,
+    "reply_checks": 639,
+    "result": "passed"
+  },
+  "build": {
+    "metadata": {
+      "Package": "com.wechat.improve",
+      "Version": "2.5-13+online.3",
+      "Architecture": "iphoneos-arm64"
+    },
+    "delivery": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/packages/2.5-13-online-experiment-3",
+    "slices": {
+      "arm64": {
+        "uuid": "55EE16B2-7D35-3C55-8903-73B1ED919CEE",
+        "min_ios": "15.0",
+        "rpaths": [
+          "/var/jb/Library/Frameworks",
+          "/var/jb/usr/lib",
+          "@loader_path/.jbroot/Library/Frameworks",
+          "@loader_path/.jbroot/usr/lib"
+        ]
+      },
+      "arm64e": {
+        "uuid": "1C2FFEE4-F0E8-3323-BF84-068AA219483D",
+        "min_ios": "15.0",
+        "rpaths": [
+          "/var/jb/Library/Frameworks",
+          "/var/jb/usr/lib",
+          "@loader_path/.jbroot/Library/Frameworks",
+          "@loader_path/.jbroot/usr/lib"
+        ]
+      }
+    },
+    "sha256": {
+      "com.wechat.improve_2.5-13+online.3_iphoneos-arm64.deb": "4bf9d6bee3cb8d96d64462336aef48d9f943bfd28cf7fae208732bb9ab0f3f8d",
+      "symbols.zip": "806608d5e7de8618fafaa0e2df3e74d92d4a30cbfdf6165acf38d2350707852f"
+    },
+    "historical_files_unchanged": 90,
+    "frozen_inputs_match": 455,
+    "changed_production_files": [
+      "Controllers/CSAutomationDiagnostics.h",
+      "Controllers/CSAutomationDiagnostics.m",
+      "Controllers/CSAutomationEventAdapter.m",
+      "Controllers/CSAutomationManager.h",
+      "Controllers/CSAutomationManager.m",
+      "Controllers/CSAutomationNativeDiagnostics.h",
+      "Controllers/CSAutomationNativeDiagnostics.m",
+      "Controllers/CSAutomationNativeSync.m",
+      "Controllers/CSAutomationNetworkActivity.h",
+      "Controllers/CSAutomationNetworkActivity.mm",
+      "Controllers/CSAutomationOnlineExperiment.h",
+      "Controllers/CSAutomationOnlineExperiment.m",
+      "Controllers/CSAutomationReplyDiagnostics.h",
+      "Controllers/CSAutomationSettingsViewController.m",
+      "Controllers/CSGroupChatNativeAdapter.m",
+      "Controllers/CSReleaseNotesViewController.m",
+      "Headers/CSUserInfoHelper.h",
+      "Hooks/AutomationHooks.xm",
+      "Hooks/CloseFriendCallReplyHooks.xm",
+      "Makefile",
+      "control"
+    ],
+    "test_only_stages_absent": true
+  },
+  "device_status": "Not yet tested. Earlier online.1 and online.2 were intermittent. Offline checks do not establish phone delivery latency."
+}

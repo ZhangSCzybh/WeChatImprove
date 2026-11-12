@@ -1,0 +1,12 @@
+[
+  {
+    "file": "NewSyncService_logBgFgResponseWithErrType_errCode_.asm",
+    "start": "0x10546123c",
+    "end": "0x1054612d8",
+    "method": "NewSyncService_logBgFgResponseWithErrType_errCode_",
+    "name": "logBgFgResponseWithErrType:errCode:",
+    "types": "v24@0:8i16i20",
+    "imp": "0x10546123c",
+    "entry": "0x117081ff8"
+  }
+]

@@ -1,0 +1,3 @@
+Automation diagnostics: 16322 checks passed; bounded capture, immutable anonymous export, malformed-event isolation, stable per-capture correlation and thread-local contexts
+Automation reply diagnostics: 639 checks passed; real ABI dispatch, bounded aliases, rebuilt wrappers, generation/epoch isolation, cached callback tokens and anonymous export
+Automation diagnostics iOS: arm64 + arm64e source objects compiled

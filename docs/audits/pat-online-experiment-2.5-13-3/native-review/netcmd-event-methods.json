@@ -1,0 +1,178 @@
+[
+  {
+    "name": "NetCmdLongLinkEvent",
+    "address": "0x11ef2c248",
+    "super": "0x11ef2c298",
+    "methods": [
+      {
+        "name": "isSendOnlyTask",
+        "types": "B16@0:8",
+        "imp": "0x10532234c",
+        "entry": "0x1174353a0"
+      },
+      {
+        "name": "decodeResponseData:errorCode:",
+        "types": "i32@0:8@16^i24",
+        "imp": "0x105322354",
+        "entry": "0x1174353ac"
+      },
+      {
+        "name": "setResponseData:errType:errCode:",
+        "types": "v32@0:8@16i24i28",
+        "imp": "0x105322450",
+        "entry": "0x1174353b8"
+      },
+      {
+        "name": "NotifyFromPrtl:MessageInfo:",
+        "types": "v28@0:8I16@20",
+        "imp": "0x1053224d4",
+        "entry": "0x1174353c4"
+      },
+      {
+        "name": "responseDecoder",
+        "types": "@?16@0:8",
+        "imp": "0x105322668",
+        "entry": "0x1174353d0"
+      },
+      {
+        "name": "setResponseDecoder:",
+        "types": "v24@0:8@?16",
+        "imp": "0x105322678",
+        "entry": "0x1174353dc"
+      },
+      {
+        "name": "responseHandler",
+        "types": "@?16@0:8",
+        "imp": "0x105322684",
+        "entry": "0x1174353e8"
+      },
+      {
+        "name": "setResponseHandler:",
+        "types": "v24@0:8@?16",
+        "imp": "0x105322694",
+        "entry": "0x1174353f4"
+      },
+      {
+        "name": "responseData",
+        "types": "@16@0:8",
+        "imp": "0x1053226a0",
+        "entry": "0x117435400"
+      },
+      {
+        "name": "setResponseData:",
+        "types": "v24@0:8@16",
+        "imp": "0x1053226b0",
+        "entry": "0x11743540c"
+      },
+      {
+        "name": "responseErrType",
+        "types": "i16@0:8",
+        "imp": "0x1053226c4",
+        "entry": "0x117435418"
+      },
+      {
+        "name": "setResponseErrType:",
+        "types": "v20@0:8i16",
+        "imp": "0x1053226d4",
+        "entry": "0x117435424"
+      },
+      {
+        "name": "responseErrCode",
+        "types": "i16@0:8",
+        "imp": "0x1053226e4",
+        "entry": "0x117435430"
+      },
+      {
+        "name": "setResponseErrCode:",
+        "types": "v20@0:8i16",
+        "imp": "0x1053226f4",
+        "entry": "0x11743543c"
+      },
+      {
+        "name": ".cxx_destruct",
+        "types": "v16@0:8",
+        "imp": "0x105322704",
+        "entry": "0x117435448"
+      }
+    ]
+  },
+  {
+    "name": "NetCmdSendOnlyEvent",
+    "address": "0x11ef2c298",
+    "super": "0x11ee44e98",
+    "methods": [
+      {
+        "name": "init",
+        "types": "@16@0:8",
+        "imp": "0x105322a54",
+        "entry": "0x117435460"
+      },
+      {
+        "name": "dealloc",
+        "types": "v16@0:8",
+        "imp": "0x105322adc",
+        "entry": "0x11743546c"
+      },
+      {
+        "name": "isSendOnlyTask",
+        "types": "B16@0:8",
+        "imp": "0x105322b8c",
+        "entry": "0x117435478"
+      },
+      {
+        "name": "TryStart",
+        "types": "v16@0:8",
+        "imp": "0x105322b94",
+        "entry": "0x117435484"
+      },
+      {
+        "name": "Stop",
+        "types": "v16@0:8",
+        "imp": "0x105322dc0",
+        "entry": "0x117435490"
+      },
+      {
+        "name": "NotifyFromPrtl:MessageInfo:",
+        "types": "v28@0:8I16@20",
+        "imp": "0x105322e88",
+        "entry": "0x11743549c"
+      },
+      {
+        "name": "m_netcmd",
+        "types": "^{INetCmdSendOnly=^^?}16@0:8",
+        "imp": "0x105322ecc",
+        "entry": "0x1174354a8"
+      },
+      {
+        "name": "setM_netcmd:",
+        "types": "v24@0:8^{INetCmdSendOnly=^^?}16",
+        "imp": "0x105322edc",
+        "entry": "0x1174354b4"
+      },
+      {
+        "name": "taskRetryCount",
+        "types": "i16@0:8",
+        "imp": "0x105322eec",
+        "entry": "0x1174354c0"
+      },
+      {
+        "name": "setTaskRetryCount:",
+        "types": "v20@0:8i16",
+        "imp": "0x105322efc",
+        "entry": "0x1174354cc"
+      },
+      {
+        "name": "taskTotalTimeoutMS",
+        "types": "i16@0:8",
+        "imp": "0x105322f0c",
+        "entry": "0x1174354d8"
+      },
+      {
+        "name": "setTaskTotalTimeoutMS:",
+        "types": "v20@0:8i16",
+        "imp": "0x105322f1c",
+        "entry": "0x1174354e4"
+      }
+    ]
+  }
+]
