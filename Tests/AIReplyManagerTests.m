@@ -9,6 +9,7 @@
 #import "CSGroupNativeBridge.h"
 #import "CSAuthorizationManager.h"
 #import "CSAIBackgroundSync.h"
+#import "CSBackgroundSyncBudget.h"
 #import "CSBackgroundRunManager.h"
 #import "AINativeDispatchUnderTest.m"
 #import "CSAIMessageAdapter.h"
@@ -521,6 +522,18 @@ static void IngressAdmissionFastPath(NSURL *url){
 }
 static NSTimer *SyncTimer(CSAIBackgroundSync *scheduler){return [scheduler valueForKey:@"timer"];}
 static void FireSync(CSAIBackgroundSync *scheduler){[SyncTimer(scheduler) fire];}
+static CSBackgroundSyncBudget *fixtureBackgroundBudget;
+static void UseFreshBackgroundBudget(CSAIBackgroundSync *scheduler){
+    // Independent fixtures have independent clocks, as if each ran in its own
+    // process. Exercise the real budget, with no reset inside an account/config
+    // transition under test. This accessor replacement affects only this
+    // isolated test executable; production sources are unchanged.
+    static dispatch_once_t once;dispatch_once(&once,^{
+        Method method=class_getClassMethod(CSBackgroundSyncBudget.class,@selector(sharedBudget));
+        method_setImplementation(method,imp_implementationWithBlock(^CSBackgroundSyncBudget *(id receiver){(void)receiver;return fixtureBackgroundBudget;}));
+    });
+    fixtureBackgroundBudget=[CSBackgroundSyncBudget new];fixtureBackgroundBudget.now=scheduler.now;
+}
 static void BackgroundSyncReplies(NSURL *url){
     CSAIReplyStore *store=[[CSAIReplyStore alloc]initWithURL:url account:account];CHECK([store load]);
     NSMutableDictionary *config=[store.configuration mutableCopy];config[@"enabled"]=@YES;config[@"endpoint"]=@"https://example.invalid/chat";config[@"model"]=@"fake-model";
@@ -528,7 +541,7 @@ static void BackgroundSyncReplies(NSURL *url){
     config[@"conversations"]=@{@"friend":@{@"enabled":@YES,@"presetID":@""},@"room@chatroom":@{@"enabled":@YES,@"presetID":@"",@"allowUnmentioned":@YES},@"other@chatroom":@{@"enabled":@YES,@"presetID":@""}};CHECK([store saveConfiguration:config error:NULL]);NSDictionary *original=store.configuration;
     CSAIReplyManager *manager=CSAIReplyManager.sharedManager;TestClient *client=[TestClient new];[manager setValue:store forKey:@"store"];[manager setValue:@(epoch) forKey:@"epoch"];[manager setValue:client forKey:@"client"];
     CSAIReplyCoordinator *coordinator=[[CSAIReplyCoordinator alloc]initWithStore:store client:client];coordinator.delegate=(id)manager;__block NSTimeInterval messageClock=4000;coordinator.now=^{return messageClock;};[coordinator configurationDidChange];[manager setValue:coordinator forKey:@"coordinator"];[manager notify];
-    CSAIBackgroundSync *scheduler=[manager valueForKey:@"backgroundSync"];[scheduler stop];__block NSTimeInterval syncClock=4000;scheduler.now=^{return syncClock;};
+    CSAIBackgroundSync *scheduler=[manager valueForKey:@"backgroundSync"];[scheduler stop];__block NSTimeInterval syncClock=4000;scheduler.now=^{return syncClock;};UseFreshBackgroundBudget(scheduler);
     TestNativeSync *service=[TestNativeSync new];service.accepts=YES;nativeSyncService=service;UIApplication.sharedApplication.applicationState=UIApplicationStateActive;canAttemptBackgroundWork=NO;SetPrivacy(NO,YES,YES);simulateSends=YES;submissions=0;
     [manager setValue:@NO forKey:@"started"];[manager start];DrainMain();CHECK(!scheduler.active && !service.syncCalls);
     // The fake native sync releases an already queued silent-group message through the unchanged incoming hook.
@@ -603,7 +616,7 @@ static void BackgroundSyncTaskWithoutAudio(NSURL *url){
     TestStore *store=nil;CSAIReplyManager *manager=BackgroundSyncContextManager(url,&store);
     NSDictionary *original=store.configuration;
     CSAIBackgroundSync *scheduler=[manager valueForKey:@"backgroundSync"];
-    __block NSTimeInterval clock=60000;scheduler.now=^{return clock;};
+    __block NSTimeInterval clock=60000;scheduler.now=^{return clock;};UseFreshBackgroundBudget(scheduler);
     TestNativeSync *service=[TestNativeSync new];service.accepts=YES;nativeSyncService=service;
     CHECK(!CSBackgroundRunManager.sharedManager.backgroundAudioActive && CSBackgroundRunManager.sharedManager.canAttemptBackgroundWork);
     [manager refresh];CHECK(scheduler.active && service.syncCalls==1 && [manager captureBackgroundSyncContextForEpoch:epoch]);
@@ -630,7 +643,7 @@ static BOOL HasVerifiedSync(CSAIBackgroundSync *scheduler){return [[scheduler va
 static void BackgroundSyncContexts(NSURL *root){
     UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;canAttemptBackgroundWork=YES;SetPrivacy(YES,YES,YES);
     TestStore *store=nil;CSAIReplyManager *manager=BackgroundSyncContextManager([root URLByAppendingPathComponent:@"sync-context-valid.plist"],&store);
-    CSAIBackgroundSync *scheduler=[manager valueForKey:@"backgroundSync"];__block NSTimeInterval clock=10000;scheduler.now=^{return clock;};
+    CSAIBackgroundSync *scheduler=[manager valueForKey:@"backgroundSync"];__block NSTimeInterval clock=10000;scheduler.now=^{return clock;};UseFreshBackgroundBudget(scheduler);
     TestNativeSync *service=[TestNativeSync new];service.accepts=YES;nativeSyncService=service;
     CHECK(![manager captureBackgroundSyncContextForEpoch:epoch]);[manager refresh];CHECK(scheduler.active && service.syncCalls==1 && !HasVerifiedSync(scheduler));
     CHECK(![manager captureBackgroundSyncContextForEpoch:epoch+1]);
@@ -660,7 +673,7 @@ static void BackgroundSyncContexts(NSURL *root){
     for(NSUInteger variant=0;variant<22;variant++){
         NSURL *url=[root URLByAppendingPathComponent:[NSString stringWithFormat:@"sync-context-%lu.plist",(unsigned long)variant]];
         manager=BackgroundSyncContextManager(url,&store);scheduler=[manager valueForKey:@"backgroundSync"];
-        clock=20000;scheduler.now=^{return clock;};service=[TestNativeSync new];service.accepts=YES;nativeSyncService=service;[manager refresh];
+        clock=20000;scheduler.now=^{return clock;};UseFreshBackgroundBudget(scheduler);service=[TestNativeSync new];service.accepts=YES;nativeSyncService=service;[manager refresh];
         CHECK(scheduler.active && service.syncCalls==1);clock=20010;context=[manager captureBackgroundSyncContextForEpoch:epoch];CHECK(context);
         NSDictionary *original=store.configuration;
         CSAIReplyStore *replacement=nil;
@@ -717,7 +730,7 @@ static void BackgroundSyncRequestReentry(NSURL *root){
     for(NSUInteger variant=0;variant<5;variant++){
         TestStore *store=nil;CSAIReplyManager *manager=BackgroundSyncContextManager([root URLByAppendingPathComponent:[NSString stringWithFormat:@"sync-request-reentry-%lu.plist",(unsigned long)variant]],&store);
         backgroundSyncObservationManager=manager;
-        CSAIBackgroundSync *scheduler=[manager valueForKey:@"backgroundSync"];__block NSTimeInterval clock=30000;scheduler.now=^{return clock;};
+        CSAIBackgroundSync *scheduler=[manager valueForKey:@"backgroundSync"];__block NSTimeInterval clock=30000;scheduler.now=^{return clock;};UseFreshBackgroundBudget(scheduler);
         TestNativeSync *service=[TestNativeSync new];service.accepts=YES;nativeSyncService=service;NSDictionary *original=store.configuration;
         CSAIReplyStore *replacement=nil;
         if(variant==4){replacement=[[CSAIReplyStore alloc]initWithURL:[root URLByAppendingPathComponent:@"sync-request-replacement.plist"] account:account];CHECK([replacement load] && [replacement saveConfiguration:original error:NULL]);}
@@ -747,7 +760,7 @@ static void BackgroundFallbackConfiguration(NSURL *root){
     TestStore *store=nil;CSAIReplyManager *manager=BackgroundSyncContextManager([root URLByAppendingPathComponent:@"fallback-toggle.plist"],&store);
     NSMutableDictionary *legacy=[store.configuration mutableCopy];[legacy removeObjectForKey:@"backgroundFallback"];CHECK([store saveConfiguration:legacy error:NULL]);
     CHECK(!store.configuration[@"backgroundFallback"]);NSString *connection=store.configuration[@"verifiedConnection"];
-    CSAIBackgroundSync *scheduler=[manager valueForKey:@"backgroundSync"];__block NSTimeInterval clock=40000;scheduler.now=^{return clock;};
+    CSAIBackgroundSync *scheduler=[manager valueForKey:@"backgroundSync"];__block NSTimeInterval clock=40000;scheduler.now=^{return clock;};UseFreshBackgroundBudget(scheduler);
     TestNativeSync *service=[TestNativeSync new];service.accepts=YES;nativeSyncService=service;[manager refresh];
     CHECK(scheduler.fallbackEnabled && scheduler.active && service.syncCalls==1 && SyncDelayIs(scheduler,45));
     clock=40005;id oldContext=[manager captureBackgroundSyncContextForEpoch:epoch];CHECK(oldContext);NSTimer *old=SyncTimer(scheduler);
@@ -800,7 +813,7 @@ static void BackgroundFallbackReentry(NSURL *root){
     UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;canAttemptBackgroundWork=YES;
     for(NSUInteger boundary=0;boundary<4;boundary++){
         TestStore *store=nil;CSAIReplyManager *manager=BackgroundSyncContextManager([root URLByAppendingPathComponent:[NSString stringWithFormat:@"fallback-reentry-%lu.plist",(unsigned long)boundary]],&store);
-        CSAIBackgroundSync *scheduler=[manager valueForKey:@"backgroundSync"];__block NSTimeInterval clock=50000;scheduler.now=^{return clock;};
+        CSAIBackgroundSync *scheduler=[manager valueForKey:@"backgroundSync"];__block NSTimeInterval clock=50000;scheduler.now=^{return clock;};UseFreshBackgroundBudget(scheduler);
         TestNativeSync *service=[TestNativeSync new];service.accepts=YES;nativeSyncService=service;[manager refresh];CHECK(service.syncCalls==1 && scheduler.active);
         id oldContext=[manager captureBackgroundSyncContextForEpoch:epoch];CHECK(oldContext);
         dispatch_block_t toggle=^{

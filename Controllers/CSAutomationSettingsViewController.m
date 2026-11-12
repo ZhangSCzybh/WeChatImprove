@@ -352,9 +352,9 @@ typedef void (^CSAutoCommit)(id value,void (^done)(BOOL success));
     NSDictionary *configuration=CSAutomationManager.sharedManager.configuration?:CSAutomationDefaultConfiguration();NSMutableArray *sections=[NSMutableArray array];__weak typeof(self) weakSelf=self;
     for(NSUInteger index=0;index<CSAutoModules().count;index++){
         NSString *module=CSAutoModules()[index];NSDictionary *config=configuration[module];
-        NSMutableArray *rows=[NSMutableArray arrayWithArray:@[
-            [self toggle:@"开启功能" icon:index==0?@"hand.tap.fill":@"text.bubble.fill" module:module key:@"enabled"],
-            CSAutoRow(@"生效私聊",@"person.fill",[NSString stringWithFormat:@"已选 %lu 人",(unsigned long)[config[@"friends"] count]],^{[weakSelf chooseConversations:module groups:NO];}),
+        NSMutableArray *rows=[NSMutableArray arrayWithObject:[self toggle:@"开启功能" icon:index==0?@"hand.tap.fill":@"text.bubble.fill" module:module key:@"enabled"]];
+        if(![module isEqual:@"mentionReply"])[rows addObject:CSAutoRow(@"生效私聊",@"person.fill",[NSString stringWithFormat:@"已选 %lu 人",(unsigned long)[config[@"friends"] count]],^{[weakSelf chooseConversations:module groups:NO];})];
+        [rows addObjectsFromArray:@[
             CSAutoRow(@"生效群聊",@"person.3.fill",[NSString stringWithFormat:@"已选 %lu 个群",(unsigned long)[config[@"groups"] count]],^{[weakSelf chooseConversations:module groups:YES];}),
             CSAutoRow(@"执行延迟",@"clock.fill",[NSString stringWithFormat:@"%@ 秒",config[@"delay"]?:@0],^{[weakSelf editDelay:module revoke:NO];})
         ]];
@@ -388,7 +388,7 @@ typedef void (^CSAutoCommit)(id value,void (^done)(BOOL success));
         @"每次从本模块的回复内容中随机选一条。@ 仅在群聊生效；私聊发送普通回复。名单和延迟与其他模块独立。",
         @"识别群聊中真正 @ 当前账号的消息。每次随机回复一条；同一条消息同时命中关键词时，优先执行本模块。",
         @"仅匹配文字消息，按关键词列表顺序采用第一条命中的规则。回复自己指在所选会话中回复本人发出的消息，自动功能产生的消息不会再次触发自身。"];
-    NSString *boundary=[NSString stringWithFormat:@"微信有后台执行机会时可处理，不要求本插件开启后台运行。锁屏数据、账号或授权暂不可用时保留等待；恢复可用或回前台后，未完成的任务在到期后 %.0f 分钟内补发一次，超过不补发。系统挂起或进程退出期间不能实时处理；撤回另受微信原生时间窗口限制。",CSAutomationLateAllowance/60.0];
+    NSString *boundary=[NSString stringWithFormat:@"设备首次解锁后，微信有后台执行机会且本功能存储、账号和授权可用时，锁屏也可处理，不要求本插件开启后台运行。条件暂不可用时保留等待；恢复可用或回前台后，未完成的任务在到期后 %.0f 分钟内补发一次，超过不补发。系统挂起或进程退出期间不能实时处理；撤回另受微信原生时间窗口限制。",CSAutomationLateAllowance/60.0];
     return [NSString stringWithFormat:@"%@\n\n%@",details[(NSUInteger)MIN(MAX(section,0),3)],boundary];
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)path {
@@ -400,6 +400,7 @@ typedef void (^CSAutoCommit)(id value,void (^done)(BOOL success));
     CSSettingItem *item=self.sections[path.section].items[path.row];if(item.actionBlock)item.actionBlock();
 }
 - (void)chooseConversations:(NSString *)module groups:(BOOL)groups {
+    if([module isEqual:@"mentionReply"] && !groups)return;
     NSDictionary *context=CSAutoContext();if(self.saving||!CSAutoRequire(self,context)||!CSSettingsCanPresentFrom(self))return;
     NSString *key=groups?@"groups":@"friends";NSArray *selected=CSAutomationManager.sharedManager.configuration[module][key];__weak typeof(self) weakSelf=self;NSError *error=nil;
     BOOL shown=CSNativeContactPickerPresent(self,groups?@"选择生效群聊":@"选择生效私聊",groups,selected?:@[],^BOOL{return weakSelf && !weakSelf.saving && CSAutoValid(context) && CSAuthorizationManager.sharedManager.isAuthorized;},^(NSArray<NSString *> *names){

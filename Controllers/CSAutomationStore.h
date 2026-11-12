@@ -3,6 +3,10 @@ NS_ASSUME_NONNULL_BEGIN
 FOUNDATION_EXPORT NSString *const CSAutomationBackupDomain;
 FOUNDATION_EXPORT NSDictionary *CSAutomationDefaultConfiguration(void);
 FOUNDATION_EXPORT BOOL CSAutomationValidateConfiguration(id configuration);
+// Accept valid 2.5-1 mentionReply.friends on import; active state is group-only.
+FOUNDATION_EXPORT NSDictionary *_Nullable CSAutomationNormalizeConfiguration(id configuration);
+// Actual storage/attribute failures may recover; malformed state is not retryable.
+FOUNDATION_EXPORT BOOL CSAutomationStorageErrorIsRetryable(NSError *_Nullable error);
 FOUNDATION_EXPORT BOOL CSAutomationValidateState(id state,NSString *account,NSError **error);
 FOUNDATION_EXPORT NSURL *CSAutomationFileURL(NSURL *resourceRoot,NSString *account);
 FOUNDATION_EXPORT NSDictionary *_Nullable CSAutomationReadState(NSURL *url,NSString *account,NSError **error);

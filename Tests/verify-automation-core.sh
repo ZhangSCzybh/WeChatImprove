@@ -14,6 +14,15 @@ source=source.replace(original,'CSAutomationFileURL([NSURL fileURLWithPath:NSPro
 (out/'EventAdapterUnderTest.m').write_text(source)
 PY
 xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-deprecated-declarations -framework Foundation \
- -I"$project_dir/Controllers" "$project_dir/Controllers/CSAutomationStore.m" "$test_dir/EventAdapterUnderTest.m" \
+ -I"$project_dir/Controllers" -I"$project_dir/Headers" "$project_dir/Controllers/CSAutomationStore.m" "$test_dir/EventAdapterUnderTest.m" \
  "$project_dir/Tests/AutomationCoreTests.m" -o "$test_dir/automation-core-tests"
 CS_AUTOMATION_TEST_ROOT="$test_dir/fixtures" "$test_dir/automation-core-tests" "$test_dir/fixtures"
+if [[ "${1:-}" == "--ios" ]]; then
+ sdk_dir=$(xcrun --sdk iphoneos --show-sdk-path)
+ for arch in arm64 arm64e; do
+  xcrun --sdk iphoneos clang -target "$arch-apple-ios15.0" -isysroot "$sdk_dir" \
+   -fobjc-arc -fblocks -Wall -Wextra -Werror -I"$project_dir/Controllers" -I"$project_dir/Headers" \
+   -c "$project_dir/Controllers/CSAutomationEventAdapter.m" -o "$test_dir/event-adapter.$arch.o"
+ done
+ printf 'Automation event adapter iOS: arm64 + arm64e source objects compiled\n'
+fi

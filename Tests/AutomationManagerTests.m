@@ -8,7 +8,12 @@
 #import "CSAuthorizationManager.h"
 #import "CSGroupNativeBridge.h"
 #import "CSGroupChatNativeAdapter.h"
+#import "CSBackgroundRunManager.h"
+#import "CSAINativeSyncObserver.h"
 #import <objc/runtime.h>
+#include <sys/file.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 static NSUInteger checks,epoch=7,sendCount,patCount,revokeCount,marks,remembered,cancellations;
 static BOOL authorized=YES,backupReady=YES,suspended,contactsAvailable=YES,patAccepted=YES,quoteAvailable=YES,protectedAvailable=YES,accountAvailable=YES;
@@ -20,15 +25,25 @@ static NSMapTable *observations;
 static dispatch_block_t duringPreparation;
 static id updatedQuoteSource;
 static BOOL liveDispatch;
+static BOOL backgroundWorkAvailable=YES;
 #define CHECK(...) do{checks++;if(!(__VA_ARGS__)){fprintf(stderr,"Automation manager failed line %d: %s\n",__LINE__,#__VA_ARGS__);exit(1);}}while(0)
 
 NSNotificationName const UIApplicationDidBecomeActiveNotification=@"active";
+NSNotificationName const UIApplicationDidEnterBackgroundNotification=@"UIApplicationDidEnterBackgroundNotification";
+NSNotificationName const UIApplicationWillEnterForegroundNotification=@"UIApplicationWillEnterForegroundNotification";
 NSNotificationName const UIApplicationProtectedDataDidBecomeAvailable=@"unlocked";
+NSNotificationName const CSBackgroundRunStateChangedNotification=@"background-work";
 @implementation UIApplication
 + (instancetype)sharedApplication{static UIApplication *application;static dispatch_once_t once;dispatch_once(&once,^{application=[self new];});return application;}
 - (BOOL)isProtectedDataAvailable{return protectedAvailable;}
 @end
 @implementation UIViewController @end
+@implementation CSBackgroundRunManager
++ (instancetype)sharedManager{static CSBackgroundRunManager *manager;static dispatch_once_t once;dispatch_once(&once,^{manager=[self new];});return manager;}
+- (BOOL)canAttemptBackgroundWork{return backgroundWorkAvailable;}
+- (BOOL)backgroundAudioActive{return NO;}
+@end
+void CSAIObserveBackgroundSyncRequest(NSUInteger expectedEpoch,void (^request)(void)){(void)expectedEpoch;if(request)request();}
 @implementation CSAuthorizationManager
 + (instancetype)sharedManager{static id value;static dispatch_once_t once;dispatch_once(&once,^{value=[self new];});return value;}
 - (BOOL)isAuthorized{return authorized;}
@@ -67,6 +82,7 @@ NSString *CSGroupChatMemberName(NSString *room,NSString *member){(void)room;(voi
 + (instancetype)sharedCoordinator{static id value;static dispatch_once_t once;dispatch_once(&once,^{value=[self new];});return value;}
 - (BOOL)isQuittingRoom:(NSString *)room{(void)room;return NO;}
 @end
+#ifndef CS_AUTOMATION_REAL_EVENT_ADAPTER
 BOOL CSMessageNativeSupports(id receiver,NSString *selector,NSString *result,NSArray *arguments){(void)result;(void)arguments;return [receiver respondsToSelector:NSSelectorFromString(selector)];}
 id CSMessageNativeInvoke(id receiver,NSString *selector,NSArray *arguments){
     if([selector isEqual:@"GetMsg:LocalID:"])return [(AutomationMessages *)receiver GetMsg:arguments[0] LocalID:[arguments[1] unsignedIntValue]];
@@ -80,6 +96,7 @@ NSDictionary *CSAutomationEventFromPat(id pat,NSString *owner,NSString *conversa
 NSArray *CSAutomationMessageIdentifiers(id wrap,NSString *owner,NSString *conversation){(void)owner;(void)conversation;return wrap[@"ids"]?:@[];}
 void CSAutomationMarkOwnedSend(id wrap){if(wrap)marks++;}
 void CSAutomationRememberOwnedSend(id wrap,NSString *owner,NSString *conversation){(void)owner;(void)conversation;if(wrap)remembered++;}
+#endif
 
 @interface CSMessagePreparedSend ()
 @property(nonatomic,strong,readwrite) id outputWrap;
@@ -135,6 +152,15 @@ void CSAutomationCancelPatObservation(id pat){if([observations objectForKey:pat]
 - (NSTimeInterval)elapsedTime{return uptime;}
 - (NSURL *)resourceRoot{return testRoot;}
 @end
+@interface AutomationCapabilityRaceLedger : CSAutomationLedger
+@property(nonatomic,strong) NSError *observedFailure;
+@end
+@implementation AutomationCapabilityRaceLedger
+- (BOOL)claimIdentifiers:(NSArray<NSString *> *)identifiers action:(NSString *)action now:(NSDate *)now error:(NSError **)error{
+    NSError *failure=nil;BOOL fresh=[super claimIdentifiers:identifiers action:action now:now error:&failure];
+    self.observedFailure=failure;backupReady=NO;if(error)*error=failure;return fresh;
+}
+@end
 static void Drain(void){for(NSUInteger i=0;i<10;i++)[NSRunLoop.mainRunLoop runMode:NSDefaultRunLoopMode beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.005]];}
 static void WaitAt(BOOL(^condition)(void),int line){for(NSUInteger i=0;i<100 && !condition();i++)Drain();if(!condition())fprintf(stderr,"Wait caller line %d timed out\n",line);CHECK(condition());}
 #define Wait(c) WaitAt(c,__LINE__)
@@ -154,22 +180,22 @@ static void Advance(CSAutomationManager *manager,NSTimeInterval seconds){uptime+
 static void ConfigureAll(CSAutomationManager *manager,NSUInteger delay){
     Keyword(manager,delay,NO,NO);
     NSMutableDictionary *mention=Module(manager,@"mentionReply"),*back=Module(manager,@"patBack"),*reply=Module(manager,@"patReply");
+    CHECK(mention[@"friends"]==nil);
     [mention addEntriesFromDictionary:@{@"enabled":@YES,@"groups":@[@"room@chatroom"],@"delay":@(delay),@"contents":@[@"mention answer"],@"mention":@YES}];
     [back addEntriesFromDictionary:@{@"enabled":@YES,@"groups":@[@"room@chatroom"],@"delay":@(delay),@"revoke":@YES,@"revokeDelay":@1}];
     [reply addEntriesFromDictionary:@{@"enabled":@YES,@"groups":@[@"room@chatroom"],@"delay":@(delay),@"contents":@[@"pat answer"],@"mention":@YES}];Save(manager,@{@"mentionReply":mention,@"patBack":back,@"patReply":reply});
 }
 static int BackgroundCases(void){
-    UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;
+    UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;protectedAvailable=NO;
     AutomationTestManager *manager=Manager();ConfigureAll(manager,2);CHECK(UIApplication.sharedApplication.applicationState==UIApplicationStateBackground);
     CHECK(Receive(manager,Event(5001,YES,NO,YES)));Advance(manager,2);CHECK(sendCount==1 && Pending(manager)==0);
-    printf("A Background real-mention: sends=%lu pending=%lu (exactly once)\n",(unsigned long)sendCount,(unsigned long)Pending(manager));
+    printf("A Locked background real-mention: ProtectedData=NO sends=%lu pending=%lu (exactly once)\n",(unsigned long)sendCount,(unsigned long)Pending(manager));
     [manager receivePat:Event(5002,YES,NO,NO) conversation:@"room@chatroom" epoch:epoch];Wait(^BOOL{return Pending(manager)==2;});Advance(manager,2);CHECK(sendCount==2 && patCount==1);
-    id exact=pats.lastObject;void (^success)(BOOL)=[observations objectForKey:exact];CHECK(success!=nil);protectedAvailable=NO;success(YES);Advance(manager,1);CHECK(Pending(manager)==1 && revokeCount==0);protectedAvailable=YES;
-    [NSNotificationCenter.defaultCenter postNotificationName:UIApplicationProtectedDataDidBecomeAvailable object:nil];CHECK(revokeCount==1 && revoked.lastObject==exact && Pending(manager)==0);
-    printf("B Background pat: patSubmits=%lu patReplySubmits=1 revokeSubmits=%lu exactObject=yes\n",(unsigned long)patCount,(unsigned long)revokeCount);
-    CHECK(Receive(manager,Event(5003,NO,NO,NO)));Advance(manager,2);CHECK(sendCount==3 && Pending(manager)==0);printf("C Background keyword: newSubmits=1 totalText=%lu\n",(unsigned long)sendCount);
-    CHECK(Receive(manager,Event(5004,NO,NO,NO)));protectedAvailable=NO;Advance(manager,2);CHECK(sendCount==3 && Pending(manager)==1);protectedAvailable=YES;[NSNotificationCenter.defaultCenter postNotificationName:UIApplicationProtectedDataDidBecomeAvailable object:nil];CHECK(sendCount==4 && Pending(manager)==0);
-    printf("D1 ProtectedData unavailable: retained=1 restoredSubmits=1 totalText=%lu\n",(unsigned long)sendCount);
+    id exact=pats.lastObject;void (^success)(BOOL)=[observations objectForKey:exact];CHECK(success!=nil);success(YES);success(YES);Advance(manager,1);CHECK(!protectedAvailable && revokeCount==1 && revoked.lastObject==exact && Pending(manager)==0);
+    printf("B Locked background pat: patSubmits=%lu patReplySubmits=1 revokeSubmits=%lu exactObject=yes unlockRequired=no\n",(unsigned long)patCount,(unsigned long)revokeCount);
+    CHECK(Receive(manager,Event(5003,NO,NO,NO)));Advance(manager,2);CHECK(!protectedAvailable && sendCount==3 && Pending(manager)==0);printf("C Locked background keyword: newSubmits=1 totalText=%lu\n",(unsigned long)sendCount);
+    CHECK(Receive(manager,Event(5004,NO,NO,NO)));Advance(manager,2);CHECK(!protectedAvailable && sendCount==4 && Pending(manager)==0 && [[manager valueForKey:@"waitingIngress"] count]==0);
+    printf("D1 ProtectedData=NO with available account/storage: admittedAndSubmitted=1 noUnlockNotification=yes totalText=%lu\n",(unsigned long)sendCount);
     CHECK(Receive(manager,Event(5005,NO,NO,NO)));authorized=NO;Advance(manager,2);CHECK(sendCount==4 && Pending(manager)==1);authorized=YES;[NSNotificationCenter.defaultCenter postNotificationName:UIApplicationDidBecomeActiveNotification object:nil];CHECK(sendCount==5 && Pending(manager)==0);
     printf("D2 Authorization unavailable: retained=1 restoredSubmits=1 totalText=%lu\n",(unsigned long)sendCount);
     CHECK(Receive(manager,Event(5006,NO,NO,NO)));accountAvailable=NO;[manager refresh];Advance(manager,2);CHECK(sendCount==5 && Pending(manager)==1 && [manager.accountID isEqual:account]);accountAvailable=YES;[NSNotificationCenter.defaultCenter postNotificationName:UIApplicationDidBecomeActiveNotification object:nil];CHECK(sendCount==6 && Pending(manager)==0);
@@ -180,18 +206,19 @@ static int BackgroundCases(void){
     printf("E Background then foreground duplicate callback: eventSubmits=1 totalText=%lu pending=0\n",(unsigned long)sendCount);
     UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;CHECK(Receive(manager,Event(5009,NO,NO,NO)));uptime+=62;wall+=62;[NSNotificationCenter.defaultCenter postNotificationName:UIApplicationDidBecomeActiveNotification object:nil];CHECK(sendCount==9 && Pending(manager)==0);
     printf("F-after late catch-up: originalDue+60s submits=1 (old 30s cutoff lost this event)\n");
-    CHECK(Receive(manager,Event(5010,NO,NO,NO)));Advance(manager,303);CHECK(sendCount==9 && Pending(manager)==0 && [manager.statusText containsString:@"5 分钟"]);printf("F-after expiry: originalDue+301s submits=0 reason=%s\n",manager.statusText.UTF8String);
-    // A cold background start can know the native epoch before protected data
-    // or the configuration is readable. Both ordinary messages and pats wait.
-    protectedAvailable=NO;AutomationTestManager *cold=[AutomationTestManager new];__block BOOL admitted=NO,done=NO;
+    NSMutableDictionary *expired=Event(5010,NO,NO,NO);CHECK(Receive(manager,expired));Advance(manager,303);CHECK(sendCount==9 && Pending(manager)==0 && [manager.statusText containsString:@"5 分钟"]);printf("F-after expiry: originalDue+301s submits=0 reason=%s\n",manager.statusText.UTF8String);
+    expired[@"created"]=@(wall);CHECK(Receive(manager,expired));CHECK(sendCount==9 && Pending(manager)==0);
+    // Actual backup/configuration unavailability still queues a cold ingress;
+    // restoring that dependency while locked must work without an unlock.
+    backupReady=NO;AutomationTestManager *cold=[AutomationTestManager new];__block BOOL admitted=NO,done=NO;
     NSMutableDictionary *coldMessage=Event(5011,NO,NO,NO),*coldPatEvent=Event(5012,YES,NO,NO);coldMessage[@"created"]=@(wall-3);coldPatEvent[@"created"]=@(wall-3);
     [cold receiveNativeSession:@"bob" wrap:coldMessage epoch:epoch completion:^(BOOL claim){admitted=claim;done=YES;}];
     [cold receivePat:coldPatEvent conversation:@"room@chatroom" epoch:epoch];CHECK(!cold.ready && !done && [[cold valueForKey:@"waitingIngress"] count]==2);Advance(cold,10);CHECK(!done);
-    protectedAvailable=YES;[NSNotificationCenter.defaultCenter postNotificationName:UIApplicationProtectedDataDidBecomeAvailable object:nil];Wait(^BOOL{return cold.ready && done && patCount==2;});CHECK(admitted && sendCount==11);
+    backupReady=YES;[cold refresh];Wait(^BOOL{return cold.ready && done && patCount==2;});CHECK(!protectedAvailable && admitted && sendCount==11);
     id coldPat=pats.lastObject;void (^coldSuccess)(BOOL)=[observations objectForKey:coldPat];CHECK(coldSuccess!=nil);coldSuccess(YES);Advance(cold,1);CHECK(revokeCount==2);
     Save(cold,@{@"keywordReply":Module(cold,@"keywordReply")});NSMutableDictionary *preEdit=Event(5017,NO,NO,NO);preEdit[@"created"]=@(wall-1);CHECK(!Receive(cold,preEdit));CHECK(Pending(cold)==0 && sendCount==11);
-    printf("D5 Cold background !ready (message+pat): created=init-3s queued=2 originalArrivalDuePreserved=yes restoredText=2 restoredPat=1; preEditIncomingRejected=yes\n");
-    // Backup/lock availability can change after the native event was accepted
+    printf("D5 Locked cold backup !ready (message+pat): queued=2 originalArrivalDuePreserved=yes restoredText=2 restoredPat=1 unlockRequired=no; preEditIncomingRejected=yes\n");
+    // Backup availability can change after the native event was accepted
     // but before its serial durable claim runs. Preserve both old claimed work
     // and the unclaimed admission until the same epoch becomes available.
     CHECK(Receive(manager,Event(5013,NO,NO,NO)));dispatch_semaphore_t release=dispatch_semaphore_create(0);dispatch_queue_t io=[manager valueForKey:@"io"];
@@ -200,12 +227,63 @@ static int BackgroundCases(void){
     Wait(^BOOL{NSArray *owners=[[manager valueForKey:@"admissions"] allValues];return owners.count && ![[owners.firstObject valueForKey:@"persisting"] boolValue];});Advance(manager,2);CHECK(!raceDone && Pending(manager)==1 && sendCount==11);
     backupReady=YES;[NSNotificationCenter.defaultCenter postNotificationName:UIApplicationProtectedDataDidBecomeAvailable object:nil];Wait(^BOOL{return raceDone;});CHECK(raceClaim && sendCount==13 && Pending(manager)==0);
     printf("D6 Native-ingress to durable-IO availability race: oldClaimRetained=1 newAdmissionRetained=1 restoredSubmits=2\n");
-    release=dispatch_semaphore_create(0);dispatch_async(io,^{dispatch_semaphore_wait(release,dispatch_time(DISPATCH_TIME_NOW,5*NSEC_PER_SEC));});__block BOOL lockRaceDone=NO;
-    [manager receiveNativeSession:@"bob" wrap:Event(5015,NO,NO,NO) epoch:epoch completion:^(BOOL claim){CHECK(claim);lockRaceDone=YES;}];protectedAvailable=NO;dispatch_semaphore_signal(release);Wait(^BOOL{return lockRaceDone;});Advance(manager,2);CHECK(Pending(manager)==1 && sendCount==13);
-    protectedAvailable=YES;[NSNotificationCenter.defaultCenter postNotificationName:UIApplicationProtectedDataDidBecomeAvailable object:nil];CHECK(Pending(manager)==0 && sendCount==14);printf("D7 ProtectedData became unavailable during durable IO: claimedTaskRetained=1 restoredSubmits=1\n");
+    protectedAvailable=YES;release=dispatch_semaphore_create(0);dispatch_async(io,^{dispatch_semaphore_wait(release,dispatch_time(DISPATCH_TIME_NOW,5*NSEC_PER_SEC));});__block BOOL lockRaceDone=NO;
+    [manager receiveNativeSession:@"bob" wrap:Event(5015,NO,NO,NO) epoch:epoch completion:^(BOOL claim){CHECK(claim);lockRaceDone=YES;}];protectedAvailable=NO;dispatch_semaphore_signal(release);Wait(^BOOL{return lockRaceDone;});CHECK(Pending(manager)==1 && sendCount==13);Advance(manager,2);
+    CHECK(!protectedAvailable && Pending(manager)==0 && sendCount==14);printf("D7 ProtectedData became unavailable during durable IO: claimBeforeSubmit=yes submits=1 unlockRequired=no\n");
     release=dispatch_semaphore_create(0);dispatch_async(io,^{dispatch_semaphore_wait(release,dispatch_time(DISPATCH_TIME_NOW,5*NSEC_PER_SEC));});__block NSUInteger expiredCallbacks=0;
     [manager receiveNativeSession:@"bob" wrap:Event(5016,NO,NO,NO) epoch:epoch completion:^(BOOL claim){CHECK(!claim);expiredCallbacks++;}];Advance(manager,303);CHECK(expiredCallbacks==1 && [[manager valueForKey:@"admissions"] count]==0 && sendCount==14);dispatch_semaphore_signal(release);
     __block BOOL ioFinished=NO;dispatch_async(io,^{dispatch_async(dispatch_get_main_queue(),^{ioFinished=YES;});});Wait(^BOOL{return ioFinished;});CHECK(expiredCallbacks==1 && Pending(manager)==0 && sendCount==14);printf("D9 Stalled durable admission expired: callback=1 lateIOCannotCreateSend=yes\n");
+    NSMutableDictionary *lateDuplicate=Event(5016,NO,NO,NO);CHECK(Receive(manager,lateDuplicate));CHECK(Pending(manager)==0 && sendCount==14);
+
+    // Use a real file lock, not the app-global protected-data flag, to deny a
+    // durable claim. Releasing our fixture's lock must allow one same-account
+    // retry while the phone-state fixture remains locked throughout.
+    NSURL *runtime=[[CSAutomationFileURL(testRoot,account) URLByDeletingPathExtension] URLByAppendingPathExtension:@"runtime.plist"];
+    NSData *runtimeBefore=[NSData dataWithContentsOfURL:runtime];CHECK(runtimeBefore!=nil);
+    NSString *lockPath=[runtime.path stringByAppendingString:@".lock"];
+    int lockDescriptor=open(lockPath.fileSystemRepresentation,O_CREAT|O_RDWR,0600);
+    CHECK(lockDescriptor>=0 && flock(lockDescriptor,LOCK_EX|LOCK_NB)==0);
+    __block BOOL storageDone=NO,storageClaim=NO;
+    NSMutableDictionary *storageEvent=Event(5018,NO,NO,NO);
+    [manager receiveNativeSession:@"bob" wrap:storageEvent epoch:epoch completion:^(BOOL claim){storageClaim=claim;storageDone=YES;}];
+    Wait(^BOOL{NSArray *owners=[[manager valueForKey:@"admissions"] allValues];return owners.count && ![[owners.firstObject valueForKey:@"persisting"] boolValue];});
+    CHECK(!storageDone && Pending(manager)==0 && sendCount==14 && !protectedAvailable);
+    CHECK([[NSData dataWithContentsOfURL:runtime] isEqual:runtimeBefore]);
+    CHECK(flock(lockDescriptor,LOCK_UN)==0 && close(lockDescriptor)==0);
+    Advance(manager,5);Wait(^BOOL{return storageDone;});
+    CHECK(storageClaim && sendCount==15 && Pending(manager)==0 && !protectedAvailable);
+    storageEvent[@"created"]=@(wall);CHECK(Receive(manager,storageEvent));CHECK(sendCount==15 && Pending(manager)==0);
+    printf("D10 Actual ledger IO blocked: noPreClaimSend=yes originalBytesPreserved=yes retainedAdmission=1 sameAccountRetrySubmits=1 duplicateSubmits=0 unlockRequired=no\n");
+
+    lockDescriptor=open(lockPath.fileSystemRepresentation,O_CREAT|O_RDWR,0600);
+    CHECK(lockDescriptor>=0 && flock(lockDescriptor,LOCK_EX|LOCK_NB)==0);
+    __block NSUInteger storageExpiryCallbacks=0;NSMutableDictionary *storageExpiry=Event(5019,NO,NO,NO);
+    [manager receiveNativeSession:@"bob" wrap:storageExpiry epoch:epoch completion:^(BOOL claim){CHECK(!claim);storageExpiryCallbacks++;}];
+    Wait(^BOOL{NSArray *owners=[[manager valueForKey:@"admissions"] allValues];return owners.count && ![[owners.firstObject valueForKey:@"persisting"] boolValue];});
+    CHECK(storageExpiryCallbacks==0 && sendCount==15);Advance(manager,303);
+    CHECK(storageExpiryCallbacks==1 && [[manager valueForKey:@"admissions"] count]==0 && Pending(manager)==0 && sendCount==15);
+    CHECK(flock(lockDescriptor,LOCK_UN)==0 && close(lockDescriptor)==0);
+    [manager refresh];Wait(^BOOL{return manager.ready;});Advance(manager,5);CHECK(!Receive(manager,storageExpiry));
+    CHECK(storageExpiryCallbacks==1 && Pending(manager)==0 && sendCount==15 && !protectedAvailable);
+    printf("D11 Actual ledger IO expiry: callbackOnce=yes lateRecoverySubmits=0 staleEventSubmits=0 locked=yes\n");
+
+    // A real malformed ledger is permanent even if account capability becomes
+    // unavailable between the storage failure and its main-queue completion.
+    runtimeBefore=[NSData dataWithContentsOfURL:runtime];CHECK(runtimeBefore!=nil);
+    NSError *raceError=nil;AutomationCapabilityRaceLedger *raceLedger=[[AutomationCapabilityRaceLedger alloc]initWithURL:runtime account:account error:&raceError];
+    CHECK(raceLedger!=nil && raceError==nil);[manager setValue:raceLedger forKey:@"ledger"];
+    NSData *brokenRuntime=[@"permanent corrupt ledger" dataUsingEncoding:NSUTF8StringEncoding];CHECK([brokenRuntime writeToURL:runtime atomically:YES]);
+    __block NSUInteger permanentCallbacks=0;
+    [manager receiveNativeSession:@"bob" wrap:Event(5020,NO,NO,NO) epoch:epoch completion:^(BOOL claim){CHECK(!claim);permanentCallbacks++;}];
+    Wait(^BOOL{return permanentCallbacks==1;});
+    CHECK(!backupReady && raceLedger.observedFailure!=nil && !CSAutomationStorageErrorIsRetryable(raceLedger.observedFailure));
+    CHECK(!manager.ready && [[manager valueForKey:@"admissions"] count]==0 && Pending(manager)==0 && sendCount==15);
+    CHECK([[NSData dataWithContentsOfURL:runtime] isEqual:brokenRuntime]);
+    backupReady=YES;[NSNotificationCenter.defaultCenter postNotificationName:UIApplicationDidBecomeActiveNotification object:nil];Wait(^BOOL{return ![[manager valueForKey:@"loading"] boolValue];});
+    CHECK(!manager.ready && permanentCallbacks==1 && sendCount==15 && [[NSData dataWithContentsOfURL:runtime] isEqual:brokenRuntime]);
+    CHECK([runtimeBefore writeToURL:runtime atomically:YES]);[NSNotificationCenter.defaultCenter postNotificationName:UIApplicationDidBecomeActiveNotification object:nil];Wait(^BOOL{return manager.ready;});Advance(manager,5);
+    CHECK(permanentCallbacks==1 && [[manager valueForKey:@"admissions"] count]==0 && Pending(manager)==0 && sendCount==15 && !protectedAvailable);
+    printf("D12 Permanent ledger error + account capability race: corruptBytesPreserved=yes admissionEnded=yes callbackOnce=yes capabilityAndFixtureRecoveryCannotRevive=yes\n");
     [NSNotificationCenter.defaultCenter removeObserver:manager];[NSNotificationCenter.defaultCenter removeObserver:cold];
     printf("Automation background cases: %lu checks passed\n",(unsigned long)checks);return 0;
 }
@@ -218,10 +296,10 @@ static IMP OriginalIsMain;
 static BOOL FixtureIsMain(id receiver,SEL selector){return ((BOOL(*)(id,SEL))OriginalIsMain)(receiver,selector) || dispatch_get_specific(&MainQueueKey)!=NULL;}
 static BOOL controlNSTimerFired;
 static void DispatchOnly(void){
-    liveDispatch=YES;UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;
+    liveDispatch=YES;UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;protectedAvailable=NO;
     dispatch_queue_set_specific(dispatch_get_main_queue(),&MainQueueKey,&MainQueueKey,NULL);Method main=class_getClassMethod(NSThread.class,@selector(isMainThread));OriginalIsMain=method_getImplementation(main);method_setImplementation(main,(IMP)FixtureIsMain);
     NSMutableDictionary *configuration=[CSAutomationDefaultConfiguration() mutableCopy];
-    for(NSString *name in @[@"patBack",@"patReply",@"mentionReply",@"keywordReply"]){NSMutableDictionary *module=[configuration[name] mutableCopy];module[@"enabled"]=@YES;module[@"groups"]=@[@"room@chatroom"];module[@"friends"]=@[@"bob"];module[@"delay"]=@1;if([name isEqual:@"patBack"]){module[@"revoke"]=@YES;module[@"revokeDelay"]=@1;}else if([name isEqual:@"keywordReply"]){module[@"quote"]=@NO;module[@"rules"]=@[Rule(@"hello",@[@"keyword answer"])];}else module[@"contents"]=@[@"answer"];configuration[name]=module;}
+    for(NSString *name in @[@"patBack",@"patReply",@"mentionReply",@"keywordReply"]){NSMutableDictionary *module=[configuration[name] mutableCopy];module[@"enabled"]=@YES;module[@"groups"]=@[@"room@chatroom"];if([name isEqual:@"mentionReply"])CHECK(module[@"friends"]==nil);else module[@"friends"]=@[@"bob"];module[@"delay"]=@1;if([name isEqual:@"patBack"]){module[@"revoke"]=@YES;module[@"revokeDelay"]=@1;}else if([name isEqual:@"keywordReply"]){module[@"quote"]=@NO;module[@"rules"]=@[Rule(@"hello",@[@"keyword answer"])];}else module[@"contents"]=@[@"answer"];configuration[name]=module;}
     NSError *error=nil;CHECK(CSAutomationWriteState(@{@"schema":@1,@"account":account,@"configuration":configuration},CSAutomationFileURL(testRoot,account),account,&error));
     AutomationLiveManager *manager=[AutomationLiveManager new];[manager start];
     NSTimer *control=[NSTimer timerWithTimeInterval:0.05 repeats:NO block:^(__unused NSTimer *timer){controlNSTimerFired=YES;}];[NSRunLoop.mainRunLoop addTimer:control forMode:NSRunLoopCommonModes];
@@ -229,7 +307,7 @@ static void DispatchOnly(void){
         for(NSUInteger identity=6001;identity<=6002;identity++){NSMutableDictionary *event=Event(identity,identity==6001,NO,identity==6001);event[@"created"]=@(floor(NSDate.date.timeIntervalSince1970));[manager receiveNativeSession:event[@"conversation"] wrap:event epoch:epoch completion:^(BOOL claim){CHECK(claim);}];}
         NSMutableDictionary *pat=Event(6003,YES,NO,NO);pat[@"created"]=@(floor(NSDate.date.timeIntervalSince1970));[manager receivePat:pat conversation:@"room@chatroom" epoch:epoch];
     };dispatch_async(dispatch_get_main_queue(),begin);
-    __block void (^finish)(void);finish=^{if(sendCount==3 && patCount==1 && revokeCount==1){finish=nil;CHECK(!controlNSTimerFired);CHECK(UIApplication.sharedApplication.applicationState==UIApplicationStateBackground);CHECK(dispatch_get_specific(&MainQueueKey)!=NULL);printf("A/B/C dispatch-only Background: text=3 (mention=1 keyword=1 patReply=1) pat=1 revoke=1; NSTimerControl=0; NSRunLoop was never pumped after dispatch_main\n");printf("Automation dispatch timer: %lu checks passed\n",(unsigned long)checks);fflush(stdout);exit(0);}dispatch_after(dispatch_time(DISPATCH_TIME_NOW,20*NSEC_PER_MSEC),dispatch_get_main_queue(),finish);};dispatch_async(dispatch_get_main_queue(),finish);
+    __block void (^finish)(void);finish=^{if(sendCount==3 && patCount==1 && revokeCount==1){finish=nil;CHECK(!controlNSTimerFired && !protectedAvailable);CHECK(UIApplication.sharedApplication.applicationState==UIApplicationStateBackground);CHECK(dispatch_get_specific(&MainQueueKey)!=NULL);CHECK([[manager valueForKey:@"waitingIngress"] count]==0);printf("A/B/C dispatch-only Locked Background: ProtectedData=NO text=3 (mention=1 keyword=1 patReply=1) pat=1 revoke=1; NSTimerControl=0; noUnlockNotification; NSRunLoop was never pumped after dispatch_main\n");printf("Automation dispatch timer: %lu checks passed\n",(unsigned long)checks);fflush(stdout);exit(0);}dispatch_after(dispatch_time(DISPATCH_TIME_NOW,20*NSEC_PER_MSEC),dispatch_get_main_queue(),finish);};dispatch_async(dispatch_get_main_queue(),finish);
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW,8*NSEC_PER_SEC),dispatch_get_main_queue(),^{fprintf(stderr,"F dispatch-only failure: text=%lu pat=%lu revoke=%lu NSTimerControl=%d\n",(unsigned long)sendCount,(unsigned long)patCount,(unsigned long)revokeCount,controlNSTimerFired);exit(1);});
     dispatch_main();
 }
@@ -250,7 +328,7 @@ int main(int argc,const char **argv){@autoreleasepool{
     AutomationTestManager *reopened=Manager();CHECK(Receive(reopened,serverOnly));CHECK(Pending(reopened)==0);
     NSMutableDictionary *ownBeforeStartup=Event(998,NO,YES,NO);ownBeforeStartup[@"created"]=@(wall-3);CHECK(!Receive(reopened,ownBeforeStartup));CHECK(Pending(reopened)==0);[NSNotificationCenter.defaultCenter removeObserver:reopened];
     // Startup arbitration waits for rules/claims instead of allowing AI to race
-    // a cold configuration load. The same timer bounds a stalled load to 30s.
+    // a cold configuration load. The same timer bounds ingress waiting to 10m.
     AutomationTestManager *cold=[AutomationTestManager new];__block BOOL coldDone=NO,coldClaim=NO;
     [cold receiveNativeSession:@"bob" wrap:serverOnly epoch:epoch completion:^(BOOL claim){coldDone=YES;coldClaim=claim;}];CHECK(!coldDone);Wait(^BOOL{return coldDone;});CHECK(coldClaim && Pending(cold)==0);[NSNotificationCenter.defaultCenter removeObserver:cold];
     AutomationTestManager *stalled=[AutomationTestManager new];dispatch_semaphore_t releaseLoad=dispatch_semaphore_create(0);dispatch_queue_t stalledIO=[stalled valueForKey:@"io"];

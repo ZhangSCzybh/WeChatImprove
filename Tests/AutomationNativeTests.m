@@ -11,10 +11,15 @@
 static NSUInteger checks,hooks,epoch=12,messageEvents,patEvents,ownedRemembers;
 static BOOL suspended,accountLock;
 static id receivedSession,receivedWrap,receivedPat;
+static NSMutableArray *receivedPats;
 static NSString *managerAccount=@"me",*rememberedAccount;
 static id mustBeRememberedBeforeWrap;
 static unsigned int rememberedLocalID;
 static NSMutableArray *trace;
+static NSUInteger xmlParserCalls;
+static id xmlParserWrap,xmlParserSession;
+static NSDictionary *xmlParserResult;
+static BOOL xmlParserThrows;
 #define CHECK(c) do {checks++;if(!(c)){fprintf(stderr,"FAIL %d: %s\n",__LINE__,#c);exit(1);}}while(0)
 void CSAutomationTestInstallIngressHooks(void);
 void CSAutomationTestBootstrapIngress(void);
@@ -34,6 +39,21 @@ void CSAutomationRememberOwnedSend(id wrap,NSString *account,NSString *conversat
     CHECK(NSThread.isMainThread);CHECK([account isEqual:@"me"]);CHECK([conversation isEqual:receivedSession] || receivedSession==nil);
     CHECK(CSAutomationIsOwnedSend(wrap));rememberedAccount=account;rememberedLocalID=[CSMessageNativeInvoke(wrap,@"m_uiMesLocalID",@[]) unsignedIntValue];ownedRemembers++;[trace addObject:@"remember"];
 }
+// This suite owns the ingress seam only. Core and manager integration suites
+// exercise the real XML parser and authorization; this must not parse fixtures
+// or manufacture PatMessageWraps and claim protocol coverage.
+NSDictionary *CSAutomationPatFromXMLMessage(id wrap,NSString *session){
+    CHECK(NSThread.isMainThread);xmlParserCalls++;xmlParserWrap=wrap;xmlParserSession=session;[trace addObject:@"xml-parser"];
+    if(xmlParserThrows)[NSException raise:@"ParserFailure" format:@"isolated from native reception"];
+    return xmlParserResult;
+}
+// Legacy ingress fixtures expose no unified SyncCmdHandler selectors. Resolve
+// that new production class dependency without creating another native route.
+@implementation CSMessageNativeEnvironment
+- (NSString *)currentAccountID{return managerAccount;}
+- (id)serviceNamed:(NSString *)name{(void)name;return nil;}
+- (id)controllerForCell:(id)cell{(void)cell;return nil;}
+@end
 @implementation CSAutomationManager
 + (instancetype)sharedManager{static id value;static dispatch_once_t once;dispatch_once(&once,^{value=[self new];});return value;}
 - (NSString *)accountID{return managerAccount;}
@@ -43,7 +63,7 @@ void CSAutomationRememberOwnedSend(id wrap,NSString *account,NSString *conversat
     CHECK(NSThread.isMainThread);CHECK(eventEpoch==epoch);messageEvents++;receivedSession=session;receivedWrap=wrap;[trace addObject:@"message"];
 }
 - (void)receivePat:(id)pat conversation:(NSString *)conversation epoch:(NSUInteger)eventEpoch{
-    CHECK(NSThread.isMainThread);CHECK(eventEpoch==epoch);CHECK([conversation isEqual:@"room@chatroom"]);patEvents++;receivedPat=pat;[trace addObject:@"pat"];
+    CHECK(NSThread.isMainThread);CHECK(eventEpoch==epoch);CHECK([conversation isEqual:@"room@chatroom"]);patEvents++;receivedPat=pat;[receivedPats addObject:pat];[trace addObject:@"pat"];
 }
 @end
 
@@ -54,6 +74,16 @@ void CSAutomationRememberOwnedSend(id wrap,NSString *account,NSString *conversat
 @property BOOL canRevoke;
 @end
 @implementation PatWrap @end
+@interface TestPatMessageWrap : NSObject
+@property(nonatomic,copy) NSString *chatUserName;
+@property(nonatomic,strong) id patWraps;
+@end
+@implementation TestPatMessageWrap @end
+@interface WrongPatTime : NSObject
+@property long long serverId;
+@property unsigned int createTime;
+@end
+@implementation WrongPatTime @end
 @interface TestSendPatWrap : NSObject
 @property(nonatomic,copy) NSString *fromUserName,*pattedUserName,*chatUserName;
 @property unsigned long long scene;
@@ -113,9 +143,10 @@ void CSAutomationRememberOwnedSend(id wrap,NSString *account,NSString *conversat
 @end
 @interface CMessageWrap : NSObject
 @property long long m_n64MesSvrID;
-@property unsigned int m_uiMesLocalID,m_uiCreateTime,m_uiStatus,m_uiAppMsgInnerType;
+@property unsigned int m_uiMesLocalID,m_uiCreateTime,m_uiStatus,m_uiMessageType,m_uiAppMsgInnerType;
 @property(nonatomic,copy) NSString *m_nsFromUsr,*m_nsToUsr,*m_nsContent,*m_nsRealChatUsr,*m_nsAtUserList;
 @property(nonatomic,strong) id quoteSource;
+@property(nonatomic,strong) id patMessageWrap;
 @property long long constructedType;
 @property NSUInteger builds,sourceUpdates;
 @property BOOL referenceable;
@@ -125,23 +156,36 @@ void CSAutomationRememberOwnedSend(id wrap,NSString *account,NSString *conversat
 - (void)UpdateMsgSource;
 @end
 @implementation CMessageWrap
-- (instancetype)initWithMsgType:(long long)type{if((self=[super init])){_constructedType=type;_referenceable=YES;}return self;}
+- (instancetype)initWithMsgType:(long long)type{if((self=[super init])){_constructedType=type;_m_uiMessageType=(unsigned int)type;_referenceable=YES;}return self;}
 - (BOOL)msgCanBeRefered{return self.referenceable;}
 - (void)updateForReferMsg:(id)source replyContent:(NSString *)content{self.quoteSource=source;self.m_nsContent=[@"native-escaped:" stringByAppendingString:content];self.builds++;}
 - (void)UpdateMsgSource{self.sourceUpdates++;}
 @end
+@interface WrongXMLMessageType : NSObject
+@property unsigned long long m_uiMessageType;
+@end
+@implementation WrongXMLMessageType @end
 @interface CMessageMgr : NSObject
-@property NSUInteger adds,asyncs,syncs,batches;
-@property BOOL throwsAdd,throwsAsync,throwsSync,throwsBatch;
+@property NSUInteger adds,asyncs,syncs,notAddDBs,batches;
+@property BOOL throwsAdd,throwsAsync,throwsSync,throwsNotAddDB,throwsBatch;
+@property BOOL throwsRevokeLookup;
+@property long long revokedServer;
+@property NSUInteger revokeLookups;
 @property(nonatomic,strong) id lastSession,lastWrap,lastUsers;
 @property(nonatomic,copy) void (^duringAdd)(id session,id wrap);
 - (void)AddMsg:(id)session MsgWrap:(id)wrap;
 - (void)AsyncOnAddMsg:(id)session MsgWrap:(id)wrap;
 - (void)onNewSyncAddMessage:(id)wrap;
+- (void)onNewSyncNotAddDBMessage:(id)wrap;
 - (void)AsyncOnAddMsgListForSession:(id)sessions NotifyUsrName:(id)users;
 - (void)AsyncOnAddMsgForSession:(id)session MsgWrap:(id)wrap;
+- (id)GetRevokeMsgBySvrId:(long long)server;
 @end
 @implementation CMessageMgr
+- (id)GetRevokeMsgBySvrId:(long long)server{
+    self.revokeLookups++;if(self.throwsRevokeLookup)[NSException raise:@"RevokeLookup" format:@"unavailable"];
+    return server==self.revokedServer?self:nil;
+}
 - (void)AddMsg:(id)session MsgWrap:(id)wrap{
     self.adds++;self.lastSession=session;self.lastWrap=wrap;[trace addObject:@"add"];
     if(self.throwsAdd)[NSException raise:@"NativeAdd" format:@"must propagate"];
@@ -157,6 +201,12 @@ void CSAutomationRememberOwnedSend(id wrap,NSString *account,NSString *conversat
     // Native m_bNew=NO still notifies onNewSyncAddMessage but returns before
     // AsyncOnAddMsg. Reproduce that confirmed branch at the native boundary.
     if(self.throwsSync)[NSException raise:@"NativeSync" format:@"must propagate"];
+}
+- (void)onNewSyncNotAddDBMessage:(id)wrap{
+    self.notAddDBs++;self.lastWrap=wrap;[trace addObject:@"not-add-db"];
+    // This callback is independent of Add/AsyncOnAdd and the generated49/62
+    // callback. Its original can complete without producing either model.
+    if(self.throwsNotAddDB)[NSException raise:@"NativeNotAddDB" format:@"must propagate"];
 }
 - (void)AsyncOnAddMsgListForSession:(id)sessions NotifyUsrName:(id)users{
     self.batches++;self.lastSession=sessions;self.lastUsers=users;[trace addObject:@"batch"];
@@ -311,8 +361,8 @@ static void TestQuotes(void){
 static void TestIngress(void){
     // Bootstrap installs thin hooks before manager/backup readiness, without
     // requiring start, a foreground container, or a keepalive switch.
-    CHECK(!CSAutomationManager.sharedManager.ready);CSAutomationTestBootstrapIngress();CHECK(hooks==8);
-    CSAutomationTestInstallIngressHooks();CHECK(hooks==8);TestEnvironment *env=Environment();CMessageWrap *wrap=Source(@"alice",@"me");
+    CHECK(!CSAutomationManager.sharedManager.ready);CSAutomationTestBootstrapIngress();NSUInteger installed=hooks;CHECK(installed>=8);
+    CSAutomationTestInstallIngressHooks();CHECK(hooks==installed);TestEnvironment *env=Environment();CMessageWrap *wrap=Source(@"alice",@"me");
     messageEvents=patEvents=ownedRemembers=0;receivedSession=nil;[trace removeAllObjects];
     [env.message AsyncOnAddMsg:@"alice" MsgWrap:wrap];CHECK(!messageEvents && env.message.asyncs==1);Drain();
     CHECK(messageEvents==1 && receivedSession==env.message.lastSession && receivedWrap==wrap);CHECK([trace[0]isEqual:@"async"]);
@@ -378,9 +428,90 @@ static void TestColdOwnedIngress(void){
     managerAccount=@"me";
     printf("Automation native cold-owned ingress: native sender fallback registered exact IDs before rebuilt queued consumer\n");
 }
+static void TestCompoundPatIngress(void){
+    TestEnvironment *env=Environment();CMessageWrap *wrap=Source(@"room@chatroom",@"me");
+    wrap.m_uiMessageType=49;wrap.m_uiAppMsgInnerType=62;wrap.m_n64MesSvrID=999;
+    TestPatMessageWrap *compound=[TestPatMessageWrap new];compound.chatUserName=@"room@chatroom";
+    PatWrap *first=[PatWrap new],*second=[PatWrap new];
+    first.fromUserName=second.fromUserName=@"alice";first.pattedUserName=second.pattedUserName=@"me";
+    first.serverId=701;second.serverId=702;first.createTime=1794384000123ULL;second.createTime=first.createTime+1;
+    compound.patWraps=@[first,second];wrap.patMessageWrap=compound;
+    NSUInteger before=patEvents,oldMessages=messageEvents,oldAdds=env.pat.adds;
+    [receivedPats removeAllObjects];[trace removeAllObjects];
+    OffMain(^{[env.message onNewSyncAddMessage:wrap];});CHECK(patEvents==before);Drain();
+    CHECK(env.message.syncs==1 && env.pat.adds==oldAdds && messageEvents==oldMessages+1);
+    CHECK(patEvents==before+2 && receivedPats[0]==first && receivedPats[1]==second);
+    CHECK(first.serverId==701 && second.serverId==702 && first.createTime==1794384000123ULL);
+    CHECK(([trace isEqual:@[@"sync",@"message",@"pat",@"pat"]]));
+    // The outer merged message ID is never used as a pat identity. Overlapping
+    // native callbacks intentionally retain 701/702 for the manager's ledger.
+    [env.message AsyncOnAddMsgListForSession:@{@"room@chatroom":wrap} NotifyUsrName:nil];Drain();
+    [env.pat addPatWrap:first toChat:@"room@chatroom" newXMLMessageWrap:wrap index:NULL];Drain();
+    CHECK(patEvents==before+5 && receivedPats[2]==first && receivedPats[3]==second && receivedPats[4]==first);
+    before=patEvents;
+    compound.chatUserName=@"unrelated@chatroom";[env.message onNewSyncAddMessage:wrap];Drain();CHECK(patEvents==before);
+    compound.chatUserName=@"room@chatroom";
+    [env.message AsyncOnAddMsgListForSession:@{@"wrong@chatroom":wrap} NotifyUsrName:nil];Drain();CHECK(patEvents==before);
+    wrap.m_nsToUsr=@"";[env.message onNewSyncAddMessage:wrap];Drain();CHECK(patEvents==before);wrap.m_nsToUsr=@"me";
+    wrap.m_nsFromUsr=@"other";[env.message onNewSyncAddMessage:wrap];Drain();CHECK(patEvents==before);wrap.m_nsFromUsr=@"room@chatroom";
+    wrap.m_uiMessageType=1;[env.message onNewSyncAddMessage:wrap];Drain();CHECK(patEvents==before);wrap.m_uiMessageType=49;
+    wrap.m_uiAppMsgInnerType=57;[env.message onNewSyncAddMessage:wrap];Drain();CHECK(patEvents==before);wrap.m_uiAppMsgInnerType=62;
+    compound.patWraps=@{@"not":@"an array"};[env.message onNewSyncAddMessage:wrap];Drain();CHECK(patEvents==before);
+    WrongPatTime *wrong=[WrongPatTime new];wrong.serverId=703;wrong.createTime=123;
+    first.serverId=0;second.createTime=0;compound.patWraps=@[first,second,wrong,@"not a pat"];
+    [env.message onNewSyncAddMessage:wrap];Drain();CHECK(patEvents==before);
+    first.serverId=701;second.createTime=1794384000124ULL;compound.patWraps=@[first,second];
+    [env.message onNewSyncAddMessage:wrap];epoch++;Drain();CHECK(patEvents==before);
+    suspended=YES;[env.message onNewSyncAddMessage:wrap];Drain();CHECK(patEvents==before);suspended=NO;
+    env.message.throwsSync=YES;BOOL threw=NO;
+    @try{[env.message onNewSyncAddMessage:wrap];}@catch(NSException *exception){threw=[exception.name isEqual:@"NativeSync"];}
+    CHECK(threw);Drain();CHECK(patEvents==before);
+    printf("Automation native compound pat ingress: sync/batch bypass XML insertion; each native server ID, millisecond timestamp, conversation and ABI retained\n");
+}
+static void TestRawXMLPatIngress(void){
+    TestEnvironment *env=Environment();CMessageWrap *raw=Source(@"room@chatroom",@"me");
+    raw.m_uiMessageType=10002;raw.m_uiCreateTime=1794384000;raw.m_n64MesSvrID=801;raw.m_uiMesLocalID=0;
+    raw.m_nsContent=@"<sysmsg type=\"pat\"><pat><fromusername>alice</fromusername><chatusername>room@chatroom</chatusername><pattedusername>me</pattedusername><template>pat</template></pat></sysmsg>";
+    id snapshot=[NSObject new];xmlParserResult=@{@"pat":snapshot,@"conversation":@"room@chatroom"};
+    NSUInteger before=patEvents,messages=messageEvents,calls=xmlParserCalls;
+    [trace removeAllObjects];[receivedPats removeAllObjects];
+    OffMain(^{[env.message onNewSyncNotAddDBMessage:raw];});
+    CHECK(env.message.notAddDBs==1 && env.message.lastWrap==raw && patEvents==before && xmlParserCalls==calls);
+    CHECK(!env.message.adds && !env.message.asyncs && !env.message.syncs && !env.pat.adds && raw.patMessageWrap==nil);
+    Drain();CHECK(messageEvents==messages+1 && patEvents==before+1 && receivedPat==snapshot);
+    CHECK(xmlParserCalls==calls+1 && xmlParserWrap==raw && [xmlParserSession isEqual:@""]);
+    CHECK(raw.m_uiMesLocalID==0 && raw.m_n64MesSvrID==801 && raw.m_uiCreateTime==1794384000);
+    CHECK(([trace isEqual:@[@"not-add-db",@"message",@"xml-parser",@"pat"]]));
+    // Existing message callbacks can overlap the new route. They carry the
+    // same raw wrapper/session into the real parser and manager ledger.
+    [env.message onNewSyncAddMessage:raw];[env.message AsyncOnAddMsg:@"room@chatroom" MsgWrap:raw];Drain();
+    CHECK(patEvents==before+3 && receivedPats[0]==snapshot && receivedPats[1]==snapshot && receivedPats[2]==snapshot);
+    CHECK(xmlParserWrap==raw && [xmlParserSession isEqual:@"room@chatroom"]);
+    before=patEvents;calls=xmlParserCalls;xmlParserResult=nil;
+    [env.message onNewSyncNotAddDBMessage:raw];Drain();CHECK(patEvents==before && xmlParserCalls==calls+1);
+    xmlParserResult=@{@"pat":snapshot,@"conversation":@"room@chatroom"};calls=xmlParserCalls;
+    raw.m_uiMessageType=1;[env.message onNewSyncNotAddDBMessage:raw];Drain();CHECK(patEvents==before && xmlParserCalls==calls);raw.m_uiMessageType=10002;
+    WrongXMLMessageType *wrong=[WrongXMLMessageType new];wrong.m_uiMessageType=10002;
+    [env.message onNewSyncNotAddDBMessage:wrong];[env.message onNewSyncNotAddDBMessage:nil];Drain();CHECK(patEvents==before && xmlParserCalls==calls);
+    [env.message onNewSyncNotAddDBMessage:raw];epoch++;Drain();CHECK(patEvents==before && xmlParserCalls==calls);
+    suspended=YES;[env.message onNewSyncNotAddDBMessage:raw];Drain();CHECK(patEvents==before && xmlParserCalls==calls);suspended=NO;
+    messages=messageEvents;env.message.throwsNotAddDB=YES;BOOL threw=NO;
+    @try{[env.message onNewSyncNotAddDBMessage:raw];}@catch(NSException *exception){threw=[exception.name isEqual:@"NativeNotAddDB"];}
+    CHECK(threw);Drain();CHECK(messageEvents==messages && patEvents==before && xmlParserCalls==calls);env.message.throwsNotAddDB=NO;
+    xmlParserThrows=YES;[env.message onNewSyncNotAddDBMessage:raw];Drain();CHECK(patEvents==before && xmlParserCalls==calls+1);xmlParserThrows=NO;
+    calls=xmlParserCalls;env.message.revokedServer=raw.m_n64MesSvrID;
+    NSUInteger lookups=env.message.revokeLookups;
+    [env.message onNewSyncNotAddDBMessage:raw];CHECK(env.message.revokeLookups==lookups+1);Drain();CHECK(patEvents==before && xmlParserCalls==calls);
+    [env.message onNewSyncAddMessage:raw];[env.message AsyncOnAddMsg:@"room@chatroom" MsgWrap:raw];Drain();CHECK(patEvents==before && xmlParserCalls==calls);
+    // A missing/temporarily unavailable optional lookup must not turn into a
+    // new global readiness gate for raw pat reception.
+    env.message.throwsRevokeLookup=YES;[env.message onNewSyncNotAddDBMessage:raw];Drain();CHECK(patEvents==before+1 && xmlParserCalls==calls+1);env.message.throwsRevokeLookup=NO;
+    xmlParserResult=nil;xmlParserWrap=xmlParserSession=nil;
+    printf("Automation native raw XML ingress seam: separate NotAddDB original precedes main-queue parser; raw identity, zero localID, ABI, epoch and exception boundaries preserved\n");
+}
 static void ChangeABI(Class cls,NSString *selector,const char *encoding){Method method=class_getInstanceMethod(cls,NSSelectorFromString(selector));CHECK(method);CHECK(class_addMethod(cls,NSSelectorFromString(selector),method_getImplementation(method),encoding));}
 int main(int argc,const char **argv){@autoreleasepool{
-    trace=[NSMutableArray array];
+    trace=[NSMutableArray array];receivedPats=[NSMutableArray array];
     Class patService=objc_allocateClassPair(TestSendPatMgr.class,"SendPatMgr",0);CHECK(patService);objc_registerClassPair(patService);
     Class patSend=objc_allocateClassPair(TestSendPatWrap.class,"SendPatWrap",0);CHECK(patSend);objc_registerClassPair(patSend);
     if(argc>1){
@@ -395,6 +526,6 @@ int main(int argc,const char **argv){@autoreleasepool{
         printf("Automation native ABI %s: %lu checks passed\n",argv[1],(unsigned long)checks);return 0;
     }
     CSAutomationInstallNativeHooks();CHECK(hooks==3);CSAutomationInstallNativeHooks();CHECK(hooks==3);
-    TestPatSending();TestPatObservation();TestPatUnavailableAccount();TestQuotes();TestIngress();TestColdOwnedIngress();
+    TestPatSending();TestPatObservation();TestPatUnavailableAccount();TestQuotes();TestIngress();TestColdOwnedIngress();TestCompoundPatIngress();TestRawXMLPatIngress();CHECK(hooks==9);
     printf("Automation native: %lu checks passed\n",(unsigned long)checks);return 0;
 }}

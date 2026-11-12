@@ -19,7 +19,7 @@ Path(sys.argv[1],'AIStoreUnderTest.m').write_text(store)
 PY
 xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-deprecated-declarations -Wno-incomplete-implementation \
  -ITests/AIDetailUIKit -IControllers -I"$test_dir" -framework Foundation -framework ImageIO -framework CoreGraphics \
- "$test_dir/AIStoreUnderTest.m" Controllers/CSAIClient.m Controllers/CSAIReplyCoordinator.m Controllers/CSAIMessageAdapter.m Controllers/CSAIBackgroundSync.m \
+ "$test_dir/AIStoreUnderTest.m" Controllers/CSAIClient.m Controllers/CSAIReplyCoordinator.m Controllers/CSAIMessageAdapter.m Controllers/CSAIBackgroundSync.m Controllers/CSBackgroundSyncBudget.m \
  Controllers/CSAIImagePreparer.m Controllers/CSAIReplyManager.m Controllers/CSBackupMutation.m Controllers/CSCloseFriendPolicy.m \
  Controllers/CSCloseFriendAutomationProjection.m Tests/AIReplyManagerTests.m -o "$test_dir/tests"
 test_output=$("$test_dir/tests" "$test_dir/state.plist")

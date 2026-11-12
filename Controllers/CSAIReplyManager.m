@@ -1,4 +1,5 @@
 #import "CSAIReplyManager.h"
+#import "CSBackgroundSyncBudget.h"
 #import "CSAutomationManager.h"
 #import "CSAIReplyCoordinator.h"
 #import "CSAIBackgroundSync.h"
@@ -363,7 +364,7 @@ BOOL CSAIReplyMessageIngressAllowsSession(id session,NSUInteger epoch) {
         if([CSMessageNativeInvoke(service,@"isGettingData",@[]) boolValue])return;
         if(![self allowsBackgroundSync] || ![self isCurrentAccount:account epoch:epoch])return;
         // YES means accepted by the native service, not that messages arrived.
-        CSAIObserveBackgroundSyncRequest(epoch,^{
+        [CSBackgroundSyncBudget.sharedBudget performForEpoch:epoch request:^{CSAIObserveBackgroundSyncRequest(epoch,^{
             // The observer has finished its guarded eligibility capture. Its
             // request frame can now be claimed: use only local snapshots here,
             // then invoke this wrapper directly without more native getters.
@@ -372,7 +373,7 @@ BOOL CSAIReplyMessageIngressAllowsSession(id session,NSUInteger epoch) {
                self.savingConfiguration || !self.backgroundSync.active || !CSBackupIsReady() || CSBackupAccountIsSuspended() ||
                self.enteringForeground || UIApplication.sharedApplication.applicationState!=UIApplicationStateBackground)return;
             CSMessageNativeInvoke(service,@"BackGroundFetchToSync",@[]);
-        });
+        });}];
     } @catch(__unused NSException *exception) {
         // Unsupported or temporarily unavailable native services wait for the next interval.
     }

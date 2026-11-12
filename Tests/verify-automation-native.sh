@@ -17,7 +17,7 @@ source=source.replace('"../Controllers/','"')
 (target/'substrate.h').write_text('#import <objc/runtime.h>\nvoid MSHookMessageEx(Class, SEL, IMP, IMP *);\n')
 PY
 xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror \
- -Wno-incomplete-implementation -Wno-unused-function -IControllers -I"$test_dir" -framework Foundation \
+ -Wno-incomplete-implementation -Wno-unused-function -IControllers -IHeaders -I"$test_dir" -framework Foundation \
  "$test_dir/NativeDispatchUnderTest.m" "$test_dir/NativeSendUnderTest.m" \
  "$test_dir/AutomationIngressUnderTest.m" Controllers/CSAutomationNativeAdapter.m Tests/AutomationNativeTests.m \
  -o "$test_dir/tests"
@@ -30,7 +30,7 @@ if [[ "${1:-}" == "--ios" ]]; then
  for arch in arm64 arm64e; do
   for source in Controllers/CSAutomationNativeAdapter.m "$test_dir/AutomationIngressUnderTest.m" Controllers/CSMessageSendAdapter.m; do
    xcrun --sdk iphoneos clang -target "$arch-apple-ios15.0" -isysroot "$sdk_dir" \
-    -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-function -IControllers -I"$test_dir" \
+    -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-function -IControllers -IHeaders -I"$test_dir" \
     -c "$source" -o "$test_dir/$(basename "$source").$arch.o"
   done
  done

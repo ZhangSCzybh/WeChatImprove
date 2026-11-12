@@ -17,7 +17,8 @@ static NSDictionary *State(NSString *account,NSString *text) {
     NSMutableDictionary *configuration=[CSAutomationDefaultConfiguration() mutableCopy];
     for(NSString *module in @[@"patBack",@"patReply",@"mentionReply",@"keywordReply"]){
         NSMutableDictionary *value=[configuration[module] mutableCopy];
-        [value addEntriesFromDictionary:@{@"enabled":@YES,@"friends":@[@"friend"],@"groups":@[@"101@chatroom"],@"delay":@7}];
+        [value addEntriesFromDictionary:@{@"enabled":@YES,@"groups":@[@"101@chatroom"],@"delay":@7}];
+        if(![module isEqual:@"mentionReply"])value[@"friends"]=@[@"friend"];
         if([module isEqual:@"patReply"] || [module isEqual:@"mentionReply"])value[@"contents"]=@[text,@"第二条回复"];
         if([module isEqual:@"patBack"])value[@"revoke"]=@YES;
         if([module isEqual:@"keywordReply"])value[@"rules"]=@[@{@"id":@"F4828A1B-BD19-4107-9A3A-F1BA2CC26F86",@"keyword":@"你好",@"match":@"contains",@"contents":@[text]}];
@@ -71,9 +72,17 @@ int main(int argc,char **argv) { @autoreleasepool {
     Check([CSBackupCodec decode:[CSBackupCodec encode:snapshot error:&error] error:&error]!=nil,@"portable codec round trip");
     NSSet *modules=[NSSet setWithObject:@"automation"],*accounts=[NSSet setWithObject:@"alice"];
     Check(CSAutomationWriteState(changed,aliceURL,@"alice",&error),@"edit fixture after snapshot");
-    NSDictionary *preview=[engine preview:snapshot modules:modules accounts:accounts error:&error];Check(preview!=nil,error.description?:@"preview");
+    // A real 2.5-1 portable field contains the retired mention friends key.
+    // Import it through preview/apply rather than normalizing the fixture first.
+    NSMutableDictionary *legacyState=[original mutableCopy],*legacyConfig=[original[@"configuration"] mutableCopy],*legacyMention=[legacyConfig[@"mentionReply"] mutableCopy];
+    legacyMention[@"friends"]=@[@"retired-private-selection"];legacyConfig[@"mentionReply"]=legacyMention;legacyState[@"configuration"]=legacyConfig;
+    Check([CSBackupRegistry validateValue:legacyState entry:[CSBackupRegistry entryForDomain:CSAutomationBackupDomain key:@"alice"] error:&error],@"2.5-1 automation field remains a valid backup import");
+    NSMutableDictionary *legacySnapshot=[snapshot mutableCopy];NSMutableArray *legacyFields=[NSMutableArray array];
+    for(NSDictionary *field in snapshot[@"fields"]){NSMutableDictionary *replacement=[field mutableCopy];if([field[@"domain"] isEqual:CSAutomationBackupDomain])replacement[@"value"]=legacyState;[legacyFields addObject:replacement];}legacySnapshot[@"fields"]=legacyFields;
+    NSDictionary *preview=[engine preview:legacySnapshot modules:modules accounts:accounts error:&error];Check(preview!=nil,error.description?:@"preview");
     Check([preview[@"changes"] count]==1,@"one module configuration change");
     Check([preview[@"fields"][0][@"value"] isEqual:Disabled(original)],@"restore disables all four modules and preserves rule data/account");
+    Check(preview[@"fields"][0][@"value"][@"configuration"][@"mentionReply"][@"friends"]==nil && [preview[@"fields"][0][@"value"][@"configuration"][@"mentionReply"][@"groups"] isEqual:original[@"configuration"][@"mentionReply"][@"groups"]],@"legacy preview drops only mention private selection and preserves group list");
     Check([[preview[@"warnings"] componentsJoinedByString:@" "] containsString:@"四个模块开关均关闭"],@"preview explains disabled restored modules");
     Check([engine prepare:preview error:&error],error.description?:@"prepare");
     Check([CSAutomationReadState(aliceURL,@"alice",&error) isEqual:changed],@"prepare does not alter live config");

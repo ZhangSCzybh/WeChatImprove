@@ -20,10 +20,6 @@ static BOOL CSAutomationGuideHookInstalled,CSAutomationResultHookInstalled,CSAut
 @end
 @implementation CSAutomationPatObservation @end
 
-static BOOL CSAutomationPatAccountValid(CSAutomationPatObservation *state) {
-    return state && state.epoch==CSBackupAccountEpoch() && !CSBackupAccountIsSuspended() &&
-        [[state.environment currentAccountID] isEqual:state.account];
-}
 static BOOL CSAutomationRequireLivePatAccount(id<CSMessageActionEnvironment> environment,NSString *account,NSUInteger epoch,BOOL *deferred) {
     if(epoch!=CSBackupAccountEpoch() || CSBackupAccountIsSuspended())return NO;
     id live=[environment currentAccountID];
@@ -37,7 +33,7 @@ static BOOL CSAutomationPatResultIdentityValid(CSAutomationPatObservation *state
     // A native CGI success belongs to this exact SendPatWrap and account epoch.
     // Protected data can temporarily hide the live account; keep the success
     // fact so its retraction can resume after unlock. Submissions still use
-    // CSAutomationPatAccountValid and require the live account to match.
+    // CSAutomationRequireLivePatAccount and require the live account to match.
     id live=[state.environment currentAccountID];
     return !live || ([live isKindOfClass:NSString.class] && (![live length] || [live isEqual:state.account]));
 }

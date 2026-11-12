@@ -3,6 +3,8 @@
 #import "CSAutomationTiming.h"
 #import "CSAutomationEventAdapter.h"
 #import "CSAutomationNativeAdapter.h"
+#import "CSBackgroundSyncBudget.h"
+#import "CSAINativeSyncObserver.h"
 #import "CSMessageSendAdapter.h"
 #import "CSBackupBootstrap.h"
 #import "CSAuthorizationManager.h"
@@ -12,12 +14,6 @@
 #import <math.h>
 #import <limits.h>
 #import <mach/mach_time.h>
-
-// Kept here until the common sender's public declaration is installed. This is
-// a service route, never the chat page's quote/draft action.
-@interface CSMessageSendAdapter (CSAutomationQuote)
-- (nullable CSMessagePreparedSend *)prepareAutomationQuote:(NSString *)text source:(id)source targetID:(NSString *)targetID accountID:(NSString *)accountID;
-@end
 
 NSNotificationName const CSAutomationConfigurationDidChange=@"CSAutomationConfigurationDidChange";
 static const NSUInteger CSAutomationMaximumPending=1000;
@@ -62,6 +58,9 @@ static const NSTimeInterval CSAutomationCapabilityRetry=5;
 @property(nonatomic,strong) NSMutableDictionary<NSString *,CSAutomationAdmission *> *admissions;
 @property(nonatomic,strong) NSMutableArray<NSDictionary *> *waitingIngress;
 @property(nonatomic,strong) dispatch_source_t timer;
+@property(nonatomic,strong) dispatch_source_t backgroundSyncTimer;
+@property(nonatomic) BOOL enteringForeground,refreshingBackgroundSync;
+@property(nonatomic) NSUInteger backgroundSyncGeneration;
 @end
 
 static NSError *AutomationError(NSString *message) {
@@ -80,7 +79,7 @@ static NSString *AdmissionKey(NSString *action,NSString *identifier) {return [NS
         _admissionBoundary=[self currentDate].timeIntervalSince1970;
     }return self;
 }
-- (void)dealloc {[NSNotificationCenter.defaultCenter removeObserver:self];if(_timer)dispatch_source_cancel(_timer);for(CSAutomationTask *task in _tasks.allValues)if(task.observing)CSAutomationCancelPatObservation(task.sendPat);}
+- (void)dealloc {[NSNotificationCenter.defaultCenter removeObserver:self];if(_timer)dispatch_source_cancel(_timer);if(_backgroundSyncTimer)dispatch_source_cancel(_backgroundSyncTimer);for(CSAutomationTask *task in _tasks.allValues)if(task.observing)CSAutomationCancelPatObservation(task.sendPat);}
 // Explicit clock/path seams also let host tests leave the user's sandbox alone.
 - (NSDate *)currentDate {return NSDate.date;}
 - (NSTimeInterval)elapsedTime {
@@ -93,24 +92,14 @@ static NSString *AdmissionKey(NSString *action,NSString *identifier) {return [NS
     NSURL *library=[NSFileManager.defaultManager URLsForDirectory:NSLibraryDirectory inDomains:NSUserDomainMask].firstObject;
     return [library URLByAppendingPathComponent:@"Preferences/WeChatImprove" isDirectory:YES];
 }
-- (void)notify {[NSNotificationCenter.defaultCenter postNotificationName:CSAutomationConfigurationDidChange object:self];}
+- (void)notify {[NSNotificationCenter.defaultCenter postNotificationName:CSAutomationConfigurationDidChange object:self];[self refreshBackgroundSync];}
 - (BOOL)accountValid:(NSString *)account epoch:(NSUInteger)epoch {
     @try {return account.length && CSBackupIsReady() && !CSBackupAccountIsSuspended() && epoch==CSBackupAccountEpoch() &&
         epoch==self.accountEpoch && [self.accountID isEqual:account] && [[self.environment currentAccountID] isEqual:account] &&
         epoch==CSBackupAccountEpoch() && !CSBackupAccountIsSuspended();} @catch(__unused NSException *exception){return NO;}
 }
-- (BOOL)protectedDataAvailable {
-    UIApplication *application=UIApplication.sharedApplication;
-    SEL selector=NSSelectorFromString(@"isProtectedDataAvailable");
-    if(![application respondsToSelector:selector])return YES;
-    NSMethodSignature *signature=[application methodSignatureForSelector:selector];
-    if(!signature || signature.numberOfArguments!=2 || signature.methodReturnLength!=sizeof(BOOL))return NO;
-    NSInvocation *invocation=[NSInvocation invocationWithMethodSignature:signature];invocation.target=application;invocation.selector=selector;
-    @try {[invocation invoke];BOOL available=NO;[invocation getReturnValue:&available];return available;} @catch(__unused NSException *exception){return NO;}
-}
 - (NSString *)availabilityReason {
     @try {
-    if(![self protectedDataAvailable])return @"受保护数据暂不可用，等待解锁";
     if(!CSBackupIsReady() || CSBackupAccountIsSuspended())return @"账号配置暂未就绪";
     if(!self.ready)return @"自动功能配置暂未就绪";
     if(![self accountValid:self.accountID epoch:self.accountEpoch])return @"微信账号资料暂不可用";
@@ -131,12 +120,14 @@ static NSString *AdmissionKey(NSString *action,NSString *identifier) {return [NS
 - (void)start {
     if(!NSThread.isMainThread){dispatch_async(dispatch_get_main_queue(),^{[self start];});return;}
     if(self.started)return;self.started=YES;
-    for(NSString *name in @[@"CSBackupAccountChanged",@"CSAutomationRestoreDidComplete",UIApplicationDidBecomeActiveNotification,UIApplicationProtectedDataDidBecomeAvailable])
+    for(NSString *name in @[@"CSBackupAccountChanged",@"CSAutomationRestoreDidComplete",UIApplicationDidBecomeActiveNotification,UIApplicationProtectedDataDidBecomeAvailable,@"UIApplicationDidEnterBackgroundNotification",@"UIApplicationWillEnterForegroundNotification"])
         [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(changed:) name:name object:nil];
     [self refresh];
 }
 - (void)changed:(NSNotification *)note {
     if(!NSThread.isMainThread){dispatch_async(dispatch_get_main_queue(),^{[self changed:note];});return;}
+    if([note.name isEqual:@"UIApplicationWillEnterForegroundNotification"]){self.enteringForeground=YES;[self stopBackgroundSync];return;}
+    if([note.name isEqual:@"UIApplicationDidEnterBackgroundNotification"] || [note.name isEqual:UIApplicationDidBecomeActiveNotification])self.enteringForeground=NO;
     if([note.name isEqual:@"CSAutomationRestoreDidComplete"]){
         self.configurationGeneration++;self.ready=NO;self.loading=NO;self.saving=NO;self.admissionBoundary=self.currentDate.timeIntervalSince1970;self.hasExplicitAdmissionBoundary=YES;
         [self cancelWaitingIngress:@"配置已恢复，旧入站事件已取消。"];
@@ -145,7 +136,73 @@ static NSString *AdmissionKey(NSString *action,NSString *identifier) {return [NS
     self.nextLoadAttempt=0;[self refresh];
     for(CSAutomationTask *task in self.tasks.allValues)if(!task.observing)task.wakeAt=MAX(task.due,MIN(task.wakeAt,self.elapsedTime));
     for(CSAutomationAdmission *admission in [NSSet setWithArray:self.admissions.allValues])if(!admission.persisting)admission.wakeAt=self.elapsedTime;
-    [self drainWaitingIngress];[self processPending];
+    [self drainWaitingIngress];[self processPending];[self refreshBackgroundSync];
+}
+
+- (BOOL)backgroundSyncDemand {
+    @try {
+    if(!NSThread.isMainThread || self.enteringForeground || UIApplication.sharedApplication.applicationState!=UIApplicationStateBackground || !self.ready || self.loading || self.saving)return NO;
+    NSDictionary *configuration=self.configuration;
+    for(NSString *module in @[@"patBack",@"patReply"]){
+        NSDictionary *item=configuration[module];
+        if([item[@"enabled"] boolValue] && ([item[@"groups"] count] || [item[@"friends"] count]) && (![module isEqual:@"patReply"] || [item[@"contents"] count]))return YES;
+    }
+    return NO;
+    } @catch(__unused NSException *exception) {return NO;}
+}
+- (BOOL)backgroundSyncEligible {
+    @try {
+    if(![self backgroundSyncDemand])return NO;
+    NSDictionary *configuration=self.configuration;
+    // Message retrieval must not depend on contacts which themselves need sync.
+    // Existing reply admission/submission still performs all conversation checks.
+    if(![self accountValid:self.accountID epoch:self.accountEpoch] || !CSAuthorizationManager.sharedManager.isAuthorized)return NO;
+    return configuration==self.configuration && [self backgroundSyncDemand];
+    } @catch(__unused NSException *exception) {return NO;}
+}
+- (void)stopBackgroundSync {
+    self.backgroundSyncGeneration++;if(self.backgroundSyncTimer){dispatch_source_cancel(self.backgroundSyncTimer);self.backgroundSyncTimer=nil;}
+}
+- (void)armBackgroundSyncAfter:(NSTimeInterval)delay {
+    [self stopBackgroundSync];NSUInteger generation=self.backgroundSyncGeneration;
+    self.backgroundSyncTimer=dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER,0,0,dispatch_get_main_queue());
+    dispatch_source_set_timer(self.backgroundSyncTimer,dispatch_time(DISPATCH_TIME_NOW,(int64_t)(MAX(0.01,delay)*NSEC_PER_SEC)),DISPATCH_TIME_FOREVER,NSEC_PER_SEC);
+    __weak typeof(self) weakSelf=self;
+    dispatch_source_set_event_handler(self.backgroundSyncTimer,^{typeof(self) manager=weakSelf;if(!manager || generation!=manager.backgroundSyncGeneration)return;[manager backgroundSyncTick];});
+    dispatch_resume(self.backgroundSyncTimer);
+}
+- (void)refreshBackgroundSync {
+    if(!NSThread.isMainThread || self.refreshingBackgroundSync)return;self.refreshingBackgroundSync=YES;
+    @try {
+        if(![self backgroundSyncDemand]){[self stopBackgroundSync];return;}
+        if(!self.backgroundSyncTimer)[self armBackgroundSyncAfter:[CSBackgroundSyncBudget.sharedBudget nextDelayForEpoch:self.accountEpoch]];
+    } @catch(__unused NSException *exception) {[self stopBackgroundSync];}
+    @finally {self.refreshingBackgroundSync=NO;}
+}
+- (void)backgroundSyncTick {
+    if(![self backgroundSyncDemand]){[self stopBackgroundSync];return;}
+    NSTimeInterval delay=[CSBackgroundSyncBudget.sharedBudget nextDelayForEpoch:self.accountEpoch];
+    // Reserve a future wake before native getters can synchronously reenter.
+    [self armBackgroundSyncAfter:delay>0?delay:45];if(delay>0)return;
+    // Temporary account/native availability must not disable future retrieval.
+    if(![self backgroundSyncEligible])return;
+    NSDictionary *configuration=self.configuration;NSString *account=self.accountID;NSUInteger epoch=self.accountEpoch,generation=self.configurationGeneration;
+    @try {
+        id service=[self.environment serviceNamed:@"NewSyncService"];
+        if(!CSMessageNativeSupports(service,@"isGettingData",@"B",@[]) || !CSMessageNativeSupports(service,@"BackGroundFetchToSync",@"B",@[]))return;
+        if([CSMessageNativeInvoke(service,@"isGettingData",@[]) boolValue])return;
+        if(![self backgroundSyncEligible] || configuration!=self.configuration || generation!=self.configurationGeneration || ![self.accountID isEqual:account] || epoch!=self.accountEpoch)return;
+        [CSBackgroundSyncBudget.sharedBudget performForEpoch:epoch request:^{
+            CSAIObserveBackgroundSyncRequest(epoch,^{
+                if(configuration!=self.configuration || generation!=self.configurationGeneration || !self.ready || self.loading || self.saving || ![self.accountID isEqual:account] || self.accountEpoch!=epoch || self.enteringForeground || UIApplication.sharedApplication.applicationState!=UIApplicationStateBackground)return;
+                CSBackupPerformAtAccountEpoch(epoch,^{
+                    // Do not unwind through the account handoff's lock boundary.
+                    @try {[CSMessageNativeInvoke(service,@"BackGroundFetchToSync",@[]) boolValue];}
+                    @catch(__unused NSException *exception) {return;}
+                });
+            });
+        }];
+    } @catch(__unused NSException *exception) {}
 }
 
 - (void)cancelTasksIncludingCleanup:(BOOL)cleanup {
@@ -155,7 +212,7 @@ static NSString *AdmissionKey(NSString *action,NSString *identifier) {return [NS
     }[self scheduleWakeup];
 }
 - (void)drainWaitingIngress {
-    if(!self.ready || ![self protectedDataAvailable] || ![self accountValid:self.accountID epoch:self.accountEpoch])return;
+    if(!self.ready || ![self accountValid:self.accountID epoch:self.accountEpoch])return;
     NSArray *pending=[self.waitingIngress copy];[self.waitingIngress removeAllObjects];
     for(NSDictionary *entry in pending){void (^completion)(BOOL)=entry[@"completion"];
         if([entry[@"epoch"] unsignedIntegerValue]!=self.accountEpoch || self.elapsedTime>[entry[@"expires"] doubleValue]){self.statusText=@"入站事件已超过等待窗口或账号已切换，本次不补发。";[self notify];completion(NO);continue;}
@@ -180,8 +237,8 @@ static NSString *AdmissionKey(NSString *action,NSString *identifier) {return [NS
         [self cancelTasksIncludingCleanup:YES];[self cancelAdmissions:@"账号或配置已变化，旧认领等待已取消。"];
         self.statusText=@"账号已切换，旧自动任务已取消。";
     }else if(initial && actual.length){self.accountID=actual;self.accountEpoch=epoch;}
-    if(!actual.length || !CSBackupIsReady() || CSBackupAccountIsSuspended() || ![self protectedDataAvailable]){
-        self.statusText=@"微信账号或受保护数据暂不可用，保留窗口内任务等待恢复。";[self notify];[self scheduleWakeup];return;
+    if(!actual.length || !CSBackupIsReady() || CSBackupAccountIsSuspended()){
+        self.statusText=@"微信账号暂不可用，保留窗口内任务等待恢复。";[self notify];[self scheduleWakeup];return;
     }
     NSString *account=self.accountID;
     if(!account.length){self.statusText=@"请登录微信后设置自动功能。";[self notify];return;}
@@ -210,9 +267,10 @@ static NSString *AdmissionKey(NSString *action,NSString *identifier) {return [NS
     if(!NSThread.isMainThread){dispatch_async(dispatch_get_main_queue(),^{[self updateConfiguration:changes completion:completion];});return;}
     if(!self.ready || self.saving || ![self accountValid:self.accountID epoch:self.accountEpoch]){if(completion)completion(NO,AutomationError(@"账号或设置状态已变化，请返回后重试。"));return;}
     NSMutableDictionary *next=[self.configuration mutableCopy];if([changes isKindOfClass:NSDictionary.class])[next addEntriesFromDictionary:changes];
-    if(![changes isKindOfClass:NSDictionary.class] || !CSAutomationValidateConfiguration(next)){if(completion)completion(NO,AutomationError(@"请检查自动功能名单、回复内容、关键词及延迟。"));return;}
+    NSDictionary *normalized=CSAutomationNormalizeConfiguration(next);
+    if(![changes isKindOfClass:NSDictionary.class] || !normalized){if(completion)completion(NO,AutomationError(@"请检查自动功能名单、回复内容、关键词及延迟。"));return;}
     // A plist round trip freezes nested mutable editor dictionaries as well.
-    NSData *data=[NSPropertyListSerialization dataWithPropertyList:next format:NSPropertyListBinaryFormat_v1_0 options:0 error:NULL];
+    NSData *data=[NSPropertyListSerialization dataWithPropertyList:normalized format:NSPropertyListBinaryFormat_v1_0 options:0 error:NULL];
     NSDictionary *frozen=data?[NSPropertyListSerialization propertyListWithData:data options:NSPropertyListImmutable format:NULL error:NULL]:nil;
     if(!frozen){if(completion)completion(NO,AutomationError(@"设置内容无效，本次未保存。"));return;}
     NSString *account=self.accountID;NSUInteger epoch=self.accountEpoch,generation=++self.configurationGeneration;NSURL *url=self.configurationURL;
@@ -233,8 +291,12 @@ static NSString *AdmissionKey(NSString *action,NSString *identifier) {return [NS
 }
 - (BOOL)supportsConversation:(NSString *)conversation {
     @try {
-        if([conversation hasSuffix:@"@chatroom"])
-            return !CSGroupChatRoomUnavailable(conversation) && CSGroupChatIsMember(conversation,self.accountID) && ![CSGroupChatQuitCoordinator.sharedCoordinator isQuittingRoom:conversation];
+        if([conversation hasSuffix:@"@chatroom"]){
+            if(CSGroupChatRoomUnavailable(conversation)){return NO;}
+            if(!CSGroupChatIsMember(conversation,self.accountID)){return NO;}
+            if([CSGroupChatQuitCoordinator.sharedCoordinator isQuittingRoom:conversation]){return NO;}
+            return YES;
+        }
         id contacts=[self.environment serviceNamed:@"CContactMgr"],contact=nil;
         for(NSString *selector in @[@"getContactByName:",@"getContactByNameFromDB:"]){if(CSMessageNativeSupports(contacts,selector,@"@",@[@"@"]))contact=CSMessageNativeInvoke(contacts,selector,@[conversation]);if(contact)break;}
         return [CSMessageActionNativeObject(contact,@"m_nsUsrName") isEqual:conversation] && CSGroupCategoryForContact(contact)==CSGroupRowCategoryPrivate;
@@ -266,13 +328,13 @@ static NSString *AdmissionKey(NSString *action,NSString *identifier) {return [NS
 - (void)enqueueSession:(id)session wrap:(id)wrap epoch:(NSUInteger)epoch pat:(BOOL)pat completion:(void (^)(BOOL))completion {
     if(!wrap || self.waitingIngress.count>=CSAutomationMaximumPending){self.statusText=@"入站等待队列已满或消息无效，本次未接收。";[self notify];if(completion)completion(NO);return;}
     [self.waitingIngress addObject:@{@"session":session?:@"",@"wrap":wrap,@"epoch":@(epoch),@"pat":@(pat),@"arrivalElapsed":@(self.elapsedTime),@"arrivalWall":@(self.currentDate.timeIntervalSince1970),@"expires":@(self.elapsedTime+300+CSAutomationLateAllowance),@"completion":[completion?:^(__unused BOOL claimed){} copy]}];
-    self.statusText=@"账号、配置或受保护数据暂未就绪，事件已排队等待。";[self notify];[self scheduleWakeup];
+    self.statusText=@"账号或配置暂未就绪，事件已排队等待。";[self notify];[self scheduleWakeup];
 }
 - (void)receiveNativeSession:(id)session wrap:(id)wrap epoch:(NSUInteger)epoch completion:(void (^)(BOOL))completion {
     if(!NSThread.isMainThread){dispatch_async(dispatch_get_main_queue(),^{[self receiveNativeSession:session wrap:wrap epoch:epoch completion:completion];});return;}
     if(!self.started)[self start];else if(!self.ready || !self.accountID.length)[self refresh];
     if(epoch!=CSBackupAccountEpoch() || epoch!=self.accountEpoch){self.statusText=@"入站事件所属账号已切换，本次未接收。";[self notify];if(completion)completion(NO);return;}
-    if(!self.ready || self.loading || self.saving || ![self protectedDataAvailable] || ![self accountValid:self.accountID epoch:epoch]){[self enqueueSession:session wrap:wrap epoch:epoch pat:NO completion:completion];return;}
+    if(!self.ready || self.loading || self.saving || ![self accountValid:self.accountID epoch:epoch]){[self enqueueSession:session wrap:wrap epoch:epoch pat:NO completion:completion];return;}
     NSMutableDictionary *event=[CSAutomationEventFromWrap(wrap,self.accountID,[session isKindOfClass:NSString.class]?session:@"") mutableCopy];
     event[@"arrivalElapsed"]=@(self.elapsedTime);event[@"arrivalWall"]=@(self.currentDate.timeIntervalSince1970);
     [self receiveEvent:event pat:NO completion:completion];
@@ -282,8 +344,9 @@ static NSString *AdmissionKey(NSString *action,NSString *identifier) {return [NS
     if(!NSThread.isMainThread){dispatch_async(dispatch_get_main_queue(),^{[self receivePat:pat conversation:conversation epoch:epoch];});return;}
     if(!self.started)[self start];else if(!self.ready || !self.accountID.length)[self refresh];
     if(epoch!=CSBackupAccountEpoch() || epoch!=self.accountEpoch){self.statusText=@"拍动事件所属账号已切换，本次未接收。";[self notify];return;}
-    if(!self.ready || self.loading || self.saving || ![self protectedDataAvailable] || ![self accountValid:self.accountID epoch:epoch]){[self enqueueSession:conversation wrap:pat epoch:epoch pat:YES completion:nil];return;}
-    NSMutableDictionary *event=[CSAutomationEventFromPat(pat,self.accountID,conversation) mutableCopy];event[@"arrivalElapsed"]=@(self.elapsedTime);event[@"arrivalWall"]=@(self.currentDate.timeIntervalSince1970);
+    if(!self.ready || self.loading || self.saving || ![self accountValid:self.accountID epoch:epoch]){[self enqueueSession:conversation wrap:pat epoch:epoch pat:YES completion:nil];return;}
+    NSMutableDictionary *event=[CSAutomationEventFromPat(pat,self.accountID,conversation) mutableCopy];
+    event[@"arrivalElapsed"]=@(self.elapsedTime);event[@"arrivalWall"]=@(self.currentDate.timeIntervalSince1970);
     [self receiveEvent:event pat:YES completion:nil];
 }
 
@@ -341,7 +404,12 @@ static NSString *AdmissionKey(NSString *action,NSString *identifier) {return [NS
     [self persistAdmission:admission];
 }
 - (void)persistAdmission:(CSAutomationAdmission *)admission {
-    if(admission.persisting || admission.suppressed)return;admission.persisting=YES;
+    if(admission.persisting || admission.suppressed)return;
+    // Storage capability is established by the configuration/ledger reads and
+    // the durable claim itself. The application's protected-data flag can be
+    // NO while these files remain usable after the device's first unlock.
+    if(!self.ready || !self.ledger){admission.wakeAt=self.elapsedTime+CSAutomationCapabilityRetry;[self scheduleWakeup];return;}
+    admission.persisting=YES;
     CSAutomationLedger *ledger=self.ledger;NSArray *identifiers=admission.identifiers.array;NSUInteger revision=admission.revision;NSDate *now=self.currentDate;
     dispatch_async(self.io,^{
         NSError *error=nil;BOOL fresh=NO,claimed=NO;
@@ -353,9 +421,11 @@ static NSString *AdmissionKey(NSString *action,NSString *identifier) {return [NS
             admission.persisting=NO;
             admission.ownsClaim|=fresh;admission.claimed|=claimed;
             BOOL sameToken=admission.epoch==self.accountEpoch && admission.epoch==CSBackupAccountEpoch() && admission.generation==self.configurationGeneration && [admission.event[@"account"] isEqual:self.accountID] && !admission.suppressed;
-            BOOL temporarilyBlocked=![self protectedDataAvailable] || !CSBackupIsReady() || CSBackupAccountIsSuspended() || ![self accountValid:self.accountID epoch:self.accountEpoch];
-            if(!claimed && sameToken && temporarilyBlocked && self.elapsedTime<=admission.deadline){
-                admission.wakeAt=self.elapsedTime+CSAutomationCapabilityRetry;self.statusText=@"持久认领前账号或受保护数据暂不可用，保留事件等待恢复。";[self notify];[self scheduleWakeup];return;
+            BOOL storageBlocked=CSAutomationStorageErrorIsRetryable(error);
+            BOOL temporarilyBlocked=!CSBackupIsReady() || CSBackupAccountIsSuspended() || ![self accountValid:self.accountID epoch:self.accountEpoch];
+            if(!claimed && sameToken && (storageBlocked || (!error && temporarilyBlocked)) && self.elapsedTime<=admission.deadline){
+                if(storageBlocked){self.ready=NO;self.ledger=nil;self.nextLoadAttempt=self.elapsedTime+CSAutomationCapabilityRetry;}
+                admission.wakeAt=self.elapsedTime+CSAutomationCapabilityRetry;self.statusText=storageBlocked?@"自动功能运行记录暂不可写，保留事件等待恢复。":@"持久认领前账号暂不可用，保留事件等待恢复。";[self notify];[self scheduleWakeup];return;
             }
             if(claimed && revision!=admission.revision){[self persistAdmission:admission];return;}
             for(NSString *identifier in admission.identifiers)if(self.admissions[AdmissionKey(admission.action,identifier)]==admission)[self.admissions removeObjectForKey:AdmissionKey(admission.action,identifier)];

@@ -2,7 +2,7 @@
 
 面向 iOS 微信的 Theos 插件，使用 Objective-C / Logos 接入微信原生界面，提供聊天分组、气泡与列表样式、消息操作和配置管理等功能。各项功能可在插件设置中按需开启。
 
-**当前版本：`2.5-1`** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+**当前版本：`2.5-10`（自动功能清理，功能行为保持）** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
 
 [功能概览](#功能概览) · [安装与入口](#安装与入口) · [使用说明](#使用说明) · [配置与备份](#配置与备份) · [源码编译](#源码编译) · [开发与验证](#开发与验证) · [常见问题](#常见问题)
 
@@ -33,12 +33,34 @@
 | 运行方式 | 需要能够向微信加载插件的 iOS 注入环境，直接构建产物为 `.deb` |
 | 近期适配参考 | 微信 `8.0.78` 与 `8.0.80`；既有适配参考用户提供的 `8.0.80.34` IPA，小丑功能在两版微信中的显示与交互仍待真机验收 |
 | 系统目标 | Makefile 的最低编译目标为 iOS `15.0`，不代表所有系统与微信组合均已验证 |
-| Rootless | `2.5-1` 安装包，包含 arm64／arm64e |
-| Rootful | `2.5-1` 安装包及重签用 dylib，包含 arm64／arm64e |
+| Rootless | `2.5-10` 安装包，包含 arm64／arm64e |
+| Rootful | `2.5-10` 安装包及重签用 dylib，包含 arm64／arm64e |
 | Roothide | Makefile 保留构建入口；当前版本没有对应的运行验证结论 |
 | 注入依赖 | `control` 声明 `mobilesubstrate >= 0.9.5000`，实际加载取决于设备的注入环境 |
 
 微信私有接口会随版本变化。主机回归和成功打包只能验证相应代码与产物，真实设备上的显示、交互及其他插件组合仍需实际确认。
+
+`2.5-10` 基于现有 2.5-9 清理自动功能：移除拍动解析仅供诊断的兼容接口及对应测试遗留，整理无用参数和重复声明。保留严格 XML 与群消息前导解析、统一入站快照、账号与授权校验、会话名单、持久去重、发送与撤回调度，以及拍动与 AI 共用的约 45 秒后台同步预算。本版不改变自动功能规则和后台请求策略。清理范围、测试结果、构建与产物核验见 [2.5-10 发布记录](packages/2.5-10-automation-cleanup/README.md)。本版尚未安装到手机实测，2.5-7 的用户验收记录仍只对应该历史版本。
+
+`2.5-9` 收尾测试与诊断死代码：四道混合门禁将解析边界、同步预算、候选和持久去重改为实际功能观测，只删除无功能观测对应的报告格式断言；移除自动功能设置页的诊断按钮、`showPatDiagnostics` 和固定文案的 `patDiagnosticReport` 桩。解析、归一化、快照、决策、发送、45 秒预算、调度与保活实现保持不变。`WithDiagnostics` 仍被既有测试依赖，本版按约束保留。完整迁移与逐条门禁对照见 [2.5-9 审计报告](../WeChatImprove-local-archive/audits/2.5-9/README.md)。
+
+**2.5-8 未上真机；2.5-9 为测试与死代码收尾，未改功能代码，因此不需重新真机验收，但仍未实测。** 2.5-7 的用户验收记录继续作为原功能依据，不能等同于这两个清理版本已实测。
+
+`2.5-8` 是纯清理版本：删除拍动排障期间的事件环、阶段计数、耗时关联、XML 结构统计和仅观察的原生探针；保留已工作的统一批次快照、10002 独立候选、精确群前导解析、晚到 49 去重、45 秒同步预算和全部账号/授权/名单/时效门禁。自动功能设置页的按钮、开关和文案逻辑保持，诊断报告公开入口仅保留无事件采集的兼容返回。发送状态机、连续时钟、原生结果观察与任务调度都有功能用途，继续保留。完整清理依据、测试前后对照和产物校验见 [2.5-8 审计报告](../WeChatImprove-local-archive/audits/2.5-8/README.md)。
+
+用户已于 2026-11-11 21:13 确认 **2.5-7 在前台、后台未锁屏及锁屏三种场景下，群聊拍我后的自动回拍和自动回复均按 60 秒窗口通过**。证据来源为用户口述反馈，无第三方日志留存，记录见 [用户验收反馈](../WeChatImprove-local-archive/audits/2.5-8/user-runtime-2.5-7.txt)。2.5-8 不继续修功能，也没有新增后台策略；其清理后真机结果与 2.5-7 的用户验收是不同证据。
+
+`2.5-7` 处理微信原生支持的群消息 `发送者:\n` 前导，严格绑定 XML 发送者、目标与群路由，让完整 10002 快照独立进入拍动规则。该版原交付时尚未取得真机验收，其后用户已确认上述三种场景正常；原始离线证据和交付记录见 [2.5-7 审计报告](../WeChatImprove-local-archive/audits/2.5-7/README.md)。
+
+`2.5-6` 已补接 `SyncCmdHandler.BatchAddMsg:ShowPush:` 统一批次和 512 条诊断；用户复验确认仍未解决后台/锁屏当场发送。其原交付记录见 [2.5-6 审计报告](../WeChatImprove-local-archive/audits/2.5-6/README.md)。
+
+`2.5-5` 加入由拍动功能独立驱动的原生后台补拉，与 AI 共用约 45 秒预算，无需配置 AI 或开启本插件“后台运行”。用户随后确认该版本未解决后台与锁屏群拍动问题；本轮保留既有请求策略，不再增加补拉频率，继续检查类型分流和原始入站。该版原交付记录见 [2.5-5 验证记录](../WeChatImprove-local-archive/audits/2.5-5/README.md)。
+
+`2.5-4` 新增自动功能右上角“诊断”，记录同步批次、入口、主队列延迟、解析拒绝原因、任务认领、群条件和提交情况，支持一键复制。仅在当前进程内存中保留最近 96 条及累计计数，按账号代次隔离，不含正文、微信号、群名、服务器消息 ID 或文件路径。用户已提供完整报告，拍动事件到前台才进入插件的结论与时间线见 [2.5-5 验证记录](../WeChatImprove-local-archive/audits/2.5-5/README.md)；原诊断交付记录见 [2.5-4 记录](../WeChatImprove-local-archive/audits/2.5-4/README.md)。本版继续保留诊断，并细分 XML 拒绝码；尚未取得原始 XML 的具体差异，不扩大其接受规则。
+
+`2.5-3` 针对“群聊拍我回拍与拍我回复仅前台有效、同一后台时段其他自动动作正常”的反馈，补接 `onNewSyncNotAddDBMessage:` 的原始 `10002` 拍动消息，避免依赖后续生成的本地 `49/62` 展示模型。严格读取原始拍动身份，并沿用已有账号、会话、时间与持久去重规则；群会话优先绑定微信的指定会话。补充原始 XML 到真实自动任务的贯通回归。见 [2.5-3 验证记录](../WeChatImprove-local-archive/audits/2.5-3/README.md)。用户复验确认后台与锁屏问题仍存在，继续通过 2.5-4 定位。
+
+`2.5-2` 修复自动功能因应用级受保护数据标志而在锁屏时统一暂停的问题，补接后台同步的聚合拍动消息，并移除 @我自动回复的私聊设置。设备首次解锁后，在微信仍有执行机会、必要存储和原生服务可用时，四个模块继续执行。验证范围见 [2.5-2 验证记录](../WeChatImprove-local-archive/audits/2.5-2/README.md)。后续用户确认群拍动在前台正常、后台和锁屏失败，该入口遗漏由 2.5-3 继续修正。
 
 `2.5-1` 针对微信 `8.0.80.34` 修复朋友圈广告评论合并时因不可变数组导致的闪退：归档读取完整原始互动数据，广告数据解码后恢复点赞与评论数组的可变性，保留已有元素、顺序及密友隐藏规则。针对性回归、构建和产物核验见 [2.5-1 验证记录](../WeChatImprove-local-archive/audits/2.5-1/README.md)；iPhone 微信的广告刷新、切页、前后台及锁屏恢复仍待安装复验。
 
@@ -46,7 +68,7 @@
 
 ### 安装步骤
 
-1. 获取与设备注入环境匹配的 `.deb`：[2.5-1 Rootless 安装包](packages/2.5-1-moments-comments/com.wechat.improve_2.5-1_iphoneos-arm64.deb)、[Rootful 安装包](packages/2.5-1-moments-comments/com.wechat.improve_2.5-1_iphoneos-arm.deb)、[重签用 dylib](packages/2.5-1-moments-comments/WeChatImprove.dylib)、[调试符号](packages/2.5-1-moments-comments/symbols.zip) 与 [SHA-256 清单](packages/2.5-1-moments-comments/SHA256SUMS)。功能范围和验证结果见 [2.5-1 审计记录](../WeChatImprove-local-archive/audits/2.5-1/README.md)。2.4-10 与 2.4-9 的历史安装包保留在本机；此前 [2.4-8](packages/2.4-8-group-chat-template-layout/)、[2.4-7](packages/2.4-7-group-chat-background-opportunity/)、[2.4-6](packages/2.4-6-group-chat-global-background/)、[2.4-5](packages/2.4-5-group-chat-background/)、[2.4-4](packages/2.4-4-group-chat-notices/)、[2.4-3-1](packages/2.4-3-1-group-chat-welcome-fix/)、[2.4-3](packages/2.4-3-group-chat-tools/) 及更早的安装包继续保留。
+1. 用户当前为 Rootless 环境，使用 [2.5-10 Rootless 安装包](packages/2.5-10-automation-cleanup/com.wechat.improve_2.5-10_iphoneos-arm64.deb)。另提供 [Rootful 安装包](packages/2.5-10-automation-cleanup/com.wechat.improve_2.5-10_iphoneos-arm.deb)、[重签用 dylib](packages/2.5-10-automation-cleanup/WeChatImprove.dylib)、[调试符号](packages/2.5-10-automation-cleanup/symbols.zip) 与 [SHA-256 清单](packages/2.5-10-automation-cleanup/SHA256SUMS)。验证记录见 [2.5-10 发布记录](packages/2.5-10-automation-cleanup/README.md)；历史包继续保留。
 
    密友头像五击快捷入口不验证身份：任何能操作已解锁手机并到达头像的人，都能查看或修改配置，并经两级确认不可撤销地完整重置当前账号的密友配置。此风险继续存在；修改密码仍须普通入口验证。
 2. 使用设备上适配该环境的包管理器或安装工具安装，并按工具提示重新加载注入环境。
@@ -162,16 +184,16 @@
 
 ### 自动功能
 
-入口位于“群聊功能”后面。四个模块默认关闭，每块分别使用微信原生选择器选择生效私聊和群聊；空名单不执行。执行延迟为 0–300 秒。
+入口位于“群聊功能”后面。四个模块默认关闭，使用微信原生选择器选择生效会话；@我自动回复仅选择群聊，其余模块可分别选择私聊和群聊。空名单不执行。执行延迟为 0–300 秒。
 
 - **拍我自动回拍**：他人拍到自己时延迟回拍；可开启撤回并设置成功回拍后的撤回延迟。只撤回这次自动回拍，遵循微信原生限频和实际撤回窗口。
 - **拍我自动回复**：配置多条文案，触发时随机选一条；可在群聊中真实 @ 拍自己的人。
-- **@我自动回复**：仅原生 @ 名单包含自己的消息触发，纯文本写了“@我”和仅 @所有人不会触发。支持随机文案及群聊中 @ 对方。
+- **@我自动回复**：仅在已选群中，原生 @ 名单包含自己的消息触发，纯文本写了“@我”和仅 @所有人不会触发。支持随机文案及群聊中 @ 对方。
 - **关键词自动回复**：每条关键词独立配置回复列表及全匹配、开头匹配或模糊匹配，可排序；第一条命中的有效规则生效。可选择引用原消息，并独立控制是否回复自己、别人。仅匹配本条正文，引用内容不会作为本条关键词命中。
 
 真实 @ 回复优先于关键词回复，固定回复认领后同一事件不再交给 AI；回拍和拍动文字回复可以各执行一次。自动发出的消息不再触发本插件关键词。普通消息及单条引用消息可参与关键词匹配，图片、语音等不参与。
 
-微信进程在前台或后台仍有执行机会时会处理事件，不要求本插件“后台运行”开关开启，也可利用其他插件维持的执行机会。系统挂起时无法实时执行；账号、授权或受保护数据暂不可用时保留任务，恢复或回到前台立即重评估，在到期后 5 分钟内补发一次，超过窗口终止并显示原因；进程重启不恢复待发送任务。修改设置或切换账号取消旧的待发任务，已成功提交的回拍在回拍及撤回开关仍开启时保留原撤回计时。备份只包含配置；恢复后四个模块关闭，本机去重记录保留。
+微信进程在前台或后台仍有执行机会时会处理事件，不要求本插件“后台运行”开关开启，也可利用其他插件维持的执行机会。系统挂起时无法实时执行；设备首次解锁后，锁屏状态下继续核验实际账号、授权、运行记录读写和原生发送条件；这些条件暂不可用时保留任务，恢复或回到前台立即重评估，在到期后 5 分钟内补发一次，超过窗口终止并显示原因；进程重启不恢复待发送任务。修改设置或切换账号取消旧的待发任务，已成功提交的回拍在回拍及撤回开关仍开启时保留原撤回计时。备份只包含配置；恢复后四个模块关闭，本机去重记录保留。
 
 ### 密友保护
 
@@ -267,7 +289,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootless \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出文件名：`packages/com.wechat.improve_2.5-1_iphoneos-arm64.deb`。本轮交付为 [2.5-1 Rootless 安装包](packages/2.5-1-moments-comments/com.wechat.improve_2.5-1_iphoneos-arm64.deb)。
+当前版本默认输出文件名：`packages/com.wechat.improve_2.5-10_iphoneos-arm64.deb`。本轮交付为 [2.5-10 Rootless 安装包](packages/2.5-10-automation-cleanup/com.wechat.improve_2.5-10_iphoneos-arm64.deb)。
 
 ### Rootful
 
@@ -276,7 +298,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出文件名：`packages/com.wechat.improve_2.5-1_iphoneos-arm.deb`。本轮交付为 [2.5-1 Rootful 安装包](packages/2.5-1-moments-comments/com.wechat.improve_2.5-1_iphoneos-arm.deb)。
+当前版本默认输出文件名：`packages/com.wechat.improve_2.5-10_iphoneos-arm.deb`。本轮交付为 [2.5-10 Rootful 安装包](packages/2.5-10-automation-cleanup/com.wechat.improve_2.5-10_iphoneos-arm.deb)。
 
 | 方案 | 动态库安装目录 |
 | --- | --- |
@@ -300,7 +322,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
 `PACKAGE_VERSION` 只覆盖当次打包版本，不会更新插件内显示版本。安装了 `dpkg-deb` 后，可以检查包元数据：
 
 ```bash
-dpkg-deb -f packages/2.5-1-moments-comments/com.wechat.improve_2.5-1_iphoneos-arm64.deb Version Architecture
+dpkg-deb -f packages/2.5-10-automation-cleanup/com.wechat.improve_2.5-10_iphoneos-arm64.deb Version Architecture
 ```
 
 插件内通过 **关于 → 版本信息** 查看随包提供的离线更新说明。
@@ -330,6 +352,8 @@ WeChatImprove/
 
 Makefile 自动收集 `Hooks/*.xm` 和 `Controllers/*.m` 参与编译。Hook 负责接入微信，业务策略、原生接口适配与设置界面主要位于 `Controllers/`。
 
+自动功能由 `AutomationHooks` 接收原生消息、拍动与同步批次，`CSAutomationEventAdapter` 生成经过严格身份和内容校验的事件；`CSAutomationStore` 处理配置、规则决策及持久去重，`CSAutomationManager` 负责账号检查、固定回复与 AI 仲裁、延迟任务和可选回拍撤回，最后通过原生适配器提交。拍动后台补拉与 AI 共用 `CSBackgroundSyncBudget` 的约 45 秒预算。2.5-10 仅清理诊断接口与无用封装，相关验证见 [发布记录](packages/2.5-10-automation-cleanup/README.md)。
+
 聊天分组主列表由 `CSGroupNativeSessionCoordinator` 管理完整原生展示基线，`CSGroupNativeModel` 复用共享归属、筛重、隐私和统计规则并输出原生会话对象；主列表使用统一的原生坐标。`CSGroupListAdapter` 负责标签、外观、身份复核和安全遮罩；折叠子页继续使用 `CSGroupProjection` / `CSGroupTableProxy`。未读面板与转发在同步完整候选作用域中取数并复核结果，随后恢复当前组。消息操作由菜单/手势入口、动作协调器和原生适配器协作；气泡与消息合并分别处理样式、分组策略和布局。修改时应同时检查相关生命周期与功能组合。
 
 ### 回归检查
@@ -355,6 +379,13 @@ bash Tests/verify-forward-selection-boundary.sh
 
 # 红包、转账核心与自动处理
 bash Tests/verify-payment-core.sh
+
+# 自动功能规则、原生入口、调度与群拍动边界
+bash Tests/verify-automation-core.sh --ios
+bash Tests/verify-automation-native.sh --ios
+bash Tests/verify-automation-manager.sh --ios
+bash Tests/verify-automation-pat-content-boundary.sh
+bash Tests/verify-background-sync-budget.sh
 ```
 
 仓库另有搜索、手势、底栏、消息时间、防撤回、后台模糊等专项脚本。测试通过主机替身验证策略、接口调用和生命周期，不替代设备验收。

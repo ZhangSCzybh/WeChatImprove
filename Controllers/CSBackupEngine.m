@@ -224,7 +224,8 @@ static NSString *StartupSession(void){static NSString *identifier;static dispatc
         }else if([f[@"domain"] isEqual:CSAutomationBackupDomain]) {
             if(![accounts containsObject:key] || ![key isEqual:context[@"account"]] || ![key isEqual:source[@"account"]]){[warnings addObject:@"已跳过其他账号的自动功能配置：请登录备份原账号后恢复。"];continue;}
             if([f[@"present"] boolValue]){
-                NSMutableDictionary *state=[f[@"value"] mutableCopy],*configuration=[state[@"configuration"] mutableCopy];
+                NSMutableDictionary *state=[f[@"value"] mutableCopy],*configuration=[CSAutomationNormalizeConfiguration(state[@"configuration"]) mutableCopy];
+                if(!configuration){EngineFail(error,@"自动功能配置无效，未准备恢复计划");return nil;}
                 for(NSString *module in @[@"patBack",@"patReply",@"mentionReply",@"keywordReply"]){NSMutableDictionary *value=[configuration[module] mutableCopy];value[@"enabled"]=@NO;configuration[module]=value;}
                 state[@"configuration"]=configuration;f[@"value"]=state;
                 [warnings addObject:@"自动功能恢复后四个模块开关均关闭；只恢复会话名单、延迟、回复内容和关键词规则，不导入待执行动作或运行记录。请检查后手动开启，不补发历史事件。"];
@@ -349,7 +350,19 @@ static NSString *StartupSession(void){static NSString *identifier;static dispatc
     return verified;
 }
 - (BOOL)verifyFields:(NSArray *)fields writes:(NSDictionary *)writes error:(NSError **)error {
-    NSArray *current=[self beforeFields:fields error:error];if(!current)return NO;if(![current isEqual:fields])return EngineFail(error,@"恢复配置回读校验失败");
+    NSArray *current=[self beforeFields:fields error:error];if(!current)return NO;
+    NSMutableArray *expected=[NSMutableArray arrayWithCapacity:fields.count];
+    for(NSDictionary *field in fields){
+        if([field[@"domain"] isEqual:CSAutomationBackupDomain] && [field[@"present"] boolValue]){
+            NSDictionary *configuration=CSAutomationNormalizeConfiguration(field[@"value"][@"configuration"]);
+            if(!configuration)return EngineFail(error,@"自动功能配置回读校验失败");
+            // A journal from before 2.5-2 may still contain the removed private
+            // mention list. Compare its canonical meaning during rollback too.
+            NSMutableDictionary *state=[field[@"value"] mutableCopy],*normalized=[field mutableCopy];
+            state[@"configuration"]=configuration;normalized[@"value"]=state;[expected addObject:normalized];
+        }else [expected addObject:field];
+    }
+    if(![current isEqual:expected])return EngineFail(error,@"恢复配置回读校验失败");
     NSDictionary *resources=[self beforeWrites:writes error:error];if(!resources)return NO;if(![resources isEqual:writes])return EngineFail(error,@"恢复图片回读校验失败");return YES;
 }
 - (BOOL)applyPendingContent:(NSError **)error {

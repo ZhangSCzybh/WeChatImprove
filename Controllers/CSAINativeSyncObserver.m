@@ -1,5 +1,6 @@
 #import "CSAINativeSyncObserver.h"
 #import "CSAIReplyManager.h"
+#import "CSBackgroundSyncBudget.h"
 #import "CSBackupBootstrap.h"
 #import "CSMessageNativeActionAdapter.h"
 #import <objc/runtime.h>
@@ -203,6 +204,7 @@ void CSAIInstallNativeSyncObserver(void) {
                 if(!isfinite(observed) || !isfinite(now) || now<observed || now-observed>=45 ||
                    observation.epoch!=CSBackupAccountEpoch() || observation.service!=service ||
                    !CSAISyncTerminalResponse(response) || !CSAISyncNativeIdle(service))return;
+                [CSBackgroundSyncBudget.sharedBudget verifiedFullSyncForEpoch:observation.epoch];
                 [CSAIReplyManager.sharedManager nativeFullSyncCompletedWithContext:observation.context];
             } @catch(__unused NSException *exception) {}
         });

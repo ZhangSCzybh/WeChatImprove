@@ -17,7 +17,7 @@ PY
 xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror \
  -Wno-incomplete-implementation -IControllers -I"$test_dir" \
  -include "$test_dir/ObserverManagerAPIs.h" -framework Foundation \
- "$test_dir/AINativeDispatchUnderTest.m" Controllers/CSAINativeSyncObserver.m Tests/AINativeSyncObserverTests.m \
+ "$test_dir/AINativeDispatchUnderTest.m" Controllers/CSAINativeSyncObserver.m Controllers/CSBackgroundSyncBudget.m Tests/AINativeSyncObserverTests.m \
  -o "$test_dir/tests"
 "$test_dir/tests"
 for mode in create-return-c create-argument-Q create-argument-count return-result-B return-event-Q handle-result-B handle-processed-c; do
