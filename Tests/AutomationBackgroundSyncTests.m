@@ -91,43 +91,50 @@ int main(int argc,const char **argv) {@autoreleasepool {
     CHECK(service.requests==1 && service.completedRequests==1);
     CHECK(service.lastAcceptedReturn && service.completedRequests==1);
     for(NSUInteger i=0;i<5;i++)[manager backgroundSyncTick];
-    SyncAdvance(44);[manager backgroundSyncTick];CHECK(service.requests==1);
+    SyncAdvance(9);[manager backgroundSyncTick];CHECK(service.requests==1);
     SyncAdvance(1);[manager backgroundSyncTick];CHECK(service.requests==2);
-    printf("Pat-only background timer: AI class/config absent, locked/contact-unavailable pull=1; attempt interval>=45s\n");
+    printf("Pat-only background timer: AI class/config absent, locked/contact-unavailable pull=1; attempt interval>=10s\n");
 
     contactsAvailable=YES;SyncConfigure(manager,YES,YES,2);
     NSUInteger previous=service.requests;[manager backgroundSyncTick];CHECK(service.requests==previous);
-    SyncAdvance(45);service.duringRequest=^{[manager backgroundSyncTick];};
+    SyncAdvance(10);service.duringRequest=^{[manager backgroundSyncTick];};
     [manager backgroundSyncTick];CHECK(service.requests==previous+1);
     CHECK(service.completedRequests==service.requests && service.exceptions==0);
     printf("Both pat modules and reentrant request: one native request, shared cooldown retained across configuration edit\n");
 
     // Future timer checks must survive temporary availability loss without any
     // incoming message, foreground event or configuration refresh to restart it.
-    previous=service.requests;accountAvailable=NO;SyncAdvance(45);[manager backgroundSyncTick];
+    previous=service.requests;accountAvailable=NO;SyncAdvance(10);[manager backgroundSyncTick];
     CHECK(service.requests==previous && [manager valueForKey:@"backgroundSyncTimer"]!=nil);
-    accountAvailable=YES;SyncAdvance(45);[manager backgroundSyncTick];CHECK(service.requests==previous+1);
-    previous=service.requests;environment.throwsAccount=YES;SyncAdvance(45);[manager backgroundSyncTick];
+    accountAvailable=YES;Wait(^BOOL{return service.requests==previous+1;});
+    previous=service.requests;environment.throwsAccount=YES;SyncAdvance(10);[manager backgroundSyncTick];
     CHECK(service.requests==previous && [manager valueForKey:@"backgroundSyncTimer"]!=nil);
-    environment.throwsAccount=NO;SyncAdvance(45);[manager backgroundSyncTick];CHECK(service.requests==previous+1);
-    previous=service.requests;authorized=NO;SyncAdvance(45);[manager backgroundSyncTick];
+    environment.throwsAccount=NO;Wait(^BOOL{return service.requests==previous+1;});
+    previous=service.requests;authorized=NO;SyncAdvance(10);[manager backgroundSyncTick];
     CHECK(service.requests==previous && [manager valueForKey:@"backgroundSyncTimer"]!=nil);
-    authorized=YES;SyncAdvance(45);[manager backgroundSyncTick];CHECK(service.requests==previous+1);
-    printf("Temporary nil/throwing account getter and unavailable authorization: future wake retained, recovered pull without external notification\n");
+    authorized=YES;Wait(^BOOL{return service.requests==previous+1;});
+    previous=service.requests;environment.sync=nil;SyncAdvance(10);[manager backgroundSyncTick];
+    CHECK(service.requests==previous);
+    environment.sync=service;Wait(^BOOL{return service.requests==previous+1;});
+    printf("Temporary nil/throwing account getter, unavailable authorization/service: real 2s timer recovers each without external notification\n");
 
-    service.busy=YES;previous=service.requests;NSUInteger gettersBefore=service.getters;SyncAdvance(45);
+    service.busy=YES;previous=service.requests;NSUInteger gettersBefore=service.getters;SyncAdvance(10);
     [manager backgroundSyncTick];[manager backgroundSyncTick];
     CHECK(service.requests==previous && service.getters>gettersBefore);
-    service.busy=NO;service.accepted=NO;NSUInteger completedBefore=service.completedRequests;SyncAdvance(45);[manager backgroundSyncTick];
+    service.busy=NO;service.accepted=NO;NSUInteger completedBefore=service.completedRequests;
+    NSTimeInterval busyRecoveryStarted=NSProcessInfo.processInfo.systemUptime;
+    Wait(^BOOL{return service.requests==previous+1;});
+    NSTimeInterval busyRecoveryElapsed=NSProcessInfo.processInfo.systemUptime-busyRecoveryStarted;
+    CHECK(busyRecoveryElapsed>=1.8 && busyRecoveryElapsed<5);
     CHECK(service.requests==previous+1 && service.completedRequests==completedBefore+1 && !service.lastAcceptedReturn);
     for(NSUInteger i=0;i<5;i++)[manager backgroundSyncTick];
-    SyncAdvance(44);[manager backgroundSyncTick];CHECK(service.requests==previous+1);
+    SyncAdvance(9);[manager backgroundSyncTick];CHECK(service.requests==previous+1);
     SyncAdvance(1);service.accepted=YES;[manager backgroundSyncTick];CHECK(service.requests==previous+2);
-    printf("Native busy skips pull; native NO consumes attempt and cannot retry before 45s\n");
+    printf("Native busy recovers through real 2s timer (%.3fs); native NO consumes attempt and cannot retry before 10s\n",busyRecoveryElapsed);
 
-    previous=service.requests;completedBefore=service.completedRequests;NSUInteger exceptionsBefore=service.exceptions;service.throwsRequest=YES;SyncAdvance(45);[manager backgroundSyncTick];
+    previous=service.requests;completedBefore=service.completedRequests;NSUInteger exceptionsBefore=service.exceptions;service.throwsRequest=YES;SyncAdvance(10);[manager backgroundSyncTick];
     CHECK(service.requests==previous+1 && service.exceptions==exceptionsBefore+1 && service.completedRequests==completedBefore);
-    [manager backgroundSyncTick];SyncAdvance(44);[manager backgroundSyncTick];CHECK(service.requests==previous+1);
+    [manager backgroundSyncTick];SyncAdvance(9);[manager backgroundSyncTick];CHECK(service.requests==previous+1);
     service.throwsRequest=NO;SyncAdvance(1);[manager backgroundSyncTick];CHECK(service.requests==previous+2);
     CHECK(service.completedRequests==service.requests-service.exceptions && service.exceptions==1);
     printf("Native exception retains budget; completedRequests counts only returned native calls\n");
@@ -140,10 +147,10 @@ int main(int argc,const char **argv) {@autoreleasepool {
     service.duringGetter=^{
         [manager updateConfiguration:@{@"patBack":disabledBack,@"patReply":disabledReply} completion:^(BOOL ok,NSError *error){(void)error;editOK=ok;editDone=YES;}];
     };
-    SyncAdvance(45);[manager backgroundSyncTick];CHECK(service.requests==previous);
+    SyncAdvance(10);[manager backgroundSyncTick];CHECK(service.requests==previous);
     Wait(^BOOL{return editDone;});CHECK(editOK && ![manager backgroundSyncEligible]);
     CHECK([manager valueForKey:@"backgroundSyncTimer"]==nil);
-    SyncAdvance(90);[manager backgroundSyncTick];CHECK(service.requests==previous);
+    SyncAdvance(20);[manager backgroundSyncTick];CHECK(service.requests==previous);
     printf("Native getter configuration-save reentry rejects stale pull; disabling both modules stops timer\n");
 
     UIApplication.sharedApplication.applicationState=UIApplicationStateActive;SyncConfigure(manager,YES,YES,2);
@@ -162,7 +169,7 @@ int main(int argc,const char **argv) {@autoreleasepool {
     // UIKit can still report background during WillEnterForeground delivery.
     CHECK(UIApplication.sharedApplication.applicationState==UIApplicationStateBackground);
     CHECK(![manager backgroundSyncEligible] && [manager valueForKey:@"backgroundSyncTimer"]==nil);
-    SyncAdvance(90);[manager backgroundSyncTick];CHECK(service.requests==previous);
+    SyncAdvance(20);[manager backgroundSyncTick];CHECK(service.requests==previous);
     UIApplication.sharedApplication.applicationState=UIApplicationStateActive;
     [NSNotificationCenter.defaultCenter postNotificationName:UIApplicationDidBecomeActiveNotification object:nil];
     [manager backgroundSyncTick];CHECK(service.requests==previous && [manager valueForKey:@"backgroundSyncTimer"]==nil);
@@ -184,6 +191,87 @@ int main(int argc,const char **argv) {@autoreleasepool {
     CHECK(service.requests==previous+1 && service.completedRequests==completedBefore+1);
     CSAutomationLedger *ledger=[manager valueForKey:@"ledger"];
     CHECK([ledger hasIdentifiers:pulledEvent[@"identifiers"] action:@"patBack"] && [ledger hasIdentifiers:pulledEvent[@"identifiers"] action:@"patReply"]);
+
+    // A zero-delay event still waits for durable admission, then both actions
+    // submit without advancing the event clock or waiting for another pull.
+    SyncConfigure(manager,YES,YES,0);SyncAdvance(10);
+    pulledEvent=Event(81002,YES,NO,NO);
+    service.duringRequest=^{[manager receivePat:pulledEvent conversation:@"room@chatroom" epoch:epoch];};
+    textBefore=sendCount;patBefore=patCount;previous=service.requests;
+    NSTimeInterval zeroDelayTime=uptime;
+    [manager backgroundSyncTick];CHECK(service.requests==previous+1);
+    Wait(^BOOL{return sendCount==textBefore+1 && patCount==patBefore+1;});
+    CHECK(uptime==zeroDelayTime && Pending(manager)==0);
+    CHECK([ledger hasIdentifiers:pulledEvent[@"identifiers"] action:@"patBack"] && [ledger hasIdentifiers:pulledEvent[@"identifiers"] action:@"patReply"]);
+    [manager receivePat:pulledEvent conversation:@"room@chatroom" epoch:epoch];Drain();
+    CHECK(sendCount==textBefore+1 && patCount==patBefore+1 && Pending(manager)==0);
+    printf("delay=0 injected event: two durable claims, one text and one pat without advancing clock; duplicate suppressed\n");
+
+    // The AI caller keeps its default 45s interval on this real shared budget.
+    // No AI manager/config is linked; this observes the unchanged API policy.
+    __block NSUInteger defaultSourceRequests=0;
+    CHECK(![CSBackgroundSyncBudget.sharedBudget performForEpoch:epoch request:^{defaultSourceRequests++;}]);
+    SyncAdvance(44);
+    CHECK(![CSBackgroundSyncBudget.sharedBudget performForEpoch:epoch request:^{defaultSourceRequests++;}]);
+    SyncAdvance(1);
+    CHECK([CSBackgroundSyncBudget.sharedBudget performForEpoch:epoch request:^{defaultSourceRequests++;}]);
+    previous=service.requests;[manager backgroundSyncTick];CHECK(service.requests==previous && defaultSourceRequests==1);
+    SyncAdvance(9);[manager backgroundSyncTick];CHECK(service.requests==previous);
+    SyncAdvance(1);[manager backgroundSyncTick];CHECK(service.requests==previous+1);
+    CHECK(![CSBackgroundSyncBudget.sharedBudget performForEpoch:epoch request:^{defaultSourceRequests++;}]);
+    CHECK(defaultSourceRequests==1);
+    printf("Mixed sources: default source still waits 45s; pat source may pull 10s after any shared request; same instant never duplicates\n");
+
+    // Module toggles alone do not request sync without an executable pat rule.
+    previous=service.requests;
+    NSMutableDictionary *emptyBack=Module(manager,@"patBack"),*emptyReply=Module(manager,@"patReply");
+    emptyBack[@"groups"]=@[];emptyBack[@"friends"]=@[];emptyReply[@"enabled"]=@NO;
+    Save(manager,@{@"patBack":emptyBack,@"patReply":emptyReply});
+    SyncAdvance(20);[manager backgroundSyncTick];CHECK(service.requests==previous && ![manager backgroundSyncEligible]);
+    emptyBack=Module(manager,@"patBack");emptyReply=Module(manager,@"patReply");
+    emptyBack[@"enabled"]=@NO;emptyReply[@"enabled"]=@YES;emptyReply[@"contents"]=@[];
+    Save(manager,@{@"patBack":emptyBack,@"patReply":emptyReply});
+    SyncAdvance(20);[manager backgroundSyncTick];CHECK(service.requests==previous && ![manager backgroundSyncEligible]);
+    emptyReply=Module(manager,@"patReply");emptyReply[@"contents"]=@[@"reply"];emptyReply[@"friends"]=@[];emptyReply[@"groups"]=@[];
+    Save(manager,@{@"patReply":emptyReply});
+    SyncAdvance(20);[manager backgroundSyncTick];CHECK(service.requests==previous && ![manager backgroundSyncEligible]);
+    NSMutableDictionary *keyword=Module(manager,@"keywordReply");keyword[@"enabled"]=@YES;keyword[@"groups"]=@[@"room@chatroom"];keyword[@"rules"]=@[Rule(@"hello",@[@"reply"])];
+    Save(manager,@{@"keywordReply":keyword});
+    SyncAdvance(20);[manager backgroundSyncTick];CHECK(service.requests==previous && ![manager backgroundSyncEligible]);
+    CHECK([manager valueForKey:@"backgroundSyncTimer"]==nil);
+    printf("No pulls for empty pat allowlists, empty reply contents or keyword-only rules\n");
+
+    UIApplication.sharedApplication.applicationState=UIApplicationStateActive;SyncConfigure(manager,YES,YES,0);
+    [NSNotificationCenter.defaultCenter postNotificationName:UIApplicationDidBecomeActiveNotification object:nil];
+    // Test every injected budget clock boundary: refresh, first tick check,
+    // attempt reservation, and the final deadline read after the native call.
+    for(NSUInteger clockBoundary=0;clockBoundary<4;clockBoundary++){
+        UIApplication.sharedApplication.applicationState=UIApplicationStateActive;
+        [NSNotificationCenter.defaultCenter postNotificationName:UIApplicationDidBecomeActiveNotification object:nil];
+        SyncAdvance(20);previous=service.requests;
+        if(clockBoundary==0)UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;
+        else SyncEnterBackground(manager);
+        __block NSUInteger clockReads=0;NSUInteger closeAtRead=clockBoundary==0?1:clockBoundary;
+        CSBackgroundSyncBudget.sharedBudget.now=^{
+            if(++clockReads==closeAtRead)[NSNotificationCenter.defaultCenter postNotificationName:UIApplicationWillEnterForegroundNotification object:nil];
+            return uptime;
+        };
+        if(clockBoundary==0)[manager refreshBackgroundSync];else [manager backgroundSyncTick];
+        CSBackgroundSyncBudget.sharedBudget.now=^{return uptime;};
+        CHECK(service.requests==previous+(clockBoundary==3?1:0));
+        CHECK(![manager backgroundSyncEligible] && [manager valueForKey:@"backgroundSyncTimer"]==nil);
+        [manager backgroundSyncTick];CHECK(service.requests==previous+(clockBoundary==3?1:0));
+    }
+    printf("Budget clock reentry at refresh/check/reservation/final rearm: foreground stop survives, stale tick never resurrects a timer\n");
+
+    UIApplication.sharedApplication.applicationState=UIApplicationStateActive;
+    [NSNotificationCenter.defaultCenter postNotificationName:UIApplicationDidBecomeActiveNotification object:nil];
+    SyncAdvance(20);SyncEnterBackground(manager);previous=service.requests;
+    service.duringRequest=^{[NSNotificationCenter.defaultCenter postNotificationName:UIApplicationWillEnterForegroundNotification object:nil];};
+    [manager backgroundSyncTick];CHECK(service.requests==previous+1);
+    CHECK([manager valueForKey:@"backgroundSyncTimer"]==nil);
+    [manager backgroundSyncTick];CHECK(service.requests==previous+1);
+    printf("Native request foreground reentry: completed request keeps cooldown, stopped timer stays stopped\n");
 
     CHECK(!protectedAvailable && UIApplication.sharedApplication.applicationState==UIApplicationStateBackground);
     [manager stopBackgroundSync];[NSNotificationCenter.defaultCenter removeObserver:manager];

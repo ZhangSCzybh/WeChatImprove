@@ -18,6 +18,8 @@
 NSNotificationName const CSAutomationConfigurationDidChange=@"CSAutomationConfigurationDidChange";
 static const NSUInteger CSAutomationMaximumPending=1000;
 static const NSTimeInterval CSAutomationCapabilityRetry=5;
+static const NSTimeInterval CSAutomationPatSyncInterval=10;
+static const NSTimeInterval CSAutomationSyncCapabilityRetry=2;
 
 @interface CSAutomationAdmission : NSObject
 @property(nonatomic,copy) NSDictionary *event,*decision;
@@ -173,28 +175,46 @@ static NSString *AdmissionKey(NSString *action,NSString *identifier) {return [NS
 }
 - (void)refreshBackgroundSync {
     if(!NSThread.isMainThread || self.refreshingBackgroundSync)return;self.refreshingBackgroundSync=YES;
+    NSUInteger wakeGeneration=self.backgroundSyncGeneration;
     @try {
-        if(![self backgroundSyncDemand]){[self stopBackgroundSync];return;}
-        if(!self.backgroundSyncTimer)[self armBackgroundSyncAfter:[CSBackgroundSyncBudget.sharedBudget nextDelayForEpoch:self.accountEpoch]];
-    } @catch(__unused NSException *exception) {[self stopBackgroundSync];}
+        BOOL demand=[self backgroundSyncDemand];
+        if(wakeGeneration!=self.backgroundSyncGeneration)return;
+        if(!demand){[self stopBackgroundSync];return;}
+        if(self.backgroundSyncTimer)return;
+        NSUInteger epoch=self.accountEpoch;
+        NSTimeInterval delay=[CSBackgroundSyncBudget.sharedBudget nextDelayForEpoch:epoch minimumInterval:CSAutomationPatSyncInterval];
+        demand=[self backgroundSyncDemand];
+        // The shared clock can synchronously close or replace this timer.
+        if(wakeGeneration==self.backgroundSyncGeneration && epoch==self.accountEpoch && demand && !self.backgroundSyncTimer)
+            [self armBackgroundSyncAfter:delay];
+    } @catch(__unused NSException *exception) {if(wakeGeneration==self.backgroundSyncGeneration)[self stopBackgroundSync];}
     @finally {self.refreshingBackgroundSync=NO;}
 }
 - (void)backgroundSyncTick {
-    if(![self backgroundSyncDemand]){[self stopBackgroundSync];return;}
-    NSTimeInterval delay=[CSBackgroundSyncBudget.sharedBudget nextDelayForEpoch:self.accountEpoch];
-    // Reserve a future wake before native getters can synchronously reenter.
-    [self armBackgroundSyncAfter:delay>0?delay:45];if(delay>0)return;
-    // Temporary account/native availability must not disable future retrieval.
-    if(![self backgroundSyncEligible])return;
-    NSDictionary *configuration=self.configuration;NSString *account=self.accountID;NSUInteger epoch=self.accountEpoch,generation=self.configurationGeneration;
+    if(!NSThread.isMainThread)return;
+    NSUInteger wakeGeneration=self.backgroundSyncGeneration;
+    BOOL demand=[self backgroundSyncDemand];
+    if(wakeGeneration!=self.backgroundSyncGeneration)return;
+    if(!demand){[self stopBackgroundSync];return;}
+    // Reserve a bounded capability check before clock/native getters reenter.
+    // A busy service has not consumed a request and need not wait a full pull.
+    [self armBackgroundSyncAfter:CSAutomationSyncCapabilityRetry];wakeGeneration=self.backgroundSyncGeneration;
+    NSDictionary *configuration=self.configuration;NSString *account=self.accountID;
+    NSUInteger epoch=self.accountEpoch,generation=self.configurationGeneration;BOOL checkedBudget=NO;
     @try {
+        NSTimeInterval delay=[CSBackgroundSyncBudget.sharedBudget nextDelayForEpoch:epoch minimumInterval:CSAutomationPatSyncInterval];
+        if(wakeGeneration!=self.backgroundSyncGeneration || epoch!=self.accountEpoch)return;
+        if(delay>0){[self armBackgroundSyncAfter:delay];return;}
+        // Temporary account/native availability keeps the short capability wake.
+        if(![self backgroundSyncEligible] || wakeGeneration!=self.backgroundSyncGeneration)return;
         id service=[self.environment serviceNamed:@"NewSyncService"];
         if(!CSMessageNativeSupports(service,@"isGettingData",@"B",@[]) || !CSMessageNativeSupports(service,@"BackGroundFetchToSync",@"B",@[]))return;
         if([CSMessageNativeInvoke(service,@"isGettingData",@[]) boolValue])return;
-        if(![self backgroundSyncEligible] || configuration!=self.configuration || generation!=self.configurationGeneration || ![self.accountID isEqual:account] || epoch!=self.accountEpoch)return;
-        [CSBackgroundSyncBudget.sharedBudget performForEpoch:epoch request:^{
+        if(![self backgroundSyncEligible] || wakeGeneration!=self.backgroundSyncGeneration || configuration!=self.configuration || generation!=self.configurationGeneration || ![self.accountID isEqual:account] || epoch!=self.accountEpoch)return;
+        checkedBudget=YES;
+        [CSBackgroundSyncBudget.sharedBudget performForEpoch:epoch minimumInterval:CSAutomationPatSyncInterval request:^{
             CSAIObserveBackgroundSyncRequest(epoch,^{
-                if(configuration!=self.configuration || generation!=self.configurationGeneration || !self.ready || self.loading || self.saving || ![self.accountID isEqual:account] || self.accountEpoch!=epoch || self.enteringForeground || UIApplication.sharedApplication.applicationState!=UIApplicationStateBackground)return;
+                if(wakeGeneration!=self.backgroundSyncGeneration || configuration!=self.configuration || generation!=self.configurationGeneration || !self.ready || self.loading || self.saving || ![self.accountID isEqual:account] || self.accountEpoch!=epoch || self.enteringForeground || UIApplication.sharedApplication.applicationState!=UIApplicationStateBackground)return;
                 CSBackupPerformAtAccountEpoch(epoch,^{
                     // Do not unwind through the account handoff's lock boundary.
                     @try {[CSMessageNativeInvoke(service,@"BackGroundFetchToSync",@[]) boolValue];}
@@ -203,6 +223,16 @@ static NSString *AdmissionKey(NSString *action,NSString *identifier) {return [NS
             });
         }];
     } @catch(__unused NSException *exception) {}
+    @finally {
+        if(checkedBudget && wakeGeneration==self.backgroundSyncGeneration){
+            // Native NO/exception and uncertain handoff retain the real attempt
+            // cooldown. A reentrant stop or replacement owns its newer timer.
+            NSTimeInterval delay=[CSBackgroundSyncBudget.sharedBudget nextDelayForEpoch:epoch minimumInterval:CSAutomationPatSyncInterval];
+            demand=[self backgroundSyncDemand];
+            if(wakeGeneration==self.backgroundSyncGeneration && epoch==self.accountEpoch && demand)
+                [self armBackgroundSyncAfter:delay>0?delay:CSAutomationSyncCapabilityRetry];
+        }
+    }
 }
 
 - (void)cancelTasksIncludingCleanup:(BOOL)cleanup {

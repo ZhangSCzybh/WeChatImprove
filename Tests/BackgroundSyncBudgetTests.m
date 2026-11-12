@@ -144,6 +144,145 @@ static void ClockBoundaryAndThreadFences(void) {
     CHECK(invoked==2);
 }
 
+static BOOL MinimumDelayIs(CSBackgroundSyncBudget *budget,NSUInteger epoch,NSTimeInterval interval,NSTimeInterval expected) {
+    return fabs([budget nextDelayForEpoch:epoch minimumInterval:interval]-expected)<0.00001;
+}
+
+static void ShortIntervalSharesBothSources(void) {
+    atomic_store(&liveEpoch,11);__block NSTimeInterval time=100;__block NSUInteger ai=0,pat=0;
+    CSBackgroundSyncBudget *budget=[CSBackgroundSyncBudget new];budget.now=^{return time;};
+    CHECK(MinimumDelayIs(budget,11,10,0) && DelayIs(budget,11,0));
+    CHECK([budget performForEpoch:11 request:^{ai++;}]);
+    CHECK(MinimumDelayIs(budget,11,10,10) && DelayIs(budget,11,45));
+    time=109.999;CHECK(![budget performForEpoch:11 minimumInterval:10 request:^{pat++;}]);
+    time=110;CHECK([budget performForEpoch:11 minimumInterval:10 request:^{pat++;}]);
+    CHECK(ai==1 && pat==1 && MinimumDelayIs(budget,11,10,10) && DelayIs(budget,11,45));
+    CHECK(![budget performForEpoch:11 request:^{ai++;}]);
+    time=119.999;CHECK(![budget performForEpoch:11 minimumInterval:10 request:^{pat++;}]);
+    time=120;CHECK([budget performForEpoch:11 minimumInterval:10 request:^{pat++;}]);
+    // Stopping the short-interval source leaves the default caller's 45-second
+    // fence measured from the most recent actual request by either source.
+    time=164.999;CHECK(![budget performForEpoch:11 request:^{ai++;}]);
+    time=165;CHECK([budget performForEpoch:11 request:^{ai++;}]);
+    CHECK(![budget performForEpoch:11 minimumInterval:10 request:^{pat++;}]);
+    time=175;CHECK([budget performForEpoch:11 minimumInterval:10 request:^{pat++;}]);
+    CHECK(ai==2 && pat==3);
+    time=10000;CHECK([budget performForEpoch:11 minimumInterval:10 request:^{pat++;}]);
+    for(NSUInteger i=0;i<5;i++)CHECK(![budget performForEpoch:11 minimumInterval:10 request:^{pat++;}]);
+    CHECK(ai==2 && pat==4 && MinimumDelayIs(budget,11,10,10) && DelayIs(budget,11,45));
+}
+
+static void ShortIntervalVerifiedCoverageAndEpochs(void) {
+    atomic_store(&liveEpoch,12);__block NSTimeInterval time=100;__block NSUInteger requests=0;
+    CSBackgroundSyncBudget *budget=[CSBackgroundSyncBudget new];budget.now=^{return time;};
+    [budget verifiedFullSyncForEpoch:12];
+    CHECK(MinimumDelayIs(budget,12,10,10) && DelayIs(budget,12,45));
+    time=109.999;CHECK(![budget performForEpoch:12 minimumInterval:10 request:^{requests++;}]);
+    time=110;CHECK([budget performForEpoch:12 minimumInterval:10 request:^{requests++;}]);
+    time=114;[budget verifiedFullSyncForEpoch:12];
+    CHECK(MinimumDelayIs(budget,12,10,10) && DelayIs(budget,12,45));
+    time=119;atomic_store(&liveEpoch,13);
+    CHECK(MinimumDelayIs(budget,13,10,1) && DelayIs(budget,13,36));
+    [budget verifiedFullSyncForEpoch:12];
+    CHECK(MinimumDelayIs(budget,13,10,1) && DelayIs(budget,13,36));
+    CHECK(![budget performForEpoch:12 minimumInterval:10 request:^{requests++;}]);
+    CHECK(![budget performForEpoch:13 minimumInterval:10 request:^{requests++;}]);
+    time=120;CHECK([budget performForEpoch:13 minimumInterval:10 request:^{requests++;}]);
+    time=125;[budget verifiedFullSyncForEpoch:13];
+    atomic_store(&liveEpoch,14);time=126;
+    CHECK(MinimumDelayIs(budget,14,10,4) && DelayIs(budget,14,39));
+    time=130;CHECK([budget performForEpoch:14 minimumInterval:10 request:^{requests++;}]);
+    CHECK(requests==3 && MinimumDelayIs(budget,14,10,10) && DelayIs(budget,14,45));
+}
+
+static void ShortIntervalReentryRejectionAndException(void) {
+    atomic_store(&liveEpoch,15);__block NSTimeInterval time=100;__block NSUInteger requests=0;
+    CSBackgroundSyncBudget *budget=[CSBackgroundSyncBudget new];budget.now=^{return time;};
+    CHECK([budget performForEpoch:15 minimumInterval:10 request:^{
+        requests++;
+        CHECK(![budget performForEpoch:15 minimumInterval:10 request:^{requests++;}]);
+        CHECK(![budget performForEpoch:15 request:^{requests++;}]);
+        atomic_store(&liveEpoch,16);
+        CHECK(![budget performForEpoch:16 minimumInterval:10 request:^{requests++;}]);
+    }]);
+    CHECK(requests==1 && MinimumDelayIs(budget,16,10,10) && DelayIs(budget,16,45));
+    time=110;NSException *original=[NSException exceptionWithName:@"short-native" reason:nil userInfo:nil];
+    BOOL caught=NO;
+    @try {[budget performForEpoch:16 minimumInterval:10 request:^{requests++;@throw original;}];}
+    @catch(NSException *exception) {caught=YES;CHECK(exception==original);}
+    CHECK(caught && requests==2 && MinimumDelayIs(budget,16,10,10));
+    CHECK(![budget performForEpoch:16 minimumInterval:10 request:^{requests++;}]);
+    time=119.999;CHECK(![budget performForEpoch:16 minimumInterval:10 request:^{requests++;}]);
+    time=120;CHECK([budget performForEpoch:16 minimumInterval:10 request:^{requests++;/* Native returned NO. */}]);
+    CHECK(![budget performForEpoch:16 minimumInterval:10 request:^{requests++;}]);
+    time=130;CHECK([budget performForEpoch:16 minimumInterval:10 request:^{
+        requests++;time=133;[budget verifiedFullSyncForEpoch:16];
+        CHECK(![budget performForEpoch:16 minimumInterval:10 request:^{requests++;}]);
+    }]);
+    CHECK(requests==4 && MinimumDelayIs(budget,16,10,10) && DelayIs(budget,16,45));
+}
+
+static void ShortIntervalValidation(void) {
+    atomic_store(&liveEpoch,17);__block NSTimeInterval time=100;__block NSUInteger requests=0,clockReads=0;
+    CSBackgroundSyncBudget *budget=[CSBackgroundSyncBudget new];budget.now=^{clockReads++;return time;};
+    for(NSNumber *invalid in @[@(NAN),@(INFINITY),@(-INFINITY),@(-1),@0,@9.999,@45.001,@(DBL_MAX)]){
+        CHECK(MinimumDelayIs(budget,17,invalid.doubleValue,45));
+        CHECK(![budget performForEpoch:17 minimumInterval:invalid.doubleValue request:^{requests++;}]);
+    }
+    CHECK(clockReads==0 && requests==0);
+    CHECK([budget performForEpoch:17 minimumInterval:20 request:^{requests++;}]);
+    time=110;CHECK(MinimumDelayIs(budget,17,20,10) && MinimumDelayIs(budget,17,10,0));
+    CHECK(![budget performForEpoch:17 minimumInterval:20 request:^{requests++;}]);
+    time=120;CHECK([budget performForEpoch:17 minimumInterval:20 request:^{requests++;}]);
+    time=121;CHECK(![budget performForEpoch:17 minimumInterval:0 request:^{requests++;}]);
+    CHECK(requests==2 && MinimumDelayIs(budget,17,10,9) && DelayIs(budget,17,44));
+    time=165;CHECK([budget performForEpoch:17 minimumInterval:45 request:^{requests++;}]);
+    CHECK(requests==3 && MinimumDelayIs(budget,17,45,45) && DelayIs(budget,17,45));
+}
+
+static void ShortIntervalClockAndThreadFences(void) {
+    atomic_store(&liveEpoch,18);__block NSTimeInterval time=ldexp(1.0,57);__block NSUInteger requests=0;
+    CSBackgroundSyncBudget *large=[CSBackgroundSyncBudget new];large.now=^{return time;};
+    CHECK(time+10==time && time+45>time);
+    CHECK(MinimumDelayIs(large,18,10,45));
+    CHECK(![large performForEpoch:18 minimumInterval:10 request:^{requests++;}]);
+    CHECK(DelayIs(large,18,0));
+    CHECK([large performForEpoch:18 request:^{requests++;}]);
+    CHECK(requests==1 && ![large performForEpoch:18 minimumInterval:10 request:^{requests++;}]);
+
+    time=100;requests=0;CSBackgroundSyncBudget *budget=[CSBackgroundSyncBudget new];
+    __weak CSBackgroundSyncBudget *weakBudget=budget;
+    budget.now=^{
+        CHECK(![weakBudget performForEpoch:18 minimumInterval:10 request:^{requests++;}]);
+        CHECK(MinimumDelayIs(weakBudget,18,10,45));
+        [weakBudget verifiedFullSyncForEpoch:18];return time;
+    };
+    CHECK([budget performForEpoch:18 minimumInterval:10 request:^{requests++;}]);
+    budget.now=^{return time;};
+    __block BOOL offMainRefused=NO;__block NSTimeInterval offMainDelay=0;
+    dispatch_sync(dispatch_get_global_queue(QOS_CLASS_DEFAULT,0),^{
+        offMainRefused=![budget performForEpoch:18 minimumInterval:10 request:^{requests++;}];
+        offMainDelay=[budget nextDelayForEpoch:18 minimumInterval:10];
+        [budget verifiedFullSyncForEpoch:18];
+    });
+    CHECK(offMainRefused && offMainDelay>0 && requests==1);
+    for(NSNumber *invalid in @[@(NAN),@(INFINITY),@(-INFINITY),@(-1),@(DBL_MAX)]){
+        time=invalid.doubleValue;CHECK(MinimumDelayIs(budget,18,10,45));
+        CHECK(![budget performForEpoch:18 minimumInterval:10 request:^{requests++;}]);
+    }
+    time=99;CHECK(![budget performForEpoch:18 minimumInterval:10 request:^{requests++;}]);
+    time=109.999;CHECK(![budget performForEpoch:18 minimumInterval:10 request:^{requests++;}]);
+    time=110;CHECK([budget performForEpoch:18 minimumInterval:10 request:^{requests++;}]);
+    budget.now=^NSTimeInterval{@throw [NSException exceptionWithName:@"short-clock" reason:nil userInfo:nil];};
+    CHECK(MinimumDelayIs(budget,18,10,45));
+    CHECK(![budget performForEpoch:18 minimumInterval:10 request:^{requests++;}]);
+    budget.now=^{atomic_store(&liveEpoch,19);return time;};time=120;
+    CHECK(![budget performForEpoch:18 minimumInterval:10 request:^{requests++;}]);
+    budget.now=^{return time;};
+    CHECK([budget performForEpoch:19 minimumInterval:10 request:^{requests++;}]);
+    CHECK(requests==3 && MinimumDelayIs(budget,19,10,10) && DelayIs(budget,19,45));
+}
+
 int main(void) {
     @autoreleasepool {
         CHECK(NSThread.isMainThread);
@@ -152,6 +291,8 @@ int main(void) {
         SourcesShareOneAttempt();BusyRejectionAndOriginalException();
         VerifiedCoverageAndEpochChanges();ReentrantRequestsAndCompletions();
         InvalidAndRegressingClocks();ClockBoundaryAndThreadFences();
+        ShortIntervalSharesBothSources();ShortIntervalVerifiedCoverageAndEpochs();
+        ShortIntervalReentryRejectionAndException();ShortIntervalValidation();ShortIntervalClockAndThreadFences();
         printf("Background sync budget: %lu checks passed; shared sources, cooldown, epochs, verified coverage, exceptions, reentry, clocks and thread fences\n",(unsigned long)checks);
     }
     return 0;

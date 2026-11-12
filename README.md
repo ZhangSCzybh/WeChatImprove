@@ -2,7 +2,7 @@
 
 面向 iOS 微信的 Theos 插件，使用 Objective-C / Logos 接入微信原生界面，提供聊天分组、气泡与列表样式、消息操作和配置管理等功能。各项功能可在插件设置中按需开启。
 
-**当前版本：`2.5-10`（自动功能清理，功能行为保持）** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+**当前版本：`2.5-11`（缩短后台拍动轮询等待）** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
 
 [功能概览](#功能概览) · [安装与入口](#安装与入口) · [使用说明](#使用说明) · [配置与备份](#配置与备份) · [源码编译](#源码编译) · [开发与验证](#开发与验证) · [常见问题](#常见问题)
 
@@ -33,12 +33,14 @@
 | 运行方式 | 需要能够向微信加载插件的 iOS 注入环境，直接构建产物为 `.deb` |
 | 近期适配参考 | 微信 `8.0.78` 与 `8.0.80`；既有适配参考用户提供的 `8.0.80.34` IPA，小丑功能在两版微信中的显示与交互仍待真机验收 |
 | 系统目标 | Makefile 的最低编译目标为 iOS `15.0`，不代表所有系统与微信组合均已验证 |
-| Rootless | `2.5-10` 安装包，包含 arm64／arm64e |
-| Rootful | `2.5-10` 安装包及重签用 dylib，包含 arm64／arm64e |
+| Rootless | `2.5-11` 安装包，包含 arm64／arm64e |
+| Rootful | `2.5-11` 安装包及重签用 dylib，包含 arm64／arm64e |
 | Roothide | Makefile 保留构建入口；当前版本没有对应的运行验证结论 |
 | 注入依赖 | `control` 声明 `mobilesubstrate >= 0.9.5000`，实际加载取决于设备的注入环境 |
 
 微信私有接口会随版本变化。主机回归和成功打包只能验证相应代码与产物，真实设备上的显示、交互及其他插件组合仍需实际确认。
+
+`2.5-11` 缩短插件自身的后台拍动等待：拍我自动回拍或拍我自动回复开启且配置有效时，补拉间隔从约 45 秒调整为约 10 秒；原生同步忙碌或条件暂不可用且尚未发出请求时，约 2 秒复查。实际调用原生请求后，返回 NO 或抛出异常仍消耗拍动的约 10 秒冷却；仅 AI 的补拉维持默认约 45 秒。两路共用请求记录，按调用来源使用间隔，保留账号、授权、名单、去重、消息入站、发送、用户延迟和撤回规则。约 10 秒是插件请求间隔，不是消息送达或回复时限；网络、原生同步和系统执行机会仍会影响时效。测试、构建与验证限制见 [2.5-11 发布记录](packages/2.5-11-pat-latency/README.md)。
 
 `2.5-10` 基于现有 2.5-9 清理自动功能：移除拍动解析仅供诊断的兼容接口及对应测试遗留，整理无用参数和重复声明。保留严格 XML 与群消息前导解析、统一入站快照、账号与授权校验、会话名单、持久去重、发送与撤回调度，以及拍动与 AI 共用的约 45 秒后台同步预算。本版不改变自动功能规则和后台请求策略。清理范围、测试结果、构建与产物核验见 [2.5-10 发布记录](packages/2.5-10-automation-cleanup/README.md)。本版尚未安装到手机实测，2.5-7 的用户验收记录仍只对应该历史版本。
 
@@ -68,7 +70,7 @@
 
 ### 安装步骤
 
-1. 用户当前为 Rootless 环境，使用 [2.5-10 Rootless 安装包](packages/2.5-10-automation-cleanup/com.wechat.improve_2.5-10_iphoneos-arm64.deb)。另提供 [Rootful 安装包](packages/2.5-10-automation-cleanup/com.wechat.improve_2.5-10_iphoneos-arm.deb)、[重签用 dylib](packages/2.5-10-automation-cleanup/WeChatImprove.dylib)、[调试符号](packages/2.5-10-automation-cleanup/symbols.zip) 与 [SHA-256 清单](packages/2.5-10-automation-cleanup/SHA256SUMS)。验证记录见 [2.5-10 发布记录](packages/2.5-10-automation-cleanup/README.md)；历史包继续保留。
+1. 用户当前为 Rootless 环境，使用 [2.5-11 Rootless 安装包](packages/2.5-11-pat-latency/com.wechat.improve_2.5-11_iphoneos-arm64.deb)。另提供 [Rootful 安装包](packages/2.5-11-pat-latency/com.wechat.improve_2.5-11_iphoneos-arm.deb)、[重签用 dylib](packages/2.5-11-pat-latency/WeChatImprove.dylib)、[调试符号](packages/2.5-11-pat-latency/symbols.zip) 与 [SHA-256 清单](packages/2.5-11-pat-latency/SHA256SUMS)。验证记录见 [2.5-11 发布记录](packages/2.5-11-pat-latency/README.md)；历史包继续保留。
 
    密友头像五击快捷入口不验证身份：任何能操作已解锁手机并到达头像的人，都能查看或修改配置，并经两级确认不可撤销地完整重置当前账号的密友配置。此风险继续存在；修改密码仍须普通入口验证。
 2. 使用设备上适配该环境的包管理器或安装工具安装，并按工具提示重新加载注入环境。
@@ -195,6 +197,8 @@
 
 微信进程在前台或后台仍有执行机会时会处理事件，不要求本插件“后台运行”开关开启，也可利用其他插件维持的执行机会。系统挂起时无法实时执行；设备首次解锁后，锁屏状态下继续核验实际账号、授权、运行记录读写和原生发送条件；这些条件暂不可用时保留任务，恢复或回到前台立即重评估，在到期后 5 分钟内补发一次，超过窗口终止并显示原因；进程重启不恢复待发送任务。修改设置或切换账号取消旧的待发任务，已成功提交的回拍在回拍及撤回开关仍开启时保留原撤回计时。备份只包含配置；恢复后四个模块关闭，本机去重记录保留。
 
+`2.5-11` 在拍动模块开启且名单、回复文案等配置有效时，以约 10 秒间隔尝试后台补拉；只开启 AI 时维持默认约 45 秒。同步正在进行或条件暂不可用、还没有调用原生请求时约 2 秒复查；真正调用后，无论原生返回 NO 还是异常，拍动都遵守约 10 秒冷却。这里调整的是获取新消息的等待，设置中的 0–300 秒执行延迟仍从事件进入处理后计算。它不保证 10 秒内收到拍动、回拍或回复，也不能在系统挂起时自行唤醒微信。
+
 ### 密友保护
 
 入口是 **插件设置 → 账号与安全 → 捉迷藏呀**。当前账号首次默认隐藏；在插件主设置页长按顶部头像 **2 秒**，轻震后显示入口并按账号记住，后台和重启后保留。已有密友密码的账号沿用原入口与隐藏偏好。头像手势只负责首次发现，不启用保护或解锁内容，也不覆盖“隐藏密友设置”。开发分支及验证见 [手势入口记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/close-friend-entry-gesture-2026-10-26/README.md)。进入后先设置独立密码、选择密友或密群，再启用；默认临时显示 300 秒，后台、账号切换及重启后重新隐藏。“首页长按解锁”默认开启，长按微信首页顶部导航栏 1 秒触发临时解锁；开启“生物识别解锁”后需通过系统面容／指纹验证，不可用、取消或失败时转密友密码，关闭时保留直接解锁；可在密友的“账号保护”中关闭，或将“长按触发时长”设为 **0.5–2 秒**，保存后生效。在首页原生搜索框输入完整密友密码也可解锁，不受长按开关影响。**密友隐藏时，搜索不显示“解锁后查看”占位行；原生实时联想、“搜索网络结果”和普通搜索照常工作。** 完整密码匹配后立即清空输入并停止本次搜索。解锁期间恢复隐藏的密友设置入口，不修改隐藏选项。临时解锁期间可正常接听和拨打密友语音／视频通话；重新锁定后恢复来电拒接设置。消息通知由微信及 iOS 原生设置决定，锁定与临时解锁均不再额外静默。朋友圈可见范围图标继续按对应开关处理。“隐藏全部朋友圈可见范围图标”覆盖朋友圈动态流、我的朋友圈列表（含缩略图）和动态详情，关闭后按原始动态恢复图标，不修改实际发布权限。开启图标隐藏时使用已适配的微信原生朋友圈页面；1.9-9 隐藏详情范围图标时保留原生占位及换行，删除按钮保持原位；入口隐藏、生物识别、摇动锁定、长按解锁和时长设置仍归入“账号保护”。详见 [1.9-9 修改与验证记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/close-friend-position-1.9-9/README.md)。开启“摇动立即锁定”后，临时解锁期间轻摇手机即可重新隐藏密友；仅在微信前台检测，锁定或进入后台即停止。
@@ -289,7 +293,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootless \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出文件名：`packages/com.wechat.improve_2.5-10_iphoneos-arm64.deb`。本轮交付为 [2.5-10 Rootless 安装包](packages/2.5-10-automation-cleanup/com.wechat.improve_2.5-10_iphoneos-arm64.deb)。
+当前版本默认输出文件名：`packages/com.wechat.improve_2.5-11_iphoneos-arm64.deb`。本轮交付为 [2.5-11 Rootless 安装包](packages/2.5-11-pat-latency/com.wechat.improve_2.5-11_iphoneos-arm64.deb)。
 
 ### Rootful
 
@@ -298,7 +302,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出文件名：`packages/com.wechat.improve_2.5-10_iphoneos-arm.deb`。本轮交付为 [2.5-10 Rootful 安装包](packages/2.5-10-automation-cleanup/com.wechat.improve_2.5-10_iphoneos-arm.deb)。
+当前版本默认输出文件名：`packages/com.wechat.improve_2.5-11_iphoneos-arm.deb`。本轮交付为 [2.5-11 Rootful 安装包](packages/2.5-11-pat-latency/com.wechat.improve_2.5-11_iphoneos-arm.deb)。
 
 | 方案 | 动态库安装目录 |
 | --- | --- |
@@ -322,7 +326,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
 `PACKAGE_VERSION` 只覆盖当次打包版本，不会更新插件内显示版本。安装了 `dpkg-deb` 后，可以检查包元数据：
 
 ```bash
-dpkg-deb -f packages/2.5-10-automation-cleanup/com.wechat.improve_2.5-10_iphoneos-arm64.deb Version Architecture
+dpkg-deb -f packages/2.5-11-pat-latency/com.wechat.improve_2.5-11_iphoneos-arm64.deb Version Architecture
 ```
 
 插件内通过 **关于 → 版本信息** 查看随包提供的离线更新说明。
@@ -352,7 +356,7 @@ WeChatImprove/
 
 Makefile 自动收集 `Hooks/*.xm` 和 `Controllers/*.m` 参与编译。Hook 负责接入微信，业务策略、原生接口适配与设置界面主要位于 `Controllers/`。
 
-自动功能由 `AutomationHooks` 接收原生消息、拍动与同步批次，`CSAutomationEventAdapter` 生成经过严格身份和内容校验的事件；`CSAutomationStore` 处理配置、规则决策及持久去重，`CSAutomationManager` 负责账号检查、固定回复与 AI 仲裁、延迟任务和可选回拍撤回，最后通过原生适配器提交。拍动后台补拉与 AI 共用 `CSBackgroundSyncBudget` 的约 45 秒预算。2.5-10 仅清理诊断接口与无用封装，相关验证见 [发布记录](packages/2.5-10-automation-cleanup/README.md)。
+自动功能由 `AutomationHooks` 接收原生消息、拍动与同步批次，`CSAutomationEventAdapter` 生成经过严格身份和内容校验的事件；`CSAutomationStore` 处理配置、规则决策及持久去重，`CSAutomationManager` 负责账号检查、固定回复与 AI 仲裁、延迟任务和可选回拍撤回，最后通过原生适配器提交。拍动后台补拉与 AI 共用 `CSBackgroundSyncBudget` 的请求记录，并按调用来源使用间隔：有效拍动后台需求约 10 秒，默认 AI 路径约 45 秒；未发出请求的 busy 或临时不可用分支约 2 秒复查。实际请求返回 NO 或异常仍消耗相应冷却。2.5-11 调整轮询等待，相关验证见 [发布记录](packages/2.5-11-pat-latency/README.md)。
 
 聊天分组主列表由 `CSGroupNativeSessionCoordinator` 管理完整原生展示基线，`CSGroupNativeModel` 复用共享归属、筛重、隐私和统计规则并输出原生会话对象；主列表使用统一的原生坐标。`CSGroupListAdapter` 负责标签、外观、身份复核和安全遮罩；折叠子页继续使用 `CSGroupProjection` / `CSGroupTableProxy`。未读面板与转发在同步完整候选作用域中取数并复核结果，随后恢复当前组。消息操作由菜单/手势入口、动作协调器和原生适配器协作；气泡与消息合并分别处理样式、分组策略和布局。修改时应同时检查相关生命周期与功能组合。
 
