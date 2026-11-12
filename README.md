@@ -2,7 +2,7 @@
 
 面向 iOS 微信的 Theos 插件，使用 Objective-C / Logos 接入微信原生界面，提供聊天分组、气泡与列表样式、消息操作和配置管理等功能。各项功能可在插件设置中按需开启。
 
-**当前版本：`2.5-12`（后台拍动改为事件触发同步）** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+**当前版本：`2.5-13`（修复后台群拍动同步服务代理识别）** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
 
 [功能概览](#功能概览) · [安装与入口](#安装与入口) · [使用说明](#使用说明) · [配置与备份](#配置与备份) · [源码编译](#源码编译) · [开发与验证](#开发与验证) · [常见问题](#常见问题)
 
@@ -33,12 +33,14 @@
 | 运行方式 | 需要能够向微信加载插件的 iOS 注入环境，直接构建产物为 `.deb` |
 | 近期适配参考 | 微信 `8.0.78` 与 `8.0.80`；既有适配参考用户提供的 `8.0.80.34` IPA，小丑功能在两版微信中的显示与交互仍待真机验收 |
 | 系统目标 | Makefile 的最低编译目标为 iOS `15.0`，不代表所有系统与微信组合均已验证 |
-| Rootless | `2.5-12` 安装包，包含 arm64／arm64e |
-| Rootful | `2.5-12` 安装包及重签用 dylib，包含 arm64／arm64e |
+| Rootless | `2.5-13` 安装包，包含 arm64／arm64e |
+| Rootful | `2.5-13` 安装包及重签用 dylib，包含 arm64／arm64e |
 | Roothide | Makefile 保留构建入口；当前版本没有对应的运行验证结论 |
 | 注入依赖 | `control` 声明 `mobilesubstrate >= 0.9.5000`，实际加载取决于设备的注入环境 |
 
 微信私有接口会随版本变化。主机回归和成功打包只能验证相应代码与产物，真实设备上的显示、交互及其他插件组合仍需实际确认。
+
+`2.5-13` 修复 2.5-12 的服务身份比较错误：微信返回的是账号服务代理，Hook 接收的是实际服务，之前直接比较两者导致有效后台同步被拒绝。现在校验代理对应的实际服务身份，并通过代理调用同步，保留原生账号上下文；配置／生命周期唤醒同样支持代理。只有当前服务确实可用才停用兼容补拉，正常事件路径不等待轮询。包与测试边界见 [2.5-13 发布记录](packages/2.5-13-pat-service-wrapper/README.md)。
 
 `2.5-12` 在已适配的微信 8.0.80 中接入原生待同步通知：后台拍动配置有效时，立即消费微信的同步需求；忙碌或暂停时保留需求，在实际完成／恢复后继续。正常路径停用拍动 10 秒定时补拉，不受 10／45 秒插件补拉预算阻挡。原生接口不满足检查或其他微信版本保留 2.5-11 兼容路径；仅 AI 的后台兜底策略保持。保留原有账号、授权、名单、持久去重、用户延迟与撤回检查。实测边界与产物见 [2.5-12 发布记录](packages/2.5-12-pat-native-sync/README.md)。
 
@@ -72,7 +74,7 @@
 
 ### 安装步骤
 
-1. 用户当前为 Rootless 环境，使用 [2.5-12 Rootless 安装包](packages/2.5-12-pat-native-sync/com.wechat.improve_2.5-12_iphoneos-arm64.deb)。另提供 [Rootful 安装包](packages/2.5-12-pat-native-sync/com.wechat.improve_2.5-12_iphoneos-arm.deb)、[重签用 dylib](packages/2.5-12-pat-native-sync/WeChatImprove.dylib)、[调试符号](packages/2.5-12-pat-native-sync/symbols.zip) 与 [SHA-256 清单](packages/2.5-12-pat-native-sync/SHA256SUMS)。验证记录见 [2.5-12 发布记录](packages/2.5-12-pat-native-sync/README.md)；历史包继续保留。
+1. 用户当前为 Rootless 环境，使用 [2.5-13 Rootless 安装包](packages/2.5-13-pat-service-wrapper/com.wechat.improve_2.5-13_iphoneos-arm64.deb)。另提供 [Rootful 安装包](packages/2.5-13-pat-service-wrapper/com.wechat.improve_2.5-13_iphoneos-arm.deb)、[重签用 dylib](packages/2.5-13-pat-service-wrapper/WeChatImprove.dylib)、[调试符号](packages/2.5-13-pat-service-wrapper/symbols.zip) 与 [SHA-256 清单](packages/2.5-13-pat-service-wrapper/SHA256SUMS)。验证记录见 [2.5-13 发布记录](packages/2.5-13-pat-service-wrapper/README.md)；历史包继续保留。
 
    密友头像五击快捷入口不验证身份：任何能操作已解锁手机并到达头像的人，都能查看或修改配置，并经两级确认不可撤销地完整重置当前账号的密友配置。此风险继续存在；修改密码仍须普通入口验证。
 2. 使用设备上适配该环境的包管理器或安装工具安装，并按工具提示重新加载注入环境。
@@ -199,7 +201,7 @@
 
 微信进程在前台或后台仍有执行机会时会处理事件，不要求本插件“后台运行”开关开启，也可利用其他插件维持的执行机会。系统挂起时无法实时执行；设备首次解锁后，锁屏状态下继续核验实际账号、授权、运行记录读写和原生发送条件；这些条件暂不可用时保留任务，恢复或回到前台立即重评估，在到期后 5 分钟内补发一次，超过窗口终止并显示原因；进程重启不恢复待发送任务。修改设置或切换账号取消旧的待发任务，已成功提交的回拍在回拍及撤回开关仍开启时保留原撤回计时。备份只包含配置；恢复后四个模块关闭，本机去重记录保留。
 
-`2.5-12` 在微信 8.0.80 且原生接口检查通过时，收到待同步通知便请求原生同步；同步忙碌、暂停或消息正在处理时，在真实完成／恢复事件后继续。该路径不创建拍动轮询计时器，不受插件补拉预算限制。其他宿主仍用原约 10 秒兼容补拉；仅 AI 的兜底约 45 秒保持。设置中的 0–300 秒执行延迟仍从事件进入处理后计算；0 秒不会额外等待。事件触发不能使被系统挂起或已退出的微信自行执行，网络及原生消息交付仍影响实际时效。
+`2.5-13` 在微信 8.0.80 且当前账号的服务代理／原生接口检查通过时，收到待同步通知便请求原生同步；同步忙碌、暂停或消息正在处理时，在真实完成／恢复事件后继续。该路径不创建拍动轮询计时器，不受插件补拉预算限制。其他宿主仍用原约 10 秒兼容补拉；仅 AI 的兜底约 45 秒保持。设置中的 0–300 秒执行延迟仍从事件进入处理后计算；0 秒不会额外等待。事件触发不能使被系统挂起或已退出的微信自行执行，网络及原生消息交付仍影响实际时效。
 
 ### 密友保护
 
@@ -295,7 +297,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootless \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出文件名：`packages/com.wechat.improve_2.5-12_iphoneos-arm64.deb`。本轮交付为 [2.5-12 Rootless 安装包](packages/2.5-12-pat-native-sync/com.wechat.improve_2.5-12_iphoneos-arm64.deb)。
+当前版本默认输出文件名：`packages/com.wechat.improve_2.5-13_iphoneos-arm64.deb`。本轮交付为 [2.5-13 Rootless 安装包](packages/2.5-13-pat-service-wrapper/com.wechat.improve_2.5-13_iphoneos-arm64.deb)。
 
 ### Rootful
 
@@ -304,7 +306,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出文件名：`packages/com.wechat.improve_2.5-12_iphoneos-arm.deb`。本轮交付为 [2.5-12 Rootful 安装包](packages/2.5-12-pat-native-sync/com.wechat.improve_2.5-12_iphoneos-arm.deb)。
+当前版本默认输出文件名：`packages/com.wechat.improve_2.5-13_iphoneos-arm.deb`。本轮交付为 [2.5-13 Rootful 安装包](packages/2.5-13-pat-service-wrapper/com.wechat.improve_2.5-13_iphoneos-arm.deb)。
 
 | 方案 | 动态库安装目录 |
 | --- | --- |
@@ -328,7 +330,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
 `PACKAGE_VERSION` 只覆盖当次打包版本，不会更新插件内显示版本。安装了 `dpkg-deb` 后，可以检查包元数据：
 
 ```bash
-dpkg-deb -f packages/2.5-12-pat-native-sync/com.wechat.improve_2.5-12_iphoneos-arm64.deb Version Architecture
+dpkg-deb -f packages/2.5-13-pat-service-wrapper/com.wechat.improve_2.5-13_iphoneos-arm64.deb Version Architecture
 ```
 
 插件内通过 **关于 → 版本信息** 查看随包提供的离线更新说明。
@@ -358,7 +360,7 @@ WeChatImprove/
 
 Makefile 自动收集 `Hooks/*.xm` 和 `Controllers/*.m` 参与编译。Hook 负责接入微信，业务策略、原生接口适配与设置界面主要位于 `Controllers/`。
 
-自动功能由 `CSAutomationNativeSync` 接入已校验宿主的原生同步需求，合并唤醒并通过 `CSAutomationManager` 复核后台配置、账号与当前服务后即时推动同步。完成、恢复事件继续消费真实待同步需求；正常路径停用拍动轮询。`AutomationHooks` 接收同步后的消息与拍动，`CSAutomationEventAdapter` 严格校验身份和内容，`CSAutomationStore` 管理配置及持久去重，Manager 处理仲裁、用户延迟及撤回，原生适配器完成提交。未适配宿主的拍动兼容补拉与 AI 仍共用 `CSBackgroundSyncBudget` 的请求记录，分别使用原约 10／45 秒间隔。详见 [2.5-12 发布记录](packages/2.5-12-pat-native-sync/README.md)。
+自动功能由 `CSAutomationNativeSync` 接入已校验宿主的原生同步需求，合并唤醒并通过 `CSAutomationManager` 复核后台配置、账号与当前服务后即时推动同步。完成、恢复事件继续消费真实待同步需求；正常路径停用拍动轮询。`AutomationHooks` 接收同步后的消息与拍动，`CSAutomationEventAdapter` 严格校验身份和内容，`CSAutomationStore` 管理配置及持久去重，Manager 处理仲裁、用户延迟及撤回，原生适配器完成提交。未适配宿主的拍动兼容补拉与 AI 仍共用 `CSBackgroundSyncBudget` 的请求记录，分别使用原约 10／45 秒间隔。详见 [2.5-13 发布记录](packages/2.5-13-pat-service-wrapper/README.md)。
 
 聊天分组主列表由 `CSGroupNativeSessionCoordinator` 管理完整原生展示基线，`CSGroupNativeModel` 复用共享归属、筛重、隐私和统计规则并输出原生会话对象；主列表使用统一的原生坐标。`CSGroupListAdapter` 负责标签、外观、身份复核和安全遮罩；折叠子页继续使用 `CSGroupProjection` / `CSGroupTableProxy`。未读面板与转发在同步完整候选作用域中取数并复核结果，随后恢复当前组。消息操作由菜单/手势入口、动作协调器和原生适配器协作；气泡与消息合并分别处理样式、分组策略和布局。修改时应同时检查相关生命周期与功能组合。
 

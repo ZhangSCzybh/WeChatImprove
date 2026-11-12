@@ -53,8 +53,9 @@ static void CSAutomationSyncDrain(id service,CSAutomationSyncState *state) {
     if(!state.pending || state.driving || state.epoch!=CSBackupAccountEpoch() ||
        objc_getAssociatedObject(service,CSAutomationSyncStateKey)!=state)return;
     @try {
-        [CSAutomationManager.sharedManager performNativeSyncForService:service epoch:state.epoch request:^{
+        [CSAutomationManager.sharedManager performNativeSyncForService:service epoch:state.epoch request:^(id receiver){
             if(state.epoch!=CSBackupAccountEpoch() || !state.pending || state.driving)return;
+            if(CSMessageNativeServiceIdentity(receiver,@"NewSyncService")!=service)return;
             if(!CSAutomationSyncFlag(service,"m_bNeedSync")){state.pending=NO;return;}
             // Never clear busy/pause/error flags to force a request. Busy needs
             // stay pending until a native completion/resume readiness event.
@@ -63,7 +64,7 @@ static void CSAutomationSyncDrain(id service,CSAutomationSyncState *state) {
             @try {
                 // Uses the scene selected by WeChat; unlike BackGroundFetch it
                 // consumes an existing notification, with no 10/45-second gate.
-                [CSMessageNativeInvoke(service,@"NotifyToSync",@[]) boolValue];
+                [CSMessageNativeInvoke(receiver,@"NotifyToSync",@[]) boolValue];
             } @catch(__unused NSException *exception) {}
             @finally {CSAutomationSyncDriveDepth--;state.driving=NO;}
         }];
@@ -89,9 +90,14 @@ static void CSAutomationSyncWake(id service,NSUInteger epoch,BOOL newNeed) {
     dispatch_async(dispatch_get_main_queue(),^{CSAutomationSyncDrain(service,state);});
 }
 void CSAutomationWakePendingNativeSync(id service,NSUInteger epoch) {
-    @try {CSAutomationSyncWake(service,epoch,YES);} @catch(__unused NSException *exception) {}
+    @try {CSAutomationSyncWake(CSMessageNativeServiceIdentity(service,@"NewSyncService"),epoch,YES);} @catch(__unused NSException *exception) {}
 }
 BOOL CSAutomationNativeSyncAvailable(void) {return CSAutomationSyncInstalled;}
+BOOL CSAutomationNativeSyncCanWake(id receiver) {
+    return NSThread.isMainThread && CSAutomationSyncInstalled &&
+        CSAutomationSyncConcrete(CSMessageNativeServiceIdentity(receiver,@"NewSyncService")) &&
+        CSMessageNativeSupports(receiver,@"NotifyToSync",@"B",@[]);
+}
 
 static BOOL CSAutomationSyncMethod(Class cls,NSString *name,NSString *result,NSArray<NSString *> *arguments) {
     Method method=class_getInstanceMethod(cls,NSSelectorFromString(name));

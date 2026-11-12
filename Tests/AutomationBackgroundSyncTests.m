@@ -3,6 +3,7 @@
 // Event normalization is covered separately by AutomationPatIngressTests.m.
 #import "CSMessageNativeActionAdapter.h"
 #import "CSBackgroundSyncBudget.h"
+#define CS_AUTOMATION_REAL_SERVICE_IDENTITY 1
 #define CSMessageNativeSupports CSBackgroundFixtureNativeSupports
 #define CSMessageNativeInvoke CSBackgroundFixtureNativeInvoke
 #define CSMessageNativeUnsigned CSBackgroundFixtureNativeUnsigned
@@ -284,7 +285,7 @@ int main(int argc,const char **argv) {@autoreleasepool {
     SyncAdvance(50);[manager backgroundSyncTick];
     CHECK(service.requests==previous && [manager valueForKey:@"backgroundSyncTimer"]==nil);
     __block NSUInteger immediate=0;
-    void (^immediateRequest)(void)=^{immediate++;};
+    void (^immediateRequest)(id)=^(id receiver){CHECK(receiver==service);immediate++;};
     // A native notification does not wait for the fallback budget, including
     // immediately after a different caller reserved its 45-second interval.
     CHECK([CSBackgroundSyncBudget.sharedBudget performForEpoch:epoch request:^{}]);
@@ -305,7 +306,7 @@ int main(int argc,const char **argv) {@autoreleasepool {
     Wait(^BOOL{return manager.ready;});
     SyncConfigure(manager,YES,YES,0);
     pulledEvent=Event(81003,YES,NO,NO);textBefore=sendCount;patBefore=patCount;zeroDelayTime=uptime;
-    [manager performNativeSyncForService:service epoch:epoch request:^{
+    [manager performNativeSyncForService:service epoch:epoch request:^(__unused id receiver){
         immediate++;[manager receivePat:pulledEvent conversation:@"room@chatroom" epoch:epoch];
     }];
     Wait(^BOOL{return sendCount==textBefore+1 && patCount==patBefore+1;});

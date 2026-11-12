@@ -20,15 +20,15 @@ static NSMutableArray<NSString *> *trace;
 #define CHECK(c) do {checks++;if(!(c)){fprintf(stderr,"FAIL %d: %s\n",__LINE__,#c);exit(1);}} while(0)
 
 @interface CSAutomationManager (NativeSyncFixture)
-- (void)performNativeSyncForService:(id)service epoch:(NSUInteger)epoch request:(void (^)(void))request;
+- (void)performNativeSyncForService:(id)service epoch:(NSUInteger)epoch request:(void (^)(id))request;
 @end
 @implementation CSAutomationManager
 + (instancetype)sharedManager {static CSAutomationManager *manager;static dispatch_once_t once;dispatch_once(&once,^{manager=[self new];});return manager;}
-- (void)performNativeSyncForService:(id)service epoch:(NSUInteger)epoch request:(void (^)(void))request {
+- (void)performNativeSyncForService:(id)service epoch:(NSUInteger)epoch request:(void (^)(id))request {
     CHECK(NSThread.isMainThread);managerCalls++;lastManagerService=service;lastManagerEpoch=epoch;[trace addObject:@"manager"];
     dispatch_block_t callback=duringManager;duringManager=nil;if(callback)callback();
     if(throwManager)[NSException raise:@"ManagerMetadata" format:@"fixture"];
-    if(eligible && backupReady && !suspended && epoch==atomic_load(&liveEpoch)){requestCalls++;request();}
+    if(eligible && backupReady && !suspended && epoch==atomic_load(&liveEpoch)){requestCalls++;request(service);}
 }
 @end
 NSUInteger CSBackupAccountEpoch(void) {return atomic_load(&liveEpoch);}

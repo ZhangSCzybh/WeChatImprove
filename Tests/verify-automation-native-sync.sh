@@ -10,7 +10,7 @@ target=Path(sys.argv[1])
 source=Path('Controllers/CSMessageNativeActionAdapter.m').read_text().split('@interface NSObject (CSNativeAppPath)',1)[0]
 (target/'NativeDispatchUnderTest.m').write_text(source)
 (target/'substrate.h').write_text('#import <objc/runtime.h>\nvoid MSHookMessageEx(Class, SEL, IMP, IMP *);\n')
-(target/'NativeSyncManagerAPIs.h').write_text('#import "CSAutomationManager.h"\n@interface CSAutomationManager (NativeSyncFixturePrefix)\n- (void)performNativeSyncForService:(id)service epoch:(NSUInteger)epoch request:(void (^)(void))request;\n@end\n')
+(target/'NativeSyncManagerAPIs.h').write_text('#import "CSAutomationManager.h"\n@interface CSAutomationManager (NativeSyncFixturePrefix)\n- (void)performNativeSyncForService:(id)service epoch:(NSUInteger)epoch request:(void (^)(id))request;\n@end\n')
 PY
 xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror \
  -Wno-incomplete-implementation -IControllers -I"$test_dir" \
