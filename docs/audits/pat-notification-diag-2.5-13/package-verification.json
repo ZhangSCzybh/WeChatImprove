@@ -1,0 +1,54 @@
+{
+  "metadata": {
+    "Package": "com.wechat.improve",
+    "Version": "2.5-13+diag.1",
+    "Architecture": "iphoneos-arm64"
+  },
+  "delivery": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/packages/2.5-13-pat-notification-diagnostic",
+  "slices": {
+    "arm64": {
+      "uuid": "C0C811E5-BA15-3527-A6AC-4590CB92DCBD",
+      "min_ios": "15.0",
+      "rpaths": [
+        "/var/jb/Library/Frameworks",
+        "/var/jb/usr/lib",
+        "@loader_path/.jbroot/Library/Frameworks",
+        "@loader_path/.jbroot/usr/lib"
+      ]
+    },
+    "arm64e": {
+      "uuid": "22E697D4-318D-37AD-800C-03482ABD8CC2",
+      "min_ios": "15.0",
+      "rpaths": [
+        "/var/jb/Library/Frameworks",
+        "/var/jb/usr/lib",
+        "@loader_path/.jbroot/Library/Frameworks",
+        "@loader_path/.jbroot/usr/lib"
+      ]
+    }
+  },
+  "sha256": {
+    "com.wechat.improve_2.5-13+diag.1_iphoneos-arm64.deb": "5430786dab10711c58fa6d0e96e5d78845007a671c5393593baa0983393100a9",
+    "symbols.zip": "b251bb23468ab33f5550c8eafc970bc666be56888826e93ea36f7db25c746c46"
+  },
+  "historical_files_unchanged": 78,
+  "frozen_inputs_match": 451,
+  "changed_production_files": [
+    "Controllers/CSAutomationDiagnostics.h",
+    "Controllers/CSAutomationDiagnostics.m",
+    "Controllers/CSAutomationEventAdapter.m",
+    "Controllers/CSAutomationManager.m",
+    "Controllers/CSAutomationNativeDiagnostics.h",
+    "Controllers/CSAutomationNativeDiagnostics.m",
+    "Controllers/CSAutomationNativeSync.m",
+    "Controllers/CSAutomationReplyDiagnostics.h",
+    "Controllers/CSAutomationSettingsViewController.m",
+    "Controllers/CSGroupChatNativeAdapter.m",
+    "Controllers/CSReleaseNotesViewController.m",
+    "Headers/CSUserInfoHelper.h",
+    "Hooks/AutomationHooks.xm",
+    "Hooks/CloseFriendCallReplyHooks.xm",
+    "control"
+  ],
+  "test_only_stages_absent": true
+}
