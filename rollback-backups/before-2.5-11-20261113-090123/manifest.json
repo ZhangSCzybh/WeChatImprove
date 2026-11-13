@@ -1,0 +1,131 @@
+{
+  "checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "head": "00634e438df1bac522e4c4b527adb95d3dfbbcea",
+  "target_release": "39930b3d",
+  "tracked_to_restore": [
+    "Controllers/CSCloseFriendCallAdapter.h",
+    "Controllers/CSCloseFriendCallAdapter.m",
+    "Controllers/CSCloseFriendSettingsViewController.m",
+    "Controllers/CSReleaseNotesViewController.m",
+    "Headers/CSUserInfoHelper.h",
+    "Hooks/CloseFriendCallHooks.xm",
+    "Hooks/CloseFriendNotificationHooks.xm",
+    "README.md",
+    "Tests/CloseFriendAlertTests.m",
+    "Tests/CloseFriendTabBadgeTests.m",
+    "Tests/verify-close-friend-alerts.sh",
+    "control"
+  ],
+  "untracked_to_archive": [
+    "Controllers/CSCloseFriendCallDiagnostics.h",
+    "Controllers/CSCloseFriendCallDiagnostics.m",
+    "Hooks/CloseFriendCallDiagnosticsHooks.xm",
+    "Tests/CloseFriendCallDiagnosticsTests.m",
+    "Tests/CloseFriendCallNotificationFixture.h",
+    "Tests/CloseFriendCallResponseTests.m",
+    "Tests/verify-close-friend-call-diagnostics.sh",
+    "Tests/verify-close-friend-call-response.sh"
+  ],
+  "files": {
+    "Controllers/CSCloseFriendCallAdapter.h": {
+      "sha256": "d1844ee96a962dce92a2cd6faabe7579dae6ed0e8e1eb025f269f38f540105d9",
+      "size": 2153,
+      "mode": "0o644"
+    },
+    "Controllers/CSCloseFriendCallAdapter.m": {
+      "sha256": "f732637ee036013c3401920cd428b1fe038b57a4878cee03034af0075cd48151",
+      "size": 18553,
+      "mode": "0o644"
+    },
+    "Controllers/CSCloseFriendSettingsViewController.m": {
+      "sha256": "5cc853ad30cba3b3cb4a21a05f6afba608a8205c6e3c9f5a67b3818969750627",
+      "size": 29274,
+      "mode": "0o644"
+    },
+    "Controllers/CSReleaseNotesViewController.m": {
+      "sha256": "b4ed1a07807a5efb221ec2abd1913de7c49b830444c65b50d24c319ede772a68",
+      "size": 107192,
+      "mode": "0o644"
+    },
+    "Headers/CSUserInfoHelper.h": {
+      "sha256": "0e8f3e5e22188e466e703f3350f11a154704f4af593d277285dd7b5a28cfedf4",
+      "size": 1245,
+      "mode": "0o644"
+    },
+    "Hooks/CloseFriendCallHooks.xm": {
+      "sha256": "73bf282481f909f983564b1dfc6937a2931cf0e10f4cb460b58fb33cb09e88b6",
+      "size": 6617,
+      "mode": "0o644"
+    },
+    "Hooks/CloseFriendNotificationHooks.xm": {
+      "sha256": "3d76025b54ba2a98a89971a4f65b11c7ceb890cd2d3b50ac09501353b1ed49b4",
+      "size": 34398,
+      "mode": "0o644"
+    },
+    "README.md": {
+      "sha256": "d96b1812755d15726ccf4a6b9fbb0d1e64c67a2f2d3893a8c2f8266bfb9e93f8",
+      "size": 83214,
+      "mode": "0o644"
+    },
+    "Tests/CloseFriendAlertTests.m": {
+      "sha256": "920e374d13f362f2eb97c0f3ec203f294635de33ed201ecd5c80efd559fb0dde",
+      "size": 18022,
+      "mode": "0o644"
+    },
+    "Tests/CloseFriendTabBadgeTests.m": {
+      "sha256": "e8c50e4dea41ad5ffa628180b931002968385a9ba01f4fb0b046cf596634801c",
+      "size": 41652,
+      "mode": "0o644"
+    },
+    "Tests/verify-close-friend-alerts.sh": {
+      "sha256": "999a7787f8011e2a987f2241229f52ac5b74b8439adbd0d3338fad464aa0b503",
+      "size": 5144,
+      "mode": "0o755"
+    },
+    "control": {
+      "sha256": "d1fe4a8c2349b5dc20d9b94904ed84dab9de3988c015030cf625d2dd65347032",
+      "size": 272,
+      "mode": "0o644"
+    },
+    "Controllers/CSCloseFriendCallDiagnostics.h": {
+      "sha256": "3039821a026e2f76f483c1a8a4bc36458e561f6063feeded89dc8e64a4e3c876",
+      "size": 1000,
+      "mode": "0o644"
+    },
+    "Controllers/CSCloseFriendCallDiagnostics.m": {
+      "sha256": "889396f4c3793957165a9ffa45f2f1534e376d20e547acc25d6359bae63ad147",
+      "size": 5846,
+      "mode": "0o644"
+    },
+    "Hooks/CloseFriendCallDiagnosticsHooks.xm": {
+      "sha256": "eab65bebf14ce810ce23930b4d9b5d9ac47479a5794762c92fe4f696fa369d08",
+      "size": 8079,
+      "mode": "0o644"
+    },
+    "Tests/CloseFriendCallDiagnosticsTests.m": {
+      "sha256": "01ad534ff03244c1c5303c995a1bfcd243806b5558db23d290bd811ae383340b",
+      "size": 7172,
+      "mode": "0o644"
+    },
+    "Tests/CloseFriendCallNotificationFixture.h": {
+      "sha256": "f23961fc7ec427d63587efff257b039cb90d20e7b3a9cb0c4cecbc110d78df5a",
+      "size": 12990,
+      "mode": "0o644"
+    },
+    "Tests/CloseFriendCallResponseTests.m": {
+      "sha256": "a20b6d78928f40e309c5ff6f808ef2765031d1117d0c07be33683c9850124b50",
+      "size": 12061,
+      "mode": "0o644"
+    },
+    "Tests/verify-close-friend-call-diagnostics.sh": {
+      "sha256": "d2b8b26cfc9156780d6d588968b34da11515acef67a6ff6a37f8eb603e89bc64",
+      "size": 336,
+      "mode": "0o755"
+    },
+    "Tests/verify-close-friend-call-response.sh": {
+      "sha256": "88b6f1ef171917a56567ef6b0d8873a7a7e0f14dda60e6a6ebc858c90fda0e6b",
+      "size": 714,
+      "mode": "0o755"
+    }
+  }
+}

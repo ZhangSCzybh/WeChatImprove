@@ -1,0 +1,17 @@
+File:           /private/tmp/wcrefine-2.1-7-fresh-8991m_zc/host-audio-resource/blank.caf
+File type ID:   caff
+Num Tracks:     1
+----
+Data format:     2 ch,  44100 Hz, Int16, interleaved
+                no channel layout.
+estimated duration: 0.055442 sec
+audio bytes: 9780
+audio packets: 2445
+bit rate: 1411200 bits per second
+packet size upper bound: 4
+maximum packet size: 4
+audio data file offset: 4096
+optimized
+audio 2445 valid frames + 0 priming + 0 remainder = 2445
+source bit depth: I16
+----

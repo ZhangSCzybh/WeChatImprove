@@ -1,0 +1,1152 @@
+{
+  "MicroMessengerAppDelegate": [
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "shouldEnterMemoryReport",
+      "type": "B16@0:8",
+      "address": "0x104e7b7bc",
+      "label": "-[MicroMessengerAppDelegate shouldEnterMemoryReport]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "enterUploadReport",
+      "type": "v16@0:8",
+      "address": "0x104e7b810",
+      "label": "-[MicroMessengerAppDelegate enterUploadReport]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "handleMemoryStatDidEndNotification:",
+      "type": "v24@0:8@16",
+      "address": "0x104e7b918",
+      "label": "-[MicroMessengerAppDelegate handleMemoryStatDidEndNotification:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "shouldEnterSafeMode",
+      "type": "B16@0:8",
+      "address": "0x104e7b4ac",
+      "label": "-[MicroMessengerAppDelegate shouldEnterSafeMode]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "enterSafeMode",
+      "type": "v16@0:8",
+      "address": "0x104e7b544",
+      "label": "-[MicroMessengerAppDelegate enterSafeMode]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "handleMMSafeModeDidEndNotification:",
+      "type": "v24@0:8@16",
+      "address": "0x104e7b680",
+      "label": "-[MicroMessengerAppDelegate handleMMSafeModeDidEndNotification:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "application:configurationForConnectingSceneSession:options:",
+      "type": "@40@0:8@16@24@32",
+      "address": "0x104e7ada4",
+      "label": "-[MicroMessengerAppDelegate application:configurationForConnectingSceneSession:options:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "application:didDiscardSceneSessions:",
+      "type": "v32@0:8@16@24",
+      "address": "0x104e7b070",
+      "label": "-[MicroMessengerAppDelegate application:didDiscardSceneSessions:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "loginGuestUser:",
+      "type": "v24@0:8@?16",
+      "address": "0x104e79a00",
+      "label": "-[MicroMessengerAppDelegate loginGuestUser:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "tryToLoginLastUser:",
+      "type": "v24@0:8@?16",
+      "address": "0x104e79bcc",
+      "label": "-[MicroMessengerAppDelegate tryToLoginLastUser:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "lazyInitNetworking",
+      "type": "v16@0:8",
+      "address": "0x104e7a4a4",
+      "label": "-[MicroMessengerAppDelegate lazyInitNetworking]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "stopNetworkEvent:",
+      "type": "v24@0:8@16",
+      "address": "0x104e7a62c",
+      "label": "-[MicroMessengerAppDelegate stopNetworkEvent:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "switchToUser:completion:",
+      "type": "v32@0:8{Uin64Adapter=Q}16@?24",
+      "address": "0x104e7a730",
+      "label": "-[MicroMessengerAppDelegate switchToUser:completion:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "internalSwitchToUser:completion:",
+      "type": "v32@0:8{Uin64=Q}16@?24",
+      "address": "0x104e7a800",
+      "label": "-[MicroMessengerAppDelegate internalSwitchToUser:completion:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "setupMMCommonAdapter",
+      "type": "v16@0:8",
+      "address": "0x104e7982c",
+      "label": "-[MicroMessengerAppDelegate setupMMCommonAdapter]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "IsChinese",
+      "type": "B16@0:8",
+      "address": "0x104e79864",
+      "label": "-[MicroMessengerAppDelegate IsChinese]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "ShouldLog:",
+      "type": "B20@0:8i16",
+      "address": "0x104e79924",
+      "label": "-[MicroMessengerAppDelegate ShouldLog:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "LogWithinCommon:module:file:line:funcName:message:",
+      "type": "v56@0:8i16r*20r*28i36r*40@48",
+      "address": "0x104e79938",
+      "label": "-[MicroMessengerAppDelegate LogWithinCommon:module:file:line:funcName:message:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "NetworkLogOutput:",
+      "type": "v24@0:8@16",
+      "address": "0x104e7997c",
+      "label": "-[MicroMessengerAppDelegate NetworkLogOutput:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "LogFeatureExt:logExt:isReportNow:isImportant:",
+      "type": "v36@0:8I16@20B28B32",
+      "address": "0x104e799d4",
+      "label": "-[MicroMessengerAppDelegate LogFeatureExt:logExt:isReportNow:isImportant:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "LogFeatureIdKey:key:value:isKeyLog:",
+      "type": "v32@0:8I16I20I24B28",
+      "address": "0x104e799e8",
+      "label": "-[MicroMessengerAppDelegate LogFeatureIdKey:key:value:isKeyLog:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "registerClsMethodObserver",
+      "type": "v16@0:8",
+      "address": "0x104e7132c",
+      "label": "-[MicroMessengerAppDelegate registerClsMethodObserver]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "registerLazyExtensionListener",
+      "type": "v16@0:8",
+      "address": "0x104e71bc4",
+      "label": "-[MicroMessengerAppDelegate registerLazyExtensionListener]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "initRootServiceObject",
+      "type": "v16@0:8",
+      "address": "0x104e780b8",
+      "label": "-[MicroMessengerAppDelegate initRootServiceObject]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "initServiceLaunchTask",
+      "type": "v16@0:8",
+      "address": "0x104e781cc",
+      "label": "-[MicroMessengerAppDelegate initServiceLaunchTask]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "initHighPhaseLaunchTask",
+      "type": "v16@0:8",
+      "address": "0x104e78210",
+      "label": "-[MicroMessengerAppDelegate initHighPhaseLaunchTask]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "initNormalPhaseLaunchTask",
+      "type": "v16@0:8",
+      "address": "0x104e7844c",
+      "label": "-[MicroMessengerAppDelegate initNormalPhaseLaunchTask]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "initLazyPhaseLaunchTask",
+      "type": "v16@0:8",
+      "address": "0x104e793cc",
+      "label": "-[MicroMessengerAppDelegate initLazyPhaseLaunchTask]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "clearServiceObject",
+      "type": "v16@0:8",
+      "address": "0x104e79740",
+      "label": "-[MicroMessengerAppDelegate clearServiceObject]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "init",
+      "type": "@16@0:8",
+      "address": "0x104e7bbac",
+      "label": "-[MicroMessengerAppDelegate init]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "timeToLazyInitAfterOpenFirstView",
+      "type": "d16@0:8",
+      "address": "0x104e7bc50",
+      "label": "-[MicroMessengerAppDelegate timeToLazyInitAfterOpenFirstView]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "goToLazyInitObject",
+      "type": "v16@0:8",
+      "address": "0x104e7bc5c",
+      "label": "-[MicroMessengerAppDelegate goToLazyInitObject]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "delayMainAppDelegateThing",
+      "type": "v16@0:8",
+      "address": "0x104e7bc68",
+      "label": "-[MicroMessengerAppDelegate delayMainAppDelegateThing]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "logTheFontOfiPhone",
+      "type": "v16@0:8",
+      "address": "0x104e7bd40",
+      "label": "-[MicroMessengerAppDelegate logTheFontOfiPhone]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "preVoidFunction",
+      "type": "v16@0:8",
+      "address": "0x104e7be90",
+      "label": "-[MicroMessengerAppDelegate preVoidFunction]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "voidFunction",
+      "type": "v16@0:8",
+      "address": "0x104e7be94",
+      "label": "-[MicroMessengerAppDelegate voidFunction]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "careEnoughForTheLiving",
+      "type": "v16@0:8",
+      "address": "0x104e7be98",
+      "label": "-[MicroMessengerAppDelegate careEnoughForTheLiving]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "loadUpdateAndExcute",
+      "type": "v16@0:8",
+      "address": "0x104e7be9c",
+      "label": "-[MicroMessengerAppDelegate loadUpdateAndExcute]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "continueMainLaunching:",
+      "type": "v24@0:8@16",
+      "address": "0x104e7bfa8",
+      "label": "-[MicroMessengerAppDelegate continueMainLaunching:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "continueBackgroundLaunching",
+      "type": "v16@0:8",
+      "address": "0x104e7e76c",
+      "label": "-[MicroMessengerAppDelegate continueBackgroundLaunching]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "onVoIPLaunch",
+      "type": "v16@0:8",
+      "address": "0x104e7e7ec",
+      "label": "-[MicroMessengerAppDelegate onVoIPLaunch]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "checkInitNetworkAndService",
+      "type": "v16@0:8",
+      "address": "0x104e7e85c",
+      "label": "-[MicroMessengerAppDelegate checkInitNetworkAndService]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "hasFirstActiveOrCheckEnterForeground",
+      "type": "B16@0:8",
+      "address": "0x104e7e8e0",
+      "label": "-[MicroMessengerAppDelegate hasFirstActiveOrCheckEnterForeground]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "detectBecomeActive",
+      "type": "v16@0:8",
+      "address": "0x104e7e924",
+      "label": "-[MicroMessengerAppDelegate detectBecomeActive]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "tryRemoveTheProtectionOfXlog",
+      "type": "v16@0:8",
+      "address": "0x104e7eb48",
+      "label": "-[MicroMessengerAppDelegate tryRemoveTheProtectionOfXlog]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "testFileProtection:",
+      "type": "B24@0:8@16",
+      "address": "0x104e7edcc",
+      "label": "-[MicroMessengerAppDelegate testFileProtection:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "tryProtectLaunchBeforeDeviceFirstUnlock",
+      "type": "v16@0:8",
+      "address": "0x104e7ee8c",
+      "label": "-[MicroMessengerAppDelegate tryProtectLaunchBeforeDeviceFirstUnlock]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "setupCrashBlockMonitor",
+      "type": "v16@0:8",
+      "address": "0x104e7f27c",
+      "label": "-[MicroMessengerAppDelegate setupCrashBlockMonitor]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "mainUISetting",
+      "type": "v16@0:8",
+      "address": "0x104e7f370",
+      "label": "-[MicroMessengerAppDelegate mainUISetting]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "mainUISettingOnce",
+      "type": "v16@0:8",
+      "address": "0x104e80cc8",
+      "label": "-[MicroMessengerAppDelegate mainUISettingOnce]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "didFinishLoad",
+      "type": "v16@0:8",
+      "address": "0x104e80ec4",
+      "label": "-[MicroMessengerAppDelegate didFinishLoad]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "reportLaunchImage",
+      "type": "v16@0:8",
+      "address": "0x104e80fc0",
+      "label": "-[MicroMessengerAppDelegate reportLaunchImage]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "application:willFinishLaunchingWithOptions:",
+      "type": "B32@0:8@16@24",
+      "address": "0x104e80fd8",
+      "label": "-[MicroMessengerAppDelegate application:willFinishLaunchingWithOptions:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "application:didFinishLaunchingWithOptions:",
+      "type": "B32@0:8@16@24",
+      "address": "0x104e81034",
+      "label": "-[MicroMessengerAppDelegate application:didFinishLaunchingWithOptions:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "internalApplication:didFinishLaunchingWithOptions:",
+      "type": "B32@0:8@16@24",
+      "address": "0x104e81a24",
+      "label": "-[MicroMessengerAppDelegate internalApplication:didFinishLaunchingWithOptions:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "isForeground",
+      "type": "B16@0:8",
+      "address": "0x104e8214c",
+      "label": "-[MicroMessengerAppDelegate isForeground]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "application:supportedInterfaceOrientationsForWindow:",
+      "type": "Q32@0:8@16@24",
+      "address": "0x104e82164",
+      "label": "-[MicroMessengerAppDelegate application:supportedInterfaceOrientationsForWindow:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "apnsToken",
+      "type": "@16@0:8",
+      "address": "0x104e82198",
+      "label": "-[MicroMessengerAppDelegate apnsToken]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "doSendTokenTimeOut",
+      "type": "v16@0:8",
+      "address": "0x104e821fc",
+      "label": "-[MicroMessengerAppDelegate doSendTokenTimeOut]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "application:didRegisterForRemoteNotificationsWithDeviceToken:",
+      "type": "v32@0:8@16@24",
+      "address": "0x104e82280",
+      "label": "-[MicroMessengerAppDelegate application:didRegisterForRemoteNotificationsWithDeviceToken:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "internalApplication:didRegisterForRemoteNotificationsWithDeviceToken:",
+      "type": "v32@0:8@16@24",
+      "address": "0x104e823cc",
+      "label": "-[MicroMessengerAppDelegate internalApplication:didRegisterForRemoteNotificationsWithDeviceToken:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "application:didFailToRegisterForRemoteNotificationsWithError:",
+      "type": "v32@0:8@16@24",
+      "address": "0x104e82640",
+      "label": "-[MicroMessengerAppDelegate application:didFailToRegisterForRemoteNotificationsWithError:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "internalApplication:didFailToRegisterForRemoteNotificationsWithError:",
+      "type": "v32@0:8@16@24",
+      "address": "0x104e8278c",
+      "label": "-[MicroMessengerAppDelegate internalApplication:didFailToRegisterForRemoteNotificationsWithError:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "application:didReceiveRemoteNotification:",
+      "type": "v32@0:8@16@24",
+      "address": "0x104e82914",
+      "label": "-[MicroMessengerAppDelegate application:didReceiveRemoteNotification:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "internalApplication:didReceiveRemoteNotification:",
+      "type": "v32@0:8@16@24",
+      "address": "0x104e82a20",
+      "label": "-[MicroMessengerAppDelegate internalApplication:didReceiveRemoteNotification:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "application:didReceiveLocalNotification:",
+      "type": "v32@0:8@16@24",
+      "address": "0x104e82ad0",
+      "label": "-[MicroMessengerAppDelegate application:didReceiveLocalNotification:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "internalApplication:didReceiveLocalNotification:",
+      "type": "v32@0:8@16@24",
+      "address": "0x104e82bdc",
+      "label": "-[MicroMessengerAppDelegate internalApplication:didReceiveLocalNotification:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "application:didReceiveRemoteNotification:fetchCompletionHandler:",
+      "type": "v40@0:8@16@24@?32",
+      "address": "0x104e82cb0",
+      "label": "-[MicroMessengerAppDelegate application:didReceiveRemoteNotification:fetchCompletionHandler:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "internalApplication:didReceiveRemoteNotification:fetchCompletionHandler:",
+      "type": "v40@0:8@16@24@?32",
+      "address": "0x104e82de8",
+      "label": "-[MicroMessengerAppDelegate internalApplication:didReceiveRemoteNotification:fetchCompletionHandler:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "apnsSilentPushTimeOut:",
+      "type": "v24@0:8@?16",
+      "address": "0x104e832c4",
+      "label": "-[MicroMessengerAppDelegate apnsSilentPushTimeOut:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "application:performFetchWithCompletionHandler:",
+      "type": "v32@0:8@16@?24",
+      "address": "0x104e833c8",
+      "label": "-[MicroMessengerAppDelegate application:performFetchWithCompletionHandler:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "internalApplication:performFetchWithCompletionHandler:",
+      "type": "v32@0:8@16@?24",
+      "address": "0x104e834d4",
+      "label": "-[MicroMessengerAppDelegate internalApplication:performFetchWithCompletionHandler:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "registerAppRefreshTask",
+      "type": "v16@0:8",
+      "address": "0x104e83c20",
+      "label": "-[MicroMessengerAppDelegate registerAppRefreshTask]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "handleAppRefreshTask:",
+      "type": "v24@0:8@16",
+      "address": "0x104e83d80",
+      "label": "-[MicroMessengerAppDelegate handleAppRefreshTask:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "submitAppRefreshTaskRequest",
+      "type": "v16@0:8",
+      "address": "0x104e840e0",
+      "label": "-[MicroMessengerAppDelegate submitAppRefreshTaskRequest]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "application:handleActionWithIdentifier:forLocalNotification:completionHandler:",
+      "type": "v48@0:8@16@24@32@?40",
+      "address": "0x104e84270",
+      "label": "-[MicroMessengerAppDelegate application:handleActionWithIdentifier:forLocalNotification:completionHandler:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "internalApplication:handleActionWithIdentifier:forLocalNotification:completionHandler:",
+      "type": "v48@0:8@16@24@32@?40",
+      "address": "0x104e843e0",
+      "label": "-[MicroMessengerAppDelegate internalApplication:handleActionWithIdentifier:forLocalNotification:completionHandler:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "application:handleActionWithIdentifier:forLocalNotification:withResponseInfo:completionHandler:",
+      "type": "v56@0:8@16@24@32@40@?48",
+      "address": "0x104e8453c",
+      "label": "-[MicroMessengerAppDelegate application:handleActionWithIdentifier:forLocalNotification:withResponseInfo:completionHandler:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "internalApplication:handleActionWithIdentifier:forLocalNotification:withResponseInfo:completionHandler:",
+      "type": "v56@0:8@16@24@32@40@?48",
+      "address": "0x104e846d8",
+      "label": "-[MicroMessengerAppDelegate internalApplication:handleActionWithIdentifier:forLocalNotification:withResponseInfo:completionHandler:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "application:handleActionWithIdentifier:forRemoteNotification:completionHandler:",
+      "type": "v48@0:8@16@24@32@?40",
+      "address": "0x104e8485c",
+      "label": "-[MicroMessengerAppDelegate application:handleActionWithIdentifier:forRemoteNotification:completionHandler:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "internalApplication:handleActionWithIdentifier:forRemoteNotification:completionHandler:",
+      "type": "v48@0:8@16@24@32@?40",
+      "address": "0x104e849cc",
+      "label": "-[MicroMessengerAppDelegate internalApplication:handleActionWithIdentifier:forRemoteNotification:completionHandler:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "application:handleActionWithIdentifier:forRemoteNotification:withResponseInfo:completionHandler:",
+      "type": "v56@0:8@16@24@32@40@?48",
+      "address": "0x104e84b00",
+      "label": "-[MicroMessengerAppDelegate application:handleActionWithIdentifier:forRemoteNotification:withResponseInfo:completionHandler:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "internalApplication:handleActionWithIdentifier:forRemoteNotification:withResponseInfo:completionHandler:",
+      "type": "v56@0:8@16@24@32@40@?48",
+      "address": "0x104e84c9c",
+      "label": "-[MicroMessengerAppDelegate internalApplication:handleActionWithIdentifier:forRemoteNotification:withResponseInfo:completionHandler:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "ClearBackGroundFetch",
+      "type": "v16@0:8",
+      "address": "0x104e84de4",
+      "label": "-[MicroMessengerAppDelegate ClearBackGroundFetch]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "getMainWindowWidth",
+      "type": "d16@0:8",
+      "address": "0x104e84eec",
+      "label": "-[MicroMessengerAppDelegate getMainWindowWidth]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "getMainWindowHeight",
+      "type": "d16@0:8",
+      "address": "0x104e84f04",
+      "label": "-[MicroMessengerAppDelegate getMainWindowHeight]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "mainConsoleWindow",
+      "type": "@16@0:8",
+      "address": "0x104e84f1c",
+      "label": "-[MicroMessengerAppDelegate mainConsoleWindow]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "application:handleEventsForBackgroundURLSession:completionHandler:",
+      "type": "v40@0:8@16@24@?32",
+      "address": "0x104e84f88",
+      "label": "-[MicroMessengerAppDelegate application:handleEventsForBackgroundURLSession:completionHandler:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "internalApplication:handleEventsForBackgroundURLSession:completionHandler:",
+      "type": "v40@0:8@16@24@?32",
+      "address": "0x104e850c0",
+      "label": "-[MicroMessengerAppDelegate internalApplication:handleEventsForBackgroundURLSession:completionHandler:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "resetBadge",
+      "type": "v16@0:8",
+      "address": "0x104e85380",
+      "label": "-[MicroMessengerAppDelegate resetBadge]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "applicationWillResignActive:",
+      "type": "v24@0:8@16",
+      "address": "0x104e853bc",
+      "label": "-[MicroMessengerAppDelegate applicationWillResignActive:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "applicationDidEnterBackground:",
+      "type": "v24@0:8@16",
+      "address": "0x104e85520",
+      "label": "-[MicroMessengerAppDelegate applicationDidEnterBackground:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "applicationWillSuspend",
+      "type": "v16@0:8",
+      "address": "0x104e858ac",
+      "label": "-[MicroMessengerAppDelegate applicationWillSuspend]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "handleOpenPush",
+      "type": "v16@0:8",
+      "address": "0x104e85914",
+      "label": "-[MicroMessengerAppDelegate handleOpenPush]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "onCancelPushAlert",
+      "type": "v16@0:8",
+      "address": "0x104e85fe8",
+      "label": "-[MicroMessengerAppDelegate onCancelPushAlert]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "onConfirmPushAlert",
+      "type": "v16@0:8",
+      "address": "0x104e860a4",
+      "label": "-[MicroMessengerAppDelegate onConfirmPushAlert]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "applicationWillEnterForeground:",
+      "type": "v24@0:8@16",
+      "address": "0x104e86180",
+      "label": "-[MicroMessengerAppDelegate applicationWillEnterForeground:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "detectInitNetworkAndService",
+      "type": "v16@0:8",
+      "address": "0x104e867a0",
+      "label": "-[MicroMessengerAppDelegate detectInitNetworkAndService]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "applicationDidBecomeActive:",
+      "type": "v24@0:8@16",
+      "address": "0x104e868c4",
+      "label": "-[MicroMessengerAppDelegate applicationDidBecomeActive:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "internalApplicationDidBecomeActive:",
+      "type": "v24@0:8@16",
+      "address": "0x104e86a2c",
+      "label": "-[MicroMessengerAppDelegate internalApplicationDidBecomeActive:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "applicationWillTerminate:",
+      "type": "v24@0:8@16",
+      "address": "0x104e86c50",
+      "label": "-[MicroMessengerAppDelegate applicationWillTerminate:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "application:didChangeStatusBarFrame:",
+      "type": "v56@0:8@16{CGRect={CGPoint=dd}{CGSize=dd}}24",
+      "address": "0x104e86ec8",
+      "label": "-[MicroMessengerAppDelegate application:didChangeStatusBarFrame:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "process3rdAppSupportContentFlagFromOpenUrl:andUrlStr:appID:",
+      "type": "v40@0:8^@16^@24@32",
+      "address": "0x104e86edc",
+      "label": "-[MicroMessengerAppDelegate process3rdAppSupportContentFlagFromOpenUrl:andUrlStr:appID:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "handleOpenURL:bundleID:",
+      "type": "B32@0:8@16@24",
+      "address": "0x104e8732c",
+      "label": "-[MicroMessengerAppDelegate handleOpenURL:bundleID:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "handleBusinessJump:bundleID:",
+      "type": "v32@0:8@16@24",
+      "address": "0x104e88aac",
+      "label": "-[MicroMessengerAppDelegate handleBusinessJump:bundleID:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "dismissCurrentWAAPP",
+      "type": "B16@0:8",
+      "address": "0x104e88d24",
+      "label": "-[MicroMessengerAppDelegate dismissCurrentWAAPP]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "reportHandleOpenUrl:schemeUrl:",
+      "type": "v32@0:8@16@24",
+      "address": "0x104e88edc",
+      "label": "-[MicroMessengerAppDelegate reportHandleOpenUrl:schemeUrl:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "application:handleOpenURL:bundleID:annotation:",
+      "type": "B48@0:8@16@24@32@40",
+      "address": "0x104e88f8c",
+      "label": "-[MicroMessengerAppDelegate application:handleOpenURL:bundleID:annotation:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "application:openURL:sourceApplication:annotation:",
+      "type": "B48@0:8@16@24@32@40",
+      "address": "0x104e895b4",
+      "label": "-[MicroMessengerAppDelegate application:openURL:sourceApplication:annotation:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "__application:openURL:sourceApplication:annotation:",
+      "type": "B48@0:8@16@24@32@40",
+      "address": "0x104e895c0",
+      "label": "-[MicroMessengerAppDelegate __application:openURL:sourceApplication:annotation:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "internalApplication:openURL:sourceApplication:annotation:",
+      "type": "B48@0:8@16@24@32@40",
+      "address": "0x104e8973c",
+      "label": "-[MicroMessengerAppDelegate internalApplication:openURL:sourceApplication:annotation:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "application:handleWatchKitExtensionRequest:reply:",
+      "type": "v40@0:8@16@24@?32",
+      "address": "0x104e898f8",
+      "label": "-[MicroMessengerAppDelegate application:handleWatchKitExtensionRequest:reply:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "setupForShortcut",
+      "type": "v16@0:8",
+      "address": "0x104e89954",
+      "label": "-[MicroMessengerAppDelegate setupForShortcut]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "application:performActionForShortcutItem:completionHandler:",
+      "type": "v40@0:8@16@24@?32",
+      "address": "0x104e89fc4",
+      "label": "-[MicroMessengerAppDelegate application:performActionForShortcutItem:completionHandler:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "internalApplication:performActionForShortcutItem:completionHandler:",
+      "type": "v40@0:8@16@24@?32",
+      "address": "0x104e8a0fc",
+      "label": "-[MicroMessengerAppDelegate internalApplication:performActionForShortcutItem:completionHandler:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "application:willContinueUserActivityWithType:",
+      "type": "B32@0:8@16@24",
+      "address": "0x104e8a7bc",
+      "label": "-[MicroMessengerAppDelegate application:willContinueUserActivityWithType:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "application:continueUserActivity:restorationHandler:",
+      "type": "B40@0:8@16@24@?32",
+      "address": "0x104e8a818",
+      "label": "-[MicroMessengerAppDelegate application:continueUserActivity:restorationHandler:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "internalApplication:continueUserActivity:restorationHandler:",
+      "type": "B40@0:8@16@24@?32",
+      "address": "0x104e8a95c",
+      "label": "-[MicroMessengerAppDelegate internalApplication:continueUserActivity:restorationHandler:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "application:didFailToContinueUserActivityWithType:error:",
+      "type": "v40@0:8@16@24@32",
+      "address": "0x104e8c140",
+      "label": "-[MicroMessengerAppDelegate application:didFailToContinueUserActivityWithType:error:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "application:didUpdateUserActivity:",
+      "type": "v32@0:8@16@24",
+      "address": "0x104e8c198",
+      "label": "-[MicroMessengerAppDelegate application:didUpdateUserActivity:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "handleMemoryWarning",
+      "type": "v16@0:8",
+      "address": "0x104e8c1f0",
+      "label": "-[MicroMessengerAppDelegate handleMemoryWarning]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "clearServiceMemory",
+      "type": "v16@0:8",
+      "address": "0x104e8c270",
+      "label": "-[MicroMessengerAppDelegate clearServiceMemory]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "applicationDidReceiveMemoryWarning:",
+      "type": "v24@0:8@16",
+      "address": "0x104e8c2b8",
+      "label": "-[MicroMessengerAppDelegate applicationDidReceiveMemoryWarning:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "didReceiveLocalMemoryWarning:",
+      "type": "v24@0:8@16",
+      "address": "0x104e8c36c",
+      "label": "-[MicroMessengerAppDelegate didReceiveLocalMemoryWarning:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "firstStartAfterUpgradeDowngrade",
+      "type": "v16@0:8",
+      "address": "0x104e8c378",
+      "label": "-[MicroMessengerAppDelegate firstStartAfterUpgradeDowngrade]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "detectAppFirstRunOrFirstRunAfterUpgrade",
+      "type": "v16@0:8",
+      "address": "0x104e8c3fc",
+      "label": "-[MicroMessengerAppDelegate detectAppFirstRunOrFirstRunAfterUpgrade]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "saveAppVersion",
+      "type": "v16@0:8",
+      "address": "0x104e8c52c",
+      "label": "-[MicroMessengerAppDelegate saveAppVersion]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "GetAppVerCompareWithLastRun",
+      "type": "q16@0:8",
+      "address": "0x104e8c73c",
+      "label": "-[MicroMessengerAppDelegate GetAppVerCompareWithLastRun]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "dealloc",
+      "type": "v16@0:8",
+      "address": "0x104e8c74c",
+      "label": "-[MicroMessengerAppDelegate dealloc]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "closeMainFrameWithoutReset",
+      "type": "v16@0:8",
+      "address": "0x104e8c7c4",
+      "label": "-[MicroMessengerAppDelegate closeMainFrameWithoutReset]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "setUserAgent",
+      "type": "v16@0:8",
+      "address": "0x104e8cc4c",
+      "label": "-[MicroMessengerAppDelegate setUserAgent]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "parseSchemaUrlFrom:",
+      "type": "@24@0:8@16",
+      "address": "0x104e8cc60",
+      "label": "-[MicroMessengerAppDelegate parseSchemaUrlFrom:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "userNotificationCenter:willPresentNotification:withCompletionHandler:",
+      "type": "v40@0:8@16@24@?32",
+      "address": "0x104e8ce90",
+      "label": "-[MicroMessengerAppDelegate userNotificationCenter:willPresentNotification:withCompletionHandler:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "userNotificationCenter:didReceiveNotificationResponse:withCompletionHandler:",
+      "type": "v40@0:8@16@24@?32",
+      "address": "0x104e8d024",
+      "label": "-[MicroMessengerAppDelegate userNotificationCenter:didReceiveNotificationResponse:withCompletionHandler:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "internalHandleReceiveNotificationResponse:withCompletionHandler:",
+      "type": "v32@0:8@16@?24",
+      "address": "0x104e8d0dc",
+      "label": "-[MicroMessengerAppDelegate internalHandleReceiveNotificationResponse:withCompletionHandler:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "handleReceiveRemoteNotification:requestID:",
+      "type": "v32@0:8@16@24",
+      "address": "0x104e8d514",
+      "label": "-[MicroMessengerAppDelegate handleReceiveRemoteNotification:requestID:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "handleReceiveLocalNotification:",
+      "type": "v24@0:8@16",
+      "address": "0x104e8d698",
+      "label": "-[MicroMessengerAppDelegate handleReceiveLocalNotification:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "onMainSceneWillConnected:",
+      "type": "v20@0:8B16",
+      "address": "0x104e8d7b0",
+      "label": "-[MicroMessengerAppDelegate onMainSceneWillConnected:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "onMainSceneReceiveUserNotificationResponse:",
+      "type": "v24@0:8@16",
+      "address": "0x104e8d828",
+      "label": "-[MicroMessengerAppDelegate onMainSceneReceiveUserNotificationResponse:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "launchIfFirstSceneConnected:",
+      "type": "v20@0:8B16",
+      "address": "0x104e8d920",
+      "label": "-[MicroMessengerAppDelegate launchIfFirstSceneConnected:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "onCarPlaySceneConnected",
+      "type": "v16@0:8",
+      "address": "0x104e8da28",
+      "label": "-[MicroMessengerAppDelegate onCarPlaySceneConnected]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "applicationProtectedDataWillBecomeUnavailable:",
+      "type": "v24@0:8@16",
+      "address": "0x104e8db60",
+      "label": "-[MicroMessengerAppDelegate applicationProtectedDataWillBecomeUnavailable:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "applicationProtectedDataDidBecomeAvailable:",
+      "type": "v24@0:8@16",
+      "address": "0x104e8dbd4",
+      "label": "-[MicroMessengerAppDelegate applicationProtectedDataDidBecomeAvailable:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "reportAppLockEvent:",
+      "type": "v24@0:8@16",
+      "address": "0x104e8dc48",
+      "label": "-[MicroMessengerAppDelegate reportAppLockEvent:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "checkAppLockEnabled",
+      "type": "B16@0:8",
+      "address": "0x104e8dde8",
+      "label": "-[MicroMessengerAppDelegate checkAppLockEnabled]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "window",
+      "type": "@16@0:8",
+      "address": "0x104e8df10",
+      "label": "-[MicroMessengerAppDelegate window]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "setWindow:",
+      "type": "v24@0:8@16",
+      "address": "0x104e8df20",
+      "label": "-[MicroMessengerAppDelegate setWindow:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "m_appViewControllerMgr",
+      "type": "@16@0:8",
+      "address": "0x104e8df34",
+      "label": "-[MicroMessengerAppDelegate m_appViewControllerMgr]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "m_isActive",
+      "type": "B16@0:8",
+      "address": "0x104e8df44",
+      "label": "-[MicroMessengerAppDelegate m_isActive]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "m_firstActive",
+      "type": "B16@0:8",
+      "address": "0x104e8df54",
+      "label": "-[MicroMessengerAppDelegate m_firstActive]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "setM_firstActive:",
+      "type": "v20@0:8B16",
+      "address": "0x104e8df64",
+      "label": "-[MicroMessengerAppDelegate setM_firstActive:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "mInBackGroundFetch",
+      "type": "B16@0:8",
+      "address": "0x104e8df74",
+      "label": "-[MicroMessengerAppDelegate mInBackGroundFetch]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "setMInBackGroundFetch:",
+      "type": "v20@0:8B16",
+      "address": "0x104e8df84",
+      "label": "-[MicroMessengerAppDelegate setMInBackGroundFetch:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "mActiveLock",
+      "type": "@16@0:8",
+      "address": "0x104e8df94",
+      "label": "-[MicroMessengerAppDelegate mActiveLock]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "setMActiveLock:",
+      "type": "v24@0:8@16",
+      "address": "0x104e8dfa4",
+      "label": "-[MicroMessengerAppDelegate setMActiveLock:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "haveLazyInit",
+      "type": "B16@0:8",
+      "address": "0x104e8dfb8",
+      "label": "-[MicroMessengerAppDelegate haveLazyInit]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "setHaveLazyInit:",
+      "type": "v20@0:8B16",
+      "address": "0x104e8dfc8",
+      "label": "-[MicroMessengerAppDelegate setHaveLazyInit:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "backgroundSessionCompletionHandler",
+      "type": "@?16@0:8",
+      "address": "0x104e8dfd8",
+      "label": "-[MicroMessengerAppDelegate backgroundSessionCompletionHandler]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "setBackgroundSessionCompletionHandler:",
+      "type": "v24@0:8@?16",
+      "address": "0x104e8dfe8",
+      "label": "-[MicroMessengerAppDelegate setBackgroundSessionCompletionHandler:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "protectedDataStatus",
+      "type": "Q16@0:8",
+      "address": "0x104e8dff4",
+      "label": "-[MicroMessengerAppDelegate protectedDataStatus]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "setProtectedDataStatus:",
+      "type": "v24@0:8Q16",
+      "address": "0x104e8e004",
+      "label": "-[MicroMessengerAppDelegate setProtectedDataStatus:]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": ".cxx_destruct",
+      "type": "v16@0:8",
+      "address": "0x104e8e014",
+      "label": "-[MicroMessengerAppDelegate .cxx_destruct]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "GlobalInstance",
+      "type": "@16@0:8",
+      "address": "0x104e7bb90",
+      "label": "+[MicroMessengerAppDelegate GlobalInstance]"
+    },
+    {
+      "class": "MicroMessengerAppDelegate",
+      "selector": "lastActiveTime",
+      "type": "q16@0:8",
+      "address": "0x104e8df04",
+      "label": "+[MicroMessengerAppDelegate lastActiveTime]"
+    }
+  ]
+}

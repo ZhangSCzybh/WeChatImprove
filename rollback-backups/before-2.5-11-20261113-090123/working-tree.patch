@@ -1,0 +1,493 @@
+diff --git a/Controllers/CSCloseFriendCallAdapter.h b/Controllers/CSCloseFriendCallAdapter.h
+index 02b1b742..2c503204 100644
+--- a/Controllers/CSCloseFriendCallAdapter.h
++++ b/Controllers/CSCloseFriendCallAdapter.h
+@@ -28,6 +28,10 @@ FOUNDATION_EXPORT void CSCFHandleMultiTalk(id manager,id message,void (^native)(
+ FOUNDATION_EXPORT BOOL CSCFCallOutputSuppressed(void);
+ FOUNDATION_EXPORT BOOL CSCFCallBannerSuppressed(id group,unsigned long long room);
+ FOUNDATION_EXPORT BOOL CSCFInvitationOutputSuppressed(id controller);
++/// Local call notifications carry their identity across the native settings callback.
++FOUNDATION_EXPORT void CSCFPerformCallNotification(id message, void (^native)(void));
++typedef void (^CSCloseFriendNotificationSettingsCompletion)(id settings);
++FOUNDATION_EXPORT CSCloseFriendNotificationSettingsCompletion CSCFCallNotificationCompletion(CSCloseFriendNotificationSettingsCompletion completion);
+ /// Called only after a supported native rejection request was submitted, not on suppression alone.
+ FOUNDATION_EXPORT void CSCFCallDidReject(CSCloseFriendCallToken *token);
+ #ifdef __cplusplus
+diff --git a/Controllers/CSCloseFriendCallAdapter.m b/Controllers/CSCloseFriendCallAdapter.m
+index 9d258d74..d7e76c64 100644
+--- a/Controllers/CSCloseFriendCallAdapter.m
++++ b/Controllers/CSCloseFriendCallAdapter.m
+@@ -1,5 +1,6 @@
+ #import "CSCloseFriendCallAdapter.h"
+ #import "CSCloseFriendBridge.h"
++#import "CSCloseFriendCallDiagnostics.h"
+ #import "CSServiceCenter.h"
+ #import <objc/message.h>
+ static BOOL Matches(id o,NSString *n,const char *t) { return CSCloseFriendMethodMatches(class_getInstanceMethod([o class],NSSelectorFromString(n)),t); }
+@@ -22,6 +23,7 @@ - (BOOL)suppressesPresentation {
+ @end
+ @interface CSCloseFriendCallAdapter ()
+ @property(nonatomic,strong) NSMutableDictionary *claims;
++- (BOOL)hasSubmittedRejection:(CSCloseFriendCallToken *)token;
+ @end
+ @implementation CSCloseFriendCallAdapter
+ - (BOOL)claim:(CSCloseFriendCallToken *)token now:(NSTimeInterval)now {
+@@ -40,6 +42,14 @@ - (void)end:(CSCloseFriendCallToken *)token {
+     // Keep a tombstone until expiry: a duplicate stale invite must not be rejected twice.
+     @synchronized(self) { CSCloseFriendCallToken *old=self.claims[token.key][@"token"]; old.state=@"native-ended"; }
+ }
++- (BOOL)hasSubmittedRejection:(CSCloseFriendCallToken *)token {
++    if(!token.key.length)return NO;
++    @synchronized(self) {
++        CSCloseFriendCallToken *old=self.claims[token.key][@"token"];
++        NSString *state=old.state;
++        return [state isEqual:@"rejectionSubmitted"] || [state isEqual:@"native-ended"];
++    }
++}
+ @end
+ static CSCloseFriendCallAdapter *Registry(void) {static CSCloseFriendCallAdapter *r;static dispatch_once_t once;dispatch_once(&once,^{r=[CSCloseFriendCallAdapter new];});return r;}
+ static void Identify(CSCloseFriendCallToken *t,NSString *caller,NSString *room,NSString *messageKey) {
+@@ -204,6 +214,41 @@ BOOL CSCFHandleInvitation(id service,id info,unsigned long long talkingRoom) {
+     return YES;
+ }
+ static NSString *const CallScope=@"CSCloseFriendIncomingCall";
++static void WithCallScope(CSCloseFriendCallToken *token,void (^action)(void)) {
++    NSMutableDictionary *scope=NSThread.currentThread.threadDictionary;id previous=scope[CallScope];
++    if(token)scope[CallScope]=token;else [scope removeObjectForKey:CallScope];
++    @try {CSCFWithAlert(token.subject,action);} @finally {
++        if(previous)scope[CallScope]=previous;else [scope removeObjectForKey:CallScope];
++    }
++}
++static CSCloseFriendCallToken *NotificationToken(id message) {
++    return CSCFIncomingCallToken(message) ?: CSCFMultiTalkToken(message);
++}
++static BOOL DiscardCallNotification(CSCloseFriendCallToken *token) {
++    return token.subject && (![token.subject isCurrent] || [token suppressesPresentation] ||
++        [Registry() hasSubmittedRejection:token]);
++}
++void CSCFPerformCallNotification(id message,void (^native)(void)) {
++    CSCloseFriendCallToken *token=NotificationToken(message);
++    CSCFCallDiagnosticsRecord(token.key.length?@"call.token":@"call.unknown",CSCloseFriendAccountEpoch());
++    if(DiscardCallNotification(token)) {CSCFCallDiagnosticsRecord(@"call.drop",CSCloseFriendAccountEpoch());return;}
++    CSCFCallDiagnosticsRecord(@"call.pass",CSCloseFriendAccountEpoch());
++    // Unknown/non-invitation input retains native handling without borrowing an
++    // enclosing call's identity. Only a validated pending invite crosses the callback.
++    WithCallScope(Pending(token)?token:nil,native);
++}
++CSCloseFriendNotificationSettingsCompletion CSCFCallNotificationCompletion(CSCloseFriendNotificationSettingsCompletion completion) {
++    CSCloseFriendCallToken *token=NSThread.currentThread.threadDictionary[CallScope];
++    if(!token || !completion)return completion;
++    CSCFCallDiagnosticsRecord(@"settings.capture",CSCloseFriendAccountEpoch());
++    return ^(id settings) {
++        CSCFCallDiagnosticsRecord(@"settings.enter",CSCloseFriendAccountEpoch());
++        if(DiscardCallNotification(token) || !Pending(token) ||
++            ![NotificationToken(token.mono).key isEqual:token.key]) {CSCFCallDiagnosticsRecord(@"settings.drop",CSCloseFriendAccountEpoch());return;}
++        CSCFCallDiagnosticsRecord(@"settings.pass",CSCloseFriendAccountEpoch());
++        WithCallScope(token,^{completion(settings);});
++    };
++}
+ BOOL CSCFCallOutputSuppressed(void) {return [NSThread.currentThread.threadDictionary[CallScope] suppressesPresentation];}
+ BOOL CSCFCallBannerSuppressed(id group,unsigned long long room) {
+     CSCloseFriendCallToken *t=NSThread.currentThread.threadDictionary[CallScope];
+@@ -217,8 +262,7 @@ void CSCFHandleMultiTalk(id manager,id message,void (^native)(void)) {
+     BOOL knownState=Bool(manager,@"isMultiTalkConnected",&wasConnected) && Unsigned(manager,@"getCurrentRoomID",&previousRoom);
+     if(!knownState || (wasConnected && previousRoom==t.roomID) || !Pending(t) || ![t suppressesPresentation]) {native();return;}
+     CSCFBindAlert(CSCloseFriendRead(message,@"m_notificationInfo"),t.subject);
+-    NSMutableDictionary *d=NSThread.currentThread.threadDictionary;id old=d[CallScope];d[CallScope]=t;
+-    @try {CSCFWithAlert(t.subject,native);} @finally {if(old)d[CallScope]=old;else [d removeObjectForKey:CallScope];}
++    WithCallScope(t,native);
+     // Initialization and PushKit/CallKit reporting above always run. Only the
+     // exact incoming room is eligible; current ordinary call state is never reset.
+     BOOL connected=YES;unsigned long long active=0;
+diff --git a/Controllers/CSCloseFriendSettingsViewController.m b/Controllers/CSCloseFriendSettingsViewController.m
+index 8ef0e8bc..997dc651 100644
+--- a/Controllers/CSCloseFriendSettingsViewController.m
++++ b/Controllers/CSCloseFriendSettingsViewController.m
+@@ -4,6 +4,22 @@
+ #import "CSNativeContactPicker.h"
+ #import "CSSettingTableViewCell.h"
+ #import "CSBackupBootstrap.h"
++#import "CSCloseFriendCallDiagnostics.h"
++#import "../Headers/CSUserInfoHelper.h"
++
++static void InstallCallDiagnosticsLifecycleObservers(void) {
++    static dispatch_once_t once;
++    dispatch_once(&once,^{
++        NSDictionary *events=@{UIApplicationDidEnterBackgroundNotification:@"app.background",
++            UIApplicationWillEnterForegroundNotification:@"app.foreground",UIApplicationDidBecomeActiveNotification:@"app.active",
++            UIApplicationWillResignActiveNotification:@"app.inactive"};
++        for(NSNotificationName name in events) {
++            [NSNotificationCenter.defaultCenter addObserverForName:name object:nil queue:nil usingBlock:^(__unused NSNotification *note) {
++                CSCFCallDiagnosticsRecord(events[name],CSCloseFriendAccountEpoch());
++            }];
++        }
++    });
++}
+ 
+ // Keep long values within the common settings layout without changing other pages.
+ @interface CSCloseFriendSettingsCell : CSSettingTableViewCell
+@@ -73,6 +89,7 @@ @interface CSCloseFriendSettingsViewController ()
+ @implementation CSCloseFriendSettingsViewController
+ - (void)viewDidLoad {
+     [super viewDidLoad]; self.title=@"密友";
++    self.navigationItem.rightBarButtonItem=[[UIBarButtonItem alloc]initWithTitle:@"通知诊断" style:UIBarButtonItemStylePlain target:self action:@selector(showCallNotificationDiagnostics)];
+     self.tableView.backgroundColor = [UIColor systemGroupedBackgroundColor];
+     self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
+     self.tableView.separatorInset = UIEdgeInsetsMake(0, 54, 0, 0);
+@@ -108,6 +125,34 @@ - (void)viewDidLoad {
+     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(policyChanged:) name:CSCloseFriendPolicyDidChangeNotification object:nil];
+     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(invalidateQuickEntry) name:UIApplicationDidEnterBackgroundNotification object:nil];
+ }
++- (void)showCallNotificationDiagnostics {
++    if(![self authorized])return;
++    UIAlertController *menu=[UIAlertController alertControllerWithTitle:@"通知诊断"
++        message:CSCFCallDiagnosticsIsRecording()?@"正在记录。复现后台／锁屏提示后，点击该通知回到微信，再返回这里复制报告。仅记录入口计数和相对时间，不记录通知内容或联系人。":@"开始记录后，将微信置于后台或锁屏并复现来电提示；点击该通知回到微信，再返回这里复制报告。记录仅保存在当前进程内存中。"
++        preferredStyle:UIAlertControllerStyleAlert];
++    [menu addAction:[UIAlertAction actionWithTitle:@"开始本轮记录" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action) {
++        if(![self authorized])return;
++        InstallCallDiagnosticsLifecycleObservers();
++        NSUInteger epoch=CSCloseFriendAccountEpoch();CSCFCallDiagnosticsStartRecording(epoch);
++        CSCFCallDiagnosticsInspectNotificationDelegate();
++        UIApplicationState state=UIApplication.sharedApplication.applicationState;
++        CSCFCallDiagnosticsRecord(state==UIApplicationStateActive?@"app.active":state==UIApplicationStateBackground?@"app.background":@"app.inactive",epoch);
++    }]];
++    [menu addAction:[UIAlertAction actionWithTitle:@"复制报告" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action) {
++        if(![self authorized])return;
++        NSUInteger epoch=CSCloseFriendAccountEpoch();CSCFCallDiagnosticsRecord(@"report.copied",epoch);
++        CSCFCallDiagnosticsInspectNotificationDelegate();
++        UIPasteboard.generalPasteboard.string=CSCFCallDiagnosticsReport(kPluginVersionString,CSCloseFriendManager.sharedManager.capabilities,epoch);
++        UIAlertController *copied=[UIAlertController alertControllerWithTitle:@"已复制通知诊断报告" message:@"报告包含版本、通知入口计数及 Hook 安装结果，不包含通知内容或联系人。" preferredStyle:UIAlertControllerStyleAlert];
++        [copied addAction:[UIAlertAction actionWithTitle:@"好" style:UIAlertActionStyleCancel handler:nil]];
++        [self presentViewController:copied animated:YES completion:nil];
++    }]];
++    [menu addAction:[UIAlertAction actionWithTitle:@"停止记录" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action) {
++        if([self authorized])CSCFCallDiagnosticsStopRecording();
++    }]];
++    [menu addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];
++    [self presentViewController:menu animated:YES completion:nil];
++}
+ - (void)configureOptionGroups {
+     self.accountKeys=@[@"hideSettingsEntry",@"hidePluginEntry",@"biometric",@"shakeToLock",@"longPressUnlockEnabled",@"longPressUnlockDuration",@"unlockSeconds"];
+     NSMutableArray *protection=[NSMutableArray new];
+diff --git a/Controllers/CSReleaseNotesViewController.m b/Controllers/CSReleaseNotesViewController.m
+index 9694ed26..d5cbc836 100644
+--- a/Controllers/CSReleaseNotesViewController.m
++++ b/Controllers/CSReleaseNotesViewController.m
+@@ -4,6 +4,21 @@
+ // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
+ static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
+     NSDictionary *releases = @{
++        @"2.6-0+notifydiag.2": @[
++            @{@"title": @"修正通知点击诊断入口", @"detail": @"补上微信实际通知管理对象和场景恢复时的转发入口，避免点击通知后报告仍显示零次响应。"},
++            @{@"title": @"核验当前通知代理", @"detail": @"开始记录时检查系统当前通知代理，仅观察已有且签名匹配的回调，不替换代理。复现后点击通知，再返回密友页复制报告。"},
++            @{@"title": @"诊断版验证范围", @"detail": @"保留现有来电拒接规则，继续区分远程推送与本地通知。本版修正诊断盲区，尚未证明残留提示已解决。"}
++        ],
++        @"2.6-0+notifydiag.1": @[
++            @{@"title": @"来电通知来源诊断", @"detail": @"2.6-0 仍有后台／锁屏通话邀请提示，本版用于定位实际通知来源。密友页右上角可开始记录；复现后点击通知，再返回复制报告。"},
++            @{@"title": @"区分远程与本地通知", @"detail": @"记录通知入口是否命中、拦截结果和所点通知的远程／本地类型。默认关闭采集，手动开始后仅保留当前进程内的固定计数与相对时间。"},
++            @{@"title": @"诊断版验证范围", @"detail": @"不记录通知内容或联系人，账号切换时清空记录。本版保留现有拒接与通知规则，不表示残留提示已修复。"}
++        ],
++        @"2.6-0": @[
++            @{@"title": @"修复密友后台来电提示", @"detail": @"密友保持隐藏且对应语音／视频拒接选项开启时，阻止微信后台或锁屏时的本地来电通知及对应振动，继续执行原有自动拒接。"},
++            @{@"title": @"延后通知复核保护状态", @"detail": @"来电提示延后生成时，重新核对当前账号与密友拒接设置，避免锁定后仍出现应屏蔽的提示。"},
++            @{@"title": @"沿用现有通知规则", @"detail": @"普通消息、正常联系人来电、临时显示及对应拒接选项关闭时继续交由微信原生处理。手机后台与锁屏效果仍需安装后复验。"}
++        ],
+         @"2.5-11": @[
+             @{@"title": @"缩短后台拍动轮询等待", @"detail": @"启用拍我自动回拍或拍我自动回复且配置有效时，后台补拉间隔改为约 10 秒；微信同步正忙或条件暂不可用、尚未发出请求时约 2 秒复查。"},
+             @{@"title": @"保留请求冷却与自动规则", @"detail": @"实际调用原生请求后，即使返回拒绝或抛出异常，拍动仍遵守约 10 秒冷却；仅 AI 的补拉维持默认约 45 秒。账号、授权、名单、去重、用户延迟与成功回拍后的撤回规则保持。"},
+diff --git a/Headers/CSUserInfoHelper.h b/Headers/CSUserInfoHelper.h
+index 201b6019..f08d4cf3 100644
+--- a/Headers/CSUserInfoHelper.h
++++ b/Headers/CSUserInfoHelper.h
+@@ -14,7 +14,7 @@ extern NSString * const kUserAvatarURLKey;    // 用户头像URL缓存键
+ extern NSString * const kChatAvatarURLKey;    // 聊天对象头像URL缓存键
+ 
+ // 插件信息相关常量
+-#define kPluginVersionString @"2.5-11"  // 插件版本号
++#define kPluginVersionString @"2.6-0+notifydiag.2"  // 插件版本号
+ 
+ #pragma mark - 类定义
+ 
+diff --git a/Hooks/CloseFriendCallHooks.xm b/Hooks/CloseFriendCallHooks.xm
+index cdca8be0..91e42b85 100644
+--- a/Hooks/CloseFriendCallHooks.xm
++++ b/Hooks/CloseFriendCallHooks.xm
+@@ -1,5 +1,34 @@
+ #import "../Controllers/CSCloseFriendCallAdapter.h"
+ #import "../Controllers/CSCloseFriendBridge.h"
++#import "../Controllers/CSCloseFriendCallDiagnostics.h"
++#import <substrate.h>
++static void InstallCallNotifications(void) {
++    for(NSString *name in @[@"showLocalNotificationWithMsg:repeatVibration:",
++        @"showLocalNotificationWithMsg:repeatVibration:silently:",
++        @"showLocalNotificationByIlinkWithMsg:repeatVibration:isCallkitAvailable:"]) {
++        __block IMP original=NULL;SEL selector=NSSelectorFromString(name);
++        BOOL extended=![name isEqual:@"showLocalNotificationWithMsg:repeatVibration:"];
++        IMP replacement=extended ? imp_implementationWithBlock(^(id owner,id message,BOOL repeat,BOOL option) {
++            CSCFCallDiagnosticsRecord([name hasPrefix:@"showLocalNotificationByIlink"]?@"mono.ilink":@"mono.three",CSCloseFriendAccountEpoch());
++            CSCFPerformCallNotification(message,^{((void(*)(id,SEL,id,BOOL,BOOL))original)(owner,selector,message,repeat,option);});
++        }) : imp_implementationWithBlock(^(id owner,id message,BOOL repeat) {
++            CSCFCallDiagnosticsRecord(@"mono.two",CSCloseFriendAccountEpoch());
++            CSCFPerformCallNotification(message,^{((void(*)(id,SEL,id,BOOL))original)(owner,selector,message,repeat);});
++        });
++        if(!CSCloseFriendInstallHook(@"MonoServiceMsgMgr",name,replacement,&original,extended?"v@:@BB":"v@:@B"))imp_removeBlock(replacement);
++    }
++    // CAppUtil preserves its own conversion and main-thread dispatch. Its public
++    // handler receives MMNotificationSetting, not UNNotificationSettings.
++    Class utility=NSClassFromString(@"CAppUtil");SEL settings=NSSelectorFromString(@"GetEnabledNotificationSettingWithCompletionHandler:");
++    if(CSCloseFriendMethodMatches(class_getClassMethod(utility,settings),"v@:@?")) {
++        __block IMP original=NULL;
++        IMP replacement=imp_implementationWithBlock(^(id owner,CSCloseFriendNotificationSettingsCompletion completion) {
++            ((void(*)(id,SEL,CSCloseFriendNotificationSettingsCompletion))original)(owner,settings,CSCFCallNotificationCompletion(completion));
++        });
++        MSHookMessageEx(object_getClass(utility),settings,replacement,&original);
++        CSCloseFriendRecordCapability(@"calls.notifications.settingsCallback",original!=NULL);
++    } else CSCloseFriendRecordCapability(@"calls.notifications.settingsCallback",NO);
++}
+ static void Guard0(NSString *cls,NSString *name,BOOL invitation) {
+     __block IMP orig=NULL;SEL sel=NSSelectorFromString(name);
+     IMP imp=imp_implementationWithBlock(^(id object){if(!(invitation?CSCFInvitationOutputSuppressed(object):CSCFCallOutputSuppressed()))((void(*)(id,SEL))orig)(object,sel);});
+@@ -21,6 +50,7 @@ static void InstallSingleCall(NSString *cls,BOOL ilink) {
+     if(!CSCloseFriendInstallHook(cls,NSStringFromSelector(startSEL),imp,&start,"v@:@"))imp_removeBlock(imp);
+ }
+ %ctor {dispatch_async(dispatch_get_main_queue(),^{
++    InstallCallNotifications();
+     CSCloseFriendRecordCapability(@"calls.systemFirstFrame.verified",NO);
+     CSCloseFriendRecordCapability(@"calls.ilinkMain.rejection",NO);
+     InstallSingleCall(@"VoIPilinkMgr",YES);
+diff --git a/Hooks/CloseFriendNotificationHooks.xm b/Hooks/CloseFriendNotificationHooks.xm
+index 168bba9f..d54e41df 100644
+--- a/Hooks/CloseFriendNotificationHooks.xm
++++ b/Hooks/CloseFriendNotificationHooks.xm
+@@ -1,5 +1,6 @@
+ #import "../Controllers/CSCloseFriendNotificationAdapter.h"
+ #import "../Controllers/CSCloseFriendCallAdapter.h"
++#import "../Controllers/CSCloseFriendCallDiagnostics.h"
+ #import "../Controllers/CSCloseFriendBridge.h"
+ #import "../Controllers/CSGroupListAdapter.h"
+ #import "../Controllers/CSGroupProjection.h"
+@@ -359,17 +360,17 @@ static void CSPublishChatTabBadges(void) {
+         CSCloseFriendRecordCapability(@"notifications.boundSound",original!=NULL);
+     } else CSCloseFriendRecordCapability(@"notifications.boundSound",NO);
+     __block IMP push=NULL;
+-    imp=imp_implementationWithBlock(^(id owner,id message,id identifier,id date,BOOL voip,BOOL silent){CSCFWithAlert(CSCFMessageSubject(message,nil),^{((void(*)(id,SEL,id,id,id,BOOL,BOOL))push)(owner,NSSelectorFromString(@"showPushWithMessageWrap:identifier:fireDate:isFromVoipPush:shouldSilent:"),message,identifier,date,voip,silent);});});
++    imp=imp_implementationWithBlock(^(id owner,id message,id identifier,id date,BOOL voip,BOOL silent){CSCFCallDiagnosticsRecord(@"push.enter",CSCloseFriendAccountEpoch());CSCFWithAlert(CSCFMessageSubject(message,nil),^{((void(*)(id,SEL,id,id,id,BOOL,BOOL))push)(owner,NSSelectorFromString(@"showPushWithMessageWrap:identifier:fireDate:isFromVoipPush:shouldSilent:"),message,identifier,date,voip,silent);});});
+     if(!CSCloseFriendInstallHook(@"MMLocalNotificationMgr",@"showPushWithMessageWrap:identifier:fireDate:isFromVoipPush:shouldSilent:",imp,&push,"v@:@@@BB"))imp_removeBlock(imp);
+     __block IMP info=NULL;
+-    imp=imp_implementationWithBlock(^id(id owner,id message,id settings,BOOL voip){id result=((id(*)(id,SEL,id,id,BOOL))info)(owner,NSSelectorFromString(@"notificationInfoForMessage:withEnabledNotificationSettings:isFromVoipPush:"),message,settings,voip);CSCFBindAlert(result,CSCFMessageSubject(message,nil));return result;});
++    imp=imp_implementationWithBlock(^id(id owner,id message,id settings,BOOL voip){CSCFCallDiagnosticsRecord(@"info.enter",CSCloseFriendAccountEpoch());id result=((id(*)(id,SEL,id,id,BOOL))info)(owner,NSSelectorFromString(@"notificationInfoForMessage:withEnabledNotificationSettings:isFromVoipPush:"),message,settings,voip);CSCFBindAlert(result,CSCFMessageSubject(message,nil));return result;});
+     if(!CSCloseFriendInstallHook(@"MMLocalNotificationMgr",@"notificationInfoForMessage:withEnabledNotificationSettings:isFromVoipPush:",imp,&info,"@@:@@B"))imp_removeBlock(imp);
+     // Class-method boundary: full ABI gate, then hook its metaclass. Never inspect
+     // unverified notification dictionary keys as account/session identity.
+     Class utility=NSClassFromString(@"MMLocalNotificationUtil");SEL local=NSSelectorFromString(@"showLocalNotificationWithInfo:");
+     if(CSCloseFriendMethodMatches(class_getClassMethod(utility,local),"v@:@")) {
+         __block IMP original=NULL;
+-        IMP replacement=imp_implementationWithBlock(^(id owner,id value){CSCloseFriendAlertSubject *s=CSCFBoundAlert(value)?:CSCFCurrentAlert();if(DiscardOutput(s))return;CSCFWithAlert(s,^{((void(*)(id,SEL,id))original)(owner,local,value);});});
++        IMP replacement=imp_implementationWithBlock(^(id owner,id value){CSCFCallDiagnosticsRecord(@"local.enter",CSCloseFriendAccountEpoch());CSCloseFriendAlertSubject *s=CSCFBoundAlert(value)?:CSCFCurrentAlert();if(DiscardOutput(s)){CSCFCallDiagnosticsRecord(@"local.drop",CSCloseFriendAccountEpoch());return;}CSCFCallDiagnosticsRecord(@"local.pass",CSCloseFriendAccountEpoch());CSCFWithAlert(s,^{((void(*)(id,SEL,id))original)(owner,local,value);});});
+         // The installer takes class names for instance methods; install this
+         // metaclass method through the same signature predicate and substrate.
+         MSHookMessageEx(object_getClass(utility),local,replacement,&original);
+@@ -377,8 +378,10 @@ static void CSPublishChatTabBadges(void) {
+     } else CSCloseFriendRecordCapability(@"notifications.localInfo",NO);
+     __block IMP add=NULL;
+     imp=imp_implementationWithBlock(^(UNUserNotificationCenter *center,UNNotificationRequest *request,void (^completion)(NSError *)){
++        CSCFCallDiagnosticsRecord(@"un.enter",CSCloseFriendAccountEpoch());
+         CSCloseFriendAlertSubject *s=CSCFBoundAlert(request)?:CSCFCurrentAlert();
+-        if(DiscardOutput(s)) {if(completion)completion(nil);return;}
++        if(DiscardOutput(s)) {CSCFCallDiagnosticsRecord(@"un.drop",CSCloseFriendAccountEpoch());if(completion)completion(nil);return;}
++        CSCFCallDiagnosticsRecord(@"un.pass",CSCloseFriendAccountEpoch());
+         NSNumber *badge=[CSGroupListAdapter closeFriendAlertBadgeCount];
+         if(badge && request.content.badge) {UNMutableNotificationContent *content=[request.content mutableCopy];content.badge=badge;request=[UNNotificationRequest requestWithIdentifier:request.identifier content:content trigger:request.trigger];}
+         if([s isCurrent]) { @synchronized(Requests){
+diff --git a/README.md b/README.md
+index a10b9ae4..62a3ea7e 100644
+--- a/README.md
++++ b/README.md
+@@ -2,7 +2,7 @@
+ 
+ 面向 iOS 微信的 Theos 插件，使用 Objective-C / Logos 接入微信原生界面，提供聊天分组、气泡与列表样式、消息操作和配置管理等功能。各项功能可在插件设置中按需开启。
+ 
+-**当前版本：`2.5-11`（缩短后台拍动轮询等待）** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
++**当前开发版本：`2.6-0+notifydiag.2`（修正密友通知点击诊断）** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+ 
+ [功能概览](#功能概览) · [安装与入口](#安装与入口) · [使用说明](#使用说明) · [配置与备份](#配置与备份) · [源码编译](#源码编译) · [开发与验证](#开发与验证) · [常见问题](#常见问题)
+ 
+@@ -26,20 +26,29 @@
+ 
+ ## 安装与入口
+ 
++用户反馈 `2.6-0` 在后台／锁屏仍出现“你收到了通话邀请”。[通知诊断第 2 版](packages/2.6-0-notification-diagnostic-2/README.md) 已在微信 `8.0.80.34` 真机上捕获实际点击：`notification.response.remote=1`、`notification.response.local=0`，由 `NotificationActionsMgr` 处理；已监测的主 App 本地通知、UN 提交和 VoIP 等入口仍为 0。该记录确认所点提示为远程通知，尚未运行时证实通知扩展处理了它，残留提示也尚未修复。本轮无需再次安装或复现同一诊断包，完整状态见 [排查记录](docs/audits/close-friend-background-call-notification-2026-11-12/README.md)。
++
++用户已明确采用 **App 内注入后重签／TrollStore 类安装**。此前将其称为 Rootless 设备环境未经核实，现予更正；具体属于普通证书重签还是 TrollStore、实际 iOS 版本及签名权限仍待核验。历史 Rootless／Rootful 包只说明 Theos 构建方案，不能证明用户设备越狱环境或重签后的扩展权限。下列链接与校验记录保留为历史产物。
++
++当前主进程 dylib 不能保证在后台远程推送首次展示前拦截。原生通知扩展具备解码来电人身份的路径，但普通扩展清空文本或不回调会回退原通知；真正的展示前过滤需满足 Apple 的 [通知过滤 entitlement](https://developer.apple.com/documentation/bundleresources/entitlements/com.apple.developer.usernotifications.filtering) 与推送条件。已保存离线包的扩展签名没有该权限，仍需核验用户实际安装包，不能将字段写入签名文件视为权限已生效。本轮未改注入范围、密友存储保护或打新的诊断包。
++
+ ### 环境与兼容性
+ 
+ | 项目 | 说明 |
+ | --- | --- |
+-| 运行方式 | 需要能够向微信加载插件的 iOS 注入环境，直接构建产物为 `.deb` |
++| 运行方式 | 需要能够向微信加载插件的 iOS 注入环境；直接构建产物为 `.deb`／dylib，App 内注入重签的适配还需核验实际签名及权限 |
++| 当前用户安装方式 | 已确认 App 内注入后重签／TrollStore 类安装；普通证书重签还是 TrollStore、iOS 版本及有效权限待核验 |
+ | 近期适配参考 | 微信 `8.0.78` 与 `8.0.80`；既有适配参考用户提供的 `8.0.80.34` IPA，小丑功能在两版微信中的显示与交互仍待真机验收 |
+ | 系统目标 | Makefile 的最低编译目标为 iOS `15.0`，不代表所有系统与微信组合均已验证 |
+-| Rootless | `2.5-11` 安装包，包含 arm64／arm64e |
+-| Rootful | `2.5-11` 安装包及重签用 dylib，包含 arm64／arm64e |
++| Rootless 构建产物 | 已归档 `2.6-0+notifydiag.2` 诊断包，包含 arm64／arm64e；不代表当前用户设备环境 |
++| Rootful 构建产物 | 保留前版 `2.6-0` 安装包，包含 arm64／arm64e；不代表当前用户设备环境 |
+ | Roothide | Makefile 保留构建入口；当前版本没有对应的运行验证结论 |
+ | 注入依赖 | `control` 声明 `mobilesubstrate >= 0.9.5000`，实际加载取决于设备的注入环境 |
+ 
+ 微信私有接口会随版本变化。主机回归和成功打包只能验证相应代码与产物，真实设备上的显示、交互及其他插件组合仍需实际确认。
+ 
++`2.6-0` 基于正式 `2.5-11` 实现主 App 本地来电通知过滤：密友保持隐藏且对应语音／视频拒接选项开启时，在微信本地来电通知入口阻止通知及对应振动，并在系统通知设置的延后回调中再次复核账号和当前拒接策略。原有自动拒接继续执行；普通消息、正常联系人、临时显示及对应拒接选项关闭时沿用微信原生处理。用户真机确认残留提示仍存在，后续诊断已确认所点提示为远程通知，故不能将本地主机回归通过等同于用户问题修复。既有核心回归、构建与产物核验见 [2.6-0 发布记录](packages/2.6-0-close-friend-call-notifications/README.md)。
++
+ `2.5-11` 缩短插件自身的后台拍动等待：拍我自动回拍或拍我自动回复开启且配置有效时，补拉间隔从约 45 秒调整为约 10 秒；原生同步忙碌或条件暂不可用且尚未发出请求时，约 2 秒复查。实际调用原生请求后，返回 NO 或抛出异常仍消耗拍动的约 10 秒冷却；仅 AI 的补拉维持默认约 45 秒。两路共用请求记录，按调用来源使用间隔，保留账号、授权、名单、去重、消息入站、发送、用户延迟和撤回规则。约 10 秒是插件请求间隔，不是消息送达或回复时限；网络、原生同步和系统执行机会仍会影响时效。测试、构建与验证限制见 [2.5-11 发布记录](packages/2.5-11-pat-latency/README.md)。
+ 
+ `2.5-10` 基于现有 2.5-9 清理自动功能：移除拍动解析仅供诊断的兼容接口及对应测试遗留，整理无用参数和重复声明。保留严格 XML 与群消息前导解析、统一入站快照、账号与授权校验、会话名单、持久去重、发送与撤回调度，以及拍动与 AI 共用的约 45 秒后台同步预算。本版不改变自动功能规则和后台请求策略。清理范围、测试结果、构建与产物核验见 [2.5-10 发布记录](packages/2.5-10-automation-cleanup/README.md)。本版尚未安装到手机实测，2.5-7 的用户验收记录仍只对应该历史版本。
+@@ -70,10 +79,10 @@
+ 
+ ### 安装步骤
+ 
+-1. 用户当前为 Rootless 环境，使用 [2.5-11 Rootless 安装包](packages/2.5-11-pat-latency/com.wechat.improve_2.5-11_iphoneos-arm64.deb)。另提供 [Rootful 安装包](packages/2.5-11-pat-latency/com.wechat.improve_2.5-11_iphoneos-arm.deb)、[重签用 dylib](packages/2.5-11-pat-latency/WeChatImprove.dylib)、[调试符号](packages/2.5-11-pat-latency/symbols.zip) 与 [SHA-256 清单](packages/2.5-11-pat-latency/SHA256SUMS)。验证记录见 [2.5-11 发布记录](packages/2.5-11-pat-latency/README.md)；历史包继续保留。
++1. 先确认实际注入与安装方式。当前用户为 App 内注入后重签／TrollStore 类安装，具体 iOS 与权限待核验；本轮远程通知分类取证已完成，无需再次安装或复现同一诊断包。[Rootless 构建的 2.6-0+notifydiag.2 诊断包](packages/2.6-0-notification-diagnostic-2/com.wechat.improve_2.6-0+notifydiag.2_iphoneos-arm64.deb)、前版 [Rootful 安装包](packages/2.6-0-close-friend-call-notifications/com.wechat.improve_2.6-0_iphoneos-arm.deb)、[重签用 dylib](packages/2.6-0-close-friend-call-notifications/WeChatImprove.dylib)、[调试符号](packages/2.6-0-close-friend-call-notifications/symbols.zip) 与 [SHA-256 清单](packages/2.6-0-close-friend-call-notifications/SHA256SUMS) 仅保留为历史产物与验证记录。
+ 
+    密友头像五击快捷入口不验证身份：任何能操作已解锁手机并到达头像的人，都能查看或修改配置，并经两级确认不可撤销地完整重置当前账号的密友配置。此风险继续存在；修改密码仍须普通入口验证。
+-2. 使用设备上适配该环境的包管理器或安装工具安装，并按工具提示重新加载注入环境。
++2. 按已核实的注入方式使用对应安装工具；App 内注入重签需核验主 App 与扩展的签名及有效权限，越狱包管理器安装则使用对应打包方案。
+ 3. 完全退出微信后重新打开，进入 **微信 → 我 → 设置 → 再也不会**。
+ 4. 按页面提示完成公众号关注验证及首次使用声明，然后按需开启功能。
+ 
+@@ -293,7 +302,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootless \
+   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
+ ```
+ 
+-当前版本默认输出文件名：`packages/com.wechat.improve_2.5-11_iphoneos-arm64.deb`。本轮交付为 [2.5-11 Rootless 安装包](packages/2.5-11-pat-latency/com.wechat.improve_2.5-11_iphoneos-arm64.deb)。
++当前开发版本默认输出文件名：`packages/com.wechat.improve_2.6-0+notifydiag.2_iphoneos-arm64.deb`。本轮交付为 [Rootless 诊断第 2 版](packages/2.6-0-notification-diagnostic-2/com.wechat.improve_2.6-0+notifydiag.2_iphoneos-arm64.deb)。
+ 
+ ### Rootful
+ 
+@@ -302,7 +311,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
+   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
+ ```
+ 
+-当前版本默认输出文件名：`packages/com.wechat.improve_2.5-11_iphoneos-arm.deb`。本轮交付为 [2.5-11 Rootful 安装包](packages/2.5-11-pat-latency/com.wechat.improve_2.5-11_iphoneos-arm.deb)。
++当前开发版本默认输出文件名：`packages/com.wechat.improve_2.6-0+notifydiag.2_iphoneos-arm.deb`。本轮未提供 Rootful 诊断包，保留前版 [2.6-0 Rootful 安装包](packages/2.6-0-close-friend-call-notifications/com.wechat.improve_2.6-0_iphoneos-arm.deb)。
+ 
+ | 方案 | 动态库安装目录 |
+ | --- | --- |
+@@ -326,7 +335,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
+ `PACKAGE_VERSION` 只覆盖当次打包版本，不会更新插件内显示版本。安装了 `dpkg-deb` 后，可以检查包元数据：
+ 
+ ```bash
+-dpkg-deb -f packages/2.5-11-pat-latency/com.wechat.improve_2.5-11_iphoneos-arm64.deb Version Architecture
++dpkg-deb -f packages/2.6-0-close-friend-call-notifications/com.wechat.improve_2.6-0_iphoneos-arm64.deb Version Architecture
+ ```
+ 
+ 插件内通过 **关于 → 版本信息** 查看随包提供的离线更新说明。
+diff --git a/Tests/CloseFriendAlertTests.m b/Tests/CloseFriendAlertTests.m
+index 6ec9311b..c8d37640 100644
+--- a/Tests/CloseFriendAlertTests.m
++++ b/Tests/CloseFriendAlertTests.m
+@@ -3,6 +3,7 @@
+ #import "CSCloseFriendBridge.h"
+ #import "CSCloseFriendNotificationAdapter.h"
+ #import "CSCloseFriendCallAdapter.h"
++#import "CSCloseFriendCallDiagnostics.h"
+ #import "CSGroupProjection.h"
+ #import "WESessionTabItem.h"
+ static NSUInteger Checks,Epoch=1;
+@@ -81,6 +82,10 @@ @interface CSGroupListAdapter : NSObject
+ @property NSNumber *alertBadge;
+ @property NSArray *alertBadgeKey;
+ @property NSUInteger changeDepth,snapshotRevision,modelRevision,snapshotEpoch;
++@property BOOL usesNativeSessionModel;
++@property NSArray *tabBadgeSections;
++@property NSUInteger tabBadgeRevision,tabBadgeEpoch;
++@property NSString *tabBadgeAccount;
+ @property BOOL dirty;
+ @property NSString *snapshotAccount;
+ + (NSNumber *)closeFriendAlertBadgeCount;
+@@ -115,20 +120,32 @@ + (instancetype)requestWithIdentifier:(NSString *)identifier content:(id)content
+ @interface UNUserNotificationCenter : NSObject
+ @property NSUInteger submissions;
+ @property NSArray *removedPending,*removedDelivered;
++@property BOOL deferSettings;
++@property NSUInteger settingsRequests;
++@property NSMutableArray *settingsCallbacks;
+ + (instancetype)currentNotificationCenter;
+ - (void)removePendingNotificationRequestsWithIdentifiers:(NSArray *)identifiers;
+ - (void)removeDeliveredNotificationsWithIdentifiers:(NSArray *)identifiers;
+ - (void)addNotificationRequest:(UNNotificationRequest *)r withCompletionHandler:(void(^)(NSError *))completion;
++- (void)getNotificationSettingsWithCompletionHandler:(void(^)(id))completion;
+ @end
+ @implementation UNUserNotificationCenter
+ + (instancetype)currentNotificationCenter{static UNUserNotificationCenter *center;static dispatch_once_t once;dispatch_once(&once,^{center=[self new];});return center;}
+ - (void)removePendingNotificationRequestsWithIdentifiers:(NSArray *)identifiers{self.removedPending=identifiers;}
+ - (void)removeDeliveredNotificationsWithIdentifiers:(NSArray *)identifiers{self.removedDelivered=identifiers;}
+ - (void)addNotificationRequest:(UNNotificationRequest *)r withCompletionHandler:(void(^)(NSError *))completion{self.submissions++;if(completion)completion(nil);}
++- (void)getNotificationSettingsWithCompletionHandler:(void(^)(id))completion {
++    self.settingsRequests++;
++    if(self.deferSettings) {
++        if(!self.settingsCallbacks)self.settingsCallbacks=[NSMutableArray array];
++        [self.settingsCallbacks addObject:[completion copy]];
++    } else if(completion)completion(@"native-settings");
++}
+ @end
+ static NSMutableDictionary *Requests;
+ #import "AlertOutputDecisions.h"
+ #import "AlertNotificationBody.h"
++#include "CloseFriendCallNotificationFixture.h"
+ static CSGroupRow *Row(NSUInteger index,NSString *name,NSUInteger count,CSGroupRowKind kind){NSUInteger path[]={0,index};return [[CSGroupRow alloc] initWithNativePath:[NSIndexPath indexPathWithIndexes:path length:2] userName:name kind:kind category:CSGroupRowCategoryPrivate top:NO unreadCount:count redDot:NO];}
+ int main(void){@autoreleasepool{
+     // Retired values in an existing profile cannot suppress current-account messages.
+@@ -216,5 +233,6 @@ int main(void){@autoreleasepool{
+     owner.modelRevision++;CHECK([[CSGroupListAdapter closeFriendAlertBadgeCount] isEqual:@0]);Policy=Snapshot(NO,NO,nil);CHECK(![CSGroupListAdapter closeFriendAlertBadgeCount]);
+     IncomingCallChecks();
+     CallReplyChecks();
++    CallNotificationChecks();
+     printf("Close-friend alerts: %lu focused checks passed (identity, calls, reply, badge, payment policy)\n",(unsigned long)Checks);
+ }return 0;}
+diff --git a/Tests/CloseFriendTabBadgeTests.m b/Tests/CloseFriendTabBadgeTests.m
+index 98fad0f7..64401a31 100644
+--- a/Tests/CloseFriendTabBadgeTests.m
++++ b/Tests/CloseFriendTabBadgeTests.m
+@@ -33,6 +33,8 @@
+ @interface CSGroupListAdapter:NSObject
+ @property(nonatomic,strong) id controller;
+ @property(nonatomic,copy) NSArray *cachedNativeSections,*tabAlertBadgeKey,*tabBadgeSections,*tabBadgePublishedKey;
++@property(nonatomic,copy) NSArray *tabBadgeScheduleKey;
++@property(nonatomic) BOOL usesNativeSessionModel;
+ @property(nonatomic,copy) NSString *tabBadgeAccount;
+ @property(nonatomic) NSUInteger tabBadgeRevision,tabBadgeEpoch;
+ @property(nonatomic) BOOL tabBadgeSourceRequired,tabBadgeRestorePending,tabBadgeSourceScheduled,tabBadgeSourceRefreshing,tabBadgeRequestDispatchPending,tabBadgeRefreshAgain;
+diff --git a/Tests/verify-close-friend-alerts.sh b/Tests/verify-close-friend-alerts.sh
+index 7b75f1b3..5d53c4d4 100755
+--- a/Tests/verify-close-friend-alerts.sh
++++ b/Tests/verify-close-friend-alerts.sh
+@@ -26,10 +26,12 @@ def body(marker):
+ (Path(sys.argv[1])/'AlertOutputDecisions.h').write_text(body('static BOOL DiscardOutput(')+'\n'+body('static void RemoveKnown('))
+ start=s.index('    __block IMP add=NULL;');end=s.index('    for(NSString *name in @[@"presentLocalNotificationNow:',start)
+ (Path(sys.argv[1])/'AlertNotificationBody.h').write_text('static void InstallNotificationOutput(void) { IMP imp;\n'+s[start:end]+'\n}')
++s=Path('Hooks/CloseFriendCallHooks.xm').read_text()
++(Path(sys.argv[1])/'AlertCallNotificationHooks.h').write_text(body('static void InstallCallNotifications(')+'\n')
+ PY
+ xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-parameter -DCSCF_CALL_REPLY_TESTING=1 \
+  -framework Foundation -I"$work" -IControllers \
+- Controllers/CSCloseFriend{Policy,Signatures,NotificationAdapter,CallAdapter,CallReply}.m \
++ Controllers/CSCloseFriend{Policy,Signatures,NotificationAdapter,CallAdapter,CallReply,CallDiagnostics}.m \
+  Controllers/CSGroupProjection.m Controllers/WESessionTabItem.m Tests/CloseFriendAlertTests.m -o "$work/alerts"
+ "$work/alerts"
+ python3 - "$work" <<'PY'
+diff --git a/control b/control
+index 76b82729..df18f5d6 100644
+--- a/control
++++ b/control
+@@ -1,6 +1,6 @@
+ Package: com.wechat.improve
+ Name: WeChatImprove
+-Version: 2.5-11
++Version: 2.6-0+notifydiag.2
+ Architecture: iphoneos-arm
+ Description: 微信插件，支持聊天按钮布局自定义等。
+ Maintainer: 再也不会

@@ -1,0 +1,443 @@
+[
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "init",
+    "type": "@16@0:8",
+    "address": "0xec79ac",
+    "label": "-[WCRefineBackgroundKeepAlive init]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "isEnabled",
+    "type": "B16@0:8",
+    "address": "0xec7b5c",
+    "label": "-[WCRefineBackgroundKeepAlive isEnabled]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "isDropNotifyEnabled",
+    "type": "B16@0:8",
+    "address": "0xec7bd4",
+    "label": "-[WCRefineBackgroundKeepAlive isDropNotifyEnabled]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "refreshSettings",
+    "type": "v16@0:8",
+    "address": "0xec7cbc",
+    "label": "-[WCRefineBackgroundKeepAlive refreshSettings]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "appDidEnterBackground",
+    "type": "v16@0:8",
+    "address": "0xec7eb0",
+    "label": "-[WCRefineBackgroundKeepAlive appDidEnterBackground]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "appWillEnterForeground",
+    "type": "v16@0:8",
+    "address": "0xec7fcc",
+    "label": "-[WCRefineBackgroundKeepAlive appWillEnterForeground]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "appDidBecomeActive",
+    "type": "v16@0:8",
+    "address": "0xec8084",
+    "label": "-[WCRefineBackgroundKeepAlive appDidBecomeActive]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "startIfNeeded",
+    "type": "v16@0:8",
+    "address": "0xec80e0",
+    "label": "-[WCRefineBackgroundKeepAlive startIfNeeded]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "beginBackgroundTaskIfNeeded",
+    "type": "v16@0:8",
+    "address": "0xec865c",
+    "label": "-[WCRefineBackgroundKeepAlive beginBackgroundTaskIfNeeded]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "onTimer",
+    "type": "v16@0:8",
+    "address": "0xec8884",
+    "label": "-[WCRefineBackgroundKeepAlive onTimer]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "requestMoreTime",
+    "type": "v16@0:8",
+    "address": "0xec88bc",
+    "label": "-[WCRefineBackgroundKeepAlive requestMoreTime]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "ensureAudioPlaying",
+    "type": "v16@0:8",
+    "address": "0xec8a08",
+    "label": "-[WCRefineBackgroundKeepAlive ensureAudioPlaying]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "cancelGracePulse",
+    "type": "v16@0:8",
+    "address": "0xec921c",
+    "label": "-[WCRefineBackgroundKeepAlive cancelGracePulse]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "onGracePulse",
+    "type": "v16@0:8",
+    "address": "0xec92e0",
+    "label": "-[WCRefineBackgroundKeepAlive onGracePulse]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "audioSessionMayHaveChanged:",
+    "type": "v24@0:8@16",
+    "address": "0xec937c",
+    "label": "-[WCRefineBackgroundKeepAlive audioSessionMayHaveChanged:]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "stopAudio",
+    "type": "v16@0:8",
+    "address": "0xec9898",
+    "label": "-[WCRefineBackgroundKeepAlive stopAudio]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "endBackgroundTask",
+    "type": "v16@0:8",
+    "address": "0xec995c",
+    "label": "-[WCRefineBackgroundKeepAlive endBackgroundTask]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "stop",
+    "type": "v16@0:8",
+    "address": "0xec9a40",
+    "label": "-[WCRefineBackgroundKeepAlive stop]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "notifyDropEndedOnTerminate",
+    "type": "v16@0:8",
+    "address": "0xec9b90",
+    "label": "-[WCRefineBackgroundKeepAlive notifyDropEndedOnTerminate]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "registerObserversIfNeeded",
+    "type": "v16@0:8",
+    "address": "0xeca8a0",
+    "label": "-[WCRefineBackgroundKeepAlive registerObserversIfNeeded]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "unregisterObserversIfNeeded",
+    "type": "v16@0:8",
+    "address": "0xecaa88",
+    "label": "-[WCRefineBackgroundKeepAlive unregisterObserversIfNeeded]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "dealloc",
+    "type": "v16@0:8",
+    "address": "0xecad40",
+    "label": "-[WCRefineBackgroundKeepAlive dealloc]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "bgTaskIdentifier",
+    "type": "Q16@0:8",
+    "address": "0xecadec",
+    "label": "-[WCRefineBackgroundKeepAlive bgTaskIdentifier]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "setBgTaskIdentifier:",
+    "type": "v24@0:8Q16",
+    "address": "0xecae08",
+    "label": "-[WCRefineBackgroundKeepAlive setBgTaskIdentifier:]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "bgTimer",
+    "type": "@16@0:8",
+    "address": "0xecae2c",
+    "label": "-[WCRefineBackgroundKeepAlive bgTimer]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "setBgTimer:",
+    "type": "v24@0:8@16",
+    "address": "0xecae48",
+    "label": "-[WCRefineBackgroundKeepAlive setBgTimer:]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "gracePulseTimer",
+    "type": "@16@0:8",
+    "address": "0xecae7c",
+    "label": "-[WCRefineBackgroundKeepAlive gracePulseTimer]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "setGracePulseTimer:",
+    "type": "v24@0:8@16",
+    "address": "0xecae98",
+    "label": "-[WCRefineBackgroundKeepAlive setGracePulseTimer:]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "silentPlayer",
+    "type": "@16@0:8",
+    "address": "0xecaecc",
+    "label": "-[WCRefineBackgroundKeepAlive silentPlayer]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "setSilentPlayer:",
+    "type": "v24@0:8@16",
+    "address": "0xecaee8",
+    "label": "-[WCRefineBackgroundKeepAlive setSilentPlayer:]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "isInBackground",
+    "type": "B16@0:8",
+    "address": "0xecaf1c",
+    "label": "-[WCRefineBackgroundKeepAlive isInBackground]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "setIsInBackground:",
+    "type": "v20@0:8B16",
+    "address": "0xecaf3c",
+    "label": "-[WCRefineBackgroundKeepAlive setIsInBackground:]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "timerInterval",
+    "type": "d16@0:8",
+    "address": "0xecaf64",
+    "label": "-[WCRefineBackgroundKeepAlive timerInterval]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "setTimerInterval:",
+    "type": "v24@0:8d16",
+    "address": "0xecaf80",
+    "label": "-[WCRefineBackgroundKeepAlive setTimerInterval:]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "observersRegistered",
+    "type": "B16@0:8",
+    "address": "0xecafa4",
+    "label": "-[WCRefineBackgroundKeepAlive observersRegistered]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "setObserversRegistered:",
+    "type": "v20@0:8B16",
+    "address": "0xecafc4",
+    "label": "-[WCRefineBackgroundKeepAlive setObserversRegistered:]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "backgroundEnteredAt",
+    "type": "@16@0:8",
+    "address": "0xecafec",
+    "label": "-[WCRefineBackgroundKeepAlive backgroundEnteredAt]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "setBackgroundEnteredAt:",
+    "type": "v24@0:8@16",
+    "address": "0xecb008",
+    "label": "-[WCRefineBackgroundKeepAlive setBackgroundEnteredAt:]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "didNotifyDropEnded",
+    "type": "B16@0:8",
+    "address": "0xecb03c",
+    "label": "-[WCRefineBackgroundKeepAlive didNotifyDropEnded]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "setDidNotifyDropEnded:",
+    "type": "v20@0:8B16",
+    "address": "0xecb05c",
+    "label": "-[WCRefineBackgroundKeepAlive setDidNotifyDropEnded:]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "yieldedForHostCall",
+    "type": "B16@0:8",
+    "address": "0xecb084",
+    "label": "-[WCRefineBackgroundKeepAlive yieldedForHostCall]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "setYieldedForHostCall:",
+    "type": "v20@0:8B16",
+    "address": "0xecb0a4",
+    "label": "-[WCRefineBackgroundKeepAlive setYieldedForHostCall:]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "yieldedForOtherAudio",
+    "type": "B16@0:8",
+    "address": "0xecb0cc",
+    "label": "-[WCRefineBackgroundKeepAlive yieldedForOtherAudio]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "setYieldedForOtherAudio:",
+    "type": "v20@0:8B16",
+    "address": "0xecb0ec",
+    "label": "-[WCRefineBackgroundKeepAlive setYieldedForOtherAudio:]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": ".cxx_destruct",
+    "type": "v16@0:8",
+    "address": "0xecb114",
+    "label": "-[WCRefineBackgroundKeepAlive .cxx_destruct]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "load",
+    "type": "v16@0:8",
+    "address": "0xec73ac",
+    "label": "+[WCRefineBackgroundKeepAlive load]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "hostCallOwnsAudioSession",
+    "type": "B16@0:8",
+    "address": "0xec759c",
+    "label": "+[WCRefineBackgroundKeepAlive hostCallOwnsAudioSession]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "otherAppOwnsAudio",
+    "type": "B16@0:8",
+    "address": "0xec781c",
+    "label": "+[WCRefineBackgroundKeepAlive otherAppOwnsAudio]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "shared",
+    "type": "@16@0:8",
+    "address": "0xec78b0",
+    "label": "+[WCRefineBackgroundKeepAlive shared]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "clampedInterval:",
+    "type": "d24@0:8q16",
+    "address": "0xec7b04",
+    "label": "+[WCRefineBackgroundKeepAlive clampedInterval:]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "formattedBackgroundDuration:",
+    "type": "@24@0:8d16",
+    "address": "0xec9f88",
+    "label": "+[WCRefineBackgroundKeepAlive formattedBackgroundDuration:]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "requestNotificationPermissionIfNeeded",
+    "type": "v16@0:8",
+    "address": "0xeca2a8",
+    "label": "+[WCRefineBackgroundKeepAlive requestNotificationPermissionIfNeeded]"
+  },
+  {
+    "class": "WCRefineBackgroundKeepAlive",
+    "selector": "sendTerminateLocalNotificationWithTitle:body:",
+    "type": "v32@0:8@16@24",
+    "address": "0xeca488",
+    "label": "+[WCRefineBackgroundKeepAlive sendTerminateLocalNotificationWithTitle:body:]"
+  },
+  {
+    "class": "WCRefineGeneralFunctionViewController",
+    "selector": "toggleBackgroundKeepAlive:",
+    "type": "v24@0:8@16",
+    "address": "0x1a6e46c",
+    "label": "-[WCRefineGeneralFunctionViewController toggleBackgroundKeepAlive:]"
+  },
+  {
+    "class": "WCRefineGeneralFunctionViewController",
+    "selector": "toggleBackgroundDropNotify:",
+    "type": "v24@0:8@16",
+    "address": "0x1a6e5a8",
+    "label": "-[WCRefineGeneralFunctionViewController toggleBackgroundDropNotify:]"
+  },
+  {
+    "class": "WCRefineGeneralFunctionViewController",
+    "selector": "setBackgroundKeepAliveInterval",
+    "type": "v16@0:8",
+    "address": "0x1a6e6e4",
+    "label": "-[WCRefineGeneralFunctionViewController setBackgroundKeepAliveInterval]"
+  },
+  {
+    "class": "WCRefineGeneralFunctionViewController",
+    "selector": "handleBackgroundKeepAliveIntervalInput:",
+    "type": "v24@0:8@16",
+    "address": "0x1a6e8c8",
+    "label": "-[WCRefineGeneralFunctionViewController handleBackgroundKeepAliveIntervalInput:]"
+  },
+  {
+    "class": "WCRefineConfig",
+    "selector": "backgroundKeepAliveEnabled",
+    "type": "B16@0:8",
+    "address": "0x208ee48",
+    "label": "-[WCRefineConfig backgroundKeepAliveEnabled]"
+  },
+  {
+    "class": "WCRefineConfig",
+    "selector": "setBackgroundKeepAliveEnabled:",
+    "type": "v20@0:8B16",
+    "address": "0x208f018",
+    "label": "-[WCRefineConfig setBackgroundKeepAliveEnabled:]"
+  },
+  {
+    "class": "WCRefineConfig",
+    "selector": "backgroundKeepAliveInterval",
+    "type": "q16@0:8",
+    "address": "0x208f148",
+    "label": "-[WCRefineConfig backgroundKeepAliveInterval]"
+  },
+  {
+    "class": "WCRefineConfig",
+    "selector": "setBackgroundKeepAliveInterval:",
+    "type": "v24@0:8q16",
+    "address": "0x208f388",
+    "label": "-[WCRefineConfig setBackgroundKeepAliveInterval:]"
+  },
+  {
+    "class": "WCRefineConfig",
+    "selector": "backgroundDropNotifyEnabled",
+    "type": "B16@0:8",
+    "address": "0x208f4ec",
+    "label": "-[WCRefineConfig backgroundDropNotifyEnabled]"
+  },
+  {
+    "class": "WCRefineConfig",
+    "selector": "setBackgroundDropNotifyEnabled:",
+    "type": "v20@0:8B16",
+    "address": "0x208f6bc",
+    "label": "-[WCRefineConfig setBackgroundDropNotifyEnabled:]"
+  }
+]

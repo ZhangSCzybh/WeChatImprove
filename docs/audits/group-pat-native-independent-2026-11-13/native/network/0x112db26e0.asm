@@ -1,0 +1,9 @@
+0x112db26e0
+0x112db26e0: adrp     x9, #0x11fb00000
+0x112db26e4: ldr      x9, [x9, #0x2b0]
+0x112db26e8: cbz      x9, #0x112db26f0
+0x112db26ec: br       x9
+0x112db26f0: ldr      x0, [x0, #0x18]
+0x112db26f4: cbz      x0, #0x112db26fc
+0x112db26f8: b        #0x112debb50
+0x112db26fc: ret      

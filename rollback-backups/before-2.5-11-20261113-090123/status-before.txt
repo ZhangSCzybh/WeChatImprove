@@ -1,0 +1,36 @@
+## main...origin/main
+ M Controllers/CSCloseFriendCallAdapter.h
+ M Controllers/CSCloseFriendCallAdapter.m
+ M Controllers/CSCloseFriendSettingsViewController.m
+ M Controllers/CSReleaseNotesViewController.m
+ M Headers/CSUserInfoHelper.h
+ M Hooks/CloseFriendCallHooks.xm
+ M Hooks/CloseFriendNotificationHooks.xm
+ M README.md
+ M Tests/CloseFriendAlertTests.m
+ M Tests/CloseFriendTabBadgeTests.m
+ M Tests/verify-close-friend-alerts.sh
+ M control
+?? Controllers/CSCloseFriendCallDiagnostics.h
+?? Controllers/CSCloseFriendCallDiagnostics.m
+?? Hooks/CloseFriendCallDiagnosticsHooks.xm
+?? Tests/CloseFriendCallDiagnosticsTests.m
+?? Tests/CloseFriendCallNotificationFixture.h
+?? Tests/CloseFriendCallResponseTests.m
+?? Tests/verify-close-friend-call-diagnostics.sh
+?? Tests/verify-close-friend-call-response.sh
+?? docs/audits/close-friend-background-call-notification-2026-11-12/
+?? packages/2.5-11-pat-diagnostic-2/
+?? packages/2.5-11-pat-diagnostic/
+?? packages/2.5-2-automation-lockscreen/
+?? packages/2.5-3-pat-lockscreen/
+?? packages/2.5-4-pat-diagnostics/
+?? packages/2.5-5-pat-background-sync/
+?? packages/2.5-6-pat-background-group/
+?? packages/2.5-7-pat-shell-content/
+?? packages/2.5-8-cleanup/
+?? packages/2.5-9-gate-cleanup/
+?? packages/2.6-0-close-friend-call-notifications/
+?? packages/2.6-0-notification-diagnostic-2/
+?? packages/2.6-0-notification-diagnostic/
+?? rollback-backups/
