@@ -1,7 +1,0 @@
-Group integration observation: setters=1 notify=1 wrapperNotify=1 text=1 pat=1 background=1 protected=0 context=outside-context
-Real core -> real manager -> registered NSProxy context -> synchronous group pat -> durable patBack/patReply claims -> one text + one pat; repeat deduplicated
-Lifecycle normalizes trusted wrapper; unregistered and wrong-target proxies rejected; replacement proxy for same raw is invoked through current wrapper
-Same account/proxy ABA epoch, stale epoch, authorization/account/suspension/foreground, configuration save and native lookup/getter reentry all reject stale requests
-Private event also retains durable dual action; proxy restores outer context after native exception and new event can recover
-Missing service retains compatibility timer; recovered wrapper tick stops timer and immediately drives existing need without advancing uptime
-Automation native sync integration: 528 checks passed; production manager/environment/ABI/core/store, NSProxy account forwarding, group/private durable dual actions and identity/epoch/eligibility fences
