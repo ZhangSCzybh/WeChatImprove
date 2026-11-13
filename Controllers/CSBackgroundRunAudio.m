@@ -4,6 +4,7 @@
 
 NSNotificationName const CSBackgroundRunHostAudioChangedNotification = @"CSBackgroundRunHostAudioChanged";
 NSNotificationName const CSBackgroundRunPlaybackFailedNotification = @"CSBackgroundRunPlaybackFailed";
+NSNotificationName const CSBackgroundRunPlaybackFinishedNotification = @"CSBackgroundRunPlaybackFinished";
 static atomic_uint_fast64_t hostEpoch;
 static atomic_uint_fast64_t hostReleaseEpoch;
 static atomic_uint hostCalls;
@@ -31,24 +32,6 @@ void CSBackgroundRunAudioDidChange(BOOL succeeded, BOOL activation, BOOL active)
         BOOL released=atomic_load(&hostReleaseEpoch)==atomic_load(&hostEpoch) && !atomic_load(&hostCalls) && !atomic_load(&hostActive);
         [NSNotificationCenter.defaultCenter postNotificationName:CSBackgroundRunHostAudioChangedNotification object:nil userInfo:@{@"released":@(released)}];
     });
-}
-
-NSData *CSBackgroundRunSilentAudioData(void) {
-    static NSData *data;
-    static dispatch_once_t once;
-    dispatch_once(&once, ^{
-        // Eight seconds of mono, 16-bit PCM. No decoder, file dependency or timer.
-        const uint32_t rate=16000, samples=rate*8, bytes=samples*2;
-        NSMutableData *wav=[NSMutableData dataWithLength:44+bytes];
-        uint8_t *p=wav.mutableBytes;
-        memcpy(p,"RIFF",4); memcpy(p+8,"WAVEfmt ",8); memcpy(p+36,"data",4);
-        const uint32_t values[]={36+bytes,16,rate,rate*2,bytes};
-        const NSUInteger offsets[]={4,16,24,28,40};
-        for (NSUInteger i=0;i<5;i++) for (NSUInteger j=0;j<4;j++) p[offsets[i]+j]=(values[i]>>(8*j))&255;
-        p[20]=1; p[22]=1; p[32]=2; p[34]=16;
-        data=[wav copy];
-    });
-    return data;
 }
 
 static NSError *CSAudioError(NSInteger code, NSString *reason) {
@@ -85,36 +68,52 @@ static NSError *CSAudioError(NSInteger code, NSString *reason) {
 }
 - (BOOL)startWithError:(NSError **)error {
     NSAssert(NSThread.isMainThread,@"Background audio is main-thread owned");
-    if (self.playing && [self ownsConfiguration]) return YES;
-    [self stop];
-    if (self.hostBusy) { if (error) *error=CSAudioError(1,@"微信正在使用音频，保活已让出"); return NO; }
+    uint64_t requestedEpoch=atomic_load(&hostEpoch);
+    BOOL owned=[self ownsConfiguration];
+    if (!owned) [self relinquish];
     AVAudioSession *session=AVAudioSession.sharedInstance;
-    self.epoch=atomic_load(&hostEpoch);
-    self.previousCategory=session.category; self.previousMode=session.mode;
-    self.previousOptions=session.categoryOptions; self.previousPolicy=session.routeSharingPolicy;
+    if (self.hostBusy || session.secondaryAudioShouldBeSilencedHint) {
+        [self stop];
+        if (error) *error=CSAudioError(1,@"微信或其他音频正在使用音频，保活已让出");
+        return NO;
+    }
+    if (self.playing && owned) return YES;
     NSError *failure=nil;
     BOOL ok=NO;
     ownChanges++;
     @try {
-        self.player=[[AVAudioPlayer alloc] initWithData:CSBackgroundRunSilentAudioData() error:&failure];
-        self.player.delegate=self;
-        self.player.numberOfLoops=-1;
-        if (!self.player) { failure=failure?:CSAudioError(2,@"无法创建保活音频"); }
-        else if (self.epoch!=atomic_load(&hostEpoch) || atomic_load(&hostCalls)) { failure=CSAudioError(3,@"微信已接管音频"); }
-        else if ([session setCategory:AVAudioSessionCategoryPlayback mode:AVAudioSessionModeDefault routeSharingPolicy:AVAudioSessionRouteSharingPolicyDefault options:AVAudioSessionCategoryOptionMixWithOthers error:&failure]) {
-            self.configured=YES;
-            if ([self ownsConfiguration] && [session setActive:YES error:&failure]) {
-                self.activated=YES;
-                if ([self ownsConfiguration]) ok=[self.player play] && self.player.isPlaying;
+        if (!owned) {
+            self.epoch=requestedEpoch;
+            self.previousCategory=session.category; self.previousMode=session.mode;
+            self.previousOptions=session.categoryOptions; self.previousPolicy=session.routeSharingPolicy;
+        }
+        NSURL *url=[NSBundle.mainBundle URLForResource:@"blank" withExtension:@"caf"];
+        if (!url) failure=CSAudioError(2,@"当前微信包缺少 blank.caf，无法播放保活音频");
+        else {
+            [self releasePlayer];
+            self.player=[[AVAudioPlayer alloc] initWithContentsOfURL:url error:&failure];
+            self.player.delegate=self;
+            self.player.volume=0;
+            if (!self.player) failure=failure?:CSAudioError(3,@"无法创建保活音频");
+            else {
+                if (!owned) {
+                    if (self.epoch!=atomic_load(&hostEpoch) || atomic_load(&hostCalls) || atomic_load(&hostActive)) failure=CSAudioError(4,@"微信已接管音频");
+                    else if ([session setCategory:AVAudioSessionCategoryPlayback mode:AVAudioSessionModeDefault routeSharingPolicy:AVAudioSessionRouteSharingPolicyDefault options:AVAudioSessionCategoryOptionMixWithOthers error:&failure]) self.configured=YES;
+                }
+                if (!failure && [self ownsConfiguration] && [session setActive:YES error:&failure]) {
+                    self.activated=YES;
+                    // A short pulse may finish before a later isPlaying read.
+                    if ([self ownsConfiguration]) ok=[self.player prepareToPlay] && [self.player play];
+                }
             }
         }
-    } @catch (__unused NSException *exception) { failure=CSAudioError(4,@"音频服务暂不可用"); }
+    } @catch (__unused NSException *exception) { failure=CSAudioError(5,@"音频服务暂不可用"); }
     @finally { ownChanges--; }
     // A native change during activation invalidates our lease immediately.
     if (ok && ![self ownsConfiguration]) ok=NO;
     if (!ok) {
         [self stop];
-        if (error) *error=failure?:CSAudioError(5,@"系统未允许启动后台音频");
+        if (error) *error=failure?:CSAudioError(6,@"系统未允许启动后台音频");
     }
     return ok;
 }
@@ -158,7 +157,11 @@ static NSError *CSAudioError(NSInteger code, NSString *reason) {
 - (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag {
     dispatch_block_t report=^{
         if (player!=self.player) return;
-        [NSNotificationCenter.defaultCenter postNotificationName:CSBackgroundRunPlaybackFailedNotification object:self];
+        player.delegate=nil;
+        self.player=nil;
+        // Successful one-shot playback is expected; retain the session lease
+        // for the next pulse, and restore it only on stop or host handover.
+        [NSNotificationCenter.defaultCenter postNotificationName:flag?CSBackgroundRunPlaybackFinishedNotification:CSBackgroundRunPlaybackFailedNotification object:self];
     };
     if (NSThread.isMainThread) report(); else dispatch_async(dispatch_get_main_queue(),report);
 }

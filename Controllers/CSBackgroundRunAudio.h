@@ -3,6 +3,7 @@
 NS_ASSUME_NONNULL_BEGIN
 extern NSNotificationName const CSBackgroundRunHostAudioChangedNotification;
 extern NSNotificationName const CSBackgroundRunPlaybackFailedNotification;
+extern NSNotificationName const CSBackgroundRunPlaybackFinishedNotification;
 
 @protocol CSBackgroundRunAudio <NSObject>
 @property(nonatomic, readonly) BOOL playing;
@@ -25,7 +26,6 @@ extern "C" {
 #endif
 BOOL CSBackgroundRunAudioWillChange(void);
 void CSBackgroundRunAudioDidChange(BOOL succeeded, BOOL activation, BOOL active);
-NSData *CSBackgroundRunSilentAudioData(void);
 #ifdef __cplusplus
 }
 #endif

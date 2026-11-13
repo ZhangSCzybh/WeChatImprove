@@ -22,13 +22,15 @@ for original in originals: source=source.replace('%orig',original,1)
 (out/'BackgroundAudioHooksUnderTest.h').write_text(source)
 manager=(root/'Controllers/CSBackgroundRunManager.m').read_text()
 runtime=(root/'Controllers/CSBackgroundRunRuntime.m').read_text()
-production=manager+runtime+(root/'Controllers/CSBackgroundRunAudio.m').read_text()+(root/'Hooks/BackgroundRun.xm').read_text()
-for forbidden in ('dispatch_source_create','dispatch_after','%hook AppDelegate','%hook SpringBoard','URLForResource:@"blank"'):
+audio=(root/'Controllers/CSBackgroundRunAudio.m').read_text()
+production=manager+runtime+audio+(root/'Hooks/BackgroundRun.xm').read_text()
+for forbidden in ('dispatch_source_create','dispatch_after','%hook AppDelegate','%hook SpringBoard','CSBackgroundRunSilentAudioData','initWithData:','numberOfLoops'):
  assert forbidden not in production, forbidden
+assert 'URLForResource:@"blank" withExtension:@"caf"' in audio
 assert 'NSTimer' not in manager and 'beginBackgroundTask' not in manager
 assert 'repeats:NO' in runtime and 'endBackgroundTask:' in runtime
 assert 'canAttemptBackgroundWork' in manager
-print('Background run: one-shot runtime boundary, finite task cleanup, public lifecycle and in-memory audio contracts')
+print('Background run: one-shot runtime boundary, finite task cleanup, public lifecycle and host blank.caf contracts')
 PY
 compile_background_test() {
 xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-parameter \
@@ -45,5 +47,4 @@ compile_background_test BackgroundRunRecordTests background-records
 compile_background_test BackgroundRunHybridTests background-hybrid
 "$test_dir/background-hybrid"
 compile_background_test BackgroundRunTests background-run
-"$test_dir/background-run" "$test_dir/silence.wav"
-/usr/bin/afinfo "$test_dir/silence.wav"
+"$test_dir/background-run"

@@ -5,7 +5,7 @@ typedef NSUInteger AVAudioSessionRouteSharingPolicy;
 enum { AVAudioSessionCategoryOptionMixWithOthers=1, AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation=1, AVAudioSessionRouteSharingPolicyDefault=0 };
 enum { AVAudioSessionInterruptionTypeEnded=0, AVAudioSessionInterruptionTypeBegan=1, AVAudioSessionInterruptionOptionShouldResume=1 };
 extern NSString *const AVAudioSessionCategoryAmbient, *const AVAudioSessionCategorySoloAmbient, *const AVAudioSessionCategoryPlayback, *const AVAudioSessionCategoryPlayAndRecord, *const AVAudioSessionModeDefault;
-extern NSNotificationName const AVAudioSessionInterruptionNotification, AVAudioSessionMediaServicesWereLostNotification, AVAudioSessionMediaServicesWereResetNotification, AVAudioSessionRouteChangeNotification;
+extern NSNotificationName const AVAudioSessionInterruptionNotification, AVAudioSessionMediaServicesWereLostNotification, AVAudioSessionMediaServicesWereResetNotification, AVAudioSessionRouteChangeNotification, AVAudioSessionSilenceSecondaryAudioHintNotification;
 extern NSString *const AVAudioSessionInterruptionTypeKey, *const AVAudioSessionInterruptionOptionKey;
 @interface AVAudioSession : NSObject
 + (instancetype)sharedInstance;
@@ -13,6 +13,7 @@ extern NSString *const AVAudioSessionInterruptionTypeKey, *const AVAudioSessionI
 @property(nonatomic) AVAudioSessionCategoryOptions categoryOptions;
 @property(nonatomic) AVAudioSessionRouteSharingPolicy routeSharingPolicy;
 @property(nonatomic) BOOL active;
+@property(nonatomic) BOOL secondaryAudioShouldBeSilencedHint;
 @property(nonatomic) BOOL failCategory, failActivation, failDeactivation, throwCategory;
 @property(nonatomic) NSUInteger configurations, activations, deactivations;
 @property(nonatomic, copy) dispatch_block_t activationAction;
@@ -30,12 +31,18 @@ extern NSString *const AVAudioSessionInterruptionTypeKey, *const AVAudioSessionI
 - (void)audioPlayerDecodeErrorDidOccur:(AVAudioPlayer *)player error:(NSError *)error;
 @end
 extern NSUInteger CSTestPlayerCreates, CSTestPlayerStarts, CSTestPlayerStops, CSTestPlayersAlive;
-extern BOOL CSTestFailPlayerCreation, CSTestFailPlayerPlay;
+extern BOOL CSTestFailPlayerCreation, CSTestFailPlayerPreparation, CSTestFailPlayerPlay, CSTestBlankResourceAvailable;
+extern NSURL *CSTestLastPlayerURL;
+extern __weak AVAudioPlayer *CSTestLastPlayer;
+void CSTestInstallBlankBundle(void);
 @interface AVAudioPlayer : NSObject
 @property(nonatomic, weak) id<AVAudioPlayerDelegate> delegate;
 @property(nonatomic) NSInteger numberOfLoops;
+@property(nonatomic) float volume;
 @property(nonatomic, getter=isPlaying) BOOL playing;
-- (instancetype)initWithData:(NSData *)data error:(NSError **)error;
+- (instancetype)initWithContentsOfURL:(NSURL *)url error:(NSError **)error;
+- (BOOL)prepareToPlay;
 - (BOOL)play;
 - (void)stop;
+- (void)finishSuccessfully:(BOOL)flag;
 @end

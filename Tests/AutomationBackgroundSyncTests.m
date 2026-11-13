@@ -58,11 +58,16 @@
 @end
 
 static void SyncAdvance(NSTimeInterval seconds) {uptime+=seconds;wall+=seconds;}
-static void SyncConfigure(CSAutomationManager *manager,BOOL backEnabled,BOOL replyEnabled,NSUInteger delay) {
+static void SyncConfigureRules(CSAutomationManager *manager,BOOL backEnabled,BOOL replyEnabled,NSUInteger delay,NSNumber *fallback) {
     NSMutableDictionary *back=Module(manager,@"patBack"),*reply=Module(manager,@"patReply");
     [back addEntriesFromDictionary:@{@"enabled":@(backEnabled),@"friends":@[@"bob"],@"groups":@[@"room@chatroom"],@"delay":@(delay),@"revoke":@NO}];
     [reply addEntriesFromDictionary:@{@"enabled":@(replyEnabled),@"friends":@[@"bob"],@"groups":@[@"room@chatroom"],@"delay":@(delay),@"contents":@[@"pat answer"],@"mention":@YES}];
-    Save(manager,@{@"patBack":back,@"patReply":reply});
+    NSMutableDictionary *changes=[@{@"patBack":back,@"patReply":reply} mutableCopy];
+    if(fallback)changes[@"patBackgroundFallback"]=fallback;
+    Save(manager,changes);
+}
+static void SyncConfigure(CSAutomationManager *manager,BOOL backEnabled,BOOL replyEnabled,NSUInteger delay) {
+    SyncConfigureRules(manager,backEnabled,replyEnabled,delay,@YES);
 }
 static void SyncEnterBackground(CSAutomationManager *manager) {
     UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;
@@ -82,7 +87,31 @@ int main(int argc,const char **argv) {@autoreleasepool {
     CHECK(CSMessageNativeSupports(service,@"BackGroundFetchToSync",@"B",@[]));
     TestSyncEnvironment *environment=[TestSyncEnvironment new];environment.sync=service;
     AutomationTestManager *manager=[AutomationTestManager new];[manager setValue:environment forKey:@"environment"];
-    [manager start];Wait(^BOOL{return manager.ready;});SyncConfigure(manager,YES,NO,2);
+    [manager start];Wait(^BOOL{return manager.ready;});
+    CHECK([manager.configuration[@"patBackgroundFallback"] isEqual:@NO]);
+    // Enabling both actions leaves the separate fallback at its default off.
+    SyncConfigureRules(manager,YES,YES,0,nil);SyncEnterBackground(manager);
+    CHECK(![manager.configuration[@"patBackgroundFallback"] boolValue]);
+    CHECK(![manager backgroundSyncEligible] && [manager valueForKey:@"backgroundSyncTimer"]==nil);
+    for(NSUInteger i=0;i<3;i++){
+        SyncAdvance(10);[manager backgroundSyncTick];[manager refreshBackgroundSync];
+        [NSNotificationCenter.defaultCenter postNotificationName:UIApplicationDidEnterBackgroundNotification object:nil];
+        [NSNotificationCenter.defaultCenter postNotificationName:UIApplicationProtectedDataDidBecomeAvailable object:nil];Drain();
+        CHECK(service.requests==0 && service.getters==0 && [manager valueForKey:@"backgroundSyncTimer"]==nil);
+    }
+    // Inject an already arrived native event at the manager boundary. Raw hook
+    // normalization is covered by AutomationPatIngressTests, independently of pulls.
+    NSMutableDictionary *nativeEvent=Event(80001,YES,NO,NO);NSTimeInterval arrivedAt=uptime;
+    [manager receivePat:nativeEvent conversation:@"room@chatroom" epoch:epoch];
+    Wait(^BOOL{return sendCount==1 && patCount==1;});
+    CHECK(uptime==arrivedAt && !protectedAvailable && Pending(manager)==0 && service.requests==0);
+    [manager receivePat:nativeEvent conversation:@"room@chatroom" epoch:epoch];Drain();
+    CHECK(sendCount==1 && patCount==1 && Pending(manager)==0 && [manager valueForKey:@"backgroundSyncTimer"]==nil);
+    printf("Fallback defaults off: both pat actions stay enabled; locked/background lifecycle creates no sync timer/request; delay=0 event submits once without advancing clock\n");
+
+    UIApplication.sharedApplication.applicationState=UIApplicationStateActive;
+    [NSNotificationCenter.defaultCenter postNotificationName:UIApplicationDidBecomeActiveNotification object:nil];
+    SyncConfigure(manager,YES,NO,2);
     CHECK(![manager backgroundSyncEligible] && service.requests==0);
     // Contact refresh may itself require synchronization. It cannot prevent pull.
     contactsAvailable=NO;SyncEnterBackground(manager);
@@ -206,6 +235,22 @@ int main(int argc,const char **argv) {@autoreleasepool {
     [manager receivePat:pulledEvent conversation:@"room@chatroom" epoch:epoch];Drain();
     CHECK(sendCount==textBefore+1 && patCount==patBefore+1 && Pending(manager)==0);
     printf("delay=0 injected event: two durable claims, one text and one pat without advancing clock; duplicate suppressed\n");
+
+    // Switching only the fallback off cancels its real source. A queued/manual
+    // late tick cannot pull or rearm it, while the two action modules stay enabled.
+    dispatch_source_t cancelledTimer=[manager valueForKey:@"backgroundSyncTimer"];
+    CHECK(cancelledTimer!=nil);NSUInteger timerGeneration=[[manager valueForKey:@"backgroundSyncGeneration"] unsignedIntegerValue];
+    previous=service.requests;Save(manager,@{@"patBackgroundFallback":@NO});
+    CHECK([manager.configuration[@"patBack"][@"enabled"] boolValue] && [manager.configuration[@"patReply"][@"enabled"] boolValue]);
+    CHECK(![manager backgroundSyncEligible] && [manager valueForKey:@"backgroundSyncTimer"]==nil && dispatch_source_testcancel(cancelledTimer));
+    CHECK([[manager valueForKey:@"backgroundSyncGeneration"] unsignedIntegerValue]>timerGeneration);
+    SyncAdvance(20);[manager backgroundSyncTick];[manager refreshBackgroundSync];Drain();
+    CHECK(service.requests==previous && [manager valueForKey:@"backgroundSyncTimer"]==nil);
+    Save(manager,@{@"patBackgroundFallback":@YES});
+    CHECK([manager backgroundSyncEligible] && [manager valueForKey:@"backgroundSyncTimer"]!=nil);
+    [manager backgroundSyncTick];Wait(^BOOL{return service.requests==previous+1;});
+    [manager backgroundSyncTick];CHECK(service.requests==previous+1);
+    printf("Runtime fallback toggle: off cancels source and rejects late ticks; on restores one budgeted request without changing either pat action\n");
 
     // The AI caller keeps its default 45s interval on this real shared budget.
     // No AI manager/config is linked; this observes the unchanged API policy.

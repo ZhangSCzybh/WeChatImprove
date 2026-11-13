@@ -145,6 +145,7 @@ static NSString *AdmissionKey(NSString *action,NSString *identifier) {return [NS
     @try {
     if(!NSThread.isMainThread || self.enteringForeground || UIApplication.sharedApplication.applicationState!=UIApplicationStateBackground || !self.ready || self.loading || self.saving)return NO;
     NSDictionary *configuration=self.configuration;
+    if(![configuration[@"patBackgroundFallback"] boolValue])return NO;
     for(NSString *module in @[@"patBack",@"patReply"]){
         NSDictionary *item=configuration[module];
         if([item[@"enabled"] boolValue] && ([item[@"groups"] count] || [item[@"friends"] count]) && (![module isEqual:@"patReply"] || [item[@"contents"] count]))return YES;

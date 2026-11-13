@@ -61,8 +61,10 @@ static BOOL CSContacts(id value) {
     dispatch_once(&once, ^{
         // Every row is an exact domain/key identity. Do not replace this with prefix matching.
         NSArray *rows=@[
+            // Preserve the legacy backup value without treating it as the new check cadence.
             @[@"legacy",@"BackgroundInterval",@"background",@"number",@"global",@""],
             @[@"legacy",@"BackgroundRunEnabled",@"background",@"bool",@"global",@""],
+            @[@"legacy",@"BackgroundRunCheckInterval",@"background",@"number",@"global",@""],
             @[@"standard",@"GameCheat_Enabled",@"games",@"bool",@"global",@""],
             @[@"standard",@"WCTimeLineMessageTailEnabled",@"timeline",@"bool",@"global",@""],
             @[@"standard",@"WCTimeLineMessageTailText",@"timeline",@"string",@"global",@""],
@@ -422,7 +424,11 @@ static BOOL CSContacts(id value) {
     NSString *type=registered[@"type"], *key=registered[@"key"];
     if (valid) {
         if ([type isEqual:@"bool"]) valid=CSBoolean(value);
-        else if ([type isEqual:@"number"]) valid=CSNumber(value);
+        else if ([type isEqual:@"number"]) {
+            valid=CSNumber(value);
+            if (valid && [registered[@"domain"] isEqual:@"legacy"] && [key isEqual:@"BackgroundRunCheckInterval"])
+                valid=[value doubleValue]>=10 && [value doubleValue]<=30 && floor([value doubleValue])==[value doubleValue];
+        }
         else if ([type isEqual:@"string"]) valid=[value isKindOfClass:NSString.class] && [value length]<=1048576;
         // Existing UIColor archives are opaque data: never instantiate archive classes from a backup.
         else if ([type isEqual:@"data"]) valid=[value isKindOfClass:NSData.class] && [value length]>0 && [value length]<=1048576;

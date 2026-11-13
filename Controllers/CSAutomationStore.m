@@ -88,10 +88,13 @@ NSDictionary *CSAutomationDefaultConfiguration(void){
     [pat addEntriesFromDictionary:@{@"contents":@[],@"mention":@NO}];[mention addEntriesFromDictionary:@{@"contents":@[],@"mention":@NO}];
     [mention removeObjectForKey:@"friends"];
     [keyword addEntriesFromDictionary:@{@"quote":@YES,@"own":@NO,@"others":@YES,@"rules":@[]}];
-    return @{@"schemaVersion":@1,@"patBack":back,@"patReply":pat,@"mentionReply":mention,@"keywordReply":keyword};
+    return @{@"schemaVersion":@1,@"patBackgroundFallback":@NO,@"patBack":back,@"patReply":pat,@"mentionReply":mention,@"keywordReply":keyword};
 }
 BOOL CSAutomationValidateConfiguration(id configuration){
-    if(![configuration isKindOfClass:NSDictionary.class] || [configuration count]!=5 || ![configuration[@"schemaVersion"] isEqual:@1])return NO;
+    if(![configuration isKindOfClass:NSDictionary.class] || ![configuration[@"schemaVersion"] isEqual:@1])return NO;
+    id fallback=configuration[@"patBackgroundFallback"];
+    if([configuration count]!=(fallback?6UL:5UL) || (fallback && !Switch(fallback)))return NO;
+    for(id key in configuration)if(![@[@"schemaVersion",@"patBackgroundFallback",@"patBack",@"patReply",@"mentionReply",@"keywordReply"] containsObject:key])return NO;
     for(NSString *name in @[@"patBack",@"patReply",@"mentionReply",@"keywordReply"]){
         id module=configuration[name];if(![module isKindOfClass:NSDictionary.class] || !Switch(module[@"enabled"]) || !Integer(module[@"delay"],0,300))return NO;
         BOOL mention=[name isEqual:@"mentionReply"],legacyFriends=mention && module[@"friends"]!=nil;
@@ -109,7 +112,9 @@ BOOL CSAutomationValidateConfiguration(id configuration){
 NSDictionary *CSAutomationNormalizeConfiguration(id configuration){
     if(!CSAutomationValidateConfiguration(configuration))return nil;
     NSMutableDictionary *result=[configuration mutableCopy],*mention=[configuration[@"mentionReply"] mutableCopy];
-    [mention removeObjectForKey:@"friends"];result[@"mentionReply"]=[mention copy];return [result copy];
+    [mention removeObjectForKey:@"friends"];result[@"mentionReply"]=[mention copy];
+    result[@"patBackgroundFallback"]=configuration[@"patBackgroundFallback"]?:@NO;
+    return [result copy];
 }
 BOOL CSAutomationValidateState(id state,NSString *account,NSError **error){
     BOOL valid=Identifier(account,NO) && [state isKindOfClass:NSDictionary.class] && [state count]==3 && [state[@"schema"] isEqual:@1] && [state[@"account"] isEqual:account] && CSAutomationValidateConfiguration(state[@"configuration"]);

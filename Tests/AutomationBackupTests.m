@@ -13,8 +13,9 @@ static CSBackupEngine *Engine(NSURL *root,NSString *suite) {
         store:[[CSBackupStore alloc]initWithRoot:[root URLByAppendingPathComponent:@"backup"]] resources:[root URLByAppendingPathComponent:@"resources"]];
     engine.context=^{return @{@"account":@"alice",@"epoch":@1,@"installationID":@"automation-backup-install",@"pluginVersion":@"2.4-3"};};return engine;
 }
-static NSDictionary *State(NSString *account,NSString *text) {
+static NSDictionary *State(NSString *account,NSString *text,BOOL fallback) {
     NSMutableDictionary *configuration=[CSAutomationDefaultConfiguration() mutableCopy];
+    configuration[@"patBackgroundFallback"]=@(fallback);
     for(NSString *module in @[@"patBack",@"patReply",@"mentionReply",@"keywordReply"]){
         NSMutableDictionary *value=[configuration[module] mutableCopy];
         [value addEntriesFromDictionary:@{@"enabled":@YES,@"groups":@[@"101@chatroom"],@"delay":@7}];
@@ -49,7 +50,7 @@ int main(int argc,char **argv) { @autoreleasepool {
     NSString *suite=[@"automation.backup." stringByAppendingString:NSUUID.UUID.UUIDString];
     CSBackupEngine *engine=Engine(root,suite);NSUserDefaults *defaults=[[NSUserDefaults alloc]initWithSuiteName:suite];
     NSURL *aliceURL=CSAutomationFileURL(engine.resourceRoot,@"alice"),*bobURL=CSAutomationFileURL(engine.resourceRoot,@"bob");
-    NSDictionary *original=State(@"alice",@"欢迎@昵称加入@群昵称"),*changed=State(@"alice",@"变更后的欢迎@昵称"),*bob=State(@"bob",@"bob的配置");
+    NSDictionary *original=State(@"alice",@"欢迎@昵称加入@群昵称",YES),*changed=State(@"alice",@"变更后的欢迎@昵称",NO),*bob=State(@"bob",@"bob的配置",NO);
     NSError *error=nil;
     Check(CSAutomationWriteState(original,aliceURL,@"alice",&error),@"write current account fixture");
     Check(CSAutomationWriteState(bob,bobURL,@"bob",&error),@"write other account fixture");
@@ -63,25 +64,31 @@ int main(int argc,char **argv) { @autoreleasepool {
     [defaults setObject:@"host secret" forKey:@"host.account"];
     NSDictionary *snapshot=[engine save:@"自动功能配置" error:&error];Check(snapshot!=nil,error.description?:@"capture");
     Check([Field(snapshot)[@"value"] isEqual:original],@"snapshot preserves exact configuration");
-    Check([Field(snapshot)[@"value"] count]==3 && [Field(snapshot)[@"value"][@"configuration"] count]==5,@"snapshot contains portable configuration only");
+    Check([Field(snapshot)[@"value"] count]==3 && [Field(snapshot)[@"value"][@"configuration"] count]==6,@"snapshot contains portable configuration only");
     Check([CSBackupRegistry entryForDomain:@"automation.runtime" key:@"alice"]==nil,@"runtime ledger has no portable registry domain");
     Check([snapshot[@"source"][@"account"] isEqual:@"alice"],@"source account preserved");
     Check([CSBackupRegistry.moduleTitles[@"automation"] isEqual:@"自动功能"],@"registered module label");
     Check([[CSBackupRegistry entryForDomain:CSAutomationBackupDomain key:@"alice"][@"scope"] isEqual:@"account"],@"account scoped registry");
     Check([CSBackupRegistry entryForDomain:CSAutomationBackupDomain key:@"../alice"]==nil,@"invalid account path rejected");
     Check([CSBackupCodec decode:[CSBackupCodec encode:snapshot error:&error] error:&error]!=nil,@"portable codec round trip");
+    NSDictionary *decoded=[CSBackupCodec decode:[CSBackupCodec encode:snapshot error:&error] error:&error];
+    Check([Field(decoded)[@"value"][@"configuration"][@"patBackgroundFallback"] isEqual:@YES],@"portable export/import preserves the enabled fallback switch");
+    Check([CSAutomationReadState(bobURL,@"bob",NULL)[@"configuration"][@"patBackgroundFallback"] isEqual:@NO],@"the other account retains its independent disabled fallback switch");
     NSSet *modules=[NSSet setWithObject:@"automation"],*accounts=[NSSet setWithObject:@"alice"];
     Check(CSAutomationWriteState(changed,aliceURL,@"alice",&error),@"edit fixture after snapshot");
     // A real 2.5-1 portable field contains the retired mention friends key.
     // Import it through preview/apply rather than normalizing the fixture first.
     NSMutableDictionary *legacyState=[original mutableCopy],*legacyConfig=[original[@"configuration"] mutableCopy],*legacyMention=[legacyConfig[@"mentionReply"] mutableCopy];
+    [legacyConfig removeObjectForKey:@"patBackgroundFallback"];
     legacyMention[@"friends"]=@[@"retired-private-selection"];legacyConfig[@"mentionReply"]=legacyMention;legacyState[@"configuration"]=legacyConfig;
     Check([CSBackupRegistry validateValue:legacyState entry:[CSBackupRegistry entryForDomain:CSAutomationBackupDomain key:@"alice"] error:&error],@"2.5-1 automation field remains a valid backup import");
     NSMutableDictionary *legacySnapshot=[snapshot mutableCopy];NSMutableArray *legacyFields=[NSMutableArray array];
     for(NSDictionary *field in snapshot[@"fields"]){NSMutableDictionary *replacement=[field mutableCopy];if([field[@"domain"] isEqual:CSAutomationBackupDomain])replacement[@"value"]=legacyState;[legacyFields addObject:replacement];}legacySnapshot[@"fields"]=legacyFields;
+    NSMutableDictionary *canonicalLegacy=[legacyState mutableCopy];canonicalLegacy[@"configuration"]=CSAutomationNormalizeConfiguration(legacyConfig);NSDictionary *restoredLegacy=Disabled(canonicalLegacy);
     NSDictionary *preview=[engine preview:legacySnapshot modules:modules accounts:accounts error:&error];Check(preview!=nil,error.description?:@"preview");
     Check([preview[@"changes"] count]==1,@"one module configuration change");
-    Check([preview[@"fields"][0][@"value"] isEqual:Disabled(original)],@"restore disables all four modules and preserves rule data/account");
+    Check([preview[@"fields"][0][@"value"] isEqual:restoredLegacy],@"restore disables all four modules and preserves rule data/account");
+    Check([preview[@"fields"][0][@"value"][@"configuration"][@"patBackgroundFallback"] isEqual:@NO] && legacyConfig.count==5,@"five-field legacy import defaults fallback off without changing the imported source");
     Check(preview[@"fields"][0][@"value"][@"configuration"][@"mentionReply"][@"friends"]==nil && [preview[@"fields"][0][@"value"][@"configuration"][@"mentionReply"][@"groups"] isEqual:original[@"configuration"][@"mentionReply"][@"groups"]],@"legacy preview drops only mention private selection and preserves group list");
     Check([[preview[@"warnings"] componentsJoinedByString:@" "] containsString:@"四个模块开关均关闭"],@"preview explains disabled restored modules");
     Check([engine prepare:preview error:&error],error.description?:@"prepare");
@@ -90,7 +97,7 @@ int main(int argc,char **argv) { @autoreleasepool {
     Complete(engine);
     [NSRunLoop.currentRunLoop runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.02]];
     Check(restoreNotifications>0 && notificationsOnMain,@"verified restore posts manager invalidation on main");
-    Check([CSAutomationReadState(aliceURL,@"alice",&error) isEqual:Disabled(original)],@"same account restored with switches disabled");
+    Check([CSAutomationReadState(aliceURL,@"alice",&error) isEqual:restoredLegacy],@"same account legacy configuration restored with module switches and fallback disabled");
     Check([[NSData dataWithContentsOfURL:bobURL] isEqual:bobBytes],@"other account bytes preserved");
     Check([[defaults objectForKey:@"host.account"] isEqual:@"host secret"],@"wechat account defaults preserved");
     Check([[NSData dataWithContentsOfURL:runtimeURL] isEqual:runtimeBytes],@"restore does not overwrite or clear local ownership ledger");
@@ -106,6 +113,7 @@ int main(int argc,char **argv) { @autoreleasepool {
     empty=[engine preview:snapshot modules:modules accounts:[NSSet setWithObject:@"alice"] error:&error];
     Check(!empty && [[NSData dataWithContentsOfURL:bobURL] isEqual:bobBytes],@"different current account never gets config reassigned");
     engine.context=^{return @{@"account":@"alice",@"epoch":@3,@"installationID":@"automation-backup-install",@"pluginVersion":@"2.4-3"};};
+    for(id value in @[@2,@"YES",NSNull.null]){NSMutableDictionary *badConfig=[original[@"configuration"] mutableCopy],*badState=[original mutableCopy];badConfig[@"patBackgroundFallback"]=value;badState[@"configuration"]=badConfig;Check(![CSBackupRegistry validateValue:badState entry:[CSBackupRegistry entryForDomain:CSAutomationBackupDomain key:@"alice"] error:&error],@"portable imports reject invalid fallback values");}
     NSMutableDictionary *invalid=[original mutableCopy];invalid[@"account"]=@"bob";
     Check(![CSBackupRegistry validateValue:invalid entry:[CSBackupRegistry entryForDomain:CSAutomationBackupDomain key:@"alice"] error:&error],@"mismatched state owner rejected");
     invalid=[original mutableCopy];invalid[@"pendingActions"]=@[@"historical event"];
@@ -127,12 +135,24 @@ int main(int argc,char **argv) { @autoreleasepool {
     empty=[engine preview:older modules:modules accounts:accounts error:&error];Check(!empty && [CSAutomationReadState(aliceURL,@"alice",NULL) isEqual:newest],@"older backup leaves new module untouched");
     // A crash after the native module file write is repaired from its original account before-image.
     preview=[engine preview:snapshot modules:modules accounts:accounts error:&error];Check([engine prepare:preview error:&error],error.description?:@"prepare crash fixture");
+    // An interrupted journal written by an older build still contains the five-field root.
+    NSMutableDictionary *oldJournal=[[engine.store journal:&error] mutableCopy];NSMutableArray *oldBefore=[NSMutableArray array];
+    for(NSDictionary *field in oldJournal[@"before"]){
+        NSMutableDictionary *before=[field mutableCopy];
+        if([field[@"domain"] isEqual:CSAutomationBackupDomain]){
+            NSMutableDictionary *oldState=[field[@"value"] mutableCopy],*oldConfig=[oldState[@"configuration"] mutableCopy],*oldMention=[oldConfig[@"mentionReply"] mutableCopy];
+            [oldConfig removeObjectForKey:@"patBackgroundFallback"];oldMention[@"friends"]=@[@"retired-private-selection"];oldConfig[@"mentionReply"]=oldMention;oldState[@"configuration"]=oldConfig;before[@"value"]=oldState;
+            Check(oldConfig.count==5 && [CSBackupRegistry validateValue:oldState entry:[CSBackupRegistry entryForDomain:CSAutomationBackupDomain key:@"alice"] error:&error],@"legacy five-field journal before-image remains valid");
+        }
+        [oldBefore addObject:before];
+    }
+    oldJournal[@"before"]=oldBefore;Check([engine.store writeJournal:oldJournal error:&error],@"persist legacy journal before-image for crash recovery");
     NSTask *child=[NSTask new];child.executableURL=[NSURL fileURLWithPath:@(argv[0])];child.arguments=@[@"crash",root.path,suite];
     Check([child launchAndReturnError:&error],@"start crash fixture");[child waitUntilExit];Check(child.terminationStatus==77,@"crashed at module write boundary");
     Check([CSAutomationReadState(aliceURL,@"alice",NULL) isEqual:Disabled(original)],@"crash occurred after replacement");
     engine.context=^{return @{@"account":@"bob",@"epoch":@4,@"installationID":@"automation-backup-install",@"pluginVersion":@"2.4-3"};};
     Check([engine applyPending:&error],error.description?:@"recover interrupted write");
-    Check([CSAutomationReadState(aliceURL,@"alice",NULL) isEqual:newest],@"rollback restores journal original alice file while bob active");
+    Check([CSAutomationReadState(aliceURL,@"alice",NULL) isEqual:newest],@"rollback normalizes the legacy before-image and restores alice with fallback off while bob active");
     Check([[NSData dataWithContentsOfURL:bobURL] isEqual:bobBytes],@"rollback never touches active bob config");
     Check([engine.store archiveJournal:&error],@"archive rolled back journal");
     engine.context=^{return @{@"account":@"alice",@"epoch":@5,@"installationID":@"automation-backup-install",@"pluginVersion":@"2.4-3"};};
@@ -145,6 +165,7 @@ int main(int argc,char **argv) { @autoreleasepool {
     Check([[defaults objectForKey:@"host.account"] isEqual:@"host secret"],@"reset preserves host preferences");
     preview=[engine preview:snapshot modules:modules accounts:accounts error:&error];Check([engine prepare:preview error:&error],@"restore after missing current account file");Complete(engine);
     Check([CSAutomationReadState(aliceURL,@"alice",NULL) isEqual:Disabled(original)],@"restored after reset");
+    Check([CSAutomationReadState(aliceURL,@"alice",NULL)[@"configuration"][@"patBackgroundFallback"] isEqual:@YES] && [CSAutomationReadState(bobURL,@"bob",NULL)[@"configuration"][@"patBackgroundFallback"] isEqual:@NO],@"new configuration restore preserves the switch value and account isolation while modules stay off");
     Check([ledger hasIdentifiers:@[@"alice|historical-local-action"] action:@"patBack"],@"historical action remains owned after reset and restore");
     [NSNotificationCenter.defaultCenter removeObserver:observer];
     [defaults removePersistentDomainForName:suite];[NSFileManager.defaultManager removeItemAtURL:root error:NULL];

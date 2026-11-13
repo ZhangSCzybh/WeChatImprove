@@ -5,6 +5,7 @@
 NS_ASSUME_NONNULL_BEGIN
 extern NSString *const CSBackgroundRunDefaultsSuite;
 extern NSString *const CSBackgroundRunEnabledKey;
+extern NSString *const CSBackgroundRunCheckIntervalKey;
 extern NSNotificationName const CSBackgroundRunSettingsChangedNotification;
 extern NSNotificationName const CSBackgroundRunStateChangedNotification;
 
@@ -17,10 +18,10 @@ extern NSNotificationName const CSBackgroundRunStateChangedNotification;
 // Main-thread request from the current group configuration. This does not change the global setting.
 - (void)setGroupChatBackgroundRequested:(BOOL)requested;
 @property(nonatomic, readonly) BOOL enabled;
+@property(nonatomic, readonly) NSTimeInterval checkInterval;
 @property(nonatomic, readonly) BOOL backgroundAudioActive;
 // A current execution opportunity, not a guarantee against system suspension.
 @property(nonatomic, readonly) BOOL canAttemptBackgroundWork;
-@property(nonatomic, readonly) BOOL canAttemptGroupChatBackgroundWork;
 @property(nonatomic, readonly) BOOL supportsBackgroundAudio;
 @property(nonatomic, copy, readonly) NSString *statusText;
 @property(nonatomic, copy, readonly) NSString *lastBackgroundResult;

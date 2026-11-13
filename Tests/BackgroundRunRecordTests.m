@@ -37,6 +37,7 @@ static void Create(NSTimeInterval remaining,BOOL alreadyBackground) {
 }
 
 int main(void) { @autoreleasepool {
+    CSTestInstallBlankBundle();
     NSString *suite=[@"background-record-tests-" stringByAppendingString:NSUUID.UUID.UUIDString];
     defaults=[[NSUserDefaults alloc] initWithSuiteName:suite];
 
@@ -55,7 +56,10 @@ int main(void) { @autoreleasepool {
     CHECK([manager.lastBackgroundCheckStatus isEqual:taskStatus]);
     __block NSUInteger stateNotifications=0;
     id stateObserver=[NSNotificationCenter.defaultCenter addObserverForName:CSBackgroundRunStateChangedNotification object:manager queue:nil usingBlock:^(NSNotification *note) { stateNotifications++; }];
-    [runtime advanceBy:26];
+    [runtime advanceBy:1.5];
+    CHECK(SameDate(manager.lastBackgroundCheckedAt,runtime.currentDate));
+    CHECK(stateNotifications==0);
+    [runtime advanceBy:23.5];
     CHECK(SameDate(manager.lastBackgroundCheckedAt,runtime.currentDate));
     CHECK([manager.lastBackgroundCheckStatus isEqual:taskStatus]);
     CHECK(SameDate(manager.lastBackgroundStartedAt,entry));
@@ -97,9 +101,9 @@ int main(void) { @autoreleasepool {
 
     // Disabling records a stop, while re-enabling during the same background
     // stay starts another actual check without inventing a new entry timestamp.
-    Create(120,NO); Background(); entry=manager.lastBackgroundStartedAt; checked=manager.lastBackgroundCheckedAt;
+    Create(120,NO); Background(); entry=manager.lastBackgroundStartedAt;
     CSTestBackgroundCheck *stale=runtime.checks.lastObject;
-    [runtime advanceBy:5]; Enable(NO);
+    [runtime advanceBy:5]; checked=manager.lastBackgroundCheckedAt; Enable(NO);
     CHECK(SameDate(manager.lastBackgroundStoppedAt,runtime.currentDate) && [manager.lastBackgroundStopReason containsString:@"关"]);
     CHECK(SameDate(manager.lastBackgroundCheckedAt,checked));
     [runtime advanceBy:2]; Enable(YES);
@@ -119,7 +123,7 @@ int main(void) { @autoreleasepool {
     CHECK(SameDate(manager.lastBackgroundStartedAt,entry) && manager.lastBackgroundStartObserved);
     CHECK(!manager.lastForegroundReturnedAt && !manager.lastBackgroundStoppedAt);
     CHECK(manager.lastCheckToForegroundInterval==-1);
-    [runtime advanceBy:2]; [stale fireEvenIfCancelled]; [oldTask expire];
+    [runtime advanceBy:1]; [stale fireEvenIfCancelled]; [oldTask expire];
     CHECK(SameDate(manager.lastBackgroundStartedAt,entry) && SameDate(manager.lastBackgroundCheckedAt,checked));
     CHECK(!manager.lastBackgroundStoppedAt && manager.canAttemptBackgroundWork);
     Foreground();
@@ -128,14 +132,14 @@ int main(void) { @autoreleasepool {
     Create(120,YES);
     CHECK(SameDate(manager.lastBackgroundStartedAt,runtime.currentDate) && !manager.lastBackgroundStartObserved);
     CHECK(SameDate(manager.lastBackgroundCheckedAt,runtime.currentDate));
-    [runtime advanceBy:3]; Foreground(); CHECK(fabs(manager.lastCheckToForegroundInterval-3)<.000001);
+    [runtime advanceBy:3]; Foreground(); CHECK(fabs(manager.lastCheckToForegroundInterval-1.5)<.000001);
     [runtime advanceBy:2]; Background();
     CHECK(SameDate(manager.lastBackgroundStartedAt,runtime.currentDate) && manager.lastBackgroundStartObserved);
     Foreground();
 
     // Display timestamps follow wall-clock changes. The diagnostic interval
     // follows monotonic time, including when the wall clock moves backwards.
-    Create(120,NO); Background(); [runtime advanceBy:26]; checked=manager.lastBackgroundCheckedAt;
+    Create(120,NO); Background(); [runtime advanceBy:25]; checked=manager.lastBackgroundCheckedAt;
     runtime.currentDate=[runtime.currentDate dateByAddingTimeInterval:-3600];
     [runtime advanceBy:5]; Foreground();
     CHECK([manager.lastForegroundReturnedAt compare:checked]==NSOrderedAscending);
@@ -148,7 +152,12 @@ int main(void) { @autoreleasepool {
     AVAudioSession.sharedInstance.activationAction=^{
         runtime.uptime+=2; runtime.currentDate=[runtime.currentDate dateByAddingTimeInterval:2]; Foreground();
     };
-    Background(); returned=runtime.currentDate;
+    Background();
+    // Deliver at the first deadline directly so the activation's simulated
+    // synchronous two-second work is not rewound by advanceBy:'s target clock.
+    NSTimeInterval delay=runtime.checks.lastObject.deadline-runtime.uptime;
+    runtime.uptime+=delay; runtime.currentDate=[runtime.currentDate dateByAddingTimeInterval:delay];
+    [runtime.checks.lastObject fireEvenIfCancelled]; returned=runtime.currentDate;
     CHECK(!manager.canAttemptBackgroundWork && !audio.playing && !runtime.liveTaskCount && !runtime.pendingCheckCount);
     CHECK(SameDate(manager.lastForegroundReturnedAt,returned));
     CHECK(!manager.lastBackgroundCheckedAt || [manager.lastBackgroundCheckedAt compare:returned]!=NSOrderedDescending);

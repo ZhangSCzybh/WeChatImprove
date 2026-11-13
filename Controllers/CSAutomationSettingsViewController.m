@@ -329,15 +329,20 @@ typedef void (^CSAutoCommit)(id value,void (^done)(BOOL success));
 - (void)dealloc { [NSNotificationCenter.defaultCenter removeObserver:self]; }
 - (void)viewWillAppear:(BOOL)animated { [super viewWillAppear:animated];[CSAutomationManager.sharedManager refresh];[self reloadSettings]; }
 - (void)changed:(NSNotification *)note { (void)note;dispatch_async(dispatch_get_main_queue(),^{CSNativeContactPickerRevalidate(self);[self reloadSettings];}); }
-- (void)saveModule:(NSString *)module changes:(NSDictionary *)changes context:(NSDictionary *)context completion:(void (^)(BOOL))completion {
+- (void)saveChanges:(NSDictionary *)changes context:(NSDictionary *)context completion:(void (^)(BOOL))completion {
     UIViewController *presenter=self.navigationController.topViewController?:self;
     if(self.saving || !CSAutoRequire(presenter,context)){if(completion)completion(NO);[self reloadSettings];return;}
-    NSMutableDictionary *value=[CSAutomationManager.sharedManager.configuration[module] mutableCopy];[value addEntriesFromDictionary:changes];
     self.saving=YES;[self reloadSettings];__weak typeof(self) weakSelf=self;
-    [CSAutomationManager.sharedManager updateConfiguration:@{module:value} completion:^(BOOL success,NSError *error){dispatch_async(dispatch_get_main_queue(),^{
+    [CSAutomationManager.sharedManager updateConfiguration:changes completion:^(BOOL success,NSError *error){dispatch_async(dispatch_get_main_queue(),^{
         typeof(self) page=weakSelf;if(!page){if(completion)completion(NO);return;}page.saving=NO;[page reloadSettings];
         if(!success)CSAutoAlert(page.navigationController.topViewController?:page,error.localizedDescription?:@"设置未保存，请稍后重试。");if(completion)completion(success);
     });}];
+}
+- (void)saveModule:(NSString *)module changes:(NSDictionary *)changes context:(NSDictionary *)context completion:(void (^)(BOOL))completion {
+    NSDictionary *current=CSAutomationManager.sharedManager.configuration[module];
+    if(![current isKindOfClass:NSDictionary.class]){if(completion)completion(NO);[self reloadSettings];return;}
+    NSMutableDictionary *value=[current mutableCopy];[value addEntriesFromDictionary:changes];
+    [self saveChanges:@{module:value} context:context completion:completion];
 }
 - (CSSettingItem *)toggle:(NSString *)title icon:(NSString *)icon module:(NSString *)module key:(NSString *)key {
     NSDictionary *config=CSAutomationManager.sharedManager.configuration[module];__weak typeof(self) weakSelf=self;
@@ -372,6 +377,11 @@ typedef void (^CSAutoCommit)(id value,void (^done)(BOOL success));
         }
         [sections addObject:[CSSettingSection sectionWithHeader:CSAutoTitles()[index] items:rows]];
     }
+    NSDictionary *context=CSAutoContext();
+    CSSettingItem *fallback=[CSSettingItem switchItemWithTitle:@"拍动后台兜底补拉" iconName:@"arrow.triangle.2.circlepath" iconColor:UIColor.systemGreenColor switchValue:[configuration[@"patBackgroundFallback"] boolValue] valueChangedBlock:^(BOOL on){
+        [weakSelf saveChanges:@{@"patBackgroundFallback":@(on)} context:context completion:nil];
+    }];
+    [sections addObject:[CSSettingSection sectionWithHeader:@"后台消息" items:@[fallback]]];
     self.sections=sections;[self.tableView reloadData];
 }
 - (BOOL)rowEnabled:(NSIndexPath *)path {
@@ -384,6 +394,7 @@ typedef void (^CSAutoCommit)(id value,void (^done)(BOOL success));
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
     (void)tableView;
     if(!CSAutomationManager.sharedManager.ready)return section==0?(CSAutomationManager.sharedManager.statusText.length?CSAutomationManager.sharedManager.statusText:@"当前账号尚未就绪，请稍后重试。"):nil;
+    if(section==(NSInteger)CSAutoModules().count)return @"默认关闭，同时用于拍我自动回拍和拍我自动回复。开启且拍动模块配置有效时，微信有后台执行机会且账号与授权可用，约每 10 秒尝试请求新消息；原生同步忙碌或暂不可用且尚未发出请求时，约 2 秒复查。关闭后仍处理微信原生收到的拍动，并遵守各模块的执行延迟。此开关按账号保存，不会自动开启后台运行；AI 的 45 秒后台兜底补拉由其自身开关控制。";
     NSArray *details=@[@"仅处理拍到自己的新拍一拍。撤回只针对本功能本次自动发出的回拍，从微信确认发送成功后开始计时，并受微信允许的撤回时间限制。",
         @"每次从本模块的回复内容中随机选一条。@ 仅在群聊生效；私聊发送普通回复。名单和延迟与其他模块独立。",
         @"识别群聊中真正 @ 当前账号的消息。每次随机回复一条；同一条消息同时命中关键词时，优先执行本模块。",

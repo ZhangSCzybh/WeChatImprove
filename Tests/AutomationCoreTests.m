@@ -203,6 +203,15 @@ int main(int argc,const char **argv){@autoreleasepool{
     Check(argc==2,@"isolated root argument");NSURL *root=[NSURL fileURLWithPath:@(argv[1])];
     TestRawPatXML();TestPatEventBoundaries();TestXMLParserBoundaries();TestXMLInputBoundaries();
     NSMutableDictionary *c=Config();Check(CSAutomationValidateConfiguration(c),@"valid default configuration");
+    Check(c.count==6 && [c[@"patBackgroundFallback"] isEqual:@NO],@"new account defaults include the disabled pat fallback switch");
+    NSMutableDictionary *oldConfiguration=Config();[oldConfiguration removeObjectForKey:@"patBackgroundFallback"];
+    Check(oldConfiguration.count==5 && CSAutomationValidateConfiguration(oldConfiguration),@"five-field pre-switch account configuration remains valid");
+    NSDictionary *upgraded=CSAutomationNormalizeConfiguration(oldConfiguration);
+    Check(upgraded.count==6 && [upgraded[@"patBackgroundFallback"] isEqual:@NO] && oldConfiguration[@"patBackgroundFallback"]==nil,@"old configuration normalizes fallback off without mutating its source");
+    for(NSNumber *value in @[@NO,@YES]){NSMutableDictionary *candidate=Config();candidate[@"patBackgroundFallback"]=value;Check(CSAutomationValidateConfiguration(candidate) && [CSAutomationNormalizeConfiguration(candidate)[@"patBackgroundFallback"] isEqual:value],@"both switch states survive validation and normalization");}
+    for(id value in @[@2,@(-1),@0.5,@"YES",@[],@{},NSNull.null]){NSMutableDictionary *candidate=Config();candidate[@"patBackgroundFallback"]=value;Check(!CSAutomationValidateConfiguration(candidate) && !CSAutomationNormalizeConfiguration(candidate),@"invalid pat fallback values cannot enter account configuration");}
+    NSMutableDictionary *unknownRoot=Config();unknownRoot[@"unsupported"]=@NO;Check(!CSAutomationValidateConfiguration(unknownRoot),@"unknown root fields are rejected");
+    [unknownRoot removeObjectForKey:@"patBackgroundFallback"];Check(!CSAutomationValidateConfiguration(unknownRoot),@"an unknown root field cannot replace the optional fallback key");
     Check(c[@"mentionReply"][@"friends"]==nil && [c[@"mentionReply"] count]==5,@"mention reply canonical configuration has groups only");
     for(NSString *name in @[@"patBack",@"patReply",@"mentionReply",@"keywordReply"]){Check(![c[name][@"enabled"] boolValue],@"modules default disabled");NSMutableDictionary *bad=Config();bad[name][@"delay"]=@301;Check(!CSAutomationValidateConfiguration(bad),@"delay range");bad[name][@"delay"]=@1.5;Check(!CSAutomationValidateConfiguration(bad),@"fractional delay");bad[name][@"delay"]=@0;Check(CSAutomationValidateConfiguration(bad),@"zero delay");bad[name][@"friends"]=@[@"room@chatroom"];Check(!CSAutomationValidateConfiguration(bad),@"separate friends/groups");}
     c[@"keywordReply"][@"rules"]=@[@{@"id":NSUUID.UUID.UUIDString,@"keyword":@"hello",@"match":@"exact",@"contents":@[@"world"]}];
@@ -217,11 +226,12 @@ int main(int argc,const char **argv){@autoreleasepool{
     Check(CSAutomationDecisions(c,Event(YES,NO),NO).count==1 && !CSAutomationDecisions(c,Event(NO,NO),NO).count,@"own/others independent");
     c[@"keywordReply"][@"others"]=@YES;c[@"mentionReply"][@"enabled"]=@YES;c[@"mentionReply"][@"groups"]=@[@"room@chatroom"];c[@"mentionReply"][@"contents"]=@[@"mention"];
     Check([CSAutomationDecisions(c,Event(NO,YES),NO).firstObject[@"module"] isEqual:@"mentionReply"],@"mention priority");Check([CSAutomationDecisions(c,Event(NO,NO),NO).firstObject[@"module"] isEqual:@"keywordReply"],@"no real mention falls through");
-    NSMutableDictionary *legacy=Config();legacy[@"mentionReply"][@"enabled"]=@YES;legacy[@"mentionReply"][@"friends"]=@[@"friend"];legacy[@"mentionReply"][@"groups"]=@[@"room@chatroom"];legacy[@"mentionReply"][@"contents"]=@[@"保留群回复"];legacy[@"mentionReply"][@"delay"]=@9;
+    NSMutableDictionary *legacy=Config();[legacy removeObjectForKey:@"patBackgroundFallback"];legacy[@"mentionReply"][@"enabled"]=@YES;legacy[@"mentionReply"][@"friends"]=@[@"friend"];legacy[@"mentionReply"][@"groups"]=@[@"room@chatroom"];legacy[@"mentionReply"][@"contents"]=@[@"保留群回复"];legacy[@"mentionReply"][@"delay"]=@9;
     Check(CSAutomationValidateConfiguration(legacy),@"valid 2.5-1 mention friends field remains importable");
     NSDictionary *normalized=CSAutomationNormalizeConfiguration(legacy);Check(normalized[@"mentionReply"][@"friends"]==nil && [normalized[@"mentionReply"][@"groups"] isEqual:legacy[@"mentionReply"][@"groups"]] && [normalized[@"mentionReply"][@"contents"] isEqual:legacy[@"mentionReply"][@"contents"]] && [normalized[@"mentionReply"][@"delay"] isEqual:@9],@"legacy normalization removes only mention friends and preserves group settings");
     for(NSString *module in @[@"patBack",@"patReply",@"keywordReply"])Check([normalized[module] isEqual:legacy[module]],@"legacy normalization preserves every other module");
     Check([legacy[@"mentionReply"][@"friends"] isEqual:@[@"friend"]],@"normalization leaves imported source unchanged");
+    Check([normalized[@"patBackgroundFallback"] isEqual:@NO] && legacy[@"patBackgroundFallback"]==nil,@"legacy mention migration also defaults the missing fallback off");
     NSDictionary *privateMention=@{@"conversation":@"friend",@"sender":@"friend",@"own":@NO,@"group":@NO,@"mentioned":@YES,@"text":@"hello"};
     Check(!CSAutomationDecisions(legacy,privateMention,NO).count,@"legacy private mention selection never creates a reply");
     Check([CSAutomationDecisions(legacy,Event(NO,YES),NO).firstObject[@"module"] isEqual:@"mentionReply"],@"legacy groups still reply to native mention");
@@ -230,8 +240,13 @@ int main(int argc,const char **argv){@autoreleasepool{
     rule[@"keyword"]=@"ell";rule[@"match"]=@"contains";Check(CSAutomationDecisions(c,Event(NO,NO),NO).count==1,@"contains matching");rule[@"match"]=@"exact";c[@"keywordReply"][@"rules"]=@[rule];Check(!CSAutomationDecisions(c,Event(NO,NO),NO).count,@"exact does not trim or fuzzy match");
     for(NSString *name in @[@"patBack",@"patReply"]){c[name][@"enabled"]=@YES;c[name][@"groups"]=@[@"room@chatroom"];}c[@"patReply"][@"contents"]=@[@"pat"];
     Check(CSAutomationDecisions(c,Event(NO,NO),YES).count==2,@"pat back and text independent");Check(!CSAutomationDecisions(c,Event(YES,NO),YES).count,@"self pat excluded");
+    NSArray *nativePatActions=CSAutomationDecisions(c,Event(NO,NO),YES);c[@"patBackgroundFallback"]=@YES;
+    Check([CSAutomationDecisions(c,Event(NO,NO),YES) isEqual:nativePatActions],@"fallback switch does not gate or alter native incoming pat actions");
     NSURL *url=CSAutomationFileURL(root,@"me");NSDictionary *state=@{@"schema":@1,@"account":@"me",@"configuration":c};NSError *error=nil;
     Check(CSAutomationWriteState(state,url,@"me",&error) && !error,@"durable config write");Check([CSAutomationReadState(url,@"me",&error) isEqual:state],@"read back exact configuration");Check(!CSAutomationReadState(url,@"other",&error) && error,@"wrong account rejected");Check(![CSAutomationFileURL(root,@"other") isEqual:url],@"account paths isolated");
+    NSURL *otherURL=CSAutomationFileURL(root,@"other");NSDictionary *otherState=@{@"schema":@1,@"account":@"other",@"configuration":CSAutomationDefaultConfiguration()};
+    Check(CSAutomationWriteState(otherState,otherURL,@"other",&error) && [CSAutomationReadState(otherURL,@"other",&error)[@"configuration"][@"patBackgroundFallback"] isEqual:@NO],@"another account keeps its own disabled fallback setting");
+    Check([CSAutomationReadState(url,@"me",&error)[@"configuration"][@"patBackgroundFallback"] isEqual:@YES],@"writing another account cannot change the enabled fallback setting");
     Check(ModeIs(url,0600) && ModeIs(url.URLByDeletingLastPathComponent,0700) && ModeIs([NSURL fileURLWithPath:[url.path stringByAppendingString:@".lock"]],0600),@"automation files and lock are private; directory is owner only");
     NSURL *legacyURL=CSAutomationFileURL(root,@"legacy");NSDictionary *legacyState=@{@"schema":@1,@"account":@"legacy",@"configuration":legacy};NSData *legacyBytes=[NSPropertyListSerialization dataWithPropertyList:legacyState format:NSPropertyListBinaryFormat_v1_0 options:0 error:NULL];
     Check([legacyBytes writeToURL:legacyURL atomically:YES],@"write raw pre-upgrade account fixture");chmod(legacyURL.fileSystemRepresentation,0644);chmod(legacyURL.URLByDeletingLastPathComponent.fileSystemRepresentation,0755);
