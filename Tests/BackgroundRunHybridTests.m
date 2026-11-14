@@ -101,6 +101,32 @@ int main(void) { @autoreleasepool {
     CHECK(fabs(NextDeadline()-entry-50)<.000001);
     Foreground(); NoResources(); CHECK(!AVAudioSession.sharedInstance.active);
 
+    // External audio keeps the same grace and periodic cadence. Its silence
+    // hints cannot stop a pulse or schedule extra recovery work between checks.
+    Create(YES,20); AVAudioSession.sharedInstance.secondaryAudioShouldBeSilencedHint=YES;
+    Background(); entry=runtime.uptime; [runtime advanceBy:1.5];
+    CHECK(audio.playing && manager.backgroundAudioActive && runtime.beginAttempts==2);
+    CHECK([AVAudioSession.sharedInstance.category isEqual:AVAudioSessionCategoryPlayback]);
+    CHECK(AVAudioSession.sharedInstance.categoryOptions==AVAudioSessionCategoryOptionMixWithOthers);
+    players=CSTestPlayerCreates; attempts=runtime.beginAttempts;
+    NSUInteger hintScheduledChecks=runtime.checks.count;
+    Post(AVAudioSessionSilenceSecondaryAudioHintNotification,AVAudioSession.sharedInstance,nil);
+    CHECK(audio.playing && CSTestPlayerCreates==players && runtime.beginAttempts==attempts);
+    CHECK(runtime.checks.count==hintScheduledChecks && fabs(NextDeadline()-entry-25)<.000001);
+    FinishPulse();
+    AVAudioSession.sharedInstance.secondaryAudioShouldBeSilencedHint=NO;
+    Post(AVAudioSessionSilenceSecondaryAudioHintNotification,AVAudioSession.sharedInstance,nil);
+    AVAudioSession.sharedInstance.secondaryAudioShouldBeSilencedHint=YES;
+    Post(AVAudioSessionSilenceSecondaryAudioHintNotification,AVAudioSession.sharedInstance,nil);
+    CHECK(!audio.playing && CSTestPlayerCreates==players && runtime.beginAttempts==attempts);
+    CHECK(runtime.checks.count==hintScheduledChecks && fabs(NextDeadline()-entry-25)<.000001);
+    [runtime advanceBy:23.49];
+    CHECK(!audio.playing && CSTestPlayerCreates==players && runtime.beginAttempts==attempts);
+    [runtime advanceBy:.01];
+    CHECK(audio.playing && CSTestPlayerCreates==players+1 && runtime.beginAttempts==attempts+1);
+    CHECK(fabs(NextDeadline()-entry-50)<.000001);
+    Foreground(); NoResources();
+
     // The public interval is normalized once. Grace remains 1.5 seconds while
     // actual subsequent checks use the configured wall-clock cadence.
     NSArray *settings=@[@10,@30,@9,@31,@10.6,@29.6,@"15",@[],@(NAN),@(INFINITY)];
@@ -171,15 +197,20 @@ int main(void) { @autoreleasepool {
     CHECK(audio.playing && manager.canAttemptBackgroundWork && runtime.liveTaskCount==1);
     Foreground(); NoResources();
 
-    // The actual hook transfers audio ownership to native calls synchronously.
-    // A release is debounced for .4 seconds without postponing periodic checks.
-    Create(YES,20); Background(); entry=runtime.uptime; [runtime advanceBy:1.5];
+    // Native WeChat ownership wins even while external audio is allowed. A
+    // release waits .4 seconds, then resumes despite the external silence hint.
+    Create(YES,20); AVAudioSession.sharedInstance.secondaryAudioShouldBeSilencedHint=YES;
+    Background(); entry=runtime.uptime; [runtime advanceBy:1.5]; CHECK(audio.playing);
     [AVAudioSession.sharedInstance setCategory:AVAudioSessionCategoryPlayAndRecord mode:@"VoiceChat" options:4 error:NULL];
     [AVAudioSession.sharedInstance setActive:YES error:NULL]; Drain();
     CHECK(!audio.playing && !manager.backgroundAudioActive && manager.canAttemptBackgroundWork);
     NSUInteger deactivations=AVAudioSession.sharedInstance.deactivations;
+    NSUInteger hostConfigurations=AVAudioSession.sharedInstance.configurations;
     CHECK(AVAudioSession.sharedInstance.active);
     [runtime advanceBy:1]; CHECK(!audio.playing && AVAudioSession.sharedInstance.deactivations==deactivations);
+    CHECK(AVAudioSession.sharedInstance.configurations==hostConfigurations);
+    CHECK([AVAudioSession.sharedInstance.category isEqual:AVAudioSessionCategoryPlayAndRecord]);
+    CHECK([AVAudioSession.sharedInstance.mode isEqual:@"VoiceChat"] && AVAudioSession.sharedInstance.categoryOptions==4);
     [AVAudioSession.sharedInstance setActive:NO error:NULL]; Drain();
     players=CSTestPlayerCreates;
     [runtime advanceBy:.39]; CHECK(!audio.playing && CSTestPlayerCreates==players);
@@ -205,9 +236,10 @@ int main(void) { @autoreleasepool {
     CHECK(fabs(NextDeadline()-entry-50)<.000001);
     Foreground(); NoResources();
 
-    // iOS interruption resumes only with ShouldResume, after the same delay.
-    // A withheld permission continues to block both grace and periodic work.
-    Create(YES,20); Background(); [runtime advanceBy:1.5];
+    // Ignoring external silence hints cannot bypass a real iOS interruption.
+    // Only ShouldResume permits recovery; withheld permission blocks later work.
+    Create(YES,20); AVAudioSession.sharedInstance.secondaryAudioShouldBeSilencedHint=YES;
+    Background(); [runtime advanceBy:1.5]; CHECK(audio.playing);
     AVAudioSession.sharedInstance.active=NO; Interrupt(YES,NO);
     CHECK(!audio.playing && !manager.backgroundAudioActive && manager.canAttemptBackgroundWork);
     Interrupt(NO,YES); players=CSTestPlayerCreates;

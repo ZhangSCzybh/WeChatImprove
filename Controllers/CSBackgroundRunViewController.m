@@ -3,6 +3,74 @@
 #import "CSSettingTableViewCell.h"
 #import <math.h>
 
+static NSString *const CSBackgroundRunRecordExplanation=@"仅保留当前微信进程中最近一次后台过程。首次检查、周期检查与系统到期分别记录；最后评估也可能来自系统到期通知，不代表又执行了一次周期检查。记录和时间间隔不能证明全程持续保活。";
+
+// The detail page receives text snapshots only. Reading historical records must
+// never reload settings or request another background task.
+@interface CSBackgroundRunRecordViewController : CSSettingsTableViewController
+@property(nonatomic, copy) NSArray<NSDictionary<NSString *, NSString *> *> *summaryRows;
+@property(nonatomic, copy) NSArray<NSDictionary<NSString *, NSString *> *> *eventRows;
+@property(nonatomic, copy) NSString *timelineExplanation;
+@property(nonatomic) BOOL hasRecord;
+@end
+
+@implementation CSBackgroundRunRecordViewController
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.title=@"后台运行记录";
+    self.tableView.backgroundColor=UIColor.systemGroupedBackgroundColor;
+    self.tableView.rowHeight=UITableViewAutomaticDimension;
+    self.tableView.estimatedRowHeight=84;
+    self.tableView.allowsSelection=NO;
+    [self.tableView registerClass:UITableViewCell.class forCellReuseIdentifier:@"BackgroundRunRecordCell"];
+    UIBarButtonItem *copy=[[UIBarButtonItem alloc] initWithTitle:@"复制记录" style:UIBarButtonItemStylePlain target:self action:@selector(copyRecord)];
+    copy.enabled=self.hasRecord;
+    copy.accessibilityLabel=@"复制后台运行摘要和事件时间线";
+    self.navigationItem.rightBarButtonItem=copy;
+}
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView { return 2; }
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return section==0?self.summaryRows.count:MAX((NSUInteger)1,self.eventRows.count);
+}
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+    return section==0?@"过程摘要":[NSString stringWithFormat:@"事件时间线（%lu 条）",(unsigned long)self.eventRows.count];
+}
+- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
+    return section==0?CSBackgroundRunRecordExplanation:self.timelineExplanation;
+}
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    UITableViewCell *cell=[tableView dequeueReusableCellWithIdentifier:@"BackgroundRunRecordCell" forIndexPath:indexPath];
+    NSDictionary *row=indexPath.section==0?self.summaryRows[indexPath.row]:self.eventRows.count?self.eventRows[indexPath.row]:@{@"title":@"尚无事件记录",@"detail":@"进入后台后，关键检查和状态变化会记录在这里。"};
+    UIListContentConfiguration *content=[cell defaultContentConfiguration];
+    content.text=row[@"title"];
+    content.secondaryText=row[@"detail"];
+    content.textProperties.font=[UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+    content.textProperties.color=UIColor.labelColor;
+    content.textProperties.numberOfLines=0;
+    content.textProperties.adjustsFontForContentSizeCategory=YES;
+    content.secondaryTextProperties.font=[UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
+    content.secondaryTextProperties.color=UIColor.secondaryLabelColor;
+    content.secondaryTextProperties.numberOfLines=0;
+    content.secondaryTextProperties.adjustsFontForContentSizeCategory=YES;
+    content.textToSecondaryTextVerticalPadding=6;
+    cell.contentConfiguration=content;
+    cell.backgroundColor=UIColor.secondarySystemGroupedBackgroundColor;
+    cell.selectionStyle=UITableViewCellSelectionStyleNone;
+    return cell;
+}
+- (void)copyRecord {
+    if (!self.hasRecord) return;
+    NSMutableString *text=[NSMutableString stringWithString:@"后台运行记录\n\n过程摘要\n"];
+    for (NSDictionary *row in self.summaryRows) [text appendFormat:@"%@：%@\n",row[@"title"],row[@"detail"]];
+    [text appendString:@"\n事件时间线\n"];
+    for (NSDictionary *row in self.eventRows) [text appendFormat:@"%@\n%@\n\n",row[@"title"],row[@"detail"]];
+    if (!self.eventRows.count) [text appendString:@"尚无事件记录\n\n"];
+    [text appendFormat:@"%@\n\n%@",self.timelineExplanation,CSBackgroundRunRecordExplanation];
+    UIPasteboard.generalPasteboard.string=text;
+    [CSUIHelper showCopySuccessToast:self];
+}
+@end
+
 @interface CSBackgroundRunViewController ()
 @property(nonatomic, strong) NSArray<CSSettingSection *> *sections;
 @property(nonatomic, strong) NSDateFormatter *recordDateFormatter;
@@ -36,7 +104,7 @@
         formatter=[NSDateFormatter new];
         formatter.locale=[[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
         formatter.calendar=[[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
-        formatter.dateFormat=full?@"yyyy-MM-dd HH:mm:ss":@"MM-dd HH:mm:ss";
+        formatter.dateFormat=full?@"yyyy-MM-dd HH:mm:ss.SSS":@"MM-dd HH:mm:ss";
         if (full) self.fullRecordDateFormatter=formatter; else self.recordDateFormatter=formatter;
     }
     formatter.timeZone=NSTimeZone.localTimeZone;
@@ -46,6 +114,23 @@
     NSTimeInterval interval=manager.lastCheckToForegroundInterval;
     if (!isfinite(interval) || interval<0) return @"尚无法计算";
     return [NSString stringWithFormat:@"%.1f 秒",interval];
+}
+- (NSArray<NSDictionary<NSString *, NSString *> *> *)recordSummaryForManager:(CSBackgroundRunManager *)manager full:(BOOL)full {
+    BOOL hasRecord=manager.lastBackgroundStartedAt!=nil;
+    return @[
+        @{@"title":@"最后结果",@"icon":@"clock",@"detail":hasRecord?manager.lastBackgroundResult:@"尚无记录"},
+        @{@"title":manager.lastBackgroundStartObserved?@"进入后台":@"开始观察",@"icon":@"arrow.down.circle",@"detail":[self recordTime:manager.lastBackgroundStartedAt full:full fallback:@"尚无记录"]},
+        @{@"title":@"首次检查",@"icon":@"clock.badge.checkmark",@"detail":[self recordTime:manager.firstScheduledCheckAt full:full fallback:hasRecord?@"尚未记录":@"尚无记录"]},
+        @{@"title":@"最近周期检查",@"icon":@"clock.arrow.circlepath",@"detail":[self recordTime:manager.lastPeriodicCheckAt full:full fallback:hasRecord?@"尚未记录":@"尚无记录"]},
+        @{@"title":@"周期检查次数",@"icon":@"number.circle",@"detail":hasRecord?[NSString stringWithFormat:@"%lu 次",(unsigned long)manager.periodicCheckCount]:@"尚无记录"},
+        @{@"title":@"系统到期时间",@"icon":@"exclamationmark.clock",@"detail":[self recordTime:manager.lastTaskExpiredAt full:full fallback:hasRecord?@"未记录到期":@"尚无记录"]},
+        @{@"title":@"停止时间",@"icon":@"stop.circle",@"detail":[self recordTime:manager.lastBackgroundStoppedAt full:full fallback:hasRecord?@"尚未停止":@"尚无记录"]},
+        @{@"title":@"停止原因",@"icon":@"info.circle",@"detail":hasRecord?manager.lastBackgroundStopReason:@"尚无记录"},
+        @{@"title":@"返回前台",@"icon":@"arrow.up.circle",@"detail":[self recordTime:manager.lastForegroundReturnedAt full:full fallback:hasRecord?@"尚未返回前台":@"尚无记录"]},
+        @{@"title":@"最后评估",@"icon":@"clock",@"detail":[self recordTime:manager.lastBackgroundCheckedAt full:full fallback:hasRecord?@"尚未评估":@"尚无记录"]},
+        @{@"title":@"评估时状态",@"icon":@"waveform",@"detail":manager.lastBackgroundCheckedAt?manager.lastBackgroundCheckStatus:@"尚未评估"},
+        @{@"title":@"评估至返回间隔",@"icon":@"timer",@"detail":[self lastCheckToForegroundText:manager]}
+    ];
 }
 - (void)rebuildSections {
     CSBackgroundRunManager *manager=CSBackgroundRunManager.sharedManager;
@@ -59,20 +144,18 @@
     CSSettingItem *state=[CSSettingItem itemWithTitle:@"当前状态" iconName:@"waveform" iconColor:UIColor.systemBlueColor detail:manager.statusText];
     CSSettingItem *checkInterval=[CSSettingItem itemWithTitle:@"检查间隔" iconName:@"timer" iconColor:UIColor.systemBlueColor detail:[NSString stringWithFormat:@"%.0f 秒",manager.checkInterval]];
     CSSettingItem *capability=[CSSettingItem itemWithTitle:@"后台音频声明" iconName:@"checkmark.shield" iconColor:UIColor.systemBlueColor detail:manager.supportsBackgroundAudio?@"当前微信包已声明":@"当前微信包未声明"];
-    BOOL hasRecord=manager.lastBackgroundStartedAt!=nil;
-    CSSettingItem *last=[CSSettingItem itemWithTitle:@"最后状态" iconName:@"clock" iconColor:UIColor.systemOrangeColor detail:manager.lastBackgroundResult];
-    CSSettingItem *started=[CSSettingItem itemWithTitle:manager.lastBackgroundStartObserved?@"进入后台":@"开始观察" iconName:@"arrow.down.circle" iconColor:UIColor.systemBlueColor detail:[self recordTime:manager.lastBackgroundStartedAt full:NO fallback:@"尚无记录"]];
-    CSSettingItem *checked=[CSSettingItem itemWithTitle:@"最后检查" iconName:@"clock.arrow.circlepath" iconColor:UIColor.systemBlueColor detail:[self recordTime:manager.lastBackgroundCheckedAt full:NO fallback:@"尚未检查"]];
-    CSSettingItem *checkState=[CSSettingItem itemWithTitle:@"检查时状态" iconName:@"waveform" iconColor:UIColor.systemBlueColor detail:manager.lastBackgroundCheckStatus.length?manager.lastBackgroundCheckStatus:@"尚未检查"];
-    CSSettingItem *returned=[CSSettingItem itemWithTitle:@"返回前台" iconName:@"arrow.up.circle" iconColor:UIColor.systemBlueColor detail:[self recordTime:manager.lastForegroundReturnedAt full:NO fallback:hasRecord?@"尚未返回前台":@"尚无记录"]];
-    CSSettingItem *stopped=[CSSettingItem itemWithTitle:@"停止时间" iconName:@"stop.circle" iconColor:UIColor.systemOrangeColor detail:[self recordTime:manager.lastBackgroundStoppedAt full:NO fallback:hasRecord?@"尚未停止":@"尚无记录"]];
-    CSSettingItem *stopReason=[CSSettingItem itemWithTitle:@"停止原因" iconName:@"info.circle" iconColor:UIColor.systemOrangeColor detail:manager.lastBackgroundStopReason.length?manager.lastBackgroundStopReason:hasRecord?@"尚未停止":@"尚无记录"];
-    CSSettingItem *interval=[CSSettingItem itemWithTitle:@"检查至返回间隔" iconName:@"timer" iconColor:UIColor.systemBlueColor detail:[self lastCheckToForegroundText:manager]];
+    NSMutableArray<CSSettingItem *> *recordItems=[NSMutableArray new];
+    NSArray *summary=[self recordSummaryForManager:manager full:NO];
+    for (NSUInteger index=0;index<9;index++) {
+        NSDictionary *row=summary[index];
+        [recordItems addObject:[CSSettingItem itemWithTitle:row[@"title"] iconName:row[@"icon"] iconColor:UIColor.systemBlueColor detail:row[@"detail"]]];
+    }
+    [recordItems addObject:[CSSettingItem itemWithTitle:@"事件时间线" iconName:@"list.bullet.rectangle" iconColor:UIColor.systemBlueColor detail:[NSString stringWithFormat:@"%lu 条记录",(unsigned long)manager.lastBackgroundEvents.count]]];
     CSSettingItem *info=[CSSettingItem itemWithTitle:@"功能说明" iconName:@"info.circle" iconColor:UIColor.systemBlueColor detail:nil];
     self.sections=@[
         [CSSettingSection sectionWithHeader:@"开关设置" items:@[toggle,checkInterval]],
         [CSSettingSection sectionWithHeader:@"运行状态" items:@[state,capability]],
-        [CSSettingSection sectionWithHeader:@"最近一次后台" items:@[last,started,checked,checkState,returned,stopped,stopReason,interval]],
+        [CSSettingSection sectionWithHeader:@"最近一次后台" items:recordItems],
         [CSSettingSection sectionWithHeader:@"说明" items:@[info]]
     ];
     [self.tableView reloadData];
@@ -83,14 +166,14 @@
     CSSettingTableViewCell *cell=[tableView dequeueReusableCellWithIdentifier:CSSettingTableViewCell.reuseIdentifier];
     [cell configureWithItem:self.sections[indexPath.section].items[indexPath.row]];
     if (indexPath.section==2 || (indexPath.section==0 && indexPath.row==1)) cell.accessoryType=UITableViewCellAccessoryDisclosureIndicator;
-    cell.accessibilityHint=indexPath.section==2?@"查看完整后台记录":(indexPath.section==0 && indexPath.row==1)?@"设置 10 至 30 秒的检查间隔":nil;
+    cell.accessibilityHint=indexPath.section==2?@"查看后台运行摘要和事件时间线，可复制记录":(indexPath.section==0 && indexPath.row==1)?@"设置 10 至 30 秒的检查间隔":nil;
     return cell;
 }
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section { return self.sections[section].header; }
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
     if (section==0) return @"进入后台后先在 1.5 秒检查一次，之后按设置的间隔检查；默认 25 秒，可设为 10–30 秒。剩余执行时间大于 0 且不足 30 秒时，尝试播放微信自带的短静音音频并续接后台任务。返回前台或关闭后释放资源，微信通话和录音优先。";
     if (section==1) return @"当前状态表示此刻可尝试的后台执行条件，不代表系统保证持续运行或红包、收款已经成功。后台音频声明仅表示安装包配置，不能证明系统已允许持续运行。";
-    if (section==2) return @"仅保留当前微信进程中最近一次后台记录，时间按设备本地时区显示。最后检查仅证明该时刻执行过检查，不能证明此前一直运行；开始观察表示中途开始记录，不是真实进入后台时刻。点击任意记录查看完整信息。";
+    if (section==2) return @"首次检查、周期检查和系统到期分别显示，互不覆盖。点击任意记录查看可滚动、可复制的事件时间线。仅保留当前微信进程中最近一次后台过程；记录不代表全程持续保活。";
     return nil;
 }
 - (NSInteger)parsedCheckInterval:(NSString *)text {
@@ -131,20 +214,22 @@
 }
 - (void)showLastBackgroundRecord {
     CSBackgroundRunManager *manager=CSBackgroundRunManager.sharedManager;
-    BOOL hasRecord=manager.lastBackgroundStartedAt!=nil;
-    NSString *message=[NSString stringWithFormat:@"最后状态：%@\n%@：%@\n最后检查：%@\n检查时状态：%@\n返回前台：%@\n停止时间：%@\n停止原因：%@\n检查至返回间隔：%@\n\n仅保留当前微信进程中最近一次记录。最后检查不能证明此前持续运行；开始观察不代表真实进入后台时刻。",
-        manager.lastBackgroundResult,
-        manager.lastBackgroundStartObserved?@"进入后台":@"开始观察",
-        [self recordTime:manager.lastBackgroundStartedAt full:YES fallback:@"尚无记录"],
-        [self recordTime:manager.lastBackgroundCheckedAt full:YES fallback:@"尚未检查"],
-        manager.lastBackgroundCheckStatus.length?manager.lastBackgroundCheckStatus:@"尚未检查",
-        [self recordTime:manager.lastForegroundReturnedAt full:YES fallback:hasRecord?@"尚未返回前台":@"尚无记录"],
-        [self recordTime:manager.lastBackgroundStoppedAt full:YES fallback:hasRecord?@"尚未停止":@"尚无记录"],
-        manager.lastBackgroundStopReason.length?manager.lastBackgroundStopReason:hasRecord?@"尚未停止":@"尚无记录",
-        [self lastCheckToForegroundText:manager]];
-    UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"最近一次后台记录" message:message preferredStyle:UIAlertControllerStyleAlert];
-    [alert addAction:[UIAlertAction actionWithTitle:@"了解了" style:UIAlertActionStyleDefault handler:nil]];
-    [self presentViewController:alert animated:YES completion:nil];
+    NSArray<CSBackgroundRunRecordEvent *> *events=manager.lastBackgroundEvents;
+    NSUInteger dropped=manager.droppedBackgroundEventCount;
+    NSMutableArray *eventRows=[NSMutableArray new];
+    for (CSBackgroundRunRecordEvent *event in events) {
+        NSString *offset=isfinite(event.elapsed) && event.elapsed>=0?[NSString stringWithFormat:@"+%.3f 秒",event.elapsed]:@"相对时间未知";
+        [eventRows addObject:@{@"title":[NSString stringWithFormat:@"%@ · %@",event.source,offset],@"detail":[NSString stringWithFormat:@"%@\n%@",[self recordTime:event.date full:YES fallback:@"时间未知"],event.detail]}];
+    }
+    NSString *origin=manager.lastBackgroundStartObserved?@"进入后台":@"开始观察";
+    NSString *timing=[NSString stringWithFormat:@"显示打开本页时的记录快照。时间为设备本地的事件处理时刻；“+秒数”从%@计算，用于比较先后与间隔。开始观察表示中途开始记录。",origin];
+    NSString *retention=dropped?[NSString stringWithFormat:@"最多保留 80 条事件。已省略 %lu 条中间事件；当前保留本次开始 1 条及最近 %lu 条事件。",(unsigned long)dropped,(unsigned long)(events.count?events.count-1:0)]:@"事件按发生顺序显示，最多保留 80 条；达到上限后保留本次开始 1 条及最近 79 条事件。";
+    CSBackgroundRunRecordViewController *record=[[CSBackgroundRunRecordViewController alloc] initWithStyle:UITableViewStyleInsetGrouped];
+    record.summaryRows=[self recordSummaryForManager:manager full:YES];
+    record.eventRows=eventRows;
+    record.timelineExplanation=[NSString stringWithFormat:@"%@\n%@",retention,timing];
+    record.hasRecord=manager.lastBackgroundStartedAt!=nil;
+    [self.navigationController pushViewController:record animated:YES];
 }
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
@@ -152,7 +237,7 @@
     if (indexPath.section==2) { [self showLastBackgroundRecord]; return; }
     if (indexPath.section!=3) return;
     UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"后台运行说明"
-        message:@"进入后台后申请系统允许的有限后台任务，1.5 秒后首次检查，之后按设置的间隔检查，默认 25 秒，可配置 10–30 秒。有效剩余时间大于 0 且不足 30 秒时，尝试短静音播放并续接后台任务。\n\n音源直接使用当前微信主包的 blank.caf，单次播放，不另外生成音频，也不无限循环。资源缺失或系统不允许播放时，当前状态会显示原因。播放正常结束后继续按间隔检查；音频播放和任务申请均不保证系统补充执行时间。\n\n微信通话、录音及系统音频中断优先，满足恢复条件后再尝试。返回前台或关闭后台运行后，停止检查并释放本插件的任务与音频资源。此开关控制本插件额外申请后台执行机会，群功能仍按自身设置和实际执行条件处理。\n\n当前状态和最近检查仅表示已观察到的执行条件，不能证明全程持续运行。后台消息和自动处理仍依赖微信原生服务；系统挂起、结束进程或用户划掉微信后，插件无法自行唤醒微信。"
+        message:@"进入后台后申请系统允许的有限后台任务，1.5 秒后首次检查，之后按设置的间隔检查，默认 25 秒，可配置 10–30 秒。有效剩余时间大于 0 且不足 30 秒时，尝试短静音播放并续接后台任务。\n\n音源直接使用当前微信主包的 blank.caf，单次播放，不另外生成音频，也不无限循环。资源缺失或系统不允许播放时，当前状态会显示原因。播放正常结束后继续按间隔检查；音频播放和任务申请均不保证系统补充执行时间。\n\n微信自身使用音频时优先让出，释放后再尝试；其他 App 播放音乐或视频时，保活音频以混音方式继续尝试，不主动打断对方播放。电话、Siri 等系统音频中断仍需等待系统允许恢复。返回前台或关闭后台运行后，停止检查并释放本插件的任务与音频资源。此开关控制本插件额外申请后台执行机会，群功能仍按自身设置和实际执行条件处理。\n\n当前状态和最近检查仅表示已观察到的执行条件，不能证明全程持续运行。后台消息和自动处理仍依赖微信原生服务；系统挂起、结束进程或用户划掉微信后，插件无法自行唤醒微信。"
         preferredStyle:UIAlertControllerStyleAlert];
     [alert addAction:[UIAlertAction actionWithTitle:@"了解了" style:UIAlertActionStyleDefault handler:nil]];
     [self presentViewController:alert animated:YES completion:nil];

@@ -72,9 +72,11 @@ static NSError *CSAudioError(NSInteger code, NSString *reason) {
     BOOL owned=[self ownsConfiguration];
     if (!owned) [self relinquish];
     AVAudioSession *session=AVAudioSession.sharedInstance;
-    if (self.hostBusy || session.secondaryAudioShouldBeSilencedHint) {
+    // External playback may coexist through MixWithOthers; native WeChat audio
+    // still owns this process's session and must never be displaced.
+    if (self.hostBusy) {
         [self stop];
-        if (error) *error=CSAudioError(1,@"微信或其他音频正在使用音频，保活已让出");
+        if (error) *error=CSAudioError(1,@"微信正在使用音频，保活已让出");
         return NO;
     }
     if (self.playing && owned) return YES;

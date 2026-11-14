@@ -67,11 +67,16 @@ int main(void) { @autoreleasepool {
     CHECK(!audio.playing && !audio.sessionOwned && !session.active && !CSTestPlayersAlive);
     CHECK(session.configurations==configurations && session.activations==activations);
 
-    // The secondary-audio hint is checked before category or activation writes.
+    // Other apps' primary audio may coexist with our muted, mixable pulse.
     Fresh(); session.secondaryAudioShouldBeSilencedHint=YES;
     configurations=session.configurations; activations=session.activations;
-    CHECK(![audio startWithError:NULL]);
-    CHECK(session.configurations==configurations && session.activations==activations && !CSTestPlayersAlive);
+    CHECK([audio startWithError:NULL] && audio.playing && audio.sessionOwned && session.active);
+    CHECK([session.category isEqual:AVAudioSessionCategoryPlayback] && [session.mode isEqual:AVAudioSessionModeDefault]);
+    CHECK(session.categoryOptions==AVAudioSessionCategoryOptionMixWithOthers && CSTestLastPlayer.volume==0);
+    CHECK(session.configurations==configurations+1 && session.activations==activations+1);
+    [audio stop];
+    CHECK(!audio.playing && !audio.sessionOwned && !session.active && !CSTestPlayersAlive);
+    CHECK([session.category isEqual:AVAudioSessionCategoryAmbient] && !session.categoryOptions);
 
     // Failure at each resource boundary releases the player and only our own
     // session lease, without replacing errors returned by native setters.
