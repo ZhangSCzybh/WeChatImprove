@@ -766,6 +766,17 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
                                                      iconName:@"square.stack.3d.up.fill"
                                                     iconColor:[UIColor systemCyanColor]
                                                       detail:nil];
+
+    // 添加信息时间设置项
+    CSSettingItem *messageTimeItem = [CSSettingItem itemWithTitle:@"信息时间"
+                                                        iconName:@"clock.fill"
+                                                       iconColor:[UIColor systemBlueColor]
+                                                         detail:nil];
+
+    CSSettingItem *backgroundBlurItem = [CSSettingItem itemWithTitle:@"后台模糊"
+                                                          iconName:@"eye.slash"
+                                                         iconColor:[UIColor systemIndigoColor]
+                                                            detail:nil];
     
     CSSettingSection *uiSection = [CSSettingSection sectionWithHeader:@"界面定制"
                                                               items:@[navigationTitleItem,
@@ -779,7 +790,9 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
                                                                      layoutSettingsItem,
                                                                      chatAttachmentItem,
                                                                      inputTextItem,
-                                                                     chatGroupItem]];
+                                                                     chatGroupItem,
+                                                                     messageTimeItem,
+                                                                     backgroundBlurItem]];
     
     // 功能增强组
     CSSettingItem *backgroundRunItem = [CSSettingItem itemWithTitle:@"后台运行" 
@@ -787,22 +800,11 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
                                                         iconColor:[UIColor systemPurpleColor]
                                                           detail:nil];
     
-    CSSettingItem *backgroundBlurItem = [CSSettingItem itemWithTitle:@"后台模糊"
-                                                          iconName:@"eye.slash"
-                                                         iconColor:[UIColor systemIndigoColor]
-                                                            detail:nil];
-
     CSSettingItem *gameCheatsItem = [CSSettingItem itemWithTitle:@"游戏辅助"
                                                       iconName:@"gamecontroller.fill"
                                                      iconColor:[UIColor systemGreenColor]
                                                        detail:nil];
     
-    // 添加信息时间设置项
-    CSSettingItem *messageTimeItem = [CSSettingItem itemWithTitle:@"信息时间"
-                                                        iconName:@"clock.fill"
-                                                       iconColor:[UIColor systemBlueColor]
-                                                         detail:nil];
-
     // 添加防止撤回设置项
     CSSettingItem *revokeItem = [CSSettingItem itemWithTitle:@"防止撤回"
                                                    iconName:@"arrow.uturn.backward.circle"
@@ -847,9 +849,7 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
     CSSettingItem *automationItem = [CSSettingItem itemWithTitle:@"自动功能" iconName:@"bolt.circle.fill" iconColor:UIColor.systemOrangeColor detail:nil];
     CSSettingSection *enhancementSection = [CSSettingSection sectionWithHeader:@"功能增强" 
                                                                       items:@[backgroundRunItem,
-                                                                             backgroundBlurItem,
                                                                              gameCheatsItem,
-                                                                             messageTimeItem,
                                                                              revokeItem,
                                                                              redEnvelopItem,
                                                                              receiveTransferItem,
