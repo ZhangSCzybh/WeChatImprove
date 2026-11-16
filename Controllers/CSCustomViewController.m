@@ -44,6 +44,7 @@
 #import "CSChatGroupSettingsViewController.h"
 #import "CSTabBarStyleSettingsViewController.h"
 #import "CSAuthorizationManager.h"
+#import "CSClientGuardSettingsViewController.h"
 
 // UI 常量
 static CGFloat const kHeaderViewHeight = 150.0f;        // 头部视图高度
@@ -693,6 +694,8 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
                                                          detail:nil];
     
     NSMutableArray *accountItems=[NSMutableArray arrayWithArray:@[accountItem,favoriteAuthItem]];
+    [accountItems addObject:[CSSettingItem itemWithTitle:@"防封检测" iconName:@"shield.lefthalf.filled"
+        iconColor:UIColor.systemBlueColor detail:nil]];
     self.closeFriendEntryVisible=[CSCloseFriendManager.sharedManager settingsEntryVisible];
     if(self.closeFriendEntryVisible) {
         [accountItems addObject:[CSSettingItem itemWithTitle:@"捉迷藏呀" iconName:@"lock.shield" iconColor:UIColor.systemBlueColor detail:nil]];
@@ -991,6 +994,10 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
         else if ([item.title isEqualToString:@"账号信息"]) {
             CSAccountDetailViewController *detailVC = [[CSAccountDetailViewController alloc] initWithStyle:UITableViewStyleInsetGrouped];
             [self.navigationController pushViewController:detailVC animated:YES];
+        }
+        else if ([item.title isEqualToString:@"防封检测"]) {
+            [self.navigationController pushViewController:[[CSClientGuardSettingsViewController alloc]
+                initWithStyle:UITableViewStyleInsetGrouped] animated:YES];
         }
         // 处理顶栏信息点击
         else if ([item.title isEqualToString:@"顶栏信息"]) {

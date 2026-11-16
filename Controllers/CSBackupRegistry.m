@@ -61,6 +61,36 @@ static BOOL CSContacts(id value) {
     dispatch_once(&once, ^{
         // Every row is an exact domain/key identity. Do not replace this with prefix matching.
         NSArray *rows=@[
+            @[@"standard",@"com.wechat.enhance.client_guard.enabled",@"client_guard",@"bool",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.client_guard.scoped_queries",@"client_guard",@"bool",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.client_guard.environment",@"client_guard",@"bool",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.client_guard.frameworks",@"client_guard",@"bool",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.client_guard.provision_path",@"client_guard",@"bool",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.client_guard.provision_read",@"client_guard",@"bool",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.client_guard.bundle_info",@"client_guard",@"bool",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.client_guard.receipt",@"client_guard",@"bool",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.client_guard.crash_block",@"client_guard",@"bool",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.client_guard.crash_monitor",@"client_guard",@"bool",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.client_guard.vendor_id",@"client_guard",@"bool",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.client_guard.checks",@"client_guard",@"bool",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.client_guard.images",@"client_guard",@"bool",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.client_guard.safe_mode",@"client_guard",@"bool",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.client_guard.friend_scope",@"client_guard",@"bool",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.client_guard.device_checks",@"client_guard",@"bool",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.client_guard.device_report",@"client_guard",@"bool",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.client_guard.fingerprint_data",@"client_guard",@"bool",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.client_guard.basic_data",@"client_guard",@"bool",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.client_guard.risk_results",@"client_guard",@"bool",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.client_guard.policy_completion",@"client_guard",@"bool",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.client_guard.cc_data",@"client_guard",@"bool",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.client_guard.device_reports",@"client_guard",@"bool",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.client_guard.safety_reports",@"client_guard",@"bool",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.client_guard.behavior_reports",@"client_guard",@"bool",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.client_guard.detection_results",@"client_guard",@"bool",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.client_guard.detection_reports",@"client_guard",@"bool",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.client_guard.experiment_reports",@"client_guard",@"bool",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.client_guard.tls_trust",@"client_guard",@"bool",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.client_guard.tls_pinning",@"client_guard",@"bool",@"global",@""],
             // Preserve the legacy backup value without treating it as the new check cadence.
             @[@"legacy",@"BackgroundInterval",@"background",@"number",@"global",@""],
             @[@"legacy",@"BackgroundRunEnabled",@"background",@"bool",@"global",@""],
@@ -399,7 +429,7 @@ static BOOL CSContacts(id value) {
     return entries;
 }
 + (NSDictionary<NSString *,NSString *> *)moduleTitles {
-    return @{@"avatar":@"头像",@"background":@"后台与隐私模糊",@"privacy":@"收藏保护",@"layout":@"布局与字体",@"bubble":@"气泡与连续消息",@"groups":@"会话分组",@"list":@"列表圆角",@"input":@"输入文本",@"message_time":@"消息时间",@"red_envelopes":@"红包设置",@"tabbar":@"底栏样式",@"attachments":@"附件布局",@"updates":@"更新控制",@"entry":@"插件入口",@"ui":@"界面精简",@"navigation":@"聊天导航",@"touch":@"触摸轨迹",@"version":@"版本设置",@"backup":@"备份设置",@"revoke":@"防撤回",@"message_actions":@"消息操作",@"transfers":@"转账设置",@"timeline":@"朋友圈尾巴",@"games":@"游戏设置",@"custom_text":@"界面文字",@"scheduled_tasks":@"定时任务",@"ai_reply":@"AI 自动回复",@"group_chat_tools":@"群聊功能",@"automation":@"自动功能"};
+    return @{@"avatar":@"头像",@"background":@"后台与隐私模糊",@"privacy":@"收藏保护",@"layout":@"布局与字体",@"bubble":@"气泡与连续消息",@"groups":@"会话分组",@"list":@"列表圆角",@"input":@"输入文本",@"message_time":@"消息时间",@"red_envelopes":@"红包设置",@"tabbar":@"底栏样式",@"attachments":@"附件布局",@"updates":@"更新控制",@"entry":@"插件入口",@"ui":@"界面精简",@"navigation":@"聊天导航",@"touch":@"触摸轨迹",@"version":@"版本设置",@"backup":@"备份设置",@"revoke":@"防撤回",@"message_actions":@"消息操作",@"transfers":@"转账设置",@"timeline":@"朋友圈尾巴",@"games":@"游戏设置",@"custom_text":@"界面文字",@"scheduled_tasks":@"定时任务",@"ai_reply":@"AI 自动回复",@"group_chat_tools":@"群聊功能",@"automation":@"自动功能",@"client_guard":@"反检测"};
 }
 + (NSDictionary *)entryForDomain:(NSString *)domain key:(NSString *)key {
     if (![domain isKindOfClass:NSString.class] || ![key isKindOfClass:NSString.class]) return nil;

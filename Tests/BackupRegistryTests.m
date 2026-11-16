@@ -13,6 +13,27 @@ int main(void) { @autoreleasepool {
     CHECK(Entry(@"GameCheat_Enabled") != nil);
     CHECK(Entry(@"WCTimeLineMessageTailText") != nil);
     CHECK(Entry(@"kReceiveTransferAutoEnableKey") != nil);
+    NSArray *guardIdentifiers=@[@"enabled",@"scoped_queries",@"environment",@"frameworks",@"provision_path",
+        @"provision_read",@"bundle_info",@"receipt",@"crash_block",@"crash_monitor",@"vendor_id",@"checks",@"images",@"safe_mode",
+        @"friend_scope",@"device_checks",@"device_report",@"fingerprint_data",@"basic_data",@"risk_results",@"policy_completion",
+        @"cc_data",@"device_reports",@"safety_reports",@"behavior_reports",@"detection_results",@"detection_reports",
+        @"experiment_reports",@"tls_trust",@"tls_pinning"];
+    CHECK(guardIdentifiers.count==30);
+    NSUInteger guardFields=0;
+    for(NSDictionary *entry in CSBackupRegistry.entries)if([entry[@"module"] isEqual:@"client_guard"])guardFields++;
+    CHECK(guardFields==guardIdentifiers.count);
+    CHECK([CSBackupRegistry.moduleTitles[@"client_guard"] isEqual:@"反检测"]);
+    for(NSString *identifier in guardIdentifiers){
+        NSString *key=[@"com.wechat.enhance.client_guard." stringByAppendingString:identifier];
+        NSDictionary *entry=Entry(key);
+        CHECK([entry[@"module"] isEqual:@"client_guard"] && [entry[@"scope"] isEqual:@"global"] && [entry[@"type"] isEqual:@"bool"]);
+        CHECK(Valid(@YES,entry) && Valid(@NO,entry));
+        CHECK(!Valid(@"YES",entry) && !Valid(@2,entry));
+        CHECK([CSBackupRegistry entryForDomain:@"legacy" key:key]==nil);
+    }
+    // Only user choices travel in a backup; device-local identifiers and observations do not.
+    for(NSString *identifier in @[@"vendor_uuid",@"local_vendor_uuid",@"image_names",@"diagnostics",@"disabled",@"unknown"])
+        CHECK(Entry([@"com.wechat.enhance.client_guard." stringByAppendingString:identifier])==nil);
     NSDictionary *favoriteVoice=Entry(@"com.wechat.enhance.voice_forward.favorite_enabled");
     CHECK([favoriteVoice[@"module"] isEqual:@"message_actions"] && [favoriteVoice[@"scope"] isEqual:@"global"] && [favoriteVoice[@"type"] isEqual:@"bool"]);
     CHECK(Valid(@YES,favoriteVoice) && Valid(@NO,favoriteVoice));

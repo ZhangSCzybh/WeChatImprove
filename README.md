@@ -2,7 +2,7 @@
 
 面向 iOS 微信的 Theos 插件，使用 Objective-C / Logos 接入微信原生界面，提供聊天分组、气泡与列表样式、消息操作和配置管理等功能。各项功能可在插件设置中按需开启。
 
-**当前版本：`2.6-6`（完整版）** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+**当前版本：`2.6-7`（防封检测整理正式版）** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
 
 [功能概览](#功能概览) · [安装与入口](#安装与入口) · [使用说明](#使用说明) · [配置与备份](#配置与备份) · [源码编译](#源码编译) · [开发与验证](#开发与验证) · [常见问题](#常见问题)
 
@@ -21,6 +21,7 @@
 | 自动处理 | 自动功能（群聊功能下方） | 拍我回拍及可选撤回、拍我回复、真实 @ 回复、关键词独立规则与引用回复；各模块独立私聊/群聊名单和延迟 |
 | 红包与收款 | 红包功能、自动收款 | 私聊/群聊开关、延迟处理、通知、自动回复和记录；红包另支持群白名单/黑名单、串行领取与汇总 |
 | 密友保护 | 账号与安全 → 捉迷藏呀 | 独立密码、账号隔离、临时显示、已适配界面的隐藏和来电拒接；支持范围与限制见交付记录 |
+| 防封检测 | 账号与安全 → 防封检测 | 28 项独立能力；实际调用诊断、资源与重启状态；精确接口兼容回退，默认关闭 |
 | 账号与辅助 | 账号信息、收藏验证、后台运行、游戏辅助 | 账号信息查看、收藏生物认证、后台运行辅助、骰子与猜拳结果选择 |
 | 插件管理 | 入口设置、版本控制、更新控制、备份配置、重置设置 | 入口名称与位置、微信版本返回值定制、内部热更新控制、配置导入导出与恢复 |
 
@@ -33,12 +34,14 @@
 | 运行方式 | 需要能够向微信加载插件的 iOS 注入环境，直接构建产物为 `.deb` |
 | 近期适配参考 | 微信 `8.0.78` 与 `8.0.80`；既有适配参考用户提供的 `8.0.80.34` IPA，小丑功能在两版微信中的显示与交互仍待真机验收 |
 | 系统目标 | Makefile 的最低编译目标为 iOS `15.0`，不代表所有系统与微信组合均已验证 |
-| Rootless | `2.6-6` 安装包，包含 arm64／arm64e |
-| Rootful | `2.6-6` 安装包及重签用 dylib，包含 arm64／arm64e |
+| Rootless | `2.6-7` 安装包，包含 arm64／arm64e |
+| Rootful | `2.6-7` 安装包及重签用 dylib，包含 arm64／arm64e |
 | Roothide | Makefile 保留构建入口；当前版本没有对应的运行验证结论 |
 | 注入依赖 | `control` 声明 `mobilesubstrate >= 0.9.5000`，实际加载取决于设备的注入环境 |
 
 微信私有接口会随版本变化。主机回归和成功打包只能验证相应代码与产物，真实设备上的显示、交互及其他插件组合仍需实际确认。
+
+`2.6-7` 正式整理“账号与安全 → 防封检测”，提供 28 项独立能力、实际调用诊断、资源与重启提示，沿用原调用链、默认关闭、精确备份与应急停用。针对真实微信 `8.0.80.34` 核实并接入两个 `JailBreakHelper` 判断与两个 `WCSHmdtMgr` 开关/任务入口；精简重复状态缓存、未使用的调用计时及重复诊断条目，测试入口不进入正式动态库。完整行为和核验边界见 [反检测说明](docs/features/client-guard.md)，产物与回归见 [2.6-7 发布记录](packages/2.6-7/README.md)。
 
 `2.6-6` 为完整版，累积包含 beta01 至 beta03 的后台开销优化和 beta04 的朋友圈未读／互动修复；本版修复后台运行设置页图标在滚动、刷新和复用后错位，以及“系统到期时间”图标缺失。共享设置单元格改用独立图标视图，保留自定义图片显示，并补齐不可用系统图标兜底、重复配置的旧开关与排序状态清理。产物与聚焦回归见 [2.6-6 发布记录](packages/2.6-6/README.md)。
 
@@ -90,7 +93,7 @@
 
 ### 安装步骤
 
-1. 用户当前为 Rootless 环境，使用 [2.6-6 Rootless 安装包](packages/2.6-6/com.wechat.improve_2.6-6_iphoneos-arm64.deb)。另提供 [Rootful 安装包](packages/2.6-6/com.wechat.improve_2.6-6_iphoneos-arm.deb)、[重签用 dylib](packages/2.6-6/WeChatImprove.dylib)、[调试符号](packages/2.6-6/symbols.zip) 与 [SHA-256 清单](packages/2.6-6/SHA256SUMS)。验证记录见 [2.6-6 发布记录](packages/2.6-6/README.md)；历史包继续保留。
+1. 用户当前为 Rootless 环境，使用 [2.6-7 Rootless 安装包](packages/2.6-7/com.wechat.improve_2.6-7_iphoneos-arm64.deb)。另提供 [Rootful 安装包](packages/2.6-7/com.wechat.improve_2.6-7_iphoneos-arm.deb)、[重签用 dylib](packages/2.6-7/WeChatImprove.dylib)、[调试符号](packages/2.6-7/symbols.zip) 与 [SHA-256 清单](packages/2.6-7/SHA256SUMS)。验证记录见 [2.6-7 发布记录](packages/2.6-7/README.md)；历史包继续保留。
 
    密友头像五击快捷入口不验证身份：任何能操作已解锁手机并到达头像的人，都能查看或修改配置，并经两级确认不可撤销地完整重置当前账号的密友配置。此风险继续存在；修改密码仍须普通入口验证。
 2. 使用设备上适配该环境的包管理器或安装工具安装，并按工具提示重新加载注入环境。
@@ -299,6 +302,8 @@
 
 完整功能、触发条件、收藏保护、清理规则和恢复事务说明见 [备份逻辑与功能说明（2.0-15）](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/backup-guide.md)。实现边界及真机验收要求见 [备份重构验证记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/backup-configuration-1.8-37/README.md)，精确配置范围见 [配置登记表](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/backup-configuration-registry.md)。
 
+**账号与安全 → 防封检测**（页面标题“反检测”）在同一页面提供 28 项独立能力，覆盖环境与资源查询、客户端检查、好友验证查询范围、设备及风险数据、检测上报、IDFV、监控与安全模式，并单列证书校验实验项。总开关和能力开关默认关闭；好友入口保留原请求、参数和结果，普通查询默认限定在已接入的同步检查范围。证书实验项会降低指定接口的证书验证约束，与好友申请是否被接受没有直接关系。关闭后后续调用恢复原链路，监控启动及安全恢复的完整恢复需要重新打开微信。包信息替换依赖可用的 `siri.plist`，不会改写宿主文件或生成有效收据。30 个用户设置支持备份、恢复与重置，本机替代 UUID 和诊断不随备份迁移。实现范围、应急停用和测试边界见[反检测说明](docs/features/client-guard.md)。本机构建与 fixture 测试不代表已通过当前微信真机验收或能避免封禁。
+
 ## 源码编译
 
 ### 准备工具
@@ -323,7 +328,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootless \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出文件名：`packages/com.wechat.improve_2.6-6_iphoneos-arm64.deb`。本轮交付为 [2.6-6 Rootless 安装包](packages/2.6-6/com.wechat.improve_2.6-6_iphoneos-arm64.deb)。
+当前版本默认输出文件名：`packages/com.wechat.improve_2.6-7_iphoneos-arm64.deb`。本轮交付为 [2.6-7 Rootless 安装包](packages/2.6-7/com.wechat.improve_2.6-7_iphoneos-arm64.deb)。
 
 ### Rootful
 
@@ -332,7 +337,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出文件名：`packages/com.wechat.improve_2.6-6_iphoneos-arm.deb`。本轮交付为 [2.6-6 Rootful 安装包](packages/2.6-6/com.wechat.improve_2.6-6_iphoneos-arm.deb)。
+当前版本默认输出文件名：`packages/com.wechat.improve_2.6-7_iphoneos-arm.deb`。本轮交付为 [2.6-7 Rootful 安装包](packages/2.6-7/com.wechat.improve_2.6-7_iphoneos-arm.deb)。
 
 | 方案 | 动态库安装目录 |
 | --- | --- |
@@ -356,7 +361,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
 `PACKAGE_VERSION` 只覆盖当次打包版本，不会更新插件内显示版本。安装了 `dpkg-deb` 后，可以检查包元数据：
 
 ```bash
-dpkg-deb -f packages/2.6-6/com.wechat.improve_2.6-6_iphoneos-arm64.deb Version Architecture
+dpkg-deb -f packages/2.6-7/com.wechat.improve_2.6-7_iphoneos-arm64.deb Version Architecture
 ```
 
 插件内通过 **关于 → 版本信息** 查看随包提供的离线更新说明。
