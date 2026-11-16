@@ -37,15 +37,29 @@
 }
 - (BOOL)setActive:(BOOL)active error:(NSError **)error {
     BOOL tracked=CSBackgroundRunAudioWillChange();
-    BOOL result=NO;
-    @try { result=%orig; return result; }
-    @finally { if (tracked) CSBackgroundRunAudioDidChange(result,YES,active); }
+    BOOL result=NO, completed=NO;
+    @try { result=%orig; completed=YES; return result; }
+    @finally {
+        if (tracked) {
+            // On iOS 8-25, IsBusy can report misuse after the session was
+            // actually deactivated. Preserve the native result and NSError.
+            NSError *failure=completed && !result && error?*error:nil;
+            BOOL deactivated=!active && [failure.domain isEqual:NSOSStatusErrorDomain] && failure.code==AVAudioSessionErrorCodeIsBusy;
+            CSBackgroundRunAudioDidChange(result || deactivated,YES,active);
+        }
+    }
 }
 - (BOOL)setActive:(BOOL)active withOptions:(AVAudioSessionSetActiveOptions)options error:(NSError **)error {
     BOOL tracked=CSBackgroundRunAudioWillChange();
-    BOOL result=NO;
-    @try { result=%orig; return result; }
-    @finally { if (tracked) CSBackgroundRunAudioDidChange(result,YES,active); }
+    BOOL result=NO, completed=NO;
+    @try { result=%orig; completed=YES; return result; }
+    @finally {
+        if (tracked) {
+            NSError *failure=completed && !result && error?*error:nil;
+            BOOL deactivated=!active && [failure.domain isEqual:NSOSStatusErrorDomain] && failure.code==AVAudioSessionErrorCodeIsBusy;
+            CSBackgroundRunAudioDidChange(result || deactivated,YES,active);
+        }
+    }
 }
 %end
 

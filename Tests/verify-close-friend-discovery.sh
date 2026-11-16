@@ -14,8 +14,8 @@ def body(marker):
         elif source[end]=='}':
             depth-=1
             if not depth:return source[start:end+1]
-markers=['static NSUInteger VisibleUnread(', 'static BOOL DiscoveryCommentInteger(', 'static BOOL DiscoveryRelatedMessage(', 'static unsigned int DiscoveryUnreadCount(', 'static void DiscoveryWithCounts(', 'static void InstallUnread(', 'static BOOL DiscoveryConcealed(', 'static void DiscoveryCounters(', 'static void DiscoveryViews(', 'static void InstallDiscovery(']
-declarations='static BOOL UnreadDisplay;\nstatic id DiscoveryCountingOwner;\nstatic NSMutableDictionary *DiscoveryCounts;\nstatic id (*NativeUnread)(id,SEL);\nstatic char DiscoveryViewKey;\n'
+markers=['BOOL CSCFUnreadBegin(', 'void CSCFUnreadEnd(', 'static CSCloseFriendSocialProjection *UnreadProjection(', 'static NSUInteger VisibleUnread(', 'static BOOL DiscoveryCommentInteger(', 'static BOOL DiscoveryRelatedMessage(', 'static unsigned int DiscoveryUnreadCount(', 'static void DiscoveryWithCounts(', 'static void InstallUnread(', 'static BOOL DiscoveryConcealed(', 'static void DiscoveryCounters(', 'static void DiscoveryViews(', 'static void InstallDiscovery(']
+declarations='static BOOL UnreadDisplay;\nstatic id DiscoveryCountingOwner;\nstatic NSMutableDictionary *DiscoveryCounts, *UnreadProjections;\nstatic NSUInteger UnreadEpoch, UnreadRevision;\nstatic NSString *UnreadAccount;\nstatic id (*NativeUnread)(id,SEL);\nstatic char DiscoveryViewKey;\n'
 (Path(sys.argv[1])/'DiscoveryBodies.h').write_text(declarations+'\n'.join(body(marker) for marker in markers))
 PY
 xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-function \

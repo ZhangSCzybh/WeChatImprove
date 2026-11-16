@@ -126,6 +126,19 @@ BOOL CSAIReplyMessageIngressAllowsSession(id session,NSUInteger epoch) {
 }
 - (void)changed:(NSNotification *)note {
     if(!NSThread.isMainThread){dispatch_async(dispatch_get_main_queue(),^{[self changed:note];});return;}
+    if([note.name isEqual:CSBackgroundRunStateChangedNotification]){
+        id changes=note.userInfo[CSBackgroundRunStateChangesKey];
+        if([changes isKindOfClass:NSNumber.class]){
+            // Display/audio changes do not change sync eligibility. Capability
+            // loss must stop scheduling immediately, without a full config/UI
+            // refresh; eligibility still validates account and authorization.
+            if([changes unsignedIntegerValue]&CSBackgroundRunStateChangeWork){
+                [self reconcileBackgroundSyncContext];[self.backgroundSync refresh];
+            }
+            return;
+        }
+        // Older senders without typed changes retain the full refresh path.
+    }
     if([note.name isEqual:UIApplicationDidEnterBackgroundNotification]){self.enteringForeground=NO;[self.store flushHistoryWithCompletion:nil];}
     dispatch_async(dispatch_get_main_queue(),^{
         // Close-friend visibility changes refresh settings without cancelling

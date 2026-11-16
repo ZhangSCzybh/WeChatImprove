@@ -290,6 +290,38 @@ static BOOL CommentCurrent(id cell) {
     NSNumber *revision=objc_getAssociatedObject(cell,&CommentRevisionKey);
     return CSCFPageIsCurrent(cell) && revision && revision.unsignedIntegerValue==CSCloseFriendCurrentSnapshot().revision && !CSCFSocialHidden(CSCloseFriendRead(cell,@"mainDataItem"),CSCloseFriendSurfaceTimeline);
 }
+static BOOL CommentDeleteRequiresAuthentication(id cell) {
+    if(!CommentCurrent(cell)) return YES;
+    if(!CSCloseFriendSurfaceConcealed(CSCloseFriendCurrentSnapshot(),CSCloseFriendSurfaceInteraction)) return NO;
+    // The cell is a view; authentication must be presented by its native page.
+    // Do not retain/replay an index captured from the concealed comment projection.
+    id owner=CSCloseFriendRead(cell,@"m_delegate");
+    if([owner isKindOfClass:UIViewController.class] && CSCFPageIsCurrent(owner))
+        CSCFSocialRequireAuthentication(owner,CSCloseFriendSurfaceInteraction);
+    return YES;
+}
+static void InstallCommentDeletion(void) {
+    for(NSString *name in @[@"showCommentDeleteOption:",@"onCommentViewDelete:"]) CSCFSocialHook1(@"WCTimeLineCommentCellView",name,^(id cell,id arg,void(^orig)(id)){
+        if(CommentDeleteRequiresAuthentication(cell)) return;
+        CSCFTimelineScope *old=Enter(nil,CSCloseFriendRead(cell,@"mainDataItem"));
+        @try {orig(arg);} @finally {Leave(old);}
+    });
+    // The native cell/page delete APIs consume source indexes. Require a new
+    // revealed gesture instead of guessing whether an incoming index is projected.
+    __block IMP remove=NULL;
+    IMP replacement=imp_implementationWithBlock(^(id cell,NSUInteger index){
+        if(CommentDeleteRequiresAuthentication(cell)) return;
+        ((void(*)(id,SEL,NSUInteger))remove)(cell,NSSelectorFromString(@"deleteComment:"),index);
+    });
+    if(!CSCloseFriendInstallHook(@"WCTimeLineCommentCellView",@"deleteComment:",replacement,&remove,"v@:Q")) imp_removeBlock(replacement);
+    __block IMP removeFromPage=NULL;
+    replacement=imp_implementationWithBlock(^(id owner,NSUInteger index,id item){
+        if(!CSCFPageIsCurrent(owner) || CSCFSocialHidden(item,CSCloseFriendSurfaceTimeline)) return;
+        if(CSCFSocialRequireAuthentication(owner,CSCloseFriendSurfaceInteraction)) return;
+        ((void(*)(id,SEL,NSUInteger,id))removeFromPage)(owner,NSSelectorFromString(@"onWCTimeLineCommentCellDeleteComment:ofDataItem:"),index,item);
+    });
+    if(!CSCloseFriendInstallHook(@"WCTimeLineViewController",@"onWCTimeLineCommentCellDeleteComment:ofDataItem:",replacement,&removeFromPage,"v@:Q@")) imp_removeBlock(replacement);
+}
 static void InstallComments(void) {
     // The count/index/height/name helpers all run against the SAME scoped native object.
     Class meta=object_getClass(NSClassFromString(@"WCTimeLineCommentCellView"));
@@ -317,19 +349,10 @@ static void InstallComments(void) {
     __block IMP show=NULL;
     IMP replacement=imp_implementationWithBlock(^id(id cell){if(!CommentCurrent(cell)) return nil; CSCFTimelineScope *old=Enter(nil,CSCloseFriendRead(cell,@"mainDataItem")); @try {return ((id(*)(id,SEL))show)(cell,NSSelectorFromString(@"getShowComment"));} @finally {Leave(old);} });
     if(!CSCloseFriendInstallHook(@"WCTimeLineCommentCellView",@"getShowComment",replacement,&show,"@@:")) imp_removeBlock(replacement);
-    for(NSString *name in @[@"showCommentClickOption:",@"showCommentDeleteOption:",@"onCommentViewDelete:",@"onFulltextBtnClick:"]) CSCFSocialHook1(@"WCTimeLineCommentCellView",name,^(id cell,id arg,void(^orig)(id)){
+    for(NSString *name in @[@"showCommentClickOption:",@"onFulltextBtnClick:"]) CSCFSocialHook1(@"WCTimeLineCommentCellView",name,^(id cell,id arg,void(^orig)(id)){
         if(!CommentCurrent(cell)) return; CSCFTimelineScope *old=Enter(nil,CSCloseFriendRead(cell,@"mainDataItem")); @try {orig(arg);} @finally {Leave(old);}
     });
-    // Native delete APIs take a source index. Do not forward a projected index into a business edit.
-    __block IMP remove=NULL;
-    replacement=imp_implementationWithBlock(^(id cell,NSUInteger index){if(!CommentCurrent(cell) || CSCloseFriendSurfaceConcealed(CSCloseFriendCurrentSnapshot(),CSCloseFriendSurfaceInteraction)) return; ((void(*)(id,SEL,NSUInteger))remove)(cell,NSSelectorFromString(@"deleteComment:"),index);});
-    if(!CSCloseFriendInstallHook(@"WCTimeLineCommentCellView",@"deleteComment:",replacement,&remove,"v@:Q")) imp_removeBlock(replacement);
-    __block IMP removeFromPage=NULL;
-    replacement=imp_implementationWithBlock(^(id owner,NSUInteger index,id item){
-        if(!CSCFPageIsCurrent(owner) || CSCloseFriendSurfaceConcealed(CSCloseFriendCurrentSnapshot(),CSCloseFriendSurfaceInteraction) || CSCFSocialHidden(item,CSCloseFriendSurfaceTimeline)) return;
-        ((void(*)(id,SEL,NSUInteger,id))removeFromPage)(owner,NSSelectorFromString(@"onWCTimeLineCommentCellDeleteComment:ofDataItem:"),index,item);
-    });
-    if(!CSCloseFriendInstallHook(@"WCTimeLineViewController",@"onWCTimeLineCommentCellDeleteComment:ofDataItem:",replacement,&removeFromPage,"v@:Q@")) imp_removeBlock(replacement);
+    InstallCommentDeletion();
     for(NSString *name in @[@"onCommentViewClicked:item:comment:",@"onCommentViewEmoticonClicked:item:comment:",@"onCommentViewPicClicked:item:comment:",@"onCommentViewExposured:item:comment:",@"onCommentViewAddEmotion:item:comment:"]) {
         __block IMP callback=NULL; SEL selector=NSSelectorFromString(name);
         replacement=imp_implementationWithBlock(^(id cell,id view,id item,id comment){

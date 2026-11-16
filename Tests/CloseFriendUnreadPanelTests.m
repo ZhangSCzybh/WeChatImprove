@@ -116,6 +116,9 @@ typedef NS_ENUM(NSInteger,UIApplicationState) { UIApplicationStateActive,UIAppli
 @implementation PanelCell @end
 @interface MainSessionMgr : NSObject
 @property(nonatomic,strong) NSMutableArray<PanelSession *> *fullSessions;
+@property(nonatomic,copy) NSArray<PanelSession *> *selectedSessions;
+@property(nonatomic) NSUInteger completeSourceDepth;
+@property(nonatomic) CSCloseFriendSurface completeSourceSurface;
 @property(nonatomic) NSUInteger enumerations;
 @property(nonatomic,copy) void (^onEnumerate)(void);
 - (NSEnumerator *)visibleSessionEnumerator;
@@ -126,11 +129,61 @@ typedef NS_ENUM(NSInteger,UIApplicationState) { UIApplicationStateActive,UIAppli
     // The native manager owns main-frame source eligibility. The panel's own
     // canShowSession method below does not read these flags.
     NSMutableArray *visible=[NSMutableArray array];
-    for(PanelSession *session in self.fullSessions)if([session canShowInMainFrame])[visible addObject:session];
+    NSArray *source=self.completeSourceDepth ? self.fullSessions : (self.selectedSessions ?: self.fullSessions);
+    for(PanelSession *session in source) {
+        BOOL concealed=self.completeSourceDepth && [Current hidesUserName:session.m_nsUserName surface:self.completeSourceSurface];
+        if([session canShowInMainFrame] && !concealed)[visible addObject:session];
+    }
     return visible.objectEnumerator;
 }
 @end
 static MainSessionMgr *Manager;
+
+// This fixture owns only the coordinator's synchronous complete-source contract.
+// Group model/array publication is covered by the coordinator's own native tests.
+// Unlike an always-successful shim, unavailable or unstable reads are rejected;
+// nested same-surface readers share one scope and every exit restores grouping.
+@interface CSGroupNativeSessionCoordinator : NSObject
+@property(nonatomic) BOOL sourceAvailable,nativeTransactionActive;
+@property(nonatomic) NSUInteger scopes,restorations,depth,scopeEpoch,scopeRevision;
+@property(nonatomic) CSCloseFriendSurface scopeSurface;
+@property(nonatomic,copy) NSString *scopeAccount;
+@property(nonatomic,weak) MainSessionMgr *scopeManager;
++ (instancetype)sharedCoordinator;
+- (BOOL)performWithCompleteSourceForSurface:(CSCloseFriendSurface)surface original:(void (^)(void))original;
+@end
+@implementation CSGroupNativeSessionCoordinator
++ (instancetype)sharedCoordinator {
+    static CSGroupNativeSessionCoordinator *coordinator;static dispatch_once_t once;
+    dispatch_once(&once,^{coordinator=[self new];coordinator.sourceAvailable=YES;});return coordinator;
+}
+- (BOOL)scopeIsCurrent {
+    return self.sourceAvailable && !self.nativeTransactionActive && Manager==self.scopeManager &&
+        Epoch==self.scopeEpoch && Current.revision==self.scopeRevision && !Current.blocked &&
+        [CurrentAccount isEqual:self.scopeAccount] && [Current.accountID isEqual:self.scopeAccount];
+}
+- (BOOL)performWithCompleteSourceForSurface:(CSCloseFriendSurface)surface original:(void (^)(void))original {
+    if(!NSThread.isMainThread || !original || !Manager || !self.sourceAvailable || self.nativeTransactionActive ||
+       (surface!=CSCloseFriendSurfaceSession && surface!=CSCloseFriendSurfaceForward) ||
+       Current.blocked || !CurrentAccount.length || ![Current.accountID isEqual:CurrentAccount])return NO;
+    if(self.depth) {
+        if(surface!=self.scopeSurface || ![self scopeIsCurrent])return NO;
+        original();return [self scopeIsCurrent];
+    }
+    self.scopeManager=Manager;self.scopeAccount=CurrentAccount;self.scopeEpoch=Epoch;
+    self.scopeRevision=Current.revision;self.scopeSurface=surface;self.depth=1;self.scopes++;
+    MainSessionMgr *manager=Manager;NSUInteger previousDepth=manager.completeSourceDepth;
+    CSCloseFriendSurface previousSurface=manager.completeSourceSurface;
+    manager.completeSourceDepth=previousDepth+1;manager.completeSourceSurface=surface;
+    BOOL accepted=NO;
+    @try {original();accepted=[self scopeIsCurrent];}
+    @finally {
+        manager.completeSourceDepth=previousDepth;manager.completeSourceSurface=previousSurface;
+        self.depth=0;self.scopeManager=nil;self.scopeAccount=nil;self.restorations++;
+    }
+    return accepted;
+}
+@end
 static NSInteger NativeNotifyCount;
 #ifdef CS_UNREAD_PANEL_ABI
 typedef NSInteger NativePredicateResult;
@@ -294,6 +347,49 @@ int main(void) { @autoreleasepool {
         fprintf(stdout,"Close-friend unread panel (unhooked native control): %lu checks, %lu failures\n",(unsigned long)Checks,(unsigned long)Failures);
         return Failures?1:0;
     }
+
+    CaseName=@"complete-source reads include other groups and restore the selected presentation";
+    CSGroupNativeSessionCoordinator *coordinator=CSGroupNativeSessionCoordinator.sharedCoordinator;
+    Manager.selectedSessions=@[second];NSArray *selectedSource=Manager.selectedSessions;
+    NSUInteger scopes=coordinator.scopes,restorations=coordinator.restorations;
+    __block BOOL nestedCalled=NO,crossSurfaceCalled=NO;
+    BOOL complete=[coordinator performWithCompleteSourceForSurface:CSCloseFriendSurfaceSession original:^{
+        CHECK(Manager.completeSourceDepth==1);
+        CHECK([Names(Manager.visibleSessionEnumerator.allObjects) isEqual:@[@"ordinary",@"second"]]);
+        CHECK([coordinator performWithCompleteSourceForSurface:CSCloseFriendSurfaceSession original:^{nestedCalled=YES;}]);
+        CHECK(![coordinator performWithCompleteSourceForSurface:CSCloseFriendSurfaceForward original:^{crossSurfaceCalled=YES;}]);
+    }];
+    CHECK(complete && nestedCalled && !crossSurfaceCalled);
+    CHECK(coordinator.scopes==scopes+1 && coordinator.restorations==restorations+1 && coordinator.depth==0);
+    CHECK(Manager.completeSourceDepth==0 && Manager.selectedSessions==selectedSource && [Manager.fullSessions isEqual:originalObjects]);
+    CHECK([Names(Manager.visibleSessionEnumerator.allObjects) isEqual:@[@"second"]]);
+    CSCFUnreadPanelRefresh(panel);
+    CHECK([Names(panel.dataLogic.currentSessionList) isEqual:@[@"ordinary",@"second"]] && !panel.tableContainerView.hidden);
+    CHECK(Manager.selectedSessions==selectedSource && Manager.completeSourceDepth==0);
+
+    CaseName=@"unavailable complete source stays masked until a verified rebuild";
+    coordinator.sourceAvailable=NO;__block BOOL rejectedCalled=NO;
+    CHECK(![coordinator performWithCompleteSourceForSurface:CSCloseFriendSurfaceSession original:^{rejectedCalled=YES;}]);
+    CHECK(!rejectedCalled);
+    NSUInteger enumerations=Manager.enumerations;CSCFUnreadPanelRefresh(panel);
+    CHECK(panel.tableContainerView.hidden && Manager.enumerations==enumerations && !CSCFUnreadPanelAllowsOpen(panel,ordinary));
+    coordinator.sourceAvailable=YES;CSCFUnreadPanelPreparePresentation(panel);
+    CHECK(!panel.tableContainerView.hidden && panel.bottomTitleCount==2 && Manager.selectedSessions==selectedSource);
+    coordinator.nativeTransactionActive=YES;
+    CHECK(![coordinator performWithCompleteSourceForSurface:CSCloseFriendSurfaceSession original:^{rejectedCalled=YES;}]);
+    CHECK(!rejectedCalled);coordinator.nativeTransactionActive=NO;
+
+    CaseName=@"complete-source exceptions propagate after grouping is restored";
+    BOOL caught=NO;restorations=coordinator.restorations;
+    @try {
+        [coordinator performWithCompleteSourceForSurface:CSCloseFriendSurfaceSession original:^{
+            @throw [NSException exceptionWithName:@"NativeCompleteSourceFailure" reason:nil userInfo:nil];
+        }];
+    } @catch(NSException *exception) {caught=[exception.name isEqual:@"NativeCompleteSourceFailure"];}
+    CHECK(caught && coordinator.depth==0 && coordinator.restorations==restorations+1);
+    CHECK(Manager.completeSourceDepth==0 && Manager.selectedSessions==selectedSource);
+    CHECK([Names(Manager.visibleSessionEnumerator.allObjects) isEqual:@[@"second"]]);
+    Manager.selectedSessions=nil;
 
     CaseName=@"unlock and relock rebuild from the complete manager with the retired option ignored";
     SetPolicy(YES,YES,YES,NO,@[@"secret"],@[@"secret-room@chatroom"],YES);Drain();

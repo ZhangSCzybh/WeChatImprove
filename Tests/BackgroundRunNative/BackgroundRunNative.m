@@ -34,6 +34,11 @@ NAME(AVAudioSessionInterruptionTypeKey); NAME(AVAudioSessionInterruptionOptionKe
 - (BOOL)nativeMode:(NSString *)mode error:(NSError **)error { self.mode=mode; return YES; }
 - (BOOL)nativeActive:(BOOL)active error:(NSError **)error {
     if (active) self.activations++; else self.deactivations++;
+    if (!active && self.failDeactivationWithBusy) {
+        self.active=NO;
+        if (error) *error=[NSError errorWithDomain:NSOSStatusErrorDomain code:AVAudioSessionErrorCodeIsBusy userInfo:nil];
+        return NO;
+    }
     if ((active && self.failActivation) || (!active && self.failDeactivation)) {
         if (error) *error=[NSError errorWithDomain:@"NativeAudio" code:11 userInfo:nil]; return NO;
     }
@@ -43,6 +48,7 @@ NAME(AVAudioSessionInterruptionTypeKey); NAME(AVAudioSessionInterruptionOptionKe
 }
 @end
 NSUInteger CSTestPlayerCreates, CSTestPlayerStarts, CSTestPlayerStops, CSTestPlayersAlive;
+NSUInteger CSTestBlankResourceLookups;
 BOOL CSTestFailPlayerCreation, CSTestFailPlayerPreparation, CSTestFailPlayerPlay;
 BOOL CSTestBlankResourceAvailable=YES;
 NSURL *CSTestLastPlayerURL;
@@ -52,8 +58,10 @@ static IMP CSTestOriginalMainBundle;
 @end
 @implementation CSTestHostBundle
 - (NSURL *)URLForResource:(NSString *)name withExtension:(NSString *)extension {
-    if ([name isEqual:@"blank"] && [extension isEqual:@"caf"])
+    if ([name isEqual:@"blank"] && [extension isEqual:@"caf"]) {
+        CSTestBlankResourceLookups++;
         return CSTestBlankResourceAvailable?[NSURL fileURLWithPath:@"/host/WeChat.app/blank.caf"]:nil;
+    }
     NSBundle *bundle=((id (*)(id,SEL))CSTestOriginalMainBundle)(NSBundle.class,@selector(mainBundle));
     return [bundle URLForResource:name withExtension:extension];
 }

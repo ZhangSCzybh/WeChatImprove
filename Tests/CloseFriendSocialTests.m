@@ -238,7 +238,14 @@ static char ShieldKey;
 static void ShieldPicker(id picker) {objc_setAssociatedObject(picker,&ShieldKey,@YES,OBJC_ASSOCIATION_RETAIN_NONATOMIC);}
 static BOOL CSCloseFriendShouldHideUserName(NSString *name,CSCloseFriendSurface surface) {return [Snapshot hidesUserName:name surface:surface];}
 #include "SocialRouteBodies.h"
-static BOOL CSCFSocialRequireAuthentication(id owner,CSCloseFriendSurface surface) {return !CSCFPageIsCurrent(owner) || CSCloseFriendSurfaceConcealed(Snapshot,surface);}
+static NSUInteger AuthenticationRequests;
+static id AuthenticationOwner;
+static BOOL CSCFSocialRequireAuthentication(id owner,CSCloseFriendSurface surface) {
+    if(!CSCFPageIsCurrent(owner))return YES;
+    if(!CSCloseFriendSurfaceConcealed(Snapshot,surface))return NO;
+    if([owner isKindOfClass:UIViewController.class]) {AuthenticationRequests++;AuthenticationOwner=owner;}
+    return YES;
+}
 #include "TimelineBodies.h"
 #include "InteractionBodies.h"
 #include "StatusBodies.h"
@@ -248,6 +255,7 @@ static void Policy(BOOL revealed,NSUInteger revision) {
     Snapshot=[[CSCloseFriendSnapshot alloc] initWithAccountID:@"fixture" profile:@{@"enabled":@YES,@"friends":@[@"secret"],@"groups":@[],@"options":CSCloseFriendDefaultOptions()} revealed:revealed revision:revision blocked:NO];
 }
 #include "CloseFriendSocialRouteFixture.h"
+#include "CloseFriendTimelineDeleteTests.h"
 #include "CloseFriendTimelinePresentationTests.h"
 #include "CloseFriendTimelineCacheTests.h"
 #include "CloseFriendTimelineArchiveTests.h"
@@ -371,6 +379,7 @@ int main(void) { @autoreleasepool {
     __block NSUInteger doneCalls=0; FinishEdit(freshPrivacy,^{doneCalls++;});
     Check(doneCalls==1 && freshPrivacy.selectContacts==acl && !NeedsUnlock(privacy));
     Check(TestTimelinePresentation()==0);
+    Check(TestTimelineDeletion()==0);
     Epoch++; Policy(NO,9); previous=Enter(page,nil); Check([facade countOfTimelineDataItem]==0); Leave(previous); Check([facade countOfTimelineDataItem]==3);
     Check(Cards(status).visible.count==0 && !MessageActionCurrent(messages,second) && NeedsUnlock(freshPrivacy));
     Check([Rows(reminderLogic,NULL,@"A") count]==0 && !PickerAllowsContact(reminder,@"alice") && [selector.arrContacts isEqual:@[@"secret"]]);

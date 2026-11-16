@@ -8,6 +8,14 @@ extern NSString *const CSBackgroundRunEnabledKey;
 extern NSString *const CSBackgroundRunCheckIntervalKey;
 extern NSNotificationName const CSBackgroundRunSettingsChangedNotification;
 extern NSNotificationName const CSBackgroundRunStateChangedNotification;
+// NSNumber bitmask in StateChanged.userInfo. Consumers of older notifications
+// without this key should keep their existing full-refresh behavior.
+extern NSString *const CSBackgroundRunStateChangesKey;
+typedef NS_OPTIONS(NSUInteger, CSBackgroundRunStateChanges) {
+    CSBackgroundRunStateChangeWork=1 << 0, // canAttemptBackgroundWork changed.
+    CSBackgroundRunStateChangeAudio=1 << 1, // backgroundAudioActive changed.
+    CSBackgroundRunStateChangeDisplay=1 << 2, // Phase or visible result changed.
+};
 
 // An immutable, in-memory observation; elapsed is monotonic time since entry,
 // or -1 when the clock is unavailable. It does not prove continuous execution.
@@ -48,6 +56,7 @@ extern NSNotificationName const CSBackgroundRunStateChangedNotification;
 // Snapshot of the latest visit: entry plus the newest 79 events, retained only
 // in this process. Timer summaries survive event truncation and task expiration.
 @property(nonatomic, copy, readonly) NSArray<CSBackgroundRunRecordEvent *> *lastBackgroundEvents;
+@property(nonatomic, readonly) NSUInteger lastBackgroundEventCount;
 @property(nonatomic, readonly) NSUInteger droppedBackgroundEventCount;
 @property(nonatomic, copy, readonly, nullable) NSDate *firstScheduledCheckAt;
 @property(nonatomic, copy, readonly, nullable) NSDate *lastPeriodicCheckAt;

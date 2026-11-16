@@ -38,6 +38,12 @@ void CSAIObserveBackgroundSyncRequest(NSUInteger expectedEpoch,void (^request)(v
 - (void)notify;
 - (void)invalidateConnectionTest;
 @end
+@interface TestBackgroundNotificationManager : CSAIReplyManager
+@property NSUInteger fullRefreshes;
+@end
+@implementation TestBackgroundNotificationManager
+- (void)refresh { self.fullRefreshes++; [super refresh]; }
+@end
 static NSUInteger checks,epoch=7,submissions;
 static NSString *account=@"alice";
 static BOOL suspended,failKeyWrite,failDirectorySync,simulateSends;
@@ -162,6 +168,7 @@ NSNotificationName const UIApplicationDidEnterBackgroundNotification=@"test-back
 NSNotificationName const UIApplicationWillEnterForegroundNotification=@"test-foreground";
 NSNotificationName const UIApplicationProtectedDataDidBecomeAvailable=@"test-unlocked";
 NSNotificationName const CSBackgroundRunStateChangedNotification=@"test-audio-state";
+NSString *const CSBackgroundRunStateChangesKey=@"CSBackgroundRunStateChanges";
 NSString *const CSCloseFriendPolicyDidChangeNotification=@"test-privacy";
 @implementation UIApplication
 + (instancetype)sharedApplication{static UIApplication *app;static dispatch_once_t once;dispatch_once(&once,^{app=[self new];});return app;}
@@ -639,6 +646,65 @@ static void BackgroundSyncTaskWithoutAudio(NSURL *url){
     nativeSyncService=nil;backgroundAudioActive=NO;canAttemptBackgroundWork=NO;
     UIApplication.sharedApplication.applicationState=UIApplicationStateActive;
 }
+static void BackgroundStateNotificationRouting(NSURL *url){
+    UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;
+    canAttemptBackgroundWork=YES;authorized=YES;SetPrivacy(YES,YES,YES);
+    TestStore *store=nil;(void)BackgroundSyncContextManager(url,&store);
+    TestBackgroundNotificationManager *manager=[TestBackgroundNotificationManager new];
+    [manager setValue:store forKey:@"store"];[manager setValue:@(epoch) forKey:@"epoch"];
+    [manager setValue:[TestClient new] forKey:@"client"];
+    CSAIBackgroundSync *scheduler=[manager valueForKey:@"backgroundSync"];
+    __block NSTimeInterval clock=70000;scheduler.now=^{return clock;};UseFreshBackgroundBudget(scheduler);
+    TestNativeSync *service=[TestNativeSync new];service.accepts=YES;nativeSyncService=service;
+    [manager start];CHECK(manager.fullRefreshes==1 && scheduler.active && service.syncCalls==1);
+    NSNotificationCenter *center=NSNotificationCenter.defaultCenter;
+    __block NSUInteger uiNotifications=0;
+    id observer=[center addObserverForName:CSAIReplyDidChange object:manager queue:nil usingBlock:^(NSNotification *note){(void)note;uiNotifications++;}];
+    NSTimer *old=SyncTimer(scheduler);
+    for(NSUInteger i=0;i<5;i++){
+        [center postNotificationName:CSBackgroundRunStateChangedNotification object:nil
+            userInfo:@{CSBackgroundRunStateChangesKey:@(CSBackgroundRunStateChangeAudio|CSBackgroundRunStateChangeDisplay)}];
+    }
+    DrainMain();CHECK(manager.fullRefreshes==1 && !uiNotifications);
+    CHECK(scheduler.active && SyncTimer(scheduler)==old && service.syncCalls==1);
+    // Capability loss stops immediately; no queued full refresh or UI work.
+    canAttemptBackgroundWork=NO;
+    [center postNotificationName:CSBackgroundRunStateChangedNotification object:nil
+        userInfo:@{CSBackgroundRunStateChangesKey:@(CSBackgroundRunStateChangeWork)}];
+    CHECK(!scheduler.active && !old.valid && manager.fullRefreshes==1);
+    DrainMain();CHECK(!scheduler.active && manager.fullRefreshes==1 && !uiNotifications);
+    [old fire];CHECK(service.syncCalls==1);
+    // Recovery retains the 45-second request budget and all eligibility gates.
+    canAttemptBackgroundWork=YES;clock+=5;
+    [center postNotificationName:CSBackgroundRunStateChangedNotification object:nil
+        userInfo:@{CSBackgroundRunStateChangesKey:@(CSBackgroundRunStateChangeWork|CSBackgroundRunStateChangeAudio)}];
+    CHECK(scheduler.active && service.syncCalls==1 && manager.fullRefreshes==1 && !uiNotifications);
+    clock+=40;FireSync(scheduler);CHECK(service.syncCalls==2);
+    authorized=NO;
+    [center postNotificationName:CSBackgroundRunStateChangedNotification object:nil
+        userInfo:@{CSBackgroundRunStateChangesKey:@(CSBackgroundRunStateChangeWork)}];
+    CHECK(!scheduler.active && service.syncCalls==2);
+    authorized=YES;account=@"bob";
+    [center postNotificationName:CSBackgroundRunStateChangedNotification object:nil
+        userInfo:@{CSBackgroundRunStateChangesKey:@(CSBackgroundRunStateChangeWork)}];
+    CHECK(!scheduler.active && service.syncCalls==2);
+    account=@"alice";
+    [center postNotificationName:CSBackgroundRunStateChangedNotification object:nil
+        userInfo:@{CSBackgroundRunStateChangesKey:@(CSBackgroundRunStateChangeWork)}];
+    CHECK(scheduler.active && service.syncCalls==2 && manager.fullRefreshes==1);
+    // Unmarked/malformed legacy notifications and configuration/account/privacy
+    // events keep their original complete refresh behavior.
+    [center postNotificationName:CSBackgroundRunStateChangedNotification object:nil];
+    CHECK(manager.fullRefreshes==1);DrainMain();CHECK(manager.fullRefreshes==2 && uiNotifications==1);
+    [center postNotificationName:CSBackgroundRunStateChangedNotification object:nil userInfo:@{CSBackgroundRunStateChangesKey:@"legacy"}];
+    DrainMain();CHECK(manager.fullRefreshes==3 && uiNotifications==2);
+    for(NSString *name in @[@"CSBackupAccountChanged",CSAIReplyConfigurationDidChange,CSCloseFriendPolicyDidChangeNotification])
+        [center postNotificationName:name object:nil];
+    DrainMain();CHECK(manager.fullRefreshes==6 && uiNotifications==5 && service.syncCalls==2);
+    [center removeObserver:observer];[center removeObserver:manager];
+    [scheduler stop];[[manager valueForKey:@"coordinator"] cancelAll];
+    nativeSyncService=nil;canAttemptBackgroundWork=NO;UIApplication.sharedApplication.applicationState=UIApplicationStateActive;
+}
 static BOOL HasVerifiedSync(CSAIBackgroundSync *scheduler){return [[scheduler valueForKey:@"verifiedSync"] boolValue];}
 static void BackgroundSyncContexts(NSURL *root){
     UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;canAttemptBackgroundWork=YES;SetPrivacy(YES,YES,YES);
@@ -1032,6 +1098,7 @@ int main(int argc,const char **argv){@autoreleasepool{
     IngressAdmissionFastPath([[url URLByDeletingLastPathComponent] URLByAppendingPathComponent:@"ingress-admission.plist"]);
     BackgroundSyncReplies([[url URLByDeletingLastPathComponent] URLByAppendingPathComponent:@"background-replies.plist"]);
     BackgroundSyncTaskWithoutAudio([[url URLByDeletingLastPathComponent] URLByAppendingPathComponent:@"background-task-without-audio.plist"]);
+    BackgroundStateNotificationRouting([[url URLByDeletingLastPathComponent] URLByAppendingPathComponent:@"background-state-routing.plist"]);
     BackgroundSyncContexts([url URLByDeletingLastPathComponent]);
     BackgroundSyncRequestReentry([url URLByDeletingLastPathComponent]);
     BackgroundFallbackConfiguration([url URLByDeletingLastPathComponent]);

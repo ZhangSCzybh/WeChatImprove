@@ -28,9 +28,10 @@ for forbidden in ('dispatch_source_create','dispatch_after','%hook AppDelegate',
  assert forbidden not in production, forbidden
 assert 'URLForResource:@"blank" withExtension:@"caf"' in audio
 assert 'NSTimer' not in manager and 'beginBackgroundTask' not in manager
-assert 'repeats:NO' in runtime and 'endBackgroundTask:' in runtime
+assert 'repeating:NO' in runtime and 'repeating:YES' in runtime and 'endBackgroundTask:' in runtime
+assert 'scheduleEvery:self.checkInterval' in manager and 'scheduleAfter:CSRunGraceInterval' in manager
 assert 'canAttemptBackgroundWork' in manager
-print('Background run: one-shot runtime boundary, finite task cleanup, public lifecycle and host blank.caf contracts')
+print('Background run: reusable periodic timer, one-shot grace/recovery, finite task cleanup and host blank.caf contracts')
 PY
 compile_background_test() {
 xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-parameter \

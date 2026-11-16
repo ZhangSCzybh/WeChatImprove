@@ -4,6 +4,7 @@ typedef NSUInteger AVAudioSessionSetActiveOptions;
 typedef NSUInteger AVAudioSessionRouteSharingPolicy;
 enum { AVAudioSessionCategoryOptionMixWithOthers=1, AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation=1, AVAudioSessionRouteSharingPolicyDefault=0 };
 enum { AVAudioSessionInterruptionTypeEnded=0, AVAudioSessionInterruptionTypeBegan=1, AVAudioSessionInterruptionOptionShouldResume=1 };
+enum { AVAudioSessionErrorCodeIsBusy=560030580 };
 extern NSString *const AVAudioSessionCategoryAmbient, *const AVAudioSessionCategorySoloAmbient, *const AVAudioSessionCategoryPlayback, *const AVAudioSessionCategoryPlayAndRecord, *const AVAudioSessionModeDefault;
 extern NSNotificationName const AVAudioSessionInterruptionNotification, AVAudioSessionMediaServicesWereLostNotification, AVAudioSessionMediaServicesWereResetNotification, AVAudioSessionRouteChangeNotification, AVAudioSessionSilenceSecondaryAudioHintNotification;
 extern NSString *const AVAudioSessionInterruptionTypeKey, *const AVAudioSessionInterruptionOptionKey;
@@ -15,6 +16,7 @@ extern NSString *const AVAudioSessionInterruptionTypeKey, *const AVAudioSessionI
 @property(nonatomic) BOOL active;
 @property(nonatomic) BOOL secondaryAudioShouldBeSilencedHint;
 @property(nonatomic) BOOL failCategory, failActivation, failDeactivation, throwCategory;
+@property(nonatomic) BOOL failDeactivationWithBusy;
 @property(nonatomic) NSUInteger configurations, activations, deactivations;
 @property(nonatomic, copy) dispatch_block_t activationAction;
 - (BOOL)setCategory:(NSString *)category error:(NSError **)error;
@@ -31,6 +33,7 @@ extern NSString *const AVAudioSessionInterruptionTypeKey, *const AVAudioSessionI
 - (void)audioPlayerDecodeErrorDidOccur:(AVAudioPlayer *)player error:(NSError *)error;
 @end
 extern NSUInteger CSTestPlayerCreates, CSTestPlayerStarts, CSTestPlayerStops, CSTestPlayersAlive;
+extern NSUInteger CSTestBlankResourceLookups;
 extern BOOL CSTestFailPlayerCreation, CSTestFailPlayerPreparation, CSTestFailPlayerPlay, CSTestBlankResourceAvailable;
 extern NSURL *CSTestLastPlayerURL;
 extern __weak AVAudioPlayer *CSTestLastPlayer;

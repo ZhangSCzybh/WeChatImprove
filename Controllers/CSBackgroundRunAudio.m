@@ -1,35 +1,54 @@
 #import "CSBackgroundRunAudio.h"
 #import <AVFoundation/AVFoundation.h>
 #import <stdatomic.h>
+#import <os/lock.h>
 
 NSNotificationName const CSBackgroundRunHostAudioChangedNotification = @"CSBackgroundRunHostAudioChanged";
 NSNotificationName const CSBackgroundRunPlaybackFailedNotification = @"CSBackgroundRunPlaybackFailed";
 NSNotificationName const CSBackgroundRunPlaybackFinishedNotification = @"CSBackgroundRunPlaybackFinished";
 static atomic_uint_fast64_t hostEpoch;
-static atomic_uint_fast64_t hostReleaseEpoch;
+static atomic_uint_fast64_t mediaGeneration;
 static atomic_uint hostCalls;
 static atomic_bool hostActive, hostActiveKnown, hostNotificationPending;
+static atomic_bool hostNotificationsEnabled;
+static BOOL mediaLossObserved;
 static _Thread_local unsigned int ownChanges, nativeChanges;
+static _Thread_local uint64_t nativeMediaGeneration;
+// Only tracker bookkeeping is protected; never hold this across an audio API.
+static os_unfair_lock hostStateLock=OS_UNFAIR_LOCK_INIT;
 
 BOOL CSBackgroundRunAudioWillChange(void) {
     if (ownChanges || nativeChanges) return NO;
     nativeChanges++;
     atomic_fetch_add(&hostCalls, 1);
-    atomic_fetch_add(&hostEpoch, 1);
+    nativeMediaGeneration=atomic_load(&mediaGeneration);
     return YES;
 }
 void CSBackgroundRunAudioDidChange(BOOL succeeded, BOOL activation, BOOL active) {
-    if (succeeded && activation) {
-        atomic_store(&hostActive, active);
-        atomic_store(&hostActiveKnown, true);
-        if (!active) atomic_store(&hostReleaseEpoch,atomic_load(&hostEpoch));
+    os_unfair_lock_lock(&hostStateLock);
+    if (succeeded && nativeMediaGeneration==atomic_load(&mediaGeneration)) {
+        // Pending calls block borrowing, but a failed write cannot revoke a
+        // valid lease or discard its original pre-plugin configuration snapshot.
+        atomic_fetch_add(&hostEpoch, 1);
+        if (activation) {
+            atomic_store(&hostActive, active);
+            atomic_store(&hostActiveKnown, true);
+        }
     }
+    os_unfair_lock_unlock(&hostStateLock);
     atomic_fetch_sub(&hostCalls, 1);
     nativeChanges--;
-    if (atomic_exchange(&hostNotificationPending, true)) return;
+    // Even a failed native call must finish tracking: an in-flight call may
+    // have made a periodic check yield. Gate delivery only after it unwinds.
+    if (!atomic_load(&hostNotificationsEnabled) || atomic_exchange(&hostNotificationPending, true)) return;
     dispatch_async(dispatch_get_main_queue(), ^{
         atomic_store(&hostNotificationPending, false);
-        BOOL released=atomic_load(&hostReleaseEpoch)==atomic_load(&hostEpoch) && !atomic_load(&hostCalls) && !atomic_load(&hostActive);
+        if (!atomic_load(&hostNotificationsEnabled)) return;
+        // Native cleanup may restore category/mode after deactivation. Such
+        // writes invalidate our lease without making the native session active.
+        // The manager also checks hostBusy before accepting a release, retaining
+        // its conservative fallback for unobserved, non-default configurations.
+        BOOL released=!atomic_load(&hostCalls) && !atomic_load(&hostActive);
         [NSNotificationCenter.defaultCenter postNotificationName:CSBackgroundRunHostAudioChangedNotification object:nil userInfo:@{@"released":@(released)}];
     });
 }
@@ -40,6 +59,8 @@ static NSError *CSAudioError(NSInteger code, NSString *reason) {
 
 @interface CSBackgroundRunAudio () <AVAudioPlayerDelegate>
 @property(nonatomic, strong) AVAudioPlayer *player;
+// Bundle metadata survives audio-server resets; players and leases never do.
+@property(nonatomic, copy) NSURL *blankURL;
 @property(nonatomic, copy) NSString *previousCategory, *previousMode;
 @property(nonatomic) AVAudioSessionCategoryOptions previousOptions;
 @property(nonatomic) AVAudioSessionRouteSharingPolicy previousPolicy;
@@ -48,6 +69,10 @@ static NSError *CSAudioError(NSInteger code, NSString *reason) {
 @end
 
 @implementation CSBackgroundRunAudio
+- (void)setHostNotificationsEnabled:(BOOL)enabled {
+    NSAssert(NSThread.isMainThread,@"Background audio delivery is main-thread owned");
+    atomic_store(&hostNotificationsEnabled, enabled);
+}
 - (BOOL)playing { return self.player.isPlaying; }
 - (BOOL)sessionOwned { return [self ownsConfiguration]; }
 - (BOOL)hostBusy {
@@ -75,7 +100,7 @@ static NSError *CSAudioError(NSInteger code, NSString *reason) {
     // External playback may coexist through MixWithOthers; native WeChat audio
     // still owns this process's session and must never be displaced.
     if (self.hostBusy) {
-        [self stop];
+        [self relinquish];
         if (error) *error=CSAudioError(1,@"微信正在使用音频，保活已让出");
         return NO;
     }
@@ -89,7 +114,11 @@ static NSError *CSAudioError(NSInteger code, NSString *reason) {
             self.previousCategory=session.category; self.previousMode=session.mode;
             self.previousOptions=session.categoryOptions; self.previousPolicy=session.routeSharingPolicy;
         }
-        NSURL *url=[NSBundle.mainBundle URLForResource:@"blank" withExtension:@"caf"];
+        NSURL *url=self.blankURL;
+        if (!url) {
+            url=[NSBundle.mainBundle URLForResource:@"blank" withExtension:@"caf"];
+            if (url) self.blankURL=url;
+        }
         if (!url) failure=CSAudioError(2,@"当前微信包缺少 blank.caf，无法播放保活音频");
         else {
             [self releasePlayer];
@@ -128,9 +157,15 @@ static NSError *CSAudioError(NSInteger code, NSString *reason) {
     self.previousCategory=nil; self.previousMode=nil;
 }
 - (void)relinquish {
+    // An in-flight native call blocks playback immediately, but it may fail.
+    // Preserve the original snapshot until a confirmed mutation revokes it.
+    BOOL pendingLease=self.configured && self.epoch==atomic_load(&hostEpoch) && atomic_load(&hostCalls)>0;
     ownChanges++;
     @try { [self releasePlayer]; }
-    @finally { [self clearLease]; ownChanges--; }
+    @finally {
+        if (!pendingLease || self.epoch!=atomic_load(&hostEpoch)) [self clearLease];
+        ownChanges--;
+    }
 }
 - (void)suspend {
     // iOS deactivates an interrupted session. Retain its configuration lease so
@@ -138,6 +173,28 @@ static NSError *CSAudioError(NSInteger code, NSString *reason) {
     ownChanges++;
     @try { [self releasePlayer]; }
     @finally { self.activated=NO; ownChanges--; }
+}
+- (void)invalidateForMediaServicesLoss {
+    os_unfair_lock_lock(&hostStateLock);
+    atomic_fetch_add(&mediaGeneration, 1);
+    atomic_fetch_add(&hostEpoch, 1);
+    atomic_store(&hostActive, false);
+    atomic_store(&hostActiveKnown, true);
+    mediaLossObserved=YES;
+    os_unfair_lock_unlock(&hostStateLock);
+    [self relinquish];
+}
+- (void)resetAfterMediaServicesReset {
+    os_unfair_lock_lock(&hostStateLock);
+    // WeChat may receive Reset first and successfully reactivate before our
+    // observer runs. Preserve post-Lost results, including in-flight calls.
+    // With no observed Lost, there is no reliable public boundary identifying
+    // stale vs fresh native activation: keep it until a native release.
+    if (!mediaLossObserved) atomic_fetch_add(&mediaGeneration, 1);
+    atomic_fetch_add(&hostEpoch, 1);
+    mediaLossObserved=NO;
+    os_unfair_lock_unlock(&hostStateLock);
+    [self relinquish];
 }
 - (void)stop {
     ownChanges++;

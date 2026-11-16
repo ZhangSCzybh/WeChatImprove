@@ -10,6 +10,7 @@ static NSUInteger Epoch=1;
 static char EpochKey;
 static NSMapTable *Refreshes;
 static CSCloseFriendSnapshot *CSCloseFriendCurrentSnapshot(void) { return Snapshot; }
+static NSUInteger CSCloseFriendAccountEpoch(void) { return Epoch; }
 static BOOL CSCFPageIsCurrent(id page) {
     NSNumber *old=objc_getAssociatedObject(page,&EpochKey);
     if(!old) { old=@(Epoch); objc_setAssociatedObject(page,&EpochKey,old,OBJC_ASSOCIATION_RETAIN_NONATOMIC); }
@@ -73,7 +74,7 @@ static BOOL CSCFSocialHidden(id object,CSCloseFriendSurface surface) {
 @implementation WCFacade
 - (id)getUnReadMessages { return self.source; }
 - (id)getUnReadMessagesLimit:(int)limit { return [self.source subarrayWithRange:NSMakeRange(0,MIN((NSUInteger)MAX(limit,0),self.source.count))]; }
-- (id)getLastUnReadMessage { return self.source.lastObject; }
+- (id)getLastUnReadMessage { return self.source.firstObject; }
 - (unsigned int)getUnReadMessageCount { return (unsigned int)self.source.count; }
 - (unsigned int)getUnReadMessageCountReleatedToMe {
     unsigned int count=0; for(DiscoveryMessage *message in self.source) if(message.related) count++; return count;

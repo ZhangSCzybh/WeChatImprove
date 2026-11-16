@@ -7,12 +7,17 @@
 @property(nonatomic, readonly) BOOL valid;
 @property(nonatomic, readonly) NSUInteger endCalls;
 @property(nonatomic, readonly) NSUInteger number;
+@property(nonatomic, copy, readonly, nullable) NSDate *expirationDate;
+@property(nonatomic, readonly) NSTimeInterval expirationUptime;
 - (void)expire;
+- (void)expireDeferringCallback;
+- (void)deliverExpirationCallback;
 @end
 
 @interface CSTestBackgroundCheck : NSObject <CSBackgroundRunScheduledCheck>
 @property(nonatomic, readonly) BOOL cancelled;
 @property(nonatomic, readonly) BOOL fired;
+@property(nonatomic, readonly) BOOL repeating;
 @property(nonatomic, readonly) NSTimeInterval deadline;
 - (void)fireEvenIfCancelled;
 @end
@@ -29,4 +34,5 @@
 @property(nonatomic, readonly) NSArray<NSString *> *events;
 @property(nonatomic, readonly) NSUInteger liveTaskCount, pendingCheckCount;
 - (void)advanceBy:(NSTimeInterval)elapsed;
+- (void)advanceWithoutDeliveryBy:(NSTimeInterval)elapsed;
 @end

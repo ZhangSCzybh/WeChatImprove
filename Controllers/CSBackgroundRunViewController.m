@@ -76,6 +76,7 @@ static NSString *const CSBackgroundRunRecordExplanation=@"仅保留当前微信�
 @property(nonatomic, strong) NSDateFormatter *recordDateFormatter;
 @property(nonatomic, strong) NSDateFormatter *fullRecordDateFormatter;
 @property(nonatomic, strong) UIAlertAction *intervalSaveAction;
+@property(nonatomic) BOOL settingsPageVisible, sectionsDirty, sectionsRefreshPending;
 @end
 
 @implementation CSBackgroundRunViewController
@@ -87,16 +88,71 @@ static NSString *const CSBackgroundRunRecordExplanation=@"仅保留当前微信�
     self.tableView.backgroundColor=UIColor.systemGroupedBackgroundColor;
     [CSSettingTableViewCell registerToTableView:self.tableView];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(stateChanged:) name:CSBackgroundRunStateChangedNotification object:CSBackgroundRunManager.sharedManager];
+    for (NSString *name in @[
+        UIApplicationDidBecomeActiveNotification, UIApplicationWillResignActiveNotification, UIApplicationDidEnterBackgroundNotification,
+        UISceneDidActivateNotification, UISceneWillDeactivateNotification, UISceneDidEnterBackgroundNotification
+    ]) [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(activityChanged:) name:name object:nil];
+    self.sectionsDirty=YES;
     [CSBackgroundRunManager.sharedManager start];
-    [self rebuildSections];
 }
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    self.settingsPageVisible=NO;
+    self.sectionsDirty=YES;
     [CSBackgroundRunManager.sharedManager reloadSettings];
-    [self rebuildSections];
+}
+- (void)viewIsAppearing:(BOOL)animated {
+    [super viewIsAppearing:animated];
+    self.settingsPageVisible=YES;
+    // The window/scene are available here, before the first visible frame.
+    // Settings notifications during viewWillAppear only marked this page dirty.
+    [self refreshSectionsIfVisible];
+}
+- (void)viewWillDisappear:(BOOL)animated {
+    self.settingsPageVisible=NO;
+    [super viewWillDisappear:animated];
 }
 - (void)dealloc { [NSNotificationCenter.defaultCenter removeObserver:self]; }
-- (void)stateChanged:(NSNotification *)notification { [self rebuildSections]; }
+- (BOOL)canRefreshSections {
+    UIWindow *window=self.viewIfLoaded.window;
+    if (!self.settingsPageVisible || !window || window.hidden || self.viewIfLoaded.hidden ||
+        UIApplication.sharedApplication.applicationState!=UIApplicationStateActive) return NO;
+    if (self.navigationController && self.navigationController.topViewController!=self) return NO;
+    UIScene *scene=window.windowScene;
+    return !scene || scene.activationState==UISceneActivationStateForegroundActive;
+}
+- (void)refreshSectionsIfVisible {
+    if (!self.sectionsDirty || ![self canRefreshSections]) return;
+    self.sectionsDirty=NO;
+    [self rebuildSections];
+}
+- (void)requestSectionsRefresh {
+    if (self.sectionsRefreshPending || !self.sectionsDirty || ![self canRefreshSections]) return;
+    self.sectionsRefreshPending=YES;
+    __weak typeof(self) weakSelf=self;
+    dispatch_async(dispatch_get_main_queue(),^{
+        CSBackgroundRunViewController *self=weakSelf;
+        if (!self) return;
+        self.sectionsRefreshPending=NO;
+        // A queued notification may outlive visibility or foreground activity.
+        [self refreshSectionsIfVisible];
+    });
+}
+- (void)stateChanged:(NSNotification *)notification {
+    if (!NSThread.isMainThread) {
+        __weak typeof(self) weakSelf=self;
+        dispatch_async(dispatch_get_main_queue(),^{ [weakSelf stateChanged:nil]; });
+        return;
+    }
+    self.sectionsDirty=YES;
+    [self requestSectionsRefresh];
+}
+- (void)activityChanged:(NSNotification *)notification {
+    if ([notification.object isKindOfClass:UIScene.class] && notification.object!=self.viewIfLoaded.window.windowScene) return;
+    self.sectionsDirty=YES;
+    if ([notification.name isEqual:UIApplicationDidBecomeActiveNotification] || [notification.name isEqual:UISceneDidActivateNotification])
+        [self requestSectionsRefresh];
+}
 - (NSString *)recordTime:(NSDate *)date full:(BOOL)full fallback:(NSString *)fallback {
     if (!date) return fallback;
     NSDateFormatter *formatter=full?self.fullRecordDateFormatter:self.recordDateFormatter;
@@ -117,20 +173,23 @@ static NSString *const CSBackgroundRunRecordExplanation=@"仅保留当前微信�
 }
 - (NSArray<NSDictionary<NSString *, NSString *> *> *)recordSummaryForManager:(CSBackgroundRunManager *)manager full:(BOOL)full {
     BOOL hasRecord=manager.lastBackgroundStartedAt!=nil;
-    return @[
+    NSArray *summary=@[
         @{@"title":@"最后结果",@"icon":@"clock",@"detail":hasRecord?manager.lastBackgroundResult:@"尚无记录"},
         @{@"title":manager.lastBackgroundStartObserved?@"进入后台":@"开始观察",@"icon":@"arrow.down.circle",@"detail":[self recordTime:manager.lastBackgroundStartedAt full:full fallback:@"尚无记录"]},
         @{@"title":@"首次检查",@"icon":@"clock.badge.checkmark",@"detail":[self recordTime:manager.firstScheduledCheckAt full:full fallback:hasRecord?@"尚未记录":@"尚无记录"]},
         @{@"title":@"最近周期检查",@"icon":@"clock.arrow.circlepath",@"detail":[self recordTime:manager.lastPeriodicCheckAt full:full fallback:hasRecord?@"尚未记录":@"尚无记录"]},
         @{@"title":@"周期检查次数",@"icon":@"number.circle",@"detail":hasRecord?[NSString stringWithFormat:@"%lu 次",(unsigned long)manager.periodicCheckCount]:@"尚无记录"},
-        @{@"title":@"系统到期时间",@"icon":@"exclamationmark.clock",@"detail":[self recordTime:manager.lastTaskExpiredAt full:full fallback:hasRecord?@"未记录到期":@"尚无记录"]},
+        @{@"title":@"系统到期时间",@"icon":@"hourglass",@"detail":[self recordTime:manager.lastTaskExpiredAt full:full fallback:hasRecord?@"未记录到期":@"尚无记录"]},
         @{@"title":@"停止时间",@"icon":@"stop.circle",@"detail":[self recordTime:manager.lastBackgroundStoppedAt full:full fallback:hasRecord?@"尚未停止":@"尚无记录"]},
         @{@"title":@"停止原因",@"icon":@"info.circle",@"detail":hasRecord?manager.lastBackgroundStopReason:@"尚无记录"},
-        @{@"title":@"返回前台",@"icon":@"arrow.up.circle",@"detail":[self recordTime:manager.lastForegroundReturnedAt full:full fallback:hasRecord?@"尚未返回前台":@"尚无记录"]},
+        @{@"title":@"返回前台",@"icon":@"arrow.up.circle",@"detail":[self recordTime:manager.lastForegroundReturnedAt full:full fallback:hasRecord?@"尚未返回前台":@"尚无记录"]}
+    ];
+    if (!full) return summary;
+    return [summary arrayByAddingObjectsFromArray:@[
         @{@"title":@"最后评估",@"icon":@"clock",@"detail":[self recordTime:manager.lastBackgroundCheckedAt full:full fallback:hasRecord?@"尚未评估":@"尚无记录"]},
         @{@"title":@"评估时状态",@"icon":@"waveform",@"detail":manager.lastBackgroundCheckedAt?manager.lastBackgroundCheckStatus:@"尚未评估"},
         @{@"title":@"评估至返回间隔",@"icon":@"timer",@"detail":[self lastCheckToForegroundText:manager]}
-    ];
+    ]];
 }
 - (void)rebuildSections {
     CSBackgroundRunManager *manager=CSBackgroundRunManager.sharedManager;
@@ -139,18 +198,17 @@ static NSString *const CSBackgroundRunRecordExplanation=@"仅保留当前微信�
         NSUserDefaults *defaults=[[NSUserDefaults alloc] initWithSuiteName:CSBackgroundRunDefaultsSuite];
         [defaults setBool:enabled forKey:CSBackgroundRunEnabledKey];
         [NSNotificationCenter.defaultCenter postNotificationName:CSBackgroundRunSettingsChangedNotification object:nil];
-        [weakSelf rebuildSections];
+        [weakSelf stateChanged:nil];
     }];
     CSSettingItem *state=[CSSettingItem itemWithTitle:@"当前状态" iconName:@"waveform" iconColor:UIColor.systemBlueColor detail:manager.statusText];
     CSSettingItem *checkInterval=[CSSettingItem itemWithTitle:@"检查间隔" iconName:@"timer" iconColor:UIColor.systemBlueColor detail:[NSString stringWithFormat:@"%.0f 秒",manager.checkInterval]];
     CSSettingItem *capability=[CSSettingItem itemWithTitle:@"后台音频声明" iconName:@"checkmark.shield" iconColor:UIColor.systemBlueColor detail:manager.supportsBackgroundAudio?@"当前微信包已声明":@"当前微信包未声明"];
     NSMutableArray<CSSettingItem *> *recordItems=[NSMutableArray new];
     NSArray *summary=[self recordSummaryForManager:manager full:NO];
-    for (NSUInteger index=0;index<9;index++) {
-        NSDictionary *row=summary[index];
+    for (NSDictionary *row in summary) {
         [recordItems addObject:[CSSettingItem itemWithTitle:row[@"title"] iconName:row[@"icon"] iconColor:UIColor.systemBlueColor detail:row[@"detail"]]];
     }
-    [recordItems addObject:[CSSettingItem itemWithTitle:@"事件时间线" iconName:@"list.bullet.rectangle" iconColor:UIColor.systemBlueColor detail:[NSString stringWithFormat:@"%lu 条记录",(unsigned long)manager.lastBackgroundEvents.count]]];
+    [recordItems addObject:[CSSettingItem itemWithTitle:@"事件时间线" iconName:@"list.bullet.rectangle" iconColor:UIColor.systemBlueColor detail:[NSString stringWithFormat:@"%lu 条记录",(unsigned long)manager.lastBackgroundEventCount]]];
     CSSettingItem *info=[CSSettingItem itemWithTitle:@"功能说明" iconName:@"info.circle" iconColor:UIColor.systemBlueColor detail:nil];
     self.sections=@[
         [CSSettingSection sectionWithHeader:@"开关设置" items:@[toggle,checkInterval]],
@@ -205,7 +263,7 @@ static NSString *const CSBackgroundRunRecordExplanation=@"仅保留当前微信�
         NSUserDefaults *defaults=[[NSUserDefaults alloc] initWithSuiteName:CSBackgroundRunDefaultsSuite];
         [defaults setInteger:interval forKey:CSBackgroundRunCheckIntervalKey];
         [NSNotificationCenter.defaultCenter postNotificationName:CSBackgroundRunSettingsChangedNotification object:nil];
-        [self rebuildSections];
+        [self stateChanged:nil];
     }];
     self.intervalSaveAction.enabled=[self parsedCheckInterval:alert.textFields.firstObject.text]!=NSNotFound;
     [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];
@@ -237,7 +295,7 @@ static NSString *const CSBackgroundRunRecordExplanation=@"仅保留当前微信�
     if (indexPath.section==2) { [self showLastBackgroundRecord]; return; }
     if (indexPath.section!=3) return;
     UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"后台运行说明"
-        message:@"进入后台后申请系统允许的有限后台任务，1.5 秒后首次检查，之后按设置的间隔检查，默认 25 秒，可配置 10–30 秒。有效剩余时间大于 0 且不足 30 秒时，尝试短静音播放并续接后台任务。\n\n音源直接使用当前微信主包的 blank.caf，单次播放，不另外生成音频，也不无限循环。资源缺失或系统不允许播放时，当前状态会显示原因。播放正常结束后继续按间隔检查；音频播放和任务申请均不保证系统补充执行时间。\n\n微信自身使用音频时优先让出，释放后再尝试；其他 App 播放音乐或视频时，保活音频以混音方式继续尝试，不主动打断对方播放。电话、Siri 等系统音频中断仍需等待系统允许恢复。返回前台或关闭后台运行后，停止检查并释放本插件的任务与音频资源。此开关控制本插件额外申请后台执行机会，群功能仍按自身设置和实际执行条件处理。\n\n当前状态和最近检查仅表示已观察到的执行条件，不能证明全程持续运行。后台消息和自动处理仍依赖微信原生服务；系统挂起、结束进程或用户划掉微信后，插件无法自行唤醒微信。"
+        message:@"进入后台后申请系统允许的有限后台任务，1.5 秒后首次检查，之后按设置的间隔检查，默认 25 秒，可配置 10–30 秒。有效剩余时间大于 0 且不足 30 秒时，尝试短静音播放并续接后台任务。\n\n音源直接使用当前微信主包的 blank.caf，单次播放，不另外生成音频，也不无限循环。资源缺失或系统不允许播放时，当前状态会显示原因。播放正常结束后继续按间隔检查；音频播放和任务申请均不保证系统补充执行时间。\n\n微信自身使用音频时优先让出，释放后再尝试；其他 App 播放音乐或视频时，保活音频以混音方式继续尝试，不主动打断对方播放。电话、Siri 等系统音频中断不会主动终止保活请求；当前音频被系统停用后，保留可用的有限后台任务，并按原周期继续尝试。中断结束后也会重新检查，实际能否播放由系统决定。返回前台或关闭后台运行后，停止检查并释放本插件的任务与音频资源。此开关控制本插件额外申请后台执行机会，群功能仍按自身设置和实际执行条件处理。\n\n当前状态和最近检查仅表示已观察到的执行条件，不能证明全程持续运行。后台消息和自动处理仍依赖微信原生服务；系统挂起、结束进程或用户划掉微信后，插件无法自行唤醒微信。"
         preferredStyle:UIAlertControllerStyleAlert];
     [alert addAction:[UIAlertAction actionWithTitle:@"了解了" style:UIAlertActionStyleDefault handler:nil]];
     [self presentViewController:alert animated:YES completion:nil];

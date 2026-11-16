@@ -161,6 +161,7 @@
 
 @interface CSSettingTableViewCell ()
 @property (nonatomic, strong) CSSettingItem *currentItem;
+@property (nonatomic, strong) UIImageView *settingIconImageView;
 @property (nonatomic, strong) UIImageView *dragHandleImageView; // 拖动手柄
 @end
 
@@ -190,16 +191,20 @@
     // 背景色
     self.backgroundColor = [UIColor secondarySystemGroupedBackgroundColor];
     
-    // 设置图标容器，使用自动布局
-    self.imageView.contentMode = UIViewContentModeCenter;
-    self.imageView.translatesAutoresizingMaskIntoConstraints = NO;
+    // UIKit 会在原生布局中调整内置 imageView，图标使用独立视图避免争用。
+    self.settingIconImageView = [[UIImageView alloc] init];
+    self.settingIconImageView.contentMode = UIViewContentModeCenter;
+    self.settingIconImageView.translatesAutoresizingMaskIntoConstraints = NO;
+    self.settingIconImageView.isAccessibilityElement = NO;
+    self.settingIconImageView.hidden = YES;
+    [self.contentView addSubview:self.settingIconImageView];
     
     // 在初始化时应用图标的自动布局约束
     [NSLayoutConstraint activateConstraints:@[
-        [self.imageView.centerYAnchor constraintEqualToAnchor:self.contentView.centerYAnchor],
-        [self.imageView.leadingAnchor constraintEqualToAnchor:self.contentView.leadingAnchor constant:15.0f],
-        [self.imageView.widthAnchor constraintEqualToConstant:29.0f],
-        [self.imageView.heightAnchor constraintEqualToConstant:29.0f]
+        [self.settingIconImageView.centerYAnchor constraintEqualToAnchor:self.contentView.centerYAnchor],
+        [self.settingIconImageView.leadingAnchor constraintEqualToAnchor:self.contentView.leadingAnchor constant:15.0f],
+        [self.settingIconImageView.widthAnchor constraintEqualToConstant:29.0f],
+        [self.settingIconImageView.heightAnchor constraintEqualToConstant:29.0f]
     ]];
     
     // 初始化拖动手柄
@@ -227,12 +232,19 @@
     // 重置所有状态
     self.textLabel.text = nil;
     self.detailTextLabel.text = nil;
-    self.imageView.image = nil;
-    self.imageView.tintColor = nil;
+    self.settingIconImageView.image = nil;
+    self.settingIconImageView.tintColor = nil;
+    self.settingIconImageView.contentMode = UIViewContentModeCenter;
+    self.settingIconImageView.hidden = YES;
+    [self.settingSwitch removeFromSuperview];
+    self.settingSwitch = nil;
     self.accessoryType = UITableViewCellAccessoryNone;
     self.accessoryView = nil;
+    self.selectionStyle = UITableViewCellSelectionStyleDefault;
     self.currentItem = nil;
     self.dragHandleImageView.hidden = YES;
+    self.showsReorderControl = NO;
+    self.shouldIndentWhileEditing = YES;
     
     // 移除所有子视图（除了系统自带的和拖动手柄）
     for (UIView *view in self.contentView.subviews) {
@@ -246,6 +258,13 @@
 
 - (void)configureWithItem:(CSSettingItem *)item {
     if (!item) return;
+
+    // 同一实例直接更新配置时也清理旧控件，不依赖 prepareForReuse 的调用时机。
+    [self.settingSwitch removeFromSuperview];
+    self.settingSwitch = nil;
+    self.accessoryView = nil;
+    self.showsReorderControl = NO;
+    self.shouldIndentWhileEditing = YES;
     
     self.currentItem = item;
     self.textLabel.text = item.title;
@@ -253,17 +272,20 @@
     // 设置图标 - 优先使用自定义图片
     if (item.customImage) {
         // 使用自定义图片
-        self.imageView.image = item.customImage;
-        self.imageView.contentMode = UIViewContentModeScaleAspectFit;
-        self.imageView.tintColor = nil; // 清除tintColor，显示原始图片颜色
+        self.settingIconImageView.image = item.customImage;
+        self.settingIconImageView.contentMode = UIViewContentModeScaleAspectFit;
+        self.settingIconImageView.tintColor = nil; // 清除tintColor，显示原始图片颜色
     } else if (item.iconName.length > 0) {
         // 使用系统图标
-        self.imageView.image = [UIImage systemImageNamed:item.iconName];
-        self.imageView.contentMode = UIViewContentModeCenter;
-        self.imageView.tintColor = item.iconColor ?: [UIColor labelColor];
+        self.settingIconImageView.image = [UIImage systemImageNamed:item.iconName] ?: [UIImage systemImageNamed:@"questionmark.circle"];
+        self.settingIconImageView.contentMode = UIViewContentModeCenter;
+        self.settingIconImageView.tintColor = item.iconColor ?: [UIColor labelColor];
     } else {
-        self.imageView.image = nil;
+        self.settingIconImageView.image = nil;
+        self.settingIconImageView.contentMode = UIViewContentModeCenter;
+        self.settingIconImageView.tintColor = nil;
     }
+    self.settingIconImageView.hidden = self.settingIconImageView.image == nil;
     
     // 根据不同类型配置Cell
     switch (item.itemType) {
@@ -286,11 +308,13 @@
             [self configureNormalItem:item];
             break;
     }
+    [self setNeedsLayout];
 }
 
 - (void)configureSwitchItem:(CSSettingItem *)item {
     // 创建开关并设置初始状态
     UISwitch *switchView = [[UISwitch alloc] init];
+    self.settingSwitch = switchView;
     switchView.on = item.switchValue;
     [switchView addTarget:self action:@selector(switchValueChanged:) forControlEvents:UIControlEventValueChanged];
     
@@ -379,11 +403,6 @@
     CGFloat fixedLabelX = 54.0f;
     CGFloat rightMargin = 15.0f;
     CGFloat minSpacing = 8.0f;
-    
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        [self setNeedsLayout];
-    });
     
     if (self.detailTextLabel.text.length > 0) {
         CGSize detailSize = [self.detailTextLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, self.detailTextLabel.frame.size.height)];

@@ -9,9 +9,17 @@ extern NSNotificationName const CSBackgroundRunPlaybackFinishedNotification;
 @property(nonatomic, readonly) BOOL playing;
 @property(nonatomic, readonly) BOOL hostBusy;
 @property(nonatomic, readonly) BOOL sessionOwned;
+// Main-thread delivery interest, initially disabled. Native ownership tracking
+// always continues. Enable before reading hostBusy to synchronize renewed demand.
+- (void)setHostNotificationsEnabled:(BOOL)enabled;
 - (BOOL)startWithError:(NSError * _Nullable * _Nullable)error;
 - (void)stop;
 - (void)suspend;
+// Establish the media-loss boundary before host reset observers can reactivate.
+- (void)invalidateForMediaServicesLoss;
+// Media services invalidated prior activation observations and audio objects.
+// Calls already in flight still complete and balance their tracking scopes.
+- (void)resetAfterMediaServicesReset;
 // The host or audio server owns the session now. Never restore/deactivate it.
 - (void)relinquish;
 @end

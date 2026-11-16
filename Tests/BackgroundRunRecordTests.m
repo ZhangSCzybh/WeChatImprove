@@ -217,6 +217,117 @@ int main(void) { @autoreleasepool {
     CHECK(!manager.lastTaskExpiredAt && manager.lastBackgroundStoppedAt);
     CHECK(!runtime.pendingCheckCount && !runtime.liveTaskCount);
 
+    // The system invalidates a task before its queued callback. An intervening
+    // settings evaluation must retain the actual expiration date and elapsed
+    // time, without a false "unknown invalidation" or a second terminal event.
+    Create(120,NO); Background(); [runtime advanceBy:1.5];
+    CSTestBackgroundTask *queuedExpiration=runtime.tasks.lastObject;
+    [runtime advanceBy:8];
+    expired=runtime.currentDate;
+    NSTimeInterval expirationElapsed=runtime.uptime-100;
+    [queuedExpiration expireDeferringCallback];
+    CHECK(!queuedExpiration.valid && SameDate(queuedExpiration.expirationDate,expired));
+    [runtime advanceBy:1]; [manager reloadSettings];
+    CHECK(SameDate(manager.lastTaskExpiredAt,expired));
+    CHECK(EventCount(@"系统到期")==1 && EventCount(@"任务失效")==0 && EventCount(@"停止")==1);
+    for (CSBackgroundRunRecordEvent *event in manager.lastBackgroundEvents)
+        if ([event.source isEqual:@"系统到期"]) CHECK(fabs(event.elapsed-expirationElapsed)<.000001);
+    beforeReread=manager.lastBackgroundEvents.count;
+    [queuedExpiration deliverExpirationCallback];
+    CHECK(manager.lastBackgroundEvents.count==beforeReread && SameDate(manager.lastTaskExpiredAt,expired));
+    CHECK(!runtime.pendingCheckCount && !runtime.liveTaskCount && queuedExpiration.endCalls==1);
+
+    // Returning to the foreground can precede the queued callback. Closing the
+    // observation must consume its real snapshot without starting new work.
+    Create(120,NO); Background(); [runtime advanceBy:9.5];
+    queuedExpiration=runtime.tasks.lastObject;
+    expired=runtime.currentDate; expirationElapsed=runtime.uptime-100;
+    [queuedExpiration expireDeferringCallback]; [runtime advanceBy:1];
+    NSUInteger attemptsBeforeStop=runtime.beginAttempts, playersBeforeStop=CSTestPlayerCreates;
+    Foreground();
+    CHECK(SameDate(manager.lastTaskExpiredAt,expired));
+    CHECK(EventCount(@"系统到期")==1 && EventCount(@"任务失效")==0 && EventCount(@"停止")==1);
+    CHECK(EventCount(@"返回前台")==1 && SameDate(manager.lastForegroundReturnedAt,runtime.currentDate));
+    for (CSBackgroundRunRecordEvent *event in manager.lastBackgroundEvents)
+        if ([event.source isEqual:@"系统到期"]) CHECK(fabs(event.elapsed-expirationElapsed)<.000001);
+    CHECK(!runtime.liveTaskCount && !runtime.pendingCheckCount && queuedExpiration.endCalls==1);
+    CHECK(runtime.beginAttempts==attemptsBeforeStop && CSTestPlayerCreates==playersBeforeStop);
+    beforeReread=manager.lastBackgroundEvents.count;
+    [queuedExpiration deliverExpirationCallback]; Foreground();
+    CHECK(manager.lastBackgroundEvents.count==beforeReread && SameDate(manager.lastTaskExpiredAt,expired));
+
+    // Either the global toggle or the last group consumer can end the shared
+    // cycle. Both shutdown paths preserve expiration before its callback.
+    for (NSUInteger groupIsLast=0;groupIsLast<2;groupIsLast++) {
+        Create(120,NO);
+        if (groupIsLast) [manager setGroupChatBackgroundRequested:YES];
+        Background(); [runtime advanceBy:1.5];
+        if (groupIsLast) {
+            Enable(NO);
+            CHECK(runtime.liveTaskCount==1 && !manager.lastBackgroundStoppedAt);
+        }
+        [runtime advanceBy:8]; queuedExpiration=runtime.tasks.lastObject;
+        expired=runtime.currentDate; expirationElapsed=runtime.uptime-100;
+        [queuedExpiration expireDeferringCallback]; [runtime advanceBy:1];
+        attemptsBeforeStop=runtime.beginAttempts; playersBeforeStop=CSTestPlayerCreates;
+        if (groupIsLast) [manager setGroupChatBackgroundRequested:NO]; else Enable(NO);
+        CHECK(SameDate(manager.lastTaskExpiredAt,expired));
+        CHECK(EventCount(@"系统到期")==1 && EventCount(@"任务失效")==0 && EventCount(@"停止")==1);
+        CHECK(SameDate(manager.lastBackgroundStoppedAt,runtime.currentDate));
+        for (CSBackgroundRunRecordEvent *event in manager.lastBackgroundEvents)
+            if ([event.source isEqual:@"系统到期"]) CHECK(fabs(event.elapsed-expirationElapsed)<.000001);
+        CHECK(!runtime.liveTaskCount && !runtime.pendingCheckCount && queuedExpiration.endCalls==1);
+        CHECK(runtime.beginAttempts==attemptsBeforeStop && CSTestPlayerCreates==playersBeforeStop);
+        beforeReread=manager.lastBackgroundEvents.count;
+        [queuedExpiration deliverExpirationCallback];
+        CHECK(manager.lastBackgroundEvents.count==beforeReread && SameDate(manager.lastTaskExpiredAt,expired));
+        Foreground();
+    }
+
+    // The notification writes its newer event before reconcile reads an older
+    // expiration snapshot. Sort by elapsed even if wall time was set backward.
+    Create(120,NO); Background(); [runtime advanceBy:9.5];
+    queuedExpiration=runtime.tasks.lastObject;
+    expired=runtime.currentDate; expirationElapsed=runtime.uptime-100;
+    [queuedExpiration expireDeferringCallback];
+    runtime.currentDate=[runtime.currentDate dateByAddingTimeInterval:-3600];
+    [runtime advanceBy:1];
+    Post(AVAudioSessionInterruptionNotification,AVAudioSession.sharedInstance,
+        @{AVAudioSessionInterruptionTypeKey:@(AVAudioSessionInterruptionTypeBegan)});
+    CHECK(SameDate(manager.lastTaskExpiredAt,expired) && EventCount(@"系统到期")==1);
+    NSUInteger expirationIndex=NSNotFound, interruptionIndex=NSNotFound, eventIndex=0;
+    NSTimeInterval orderedElapsed=-1;
+    for (CSBackgroundRunRecordEvent *event in manager.lastBackgroundEvents) {
+        if (event.elapsed>=0) { CHECK(event.elapsed>=orderedElapsed); orderedElapsed=event.elapsed; }
+        if ([event.source isEqual:@"系统到期"]) {
+            expirationIndex=eventIndex;
+            CHECK(fabs(event.elapsed-expirationElapsed)<.000001);
+        }
+        if ([event.source isEqual:@"系统中断"]) {
+            interruptionIndex=eventIndex;
+            CHECK([event.date compare:expired]==NSOrderedAscending);
+        }
+        eventIndex++;
+    }
+    CHECK(expirationIndex!=NSNotFound && interruptionIndex!=NSNotFound && expirationIndex<interruptionIndex);
+    CHECK([manager.lastBackgroundEvents.firstObject.source isEqual:@"进入后台"]);
+    beforeReread=manager.lastBackgroundEvents.count;
+    [queuedExpiration deliverExpirationCallback];
+    CHECK(manager.lastBackgroundEvents.count==beforeReread && EventCount(@"系统到期")==1);
+    Foreground();
+
+    // A queued expiration from an already observed, ended visit cannot append
+    // to the replacement visit even when delivered after a new lease starts.
+    Create(120,NO); Background(); [runtime advanceBy:1.5];
+    queuedExpiration=runtime.tasks.lastObject;
+    [queuedExpiration expireDeferringCallback]; [manager reloadSettings];
+    CHECK(EventCount(@"系统到期")==1);
+    Foreground(); Background();
+    beforeReread=manager.lastBackgroundEvents.count;
+    [queuedExpiration deliverExpirationCallback];
+    CHECK(manager.lastBackgroundEvents.count==beforeReread && !manager.lastTaskExpiredAt);
+    CHECK(manager.canAttemptBackgroundWork && runtime.liveTaskCount==1);
+
     // Retention is bounded, preserves the initial entry and stable first-check
     // summary, and reports omitted events instead of presenting a full history.
     Create(120,NO); Background();
@@ -234,6 +345,23 @@ int main(void) { @autoreleasepool {
         CHECK(event.elapsed>=previousElapsed);
         previousElapsed=event.elapsed;
     }
+    // Inserting a late snapshot into a full timeline still retains the entry
+    // and the latest 79 events, with bounded storage and ordered known offsets.
+    CSBackgroundRunRecordEvent *retainedEntry=manager.lastBackgroundEvents.firstObject;
+    NSUInteger droppedBeforeDelayed=manager.droppedBackgroundEventCount;
+    queuedExpiration=runtime.tasks.lastObject;
+    [queuedExpiration expireDeferringCallback]; [runtime advanceBy:1];
+    Post(AVAudioSessionInterruptionNotification,AVAudioSession.sharedInstance,
+        @{AVAudioSessionInterruptionTypeKey:@(AVAudioSessionInterruptionTypeBegan)});
+    CHECK(manager.lastBackgroundEvents.count==80 && manager.droppedBackgroundEventCount>droppedBeforeDelayed);
+    CHECK(manager.lastBackgroundEvents.firstObject==retainedEntry && EventCount(@"系统到期")==1);
+    previousElapsed=-1;
+    for (CSBackgroundRunRecordEvent *event in manager.lastBackgroundEvents) {
+        if (event.elapsed>=0) { CHECK(event.elapsed>=previousElapsed); previousElapsed=event.elapsed; }
+    }
+    beforeReread=manager.lastBackgroundEvents.count;
+    [queuedExpiration deliverExpirationCallback];
+    CHECK(manager.lastBackgroundEvents.count==beforeReread && EventCount(@"系统到期")==1);
     Foreground(); Background();
     CHECK(!manager.droppedBackgroundEventCount && !manager.periodicCheckCount);
     CHECK(!manager.firstScheduledCheckAt && !manager.lastPeriodicCheckAt && !manager.lastTaskExpiredAt);
@@ -267,6 +395,51 @@ int main(void) { @autoreleasepool {
     Enable(YES);
     CHECK(manager.lastBackgroundEvents.count>beforeReread);
     CHECK([manager.lastBackgroundEvents.firstObject.source isEqual:@"开始观察"]);
+
+    // Reusing recovery resources does not invent another audio/task attempt or
+    // erase the real grace evaluation, original first check, or prior expiry.
+    Create(29,NO); Background(); [runtime advanceBy:1.5];
+    NSDate *recoveryFirst=manager.firstScheduledCheckAt;
+    [CSTestLastPlayer finishSuccessfully:YES]; [runtime.tasks.lastObject expire];
+    NSDate *recoveryExpiration=manager.lastTaskExpiredAt;
+    runtime.backgroundTimeRemaining=29;
+    Post(AVAudioSessionInterruptionNotification,AVAudioSession.sharedInstance,
+        @{AVAudioSessionInterruptionTypeKey:@(AVAudioSessionInterruptionTypeEnded)});
+    NSTimeInterval recoveryEntry=runtime.uptime;
+    [runtime advanceBy:.4]; CHECK(audio.playing && EventCount(@"恢复检查")==1);
+    [CSTestLastPlayer finishSuccessfully:YES];
+    NSUInteger recoveryAttempts=runtime.beginAttempts, recoveryPlayers=CSTestPlayerCreates;
+    NSUInteger recordedAttempts=EventCount(@"音频尝试"), recordedRenewals=EventCount(@"任务替换");
+    [runtime advanceBy:1.1];
+    CHECK(runtime.beginAttempts==recoveryAttempts && CSTestPlayerCreates==recoveryPlayers && !audio.playing);
+    CHECK(EventCount(@"首次检查")==2 && EventCount(@"资源复用")==1);
+    CHECK(EventCount(@"音频尝试")==recordedAttempts && EventCount(@"任务替换")==recordedRenewals);
+    CHECK(SameDate(manager.firstScheduledCheckAt,recoveryFirst));
+    CHECK(SameDate(manager.lastTaskExpiredAt,recoveryExpiration) && EventCount(@"系统到期")==1);
+    CHECK(SameDate(manager.lastBackgroundCheckedAt,runtime.currentDate));
+    CHECK(!manager.periodicCheckCount && !manager.lastPeriodicCheckAt);
+    CHECK([manager.lastBackgroundEvents.lastObject.source isEqual:@"资源复用"]);
+    CHECK(fabs(manager.lastBackgroundEvents.lastObject.elapsed-3)<.000001);
+    [runtime advanceBy:recoveryEntry+25-runtime.uptime];
+    CHECK(manager.periodicCheckCount==1 && SameDate(manager.lastPeriodicCheckAt,runtime.currentDate));
+    CHECK(runtime.beginAttempts==recoveryAttempts+1 && CSTestPlayerCreates==recoveryPlayers+1 && EventCount(@"资源复用")==1);
+    Foreground();
+
+    // A recovery above the threshold has no resource success to reuse. If the
+    // budget crosses below 30s before grace, record its actual new requests.
+    Create(31,NO); Background(); [runtime advanceBy:1.5];
+    recoveryFirst=manager.firstScheduledCheckAt; [runtime.tasks.lastObject expire];
+    runtime.backgroundTimeRemaining=31;
+    Post(AVAudioSessionInterruptionNotification,AVAudioSession.sharedInstance,
+        @{AVAudioSessionInterruptionTypeKey:@(AVAudioSessionInterruptionTypeEnded)});
+    [runtime advanceBy:.4];
+    CHECK(!audio.playing && !EventCount(@"音频尝试") && !EventCount(@"任务替换"));
+    runtime.backgroundTimeRemaining=29;
+    [runtime advanceBy:1.1];
+    CHECK(audio.playing && EventCount(@"音频尝试")==1 && EventCount(@"任务替换")==1);
+    CHECK(EventCount(@"首次检查")==2 && !EventCount(@"资源复用"));
+    CHECK(SameDate(manager.firstScheduledCheckAt,recoveryFirst) && SameDate(manager.lastBackgroundCheckedAt,runtime.currentDate));
+    Foreground();
 
     // Audio outcomes and task attempts are observable without issuing any extra
     // native work. A denied initial task must not fabricate a scheduled check.
