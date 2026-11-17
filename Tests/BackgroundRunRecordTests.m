@@ -422,7 +422,7 @@ int main(void) { @autoreleasepool {
     CHECK(fabs(manager.lastBackgroundEvents.lastObject.elapsed-3)<.000001);
     [runtime advanceBy:recoveryEntry+25-runtime.uptime];
     CHECK(manager.periodicCheckCount==1 && SameDate(manager.lastPeriodicCheckAt,runtime.currentDate));
-    CHECK(runtime.beginAttempts==recoveryAttempts+1 && CSTestPlayerCreates==recoveryPlayers+1 && EventCount(@"资源复用")==1);
+    CHECK(runtime.beginAttempts==recoveryAttempts && CSTestPlayerCreates==recoveryPlayers+1 && EventCount(@"资源复用")==1);
     Foreground();
 
     // A recovery above the threshold has no resource success to reuse. If the
@@ -436,7 +436,7 @@ int main(void) { @autoreleasepool {
     CHECK(!audio.playing && !EventCount(@"音频尝试") && !EventCount(@"任务替换"));
     runtime.backgroundTimeRemaining=29;
     [runtime advanceBy:1.1];
-    CHECK(audio.playing && EventCount(@"音频尝试")==1 && EventCount(@"任务替换")==1);
+    CHECK(audio.playing && EventCount(@"音频尝试")==1 && !EventCount(@"任务替换"));
     CHECK(EventCount(@"首次检查")==2 && !EventCount(@"资源复用"));
     CHECK(SameDate(manager.firstScheduledCheckAt,recoveryFirst) && SameDate(manager.lastBackgroundCheckedAt,runtime.currentDate));
     Foreground();
@@ -444,13 +444,13 @@ int main(void) { @autoreleasepool {
     // Audio outcomes and task attempts are observable without issuing any extra
     // native work. A denied initial task must not fabricate a scheduled check.
     Create(7,NO); Background(); [runtime advanceBy:1.5];
-    CHECK(audio.playing && runtime.beginAttempts==2);
-    CHECK(EventCount(@"音频尝试")==1 && EventCount(@"任务替换")==1);
+    CHECK(audio.playing && runtime.beginAttempts==1);
+    CHECK(EventCount(@"音频尝试")==1 && !EventCount(@"任务替换"));
     [CSTestLastPlayer finishSuccessfully:YES];
     CHECK(EventCount(@"音频结束")==1 && !audio.playing);
     Create(7,NO); CSTestBlankResourceAvailable=NO;
     Background(); [runtime advanceBy:1.5];
-    CHECK(EventCount(@"音频尝试")==1 && !audio.playing && runtime.beginAttempts==2);
+    CHECK(EventCount(@"音频尝试")==1 && !audio.playing && runtime.beginAttempts==1);
     CSTestBlankResourceAvailable=YES;
     Create(120,NO); runtime.failBegin=YES; Background();
     CHECK(EventCount(@"任务初次申请")==1 && EventCount(@"停止")==1);
@@ -468,6 +468,25 @@ int main(void) { @autoreleasepool {
     CHECK(!manager.firstScheduledCheckAt && !manager.periodicCheckCount);
     CHECK(EventCount(@"首次检查")==0 && EventCount(@"音频尝试")==0);
     CHECK(manager.canAttemptBackgroundWork && runtime.liveTaskCount==1);
+
+    // A host release after expiration is a distinct event-driven handoff. Keep
+    // the historical expiration/stop and the original first check, without
+    // fabricating a periodic delivery while the manager had no execution lease.
+    Create(120,NO);
+    [AVAudioSession.sharedInstance setActive:YES error:NULL]; Drain();
+    Background(); [runtime advanceBy:2];
+    NSDate *handoffFirst=manager.firstScheduledCheckAt;
+    [runtime.tasks.lastObject expire];
+    NSDate *handoffExpired=manager.lastTaskExpiredAt;
+    CHECK(EventCount(@"系统到期")==1 && EventCount(@"停止")==1);
+    [runtime advanceBy:10];
+    [AVAudioSession.sharedInstance setActive:NO error:NULL]; Drain();
+    CHECK(audio.playing && SameDate(manager.lastBackgroundCheckedAt,runtime.currentDate));
+    CHECK(SameDate(manager.firstScheduledCheckAt,handoffFirst) && SameDate(manager.lastTaskExpiredAt,handoffExpired));
+    CHECK(EventCount(@"交接待处理")==1 && EventCount(@"交接桥接申请")==1);
+    CHECK(EventCount(@"交接检查")==1 && EventCount(@"交接成功")==1);
+    CHECK(EventCount(@"系统到期")==1 && EventCount(@"停止")==1);
+    CHECK(!manager.periodicCheckCount && !manager.lastPeriodicCheckAt && !EventCount(@"周期检查"));
 
     Enable(NO); [NSNotificationCenter.defaultCenter removeObserver:manager]; manager=nil; [audio stop]; audio=nil; runtime=nil; Drain();
     CHECK(!CSTestPlayersAlive);

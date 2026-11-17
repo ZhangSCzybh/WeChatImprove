@@ -7,6 +7,13 @@ static NSUInteger checks;
 #define CHECK(c) do { checks++; if (!(c)) { fprintf(stderr,"FAIL %d: %s\n",__LINE__,#c); exit(1); } } while(0)
 static CSBackgroundRunAudio *audio;
 static void Drain(void) { for (NSUInteger i=0;i<4;i++) [NSRunLoop.currentRunLoop runUntilDate:[NSDate dateWithTimeIntervalSinceNow:.005]]; }
+static void OnNativeWorker(dispatch_block_t block) {
+    // dispatch_sync may execute a global-queue block on the caller's thread.
+    // Force another thread so the module's own-change TLS cannot hide the call.
+    dispatch_semaphore_t done=dispatch_semaphore_create(0);
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_DEFAULT,0),^{ block(); dispatch_semaphore_signal(done); });
+    CHECK(dispatch_semaphore_wait(done,dispatch_time(DISPATCH_TIME_NOW,5*NSEC_PER_SEC))==0);
+}
 static void Fresh(void) {
     [audio setHostNotificationsEnabled:NO];
     [audio stop]; audio=nil;
@@ -14,6 +21,7 @@ static void Fresh(void) {
     session.failCategory=session.failActivation=session.failDeactivation=session.throwCategory=NO;
     session.failDeactivationWithBusy=NO;
     session.secondaryAudioShouldBeSilencedHint=NO; session.activationAction=nil;
+    session.categoryAction=nil; session.categoryReadAction=nil; session.deactivationAction=nil;
     CSTestFailPlayerCreation=CSTestFailPlayerPreparation=CSTestFailPlayerPlay=NO;
     CSTestBlankResourceAvailable=YES;
     [session setCategory:AVAudioSessionCategoryAmbient mode:AVAudioSessionModeDefault options:0 error:NULL];
@@ -27,8 +35,9 @@ int main(void) { @autoreleasepool {
     AVAudioSession *session=AVAudioSession.sharedInstance;
     __block NSUInteger hostEvents=0, finished=0, failed=0;
     __block BOOL hostReleased=NO;
+    __block NSDictionary *hostMetadata=nil;
     NSNotificationCenter *center=NSNotificationCenter.defaultCenter;
-    id hostObserver=[center addObserverForName:CSBackgroundRunHostAudioChangedNotification object:nil queue:nil usingBlock:^(NSNotification *note){ hostEvents++; hostReleased=[note.userInfo[@"released"] boolValue]; }];
+    id hostObserver=[center addObserverForName:CSBackgroundRunHostAudioChangedNotification object:nil queue:nil usingBlock:^(NSNotification *note){ hostEvents++; hostReleased=[note.userInfo[@"released"] boolValue]; hostMetadata=[note.userInfo copy]; }];
     id finishedObserver=[center addObserverForName:CSBackgroundRunPlaybackFinishedNotification object:nil queue:nil usingBlock:^(NSNotification *note){ CHECK(note.object==audio); finished++; }];
     id failedObserver=[center addObserverForName:CSBackgroundRunPlaybackFailedNotification object:nil queue:nil usingBlock:^(NSNotification *note){ CHECK(note.object==audio); failed++; }];
 
@@ -56,6 +65,7 @@ int main(void) { @autoreleasepool {
     CHECK(![session setCategory:AVAudioSessionCategoryPlayAndRecord error:&nativeFailure] && nativeFailure.code==10);
     Drain();
     CHECK(audio.playing && audio.sessionOwned && !audio.hostBusy && hostReleased);
+    CHECK(hostMetadata[@"releaseConfirmed"]!=nil && ![hostMetadata[@"releaseConfirmed"] boolValue]);
     session.failCategory=NO; configurations=session.configurations;
 
     // Finishing a short pulse is normal, preserves the original snapshot and
@@ -95,6 +105,13 @@ int main(void) { @autoreleasepool {
     [session setMode:AVAudioSessionModeDefault error:NULL];
     [session setCategory:AVAudioSessionCategoryAmbient error:NULL];
     Drain(); CHECK(!audio.hostBusy && hostReleased);
+    NSUInteger releaseEpisode=audio.hostReleaseEpisode;
+    CHECK(releaseEpisode>0 && audio.hostReleaseConfirmed && [hostMetadata[@"releaseConfirmed"] boolValue]);
+    CHECK([hostMetadata[@"releaseEpisode"] unsignedIntegerValue]==releaseEpisode && [hostMetadata[@"source"] length]>0);
+    [session setMode:AVAudioSessionModeDefault error:NULL]; Drain();
+    [session setActive:NO error:NULL]; Drain();
+    CHECK(audio.hostReleaseEpisode==releaseEpisode && audio.hostReleaseConfirmed);
+    CHECK([hostMetadata[@"releaseEpisode"] unsignedIntegerValue]==releaseEpisode);
     CHECK([audio startWithError:NULL] && audio.playing); [audio stop];
 
     // Older iOS versions can report IsBusy even though deactivation occurred.
@@ -353,11 +370,121 @@ int main(void) { @autoreleasepool {
     session.active=NO;
     [audio invalidateForMediaServicesLoss];
     CHECK(preResetPlayer==nil && !audio.playing && !audio.sessionOwned && !CSTestPlayersAlive);
+    CHECK(!audio.hostReleaseConfirmed);
     [audio resetAfterMediaServicesReset];
     CHECK([audio startWithError:NULL] && audio.playing && CSTestPlayerCreates==playerCreates+2);
     CHECK(CSTestBlankResourceLookups==resourceLookups+1);
     [audio stop]; CHECK(!CSTestPlayersAlive);
     CHECK([audio startWithError:NULL] && CSTestPlayerCreates==playerCreates+3 && CSTestBlankResourceLookups==resourceLookups+1);
+
+    // A state object remains an immutable observation after subsequent native
+    // work. In-flight mutations block borrowing; failed completion unblocks it
+    // without destroying the existing player or configuration lease.
+    Fresh(); CSBackgroundRunAudioState *idleState=[audio currentState];
+    CHECK(!idleState.playing && !idleState.sessionOwned && !idleState.hostBusy);
+    CHECK([audio startWithError:NULL]);
+    CSBackgroundRunAudioState *ownedState=[audio currentState];
+    CHECK(ownedState.playing && ownedState.sessionOwned && !ownedState.hostBusy && !ownedState.ownChangeInProgress);
+    CHECK(!idleState.playing && !idleState.sessionOwned);
+    CHECK(CSBackgroundRunAudioWillChange());
+    CSBackgroundRunAudioState *inFlight=[audio currentState];
+    CHECK(inFlight.hostBusy && !inFlight.sessionOwned && !inFlight.hostReleaseConfirmed && inFlight.hostCalls==1);
+    CHECK(ownedState.sessionOwned && !ownedState.hostBusy && !ownedState.hostCalls);
+    CSBackgroundRunAudioDidChange(NO,NO,NO); Drain();
+    CSBackgroundRunAudioState *afterFailure=[audio currentState];
+    CHECK(afterFailure.playing && afterFailure.sessionOwned && !afterFailure.hostBusy && !afterFailure.hostCalls);
+    CHECK(afterFailure.configurationRevision==ownedState.configurationRevision);
+
+    // A native call may begin and end inside an audio property getter. A failed
+    // call leaves the configuration epoch unchanged, but invalidates this sample
+    // through the tracking revision; the following clean read can own it again.
+    session.categoryReadAction=^{
+        CHECK(CSBackgroundRunAudioWillChange()); CSBackgroundRunAudioDidChange(NO,NO,NO);
+    };
+    CSBackgroundRunAudioState *failedDuringRead=[audio currentState];
+    CHECK(failedDuringRead.hostBusy && !failedDuringRead.sessionOwned && !failedDuringRead.hostReleaseConfirmed && !failedDuringRead.hostCalls);
+    CHECK(failedDuringRead.configurationRevision==afterFailure.configurationRevision);
+    [audio relinquish];
+    CHECK(!audio.playing && audio.sessionOwned);
+    CHECK([audio startWithError:NULL]); [audio stop];
+    CHECK(!session.active && [session.category isEqual:AVAudioSessionCategoryAmbient]);
+    CHECK([audio startWithError:NULL]);
+    CSBackgroundRunAudioState *cleanAfterFailedRead=[audio currentState];
+    CHECK(cleanAfterFailedRead.playing && cleanAfterFailedRead.sessionOwned && !cleanAfterFailedRead.hostBusy);
+
+    // A successful mutation also rejects the mixed sample. The next read sees
+    // current idle host state and the actual lost lease, without stopping audio
+    // or otherwise mutating the state merely because it was sampled.
+    session.categoryReadAction=^{ [AVAudioSession.sharedInstance setMode:AVAudioSessionModeDefault error:NULL]; };
+    CSBackgroundRunAudioState *changedDuringRead=[audio currentState];
+    CHECK(changedDuringRead.hostBusy && !changedDuringRead.sessionOwned && !changedDuringRead.hostReleaseConfirmed);
+    CSBackgroundRunAudioState *cleanAfterChange=[audio currentState];
+    CHECK(!cleanAfterChange.hostBusy && !cleanAfterChange.sessionOwned && cleanAfterChange.playing);
+    CHECK(cleanAfterChange.configurationRevision!=cleanAfterFailedRead.configurationRevision);
+    CHECK([audio startWithError:NULL]);
+    session.categoryReadAction=^{ [NSException raise:@"TestAudioPropertyUnavailable" format:@"Audio property temporarily unavailable"]; };
+    CSBackgroundRunAudioState *unreadable=[audio currentState];
+    CHECK(unreadable.hostBusy && !unreadable.sessionOwned && !unreadable.hostReleaseConfirmed);
+    CHECK([audio currentState].sessionOwned && [audio currentState].playing);
+    [audio invalidateForMediaServicesLoss];
+    CSBackgroundRunAudioState *afterLoss=[audio currentState];
+    CHECK(!afterLoss.playing && !afterLoss.sessionOwned && !afterLoss.hostReleaseConfirmed);
+    CHECK(afterLoss.mediaGeneration!=afterFailure.mediaGeneration && afterFailure.playing && afterFailure.sessionOwned);
+
+    // Starting again must use one coherent ownership sample too. Mixing the
+    // raced owned=NO read with a later clean busy=NO would replace the original
+    // Ambient snapshot with Playback and restore the wrong host configuration.
+    Fresh(); CHECK([audio startWithError:NULL]);
+    session.categoryReadAction=^{
+        CHECK(CSBackgroundRunAudioWillChange()); CSBackgroundRunAudioDidChange(NO,NO,NO);
+    };
+    nativeFailure=nil;
+    CHECK(![audio startWithError:&nativeFailure] && nativeFailure!=nil);
+    CHECK(audio.sessionOwned);
+    CHECK([audio startWithError:NULL]); [audio stop];
+    CHECK(!session.active && [session.category isEqual:AVAudioSessionCategoryAmbient]);
+
+    // Cleanup may recheck a conservative mixed sample once when no successful
+    // native mutation revoked the lease. stop runs in the own-change scope, so
+    // complete the native call on another thread to exercise the real tracker.
+    Fresh(); CHECK([audio startWithError:NULL]);
+    session.categoryReadAction=^{
+        OnNativeWorker(^{
+            CHECK(CSBackgroundRunAudioWillChange()); CSBackgroundRunAudioDidChange(NO,NO,NO);
+        });
+    };
+    [audio stop];
+    CHECK(!session.active && [session.category isEqual:AVAudioSessionCategoryAmbient]);
+    CHECK(!audio.playing && !audio.sessionOwned);
+
+    // A real successful native takeover during that same first cleanup read
+    // cannot be retried into permission to deactivate or restore host settings.
+    Fresh(); CHECK([audio startWithError:NULL]);
+    deactivations=session.deactivations;
+    session.categoryReadAction=^{
+        OnNativeWorker(^{
+            [AVAudioSession.sharedInstance setCategory:AVAudioSessionCategoryPlayAndRecord mode:@"VoiceChat" options:4 error:NULL];
+            [AVAudioSession.sharedInstance setActive:YES error:NULL];
+        });
+    };
+    [audio stop];
+    CHECK(session.active && session.deactivations==deactivations);
+    CHECK([session.category isEqual:AVAudioSessionCategoryPlayAndRecord] && [session.mode isEqual:@"VoiceChat"] && session.categoryOptions==4);
+    CHECK(!audio.playing && !audio.sessionOwned);
+
+    // The post-deactivation restore check has the same bounded retry rule; a
+    // complete failed native call there must not leave Playback as host state.
+    Fresh(); CHECK([audio startWithError:NULL]);
+    session.deactivationAction=^{
+        AVAudioSession.sharedInstance.categoryReadAction=^{
+            OnNativeWorker(^{
+                CHECK(CSBackgroundRunAudioWillChange()); CSBackgroundRunAudioDidChange(NO,NO,NO);
+            });
+        };
+    };
+    [audio stop];
+    CHECK(!session.active && [session.category isEqual:AVAudioSessionCategoryAmbient]);
+    CHECK(!audio.playing && !audio.sessionOwned);
 
     Fresh(); [audio setHostNotificationsEnabled:NO]; [audio stop]; audio=nil; Drain(); CHECK(!CSTestPlayersAlive);
     [center removeObserver:hostObserver]; [center removeObserver:finishedObserver]; [center removeObserver:failedObserver];

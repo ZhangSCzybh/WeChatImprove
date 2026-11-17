@@ -2,12 +2,23 @@
 typedef NSUInteger AVAudioSessionCategoryOptions;
 typedef NSUInteger AVAudioSessionSetActiveOptions;
 typedef NSUInteger AVAudioSessionRouteSharingPolicy;
+typedef NS_ENUM(NSUInteger, AVAudioSessionRouteChangeReason) {
+    AVAudioSessionRouteChangeReasonUnknown=0,
+    AVAudioSessionRouteChangeReasonNewDeviceAvailable=1,
+    AVAudioSessionRouteChangeReasonOldDeviceUnavailable=2,
+    AVAudioSessionRouteChangeReasonCategoryChange=3,
+    AVAudioSessionRouteChangeReasonOverride=4,
+    AVAudioSessionRouteChangeReasonWakeFromSleep=6,
+    AVAudioSessionRouteChangeReasonNoSuitableRouteForCategory=7,
+    AVAudioSessionRouteChangeReasonRouteConfigurationChange=8
+};
 enum { AVAudioSessionCategoryOptionMixWithOthers=1, AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation=1, AVAudioSessionRouteSharingPolicyDefault=0 };
 enum { AVAudioSessionInterruptionTypeEnded=0, AVAudioSessionInterruptionTypeBegan=1, AVAudioSessionInterruptionOptionShouldResume=1 };
 enum { AVAudioSessionErrorCodeIsBusy=560030580 };
 extern NSString *const AVAudioSessionCategoryAmbient, *const AVAudioSessionCategorySoloAmbient, *const AVAudioSessionCategoryPlayback, *const AVAudioSessionCategoryPlayAndRecord, *const AVAudioSessionModeDefault;
 extern NSNotificationName const AVAudioSessionInterruptionNotification, AVAudioSessionMediaServicesWereLostNotification, AVAudioSessionMediaServicesWereResetNotification, AVAudioSessionRouteChangeNotification, AVAudioSessionSilenceSecondaryAudioHintNotification;
 extern NSString *const AVAudioSessionInterruptionTypeKey, *const AVAudioSessionInterruptionOptionKey;
+extern NSString *const AVAudioSessionRouteChangeReasonKey;
 @interface AVAudioSession : NSObject
 + (instancetype)sharedInstance;
 @property(nonatomic, copy) NSString *category, *mode;
@@ -19,6 +30,9 @@ extern NSString *const AVAudioSessionInterruptionTypeKey, *const AVAudioSessionI
 @property(nonatomic) BOOL failDeactivationWithBusy;
 @property(nonatomic) NSUInteger configurations, activations, deactivations;
 @property(nonatomic, copy) dispatch_block_t activationAction;
+@property(nonatomic, copy) dispatch_block_t deactivationAction;
+@property(nonatomic, copy) dispatch_block_t categoryAction;
+@property(nonatomic, copy) dispatch_block_t categoryReadAction;
 - (BOOL)setCategory:(NSString *)category error:(NSError **)error;
 - (BOOL)setCategory:(NSString *)category withOptions:(AVAudioSessionCategoryOptions)options error:(NSError **)error;
 - (BOOL)setCategory:(NSString *)category mode:(NSString *)mode options:(AVAudioSessionCategoryOptions)options error:(NSError **)error;

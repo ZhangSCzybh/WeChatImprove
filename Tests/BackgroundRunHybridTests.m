@@ -103,13 +103,12 @@ int main(void) { @autoreleasepool {
     CSTestBackgroundTask *first=runtime.tasks.firstObject;
     [runtime advanceBy:.01];
     CHECK(audio.playing && manager.backgroundAudioActive && manager.canAttemptBackgroundWork);
-    CHECK(runtime.beginAttempts==2 && runtime.liveTaskCount==1 && first.endCalls==1);
-    CHECK([runtime.events indexOfObject:@"begin:2"]<[runtime.events indexOfObject:@"end:1"]);
+    CHECK(runtime.beginAttempts==1 && runtime.liveTaskCount==1 && first.endCalls==0);
     CHECK([CSTestLastPlayerURL.path isEqual:@"/host/WeChat.app/blank.caf"]);
     CHECK(CSTestLastPlayer.numberOfLoops==0 && CSTestLastPlayer.volume==0);
     CHECK(fabs(NextDeadline()-entry-25)<.000001);
     CSTestBackgroundTask *second=runtime.tasks.lastObject;
-    [first expire]; CHECK(second.valid && second.endCalls==0 && manager.canAttemptBackgroundWork);
+    CHECK(second==first && second.valid && second.endCalls==0 && manager.canAttemptBackgroundWork);
     FinishPulse();
     CHECK(!audio.playing && !manager.backgroundAudioActive && manager.canAttemptBackgroundWork && second.valid);
     players=CSTestPlayerCreates; NSUInteger attempts=runtime.beginAttempts;
@@ -117,7 +116,7 @@ int main(void) { @autoreleasepool {
     for (NSUInteger i=0;i<20;i++) { Background(); Post(NSUserDefaultsDidChangeNotification,nil,nil); }
     CHECK(CSTestPlayerCreates==players && runtime.beginAttempts==attempts && [manager.lastBackgroundCheckedAt isEqualToDate:pulseCheck]);
     [runtime advanceBy:23.49]; CHECK(!audio.playing && runtime.beginAttempts==attempts);
-    [runtime advanceBy:.01]; CHECK(audio.playing && runtime.beginAttempts==attempts+1);
+    [runtime advanceBy:.01]; CHECK(audio.playing && runtime.beginAttempts==attempts);
     CHECK(fabs(NextDeadline()-entry-50)<.000001);
     Foreground(); NoResources(); CHECK(!AVAudioSession.sharedInstance.active);
 
@@ -125,7 +124,7 @@ int main(void) { @autoreleasepool {
     // hints cannot stop a pulse or schedule extra recovery work between checks.
     Create(YES,20); AVAudioSession.sharedInstance.secondaryAudioShouldBeSilencedHint=YES;
     Background(); entry=runtime.uptime; [runtime advanceBy:1.5];
-    CHECK(audio.playing && manager.backgroundAudioActive && runtime.beginAttempts==2);
+    CHECK(audio.playing && manager.backgroundAudioActive && runtime.beginAttempts==1);
     CHECK([AVAudioSession.sharedInstance.category isEqual:AVAudioSessionCategoryPlayback]);
     CHECK(AVAudioSession.sharedInstance.categoryOptions==AVAudioSessionCategoryOptionMixWithOthers);
     players=CSTestPlayerCreates; attempts=runtime.beginAttempts;
@@ -143,7 +142,7 @@ int main(void) { @autoreleasepool {
     [runtime advanceBy:23.49];
     CHECK(!audio.playing && CSTestPlayerCreates==players && runtime.beginAttempts==attempts);
     [runtime advanceBy:.01];
-    CHECK(audio.playing && CSTestPlayerCreates==players+1 && runtime.beginAttempts==attempts+1);
+    CHECK(audio.playing && CSTestPlayerCreates==players+1 && runtime.beginAttempts==attempts);
     CHECK(fabs(NextDeadline()-entry-50)<.000001);
     Foreground(); NoResources();
 
@@ -157,7 +156,7 @@ int main(void) { @autoreleasepool {
         CHECK(!audio.playing && fabs(NextDeadline()-entry-1.5)<.000001);
         [runtime advanceBy:1.5]; CHECK(audio.playing); FinishPulse();
         CHECK(fabs(NextDeadline()-entry-expected[i])<.000001);
-        [runtime advanceBy:expected[i]-1.5]; CHECK(audio.playing && runtime.beginAttempts==3);
+        [runtime advanceBy:expected[i]-1.5]; CHECK(audio.playing && runtime.beginAttempts==1);
         Foreground(); NoResources();
     }
 
@@ -176,7 +175,7 @@ int main(void) { @autoreleasepool {
     CHECK(manager.periodicCheckCount==1 && !audio.playing);
     [runtime advanceBy:0];
     CHECK(runtime.uptime==deliveredAt && manager.periodicCheckCount==2);
-    CHECK(audio.playing && CSTestPlayerCreates==players+1 && runtime.beginAttempts==attempts+1);
+    CHECK(audio.playing && CSTestPlayerCreates==players+1 && runtime.beginAttempts==attempts);
     CHECK(runtime.checks.count==2 && runtime.checks.firstObject==periodicCheck);
     CHECK(fabs(NextDeadline()-deliveredAt-25)<.000001);
     FinishPulse(); [runtime advanceBy:24.999];
@@ -219,14 +218,14 @@ int main(void) { @autoreleasepool {
         Foreground(); NoResources();
     }
 
-    // Audio/resource failures still permit native task renewal at the check.
-    // Fixing the resource cannot cause an immediate audio or renewal retry.
+    // Audio/resource failures retain the valid task without requesting another.
+    // Fixing the resource cannot cause an immediate audio or task retry.
     for (NSUInteger failure=0;failure<3;failure++) {
         Create(failure!=2,20); Background(); first=runtime.tasks.firstObject;
         CSTestBlankResourceAvailable=failure!=0; CSTestFailPlayerPlay=failure==1;
         [runtime advanceBy:1.5];
-        CHECK(!audio.playing && first.endCalls==1 && runtime.liveTaskCount==1 && manager.canAttemptBackgroundWork);
-        CHECK(runtime.beginAttempts==2 && runtime.tasks.lastObject.valid);
+        CHECK(!audio.playing && first.endCalls==0 && runtime.liveTaskCount==1 && manager.canAttemptBackgroundWork);
+        CHECK(runtime.beginAttempts==1 && runtime.tasks.lastObject==first && first.valid);
         players=CSTestPlayerCreates; attempts=runtime.beginAttempts;
         CSTestBlankResourceAvailable=YES; CSTestFailPlayerPlay=NO;
         for (NSUInteger i=0;i<10;i++) Post(NSUserDefaultsDidChangeNotification,nil,nil);
@@ -237,16 +236,16 @@ int main(void) { @autoreleasepool {
         Foreground(); NoResources();
     }
 
-    // Renewal failure never releases the previous valid assertion. A later
-    // scheduled check may retry successfully; no historical rotation latch.
+    // Ordinary checks never request replacement while a usable task exists,
+    // even when a hypothetical new request would fail.
     Create(YES,20); Background(); first=runtime.tasks.firstObject; runtime.failBegin=YES;
     [runtime advanceBy:1.5];
-    CHECK(audio.playing && runtime.beginAttempts==2 && first.valid && first.endCalls==0 && runtime.liveTaskCount==1);
+    CHECK(audio.playing && runtime.beginAttempts==1 && first.valid && first.endCalls==0 && runtime.liveTaskCount==1);
     FinishPulse(); CHECK(manager.canAttemptBackgroundWork && !manager.backgroundAudioActive);
     runtime.failBegin=NO; attempts=runtime.beginAttempts;
     [manager reloadSettings]; CHECK(runtime.beginAttempts==attempts);
     [runtime advanceBy:23.5];
-    CHECK(audio.playing && runtime.beginAttempts==attempts+1 && first.endCalls==1 && runtime.liveTaskCount==1);
+    CHECK(audio.playing && runtime.beginAttempts==attempts && first.endCalls==0 && runtime.liveTaskCount==1);
     Foreground(); NoResources();
 
     // An initial task refusal cannot create an immediate audio fallback or a
@@ -262,7 +261,7 @@ int main(void) { @autoreleasepool {
     Foreground(); NoResources();
 
     // Native WeChat ownership wins even while external audio is allowed. A
-    // release waits .4 seconds, then resumes despite the external silence hint.
+    // a confirmed release resumes immediately despite the external silence hint.
     Create(YES,20); AVAudioSession.sharedInstance.secondaryAudioShouldBeSilencedHint=YES;
     Background(); entry=runtime.uptime; [runtime advanceBy:1.5]; CHECK(audio.playing);
     [AVAudioSession.sharedInstance setCategory:AVAudioSessionCategoryPlayAndRecord mode:@"VoiceChat" options:4 error:NULL];
@@ -275,30 +274,28 @@ int main(void) { @autoreleasepool {
     CHECK(AVAudioSession.sharedInstance.configurations==hostConfigurations);
     CHECK([AVAudioSession.sharedInstance.category isEqual:AVAudioSessionCategoryPlayAndRecord]);
     CHECK([AVAudioSession.sharedInstance.mode isEqual:@"VoiceChat"] && AVAudioSession.sharedInstance.categoryOptions==4);
+    players=CSTestPlayerCreates; attempts=runtime.beginAttempts;
     [AVAudioSession.sharedInstance setActive:NO error:NULL];
     [AVAudioSession.sharedInstance setCategory:AVAudioSessionCategoryAmbient mode:AVAudioSessionModeDefault options:0 error:NULL];
     [AVAudioSession.sharedInstance setMode:AVAudioSessionModeDefault error:NULL]; Drain();
-    players=CSTestPlayerCreates;
-    [runtime advanceBy:.39]; CHECK(!audio.playing && CSTestPlayerCreates==players);
-    [runtime advanceBy:.01]; CHECK(audio.playing && manager.canAttemptBackgroundWork);
+    CHECK(audio.playing && manager.canAttemptBackgroundWork && CSTestPlayerCreates==players+1);
+    CHECK(runtime.beginAttempts==attempts); // The valid task bridges this handoff.
+    [runtime advanceBy:.4]; CHECK(audio.playing && CSTestPlayerCreates==players+1);
     CHECK(fabs(NextDeadline()-entry-25)<.000001);
     Foreground(); NoResources();
 
-    // A periodic check inside the host-release debounce may renew its task,
-    // but audio must wait for the full .4 seconds without shifting the cadence.
+    // A confirmed release just before a periodic check cannot wait for the old
+    // debounce; the original periodic clock continues without a second player.
     Create(YES,20); Background(); entry=runtime.uptime; [runtime advanceBy:1.5];
     [AVAudioSession.sharedInstance setCategory:AVAudioSessionCategoryPlayAndRecord mode:@"VoiceChat" options:4 error:NULL];
     [AVAudioSession.sharedInstance setActive:YES error:NULL]; Drain();
     [runtime advanceBy:entry+24.8-runtime.uptime]; CHECK(!audio.playing);
-    [AVAudioSession.sharedInstance setActive:NO error:NULL]; Drain();
     players=CSTestPlayerCreates; attempts=runtime.beginAttempts;
+    [AVAudioSession.sharedInstance setActive:NO error:NULL]; Drain();
+    CHECK(audio.playing && CSTestPlayerCreates==players+1 && runtime.beginAttempts==attempts);
     [runtime advanceBy:entry+25-runtime.uptime];
-    CHECK(!audio.playing && CSTestPlayerCreates==players && runtime.beginAttempts==attempts+1);
+    CHECK(audio.playing && CSTestPlayerCreates==players+1 && runtime.beginAttempts==attempts);
     CHECK(manager.canAttemptBackgroundWork && runtime.liveTaskCount==1);
-    CHECK(fabs(NextDeadline()-entry-25.2)<.000001);
-    [runtime advanceBy:.19]; CHECK(!audio.playing && CSTestPlayerCreates==players);
-    [runtime advanceBy:NextDeadline()-runtime.uptime];
-    CHECK(audio.playing && CSTestPlayerCreates==players+1 && fabs(runtime.uptime-entry-25.2)<.000001);
     CHECK(fabs(NextDeadline()-entry-50)<.000001);
     Foreground(); NoResources();
 
@@ -314,12 +311,12 @@ int main(void) { @autoreleasepool {
     AVAudioSession.sharedInstance.failActivation=YES;
     [runtime advanceBy:23.5];
     CHECK(!audio.playing && CSTestPlayerCreates==players+1 && manager.canAttemptBackgroundWork);
-    CHECK(runtime.beginAttempts==attempts+1 && runtime.liveTaskCount==1);
+    CHECK(runtime.beginAttempts==attempts && runtime.liveTaskCount==1);
     CHECK(fabs(NextDeadline()-entry-50)<.000001);
     AVAudioSession.sharedInstance.failActivation=NO;
     [runtime advanceBy:25];
     CHECK(audio.playing && CSTestPlayerCreates==players+2 && manager.backgroundAudioActive);
-    CHECK(runtime.beginAttempts==attempts+2 && runtime.liveTaskCount==1);
+    CHECK(runtime.beginAttempts==attempts && runtime.liveTaskCount==1);
     Foreground(); NoResources();
 
     // Ended always requests one delayed recovery: with/without ShouldResume,
@@ -337,7 +334,7 @@ int main(void) { @autoreleasepool {
         CHECK(!audio.playing && CSTestPlayerCreates==players && runtime.beginAttempts==attempts);
         [runtime advanceBy:.01];
         CHECK(audio.playing && CSTestPlayerCreates==players+1 && manager.canAttemptBackgroundWork);
-        CHECK(runtime.beginAttempts==attempts+1 && runtime.liveTaskCount==1);
+        CHECK(runtime.beginAttempts==attempts && runtime.liveTaskCount==1);
         CHECK(fabs(NextDeadline()-entry-25)<.000001);
         Foreground(); NoResources();
     }
@@ -369,15 +366,15 @@ int main(void) { @autoreleasepool {
         [runtime advanceBy:1.1];
         BOOL reused=budget>=2;
         CHECK(CSTestPlayerCreates==players+(reused?0:1));
-        CHECK(runtime.beginAttempts==attempts+(reused?0:1));
+        CHECK(runtime.beginAttempts==attempts);
         CHECK(EventCount(@"资源复用")== (reused?1:0));
-        CHECK((runtime.tasks.lastObject==second)==reused);
+        CHECK(runtime.tasks.lastObject==second && second.valid);
         CHECK([manager.firstScheduledCheckAt isEqualToDate:originalFirst]);
         CHECK([manager.lastBackgroundCheckedAt isEqualToDate:runtime.currentDate] && !manager.periodicCheckCount);
         CHECK(fabs(NextDeadline()-entry-25)<.000001);
         if (reused) {
             [runtime advanceBy:23.5];
-            CHECK(audio.playing && CSTestPlayerCreates==players+1 && runtime.beginAttempts==attempts+1);
+            CHECK(audio.playing && CSTestPlayerCreates==players+1 && runtime.beginAttempts==attempts);
             CHECK(manager.periodicCheckCount==1 && EventCount(@"资源复用")==1);
         }
         Foreground(); NoResources();
@@ -387,16 +384,16 @@ int main(void) { @autoreleasepool {
     // retry. None of these recovery checks completed both resource requests.
     for (NSUInteger failure=0;failure<3;failure++) {
         entry=ReopenExpiredCycle(failure==2?31:29);
-        CSTestFailPlayerPlay=failure==0; runtime.failBegin=failure==1;
+        CSTestFailPlayerPlay=failure==0; CSTestFailPlayerPreparation=failure==1;
         players=CSTestPlayerCreates; attempts=runtime.beginAttempts;
         [runtime advanceBy:.4];
-        CHECK(runtime.beginAttempts==attempts+(failure==2?0:1));
-        CHECK(audio.playing==(failure==1));
+        CHECK(runtime.beginAttempts==attempts);
+        CHECK(!audio.playing);
         if (audio.playing) FinishPulse();
-        CSTestFailPlayerPlay=NO; runtime.failBegin=NO; runtime.backgroundTimeRemaining=29;
+        CSTestFailPlayerPlay=NO; CSTestFailPlayerPreparation=NO; runtime.backgroundTimeRemaining=29;
         players=CSTestPlayerCreates; attempts=runtime.beginAttempts;
         [runtime advanceBy:1.1];
-        CHECK(audio.playing && CSTestPlayerCreates==players+1 && runtime.beginAttempts==attempts+1);
+        CHECK(audio.playing && CSTestPlayerCreates==players+1 && runtime.beginAttempts==attempts);
         CHECK(!EventCount(@"资源复用") && fabs(NextDeadline()-entry-25)<.000001);
         Foreground(); NoResources();
     }
@@ -405,12 +402,11 @@ int main(void) { @autoreleasepool {
     CHECK(!audio.playing && manager.canAttemptBackgroundWork);
     players=CSTestPlayerCreates; attempts=runtime.beginAttempts;
     [runtime advanceBy:entry+1.5-runtime.uptime];
-    CHECK(audio.playing && CSTestPlayerCreates==players+1 && runtime.beginAttempts==attempts+1);
+    CHECK(audio.playing && CSTestPlayerCreates==players+1 && runtime.beginAttempts==attempts);
     CHECK(!EventCount(@"资源复用")); Foreground(); NoResources();
 
-    // Interruption, route, media, and host events after recovery revoke reuse.
-    // Normal completion alone above must keep it, including a later recovery
-    // which succeeds before grace after one of these invalidating events.
+    // Interruption, media loss and native ownership changes revoke old reuse.
+    // A later successful recovery may supply a fresh credential for grace.
     for (NSUInteger event=0;event<4;event++) {
         entry=ReopenExpiredCycle(29); [runtime advanceBy:.4]; FinishPulse();
         if (event==0) { AVAudioSession.sharedInstance.active=NO; Interrupt(YES,NO); }
@@ -421,18 +417,20 @@ int main(void) { @autoreleasepool {
         } else {
             [AVAudioSession.sharedInstance setMode:AVAudioSessionModeDefault error:NULL]; Drain();
         }
-        if (event!=0) { [runtime advanceBy:.4]; CHECK(audio.playing); FinishPulse(); }
+        if (event==1 || event==2) { [runtime advanceBy:.4]; CHECK(audio.playing); FinishPulse(); }
+        if (event==3) CHECK(!audio.playing); // Cleanup is not a new release episode.
         players=CSTestPlayerCreates; attempts=runtime.beginAttempts;
         [runtime advanceBy:entry+1.5-runtime.uptime];
-        CHECK(audio.playing && CSTestPlayerCreates==players+1 && runtime.beginAttempts==attempts+1);
-        CHECK(!EventCount(@"资源复用")); Foreground(); NoResources();
+        BOOL freshRecovery=event==1 || event==2;
+        CHECK(audio.playing==!freshRecovery && CSTestPlayerCreates==players+(freshRecovery?0:1) && runtime.beginAttempts==attempts);
+        CHECK(EventCount(@"资源复用")== (freshRecovery?1:0)); Foreground(); NoResources();
     }
 
     // Interval changes use the new explicit deadline when proving coverage.
     entry=ReopenExpiredCycle(29); [runtime advanceBy:.4]; FinishPulse();
     SetInterval(@30); players=CSTestPlayerCreates; attempts=runtime.beginAttempts;
     [runtime advanceBy:1.1];
-    CHECK(audio.playing && CSTestPlayerCreates==players+1 && runtime.beginAttempts==attempts+1);
+    CHECK(audio.playing && CSTestPlayerCreates==players+1 && runtime.beginAttempts==attempts);
     CHECK(!EventCount(@"资源复用") && fabs(NextDeadline()-entry-30.4)<.000001);
     Foreground(); NoResources();
 
@@ -441,7 +439,7 @@ int main(void) { @autoreleasepool {
     CHECK(!manager.firstScheduledCheckAt);
     players=CSTestPlayerCreates; attempts=runtime.beginAttempts;
     [runtime advanceBy:1.1];
-    CHECK(audio.playing && CSTestPlayerCreates==players+1 && runtime.beginAttempts==attempts+1);
+    CHECK(audio.playing && CSTestPlayerCreates==players+1 && runtime.beginAttempts==attempts);
     CHECK(manager.firstScheduledCheckAt && !EventCount(@"资源复用")); Foreground(); NoResources();
 
     // A new observation invalidates a recovery even when the transitions occur
@@ -454,7 +452,7 @@ int main(void) { @autoreleasepool {
     CHECK(!manager.firstScheduledCheckAt && !EventCount(@"资源复用"));
     players=CSTestPlayerCreates; attempts=runtime.beginAttempts;
     [runtime advanceBy:NextDeadline()-runtime.uptime];
-    CHECK(audio.playing && CSTestPlayerCreates==players+1 && runtime.beginAttempts==attempts+1);
+    CHECK(audio.playing && CSTestPlayerCreates==players+1 && runtime.beginAttempts==attempts);
     CHECK(manager.firstScheduledCheckAt && !EventCount(@"资源复用")); Foreground(); NoResources();
 
     // A foreground/background epoch cannot inherit a missing interruption end.
@@ -486,7 +484,7 @@ int main(void) { @autoreleasepool {
     CHECK(fabs(NextDeadline()-entry-25)<.000001);
     [runtime advanceBy:23.5];
     CHECK(!audio.playing && CSTestPlayerCreates==players && manager.canAttemptBackgroundWork);
-    CHECK(runtime.beginAttempts==attempts+1 && runtime.liveTaskCount==1 && second.endCalls==1);
+    CHECK(runtime.beginAttempts==attempts && runtime.liveTaskCount==1 && second.endCalls==0);
     [runtime.tasks.lastObject expire]; NoResources();
     Foreground(); NoResources();
 

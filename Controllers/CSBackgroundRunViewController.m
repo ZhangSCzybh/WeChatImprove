@@ -229,8 +229,8 @@ static NSString *const CSBackgroundRunRecordExplanation=@"仅保留当前微信�
 }
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section { return self.sections[section].header; }
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
-    if (section==0) return @"进入后台后先在 1.5 秒检查一次，之后按设置的间隔检查；默认 25 秒，可设为 10–30 秒。剩余执行时间大于 0 且不足 30 秒时，尝试播放微信自带的短静音音频并续接后台任务。返回前台或关闭后释放资源，微信通话和录音优先。";
-    if (section==1) return @"当前状态表示此刻可尝试的后台执行条件，不代表系统保证持续运行或红包、收款已经成功。后台音频声明仅表示安装包配置，不能证明系统已允许持续运行。";
+    if (section==0) return @"进入后台后先在 1.5 秒检查一次，之后按设置的间隔检查；默认 25 秒，可设为 10–30 秒。普通检查在剩余执行时间大于 0 且不足 30 秒时尝试短音频。微信明确释放音频后立即评估交接，无需等待普通周期；让出期间有可用有限任务时增加有限次数的轻量复核。返回前台或关闭后释放资源，微信通话和录音优先。";
+    if (section==1) return @"等待音频交接机会表示当前没有插件持有的后台执行资源，仍保留事件监听；不会靠定时器唤醒已挂起的微信。当前状态不代表系统保证持续运行或自动处理已经成功。后台音频声明仅表示安装包配置。";
     if (section==2) return @"首次检查、周期检查和系统到期分别显示，互不覆盖。点击任意记录查看可滚动、可复制的事件时间线。仅保留当前微信进程中最近一次后台过程；记录不代表全程持续保活。";
     return nil;
 }
@@ -295,7 +295,7 @@ static NSString *const CSBackgroundRunRecordExplanation=@"仅保留当前微信�
     if (indexPath.section==2) { [self showLastBackgroundRecord]; return; }
     if (indexPath.section!=3) return;
     UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"后台运行说明"
-        message:@"进入后台后申请系统允许的有限后台任务，1.5 秒后首次检查，之后按设置的间隔检查，默认 25 秒，可配置 10–30 秒。有效剩余时间大于 0 且不足 30 秒时，尝试短静音播放并续接后台任务。\n\n音源直接使用当前微信主包的 blank.caf，单次播放，不另外生成音频，也不无限循环。资源缺失或系统不允许播放时，当前状态会显示原因。播放正常结束后继续按间隔检查；音频播放和任务申请均不保证系统补充执行时间。\n\n微信自身使用音频时优先让出，释放后再尝试；其他 App 播放音乐或视频时，保活音频以混音方式继续尝试，不主动打断对方播放。电话、Siri 等系统音频中断不会主动终止保活请求；当前音频被系统停用后，保留可用的有限后台任务，并按原周期继续尝试。中断结束后也会重新检查，实际能否播放由系统决定。返回前台或关闭后台运行后，停止检查并释放本插件的任务与音频资源。此开关控制本插件额外申请后台执行机会，群功能仍按自身设置和实际执行条件处理。\n\n当前状态和最近检查仅表示已观察到的执行条件，不能证明全程持续运行。后台消息和自动处理仍依赖微信原生服务；系统挂起、结束进程或用户划掉微信后，插件无法自行唤醒微信。"
+        message:@"进入后台后申请系统允许的有限后台任务，1.5 秒后首次检查，之后按设置的间隔检查，默认 25 秒，可配置 10–30 秒。普通检查在有效剩余时间大于 0 且不足 30 秒时尝试短音频，仍有效的后台任务继续复用。\n\n微信自身使用音频时优先让出。明确收到释放事件后立即评估交接，不等待普通周期或固定 0.4 秒；复用可用任务，必要时由同一次释放申请一次桥接任务。让出期间有正的有限预算时，每 1 秒轻量复核，余量不超过 8 秒时为 0.5 秒，同次后台最多 30 次。任务到期取消定时检查并保留交接记录和音频监听，后续恢复取决于新的真实执行机会。声音结束但会话尚未确认释放时继续让出。\n\n音源使用微信主包的 blank.caf，单次混音播放，不生成替代音频，不无限循环；其他 App 的音乐或视频可混音共存。电话、Siri 中断及音频服务恢复保留各自检查策略。播放成功、任务获准均不保证系统补充执行时间，失败与等待原因可在时间线中查看。\n\n返回前台或关闭后台需求后清理资源和旧交接。此开关只控制本插件额外申请执行机会，业务功能仍按自身设置处理。记录不能证明全程持续运行；系统挂起、结束进程或用户划掉微信后，插件无法自行唤醒微信。"
         preferredStyle:UIAlertControllerStyleAlert];
     [alert addAction:[UIAlertAction actionWithTitle:@"了解了" style:UIAlertActionStyleDefault handler:nil]];
     [self presentViewController:alert animated:YES completion:nil];

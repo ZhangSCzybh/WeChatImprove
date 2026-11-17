@@ -10,6 +10,7 @@ NAME(AVAudioSessionCategoryAmbient); NAME(AVAudioSessionCategorySoloAmbient); NA
 NAME(AVAudioSessionInterruptionNotification); NAME(AVAudioSessionMediaServicesWereLostNotification); NAME(AVAudioSessionMediaServicesWereResetNotification); NAME(AVAudioSessionRouteChangeNotification);
 NAME(AVAudioSessionSilenceSecondaryAudioHintNotification);
 NAME(AVAudioSessionInterruptionTypeKey); NAME(AVAudioSessionInterruptionOptionKey);
+NAME(AVAudioSessionRouteChangeReasonKey);
 @implementation UIScene @end
 @implementation UIApplication
 + (instancetype)sharedApplication { static UIApplication *app; if (!app) { app=[self new]; app.connectedScenes=[NSSet set]; } return app; }
@@ -17,6 +18,11 @@ NAME(AVAudioSessionInterruptionTypeKey); NAME(AVAudioSessionInterruptionOptionKe
 - (void)endBackgroundTask:(UIBackgroundTaskIdentifier)identifier {}
 @end
 @implementation AVAudioSession
+@synthesize category=_category;
+- (NSString *)category {
+    if (self.categoryReadAction) { dispatch_block_t action=self.categoryReadAction; self.categoryReadAction=nil; action(); }
+    return _category;
+}
 + (instancetype)sharedInstance {
     static AVAudioSession *session;
     if (!session) { session=[self new]; session.category=AVAudioSessionCategoryAmbient; session.mode=AVAudioSessionModeDefault; }
@@ -29,6 +35,7 @@ NAME(AVAudioSessionInterruptionTypeKey); NAME(AVAudioSessionInterruptionOptionKe
     if (self.throwCategory) @throw [NSException exceptionWithName:@"NativeCategoryException" reason:nil userInfo:nil];
     if (self.failCategory) { if (error) *error=[NSError errorWithDomain:@"NativeAudio" code:10 userInfo:nil]; return NO; }
     self.category=category; self.mode=mode; self.routeSharingPolicy=policy; self.categoryOptions=options;
+    if (self.categoryAction) { dispatch_block_t action=self.categoryAction; self.categoryAction=nil; action(); }
     return YES;
 }
 - (BOOL)nativeMode:(NSString *)mode error:(NSError **)error { self.mode=mode; return YES; }
@@ -44,6 +51,7 @@ NAME(AVAudioSessionInterruptionTypeKey); NAME(AVAudioSessionInterruptionOptionKe
     }
     self.active=active;
     if (active && self.activationAction) { dispatch_block_t action=self.activationAction; self.activationAction=nil; action(); }
+    if (!active && self.deactivationAction) { dispatch_block_t action=self.deactivationAction; self.deactivationAction=nil; action(); }
     return YES;
 }
 @end

@@ -49,3 +49,7 @@ compile_background_test BackgroundRunHybridTests background-hybrid
 "$test_dir/background-hybrid"
 compile_background_test BackgroundRunTests background-run
 "$test_dir/background-run"
+compile_background_test BackgroundRunHandoffTests background-handoff
+"$test_dir/background-handoff"
+compile_background_test BackgroundRunCoalescingTests background-coalescing
+"$test_dir/background-coalescing"

@@ -16,6 +16,7 @@ static const NSTimeInterval CSRunDefaultCheckInterval=25, CSRunGraceInterval=1.5
 static const NSTimeInterval CSRunResumeInterval=.4, CSRunAudioThreshold=30;
 static const NSTimeInterval CSRunRecoveryBudgetMargin=1;
 static const NSUInteger CSRunRecordEventLimit=80;
+static const NSUInteger CSRunYieldProbeLimit=30;
 static NSTimeInterval CSRunCheckInterval(id value) {
     if (![value isKindOfClass:NSNumber.class] || !isfinite([value doubleValue])) return CSRunDefaultCheckInterval;
     return MIN(30,MAX(10,round([value doubleValue])));
@@ -52,6 +53,7 @@ static NSString *CSRunRecordedBudget(NSTimeInterval remaining) {
 @property(nonatomic, strong) id<CSBackgroundRunRuntime> runtime;
 @property(nonatomic, strong) id<CSBackgroundRunTask> task;
 @property(nonatomic, strong) id<CSBackgroundRunScheduledCheck> scheduledCheck, graceCheck, resumeCheck;
+@property(nonatomic, strong) id<CSBackgroundRunScheduledCheck> yieldCheck;
 @property(nonatomic, readwrite) BOOL enabled, supportsBackgroundAudio;
 @property(nonatomic, readwrite) NSTimeInterval checkInterval;
 @property(nonatomic, copy, readwrite) NSString *statusText, *lastBackgroundResult;
@@ -63,7 +65,7 @@ static NSString *CSRunRecordedBudget(NSTimeInterval remaining) {
 @property(nonatomic) NSTimeInterval lastCheckUptime;
 @property(nonatomic, copy) NSString *audioFailure;
 @property(nonatomic) BOOL started, background, mediaLost, hostYielded, hostNotificationsEnabled;
-@property(nonatomic) BOOL cycleActive, cycleEnded, reconciling, reconcileAgain, taskExpirationPending;
+@property(nonatomic) BOOL cycleActive, cycleEnded, reconciling, reconcileAgain, taskExpirationPending, routeRecoveryPending;
 @property(nonatomic) BOOL groupChatRequested, publishedWork, publishedAudio;
 @property(nonatomic) NSUInteger generation, checkGeneration, resumeGeneration;
 @property(nonatomic) CSBackgroundRunPhase phase;
@@ -75,11 +77,18 @@ static NSString *CSRunRecordedBudget(NSTimeInterval remaining) {
 @property(nonatomic, copy) NSString *pendingCheckSource;
 @property(nonatomic) NSUInteger recordedAudioGeneration, recordedAudioObservationIdentifier;
 @property(nonatomic) BOOL recordedAudioAttempt;
-// Only a reopened cycle may reuse its successful recovery at the grace check.
-@property(nonatomic) BOOL recoveryGraceEligible;
-@property(nonatomic) NSUInteger recoveryGraceGeneration, recoveryGraceObservationIdentifier, recoveryGraceRevision;
-@property(nonatomic, strong) id<CSBackgroundRunTask> recoveryGraceTask;
+// Adjacent checks share a successful resource decision only while its task,
+// native ownership revision and media generation still match.
+@property(nonatomic) BOOL resourceSuccessEligible, resourceUsesSnapshot;
+@property(nonatomic) NSUInteger resourceGeneration, resourceObservationIdentifier, resourceRevision;
+@property(nonatomic) uint64_t resourceConfigurationRevision, resourceMediaGeneration;
+@property(nonatomic, strong) id<CSBackgroundRunTask> resourceTask;
+@property(nonatomic) NSTimeInterval resourceSuccessUptime;
 @property(nonatomic) NSTimeInterval nextPeriodicDeadline;
+// The handoff belongs to a background visit and a real host release, not a task.
+@property(nonatomic) BOOL handoffPending, handoffAttempted, handoffInProgress, handoffCleanupRetried;
+@property(nonatomic) NSUInteger handoffEpisode, handoffObservationIdentifier, lastHandledReleaseEpisode;
+@property(nonatomic) NSUInteger yieldCheckGeneration, yieldProbeCount;
 @end
 
 @implementation CSBackgroundRunManager
@@ -110,10 +119,21 @@ static NSString *CSRunRecordedBudget(NSTimeInterval remaining) {
 - (void)dealloc {
     [NSNotificationCenter.defaultCenter removeObserver:self];
     if (_hostNotificationsEnabled) [_audio setHostNotificationsEnabled:NO];
-    [_scheduledCheck cancel]; [_graceCheck cancel]; [_resumeCheck cancel]; [_task end]; [_audio stop];
+    [_scheduledCheck cancel]; [_graceCheck cancel]; [_resumeCheck cancel]; [_yieldCheck cancel]; [_task end]; [_audio stop];
 }
 - (BOOL)resourcesRequested { return self.enabled || self.groupChatRequested; }
-- (BOOL)backgroundAudioActive { return self.resourcesRequested && self.background && self.audio.playing && self.audio.sessionOwned; }
+- (CSBackgroundRunAudioState *)currentAudioState {
+    return [self.audio respondsToSelector:@selector(currentState)]?[self.audio currentState]:nil;
+}
+- (BOOL)hostAudioBusy {
+    CSBackgroundRunAudioState *state=[self currentAudioState];
+    return state?state.hostBusy:self.audio.hostBusy;
+}
+- (BOOL)backgroundAudioActive {
+    if (!self.resourcesRequested || !self.background) return NO;
+    CSBackgroundRunAudioState *state=[self currentAudioState];
+    return state?(state.playing && state.sessionOwned):(self.audio.playing && self.audio.sessionOwned);
+}
 - (BOOL)executionAvailableWithAudio:(BOOL)audio {
     return self.resourcesRequested && self.background && self.cycleActive && !self.cycleEnded &&
         (audio || (self.task.valid && self.runtime.backgroundTimeRemaining>0));
@@ -208,7 +228,11 @@ static NSString *CSRunRecordedBudget(NSTimeInterval remaining) {
     [self recordEventWithSource:@"系统到期" detail:detail date:date uptime:uptime];
 }
 - (void)beginObservationWithKnownEntry:(BOOL)knownEntry {
-    [self invalidateRecoveryGrace];
+    [self invalidateSuccessfulResources];
+    [self invalidateHostHandoff:nil];
+    CSBackgroundRunAudioState *state=[self currentAudioState];
+    self.lastHandledReleaseEpisode=state?state.hostReleaseEpisode:([self.audio respondsToSelector:@selector(hostReleaseEpisode)]?self.audio.hostReleaseEpisode:0);
+    self.yieldProbeCount=0;
     self.observationOpen=YES;
     self.lastBackgroundStartedAt=self.runtime.currentDate;
     self.lastBackgroundStartObserved=knownEntry;
@@ -228,7 +252,7 @@ static NSString *CSRunRecordedBudget(NSTimeInterval remaining) {
         date:self.lastBackgroundStartedAt uptime:now];
 }
 - (void)recordStop:(NSString *)reason {
-    [self invalidateRecoveryGrace];
+    [self invalidateSuccessfulResources];
     if (!self.observationOpen) return;
     // A foreground or final-demand stop can beat the queued expiration callback.
     // Preserve its real snapshot, but leave valid tasks to releaseResources:
@@ -255,16 +279,28 @@ static NSString *CSRunRecordedBudget(NSTimeInterval remaining) {
 }
 - (void)cancelResumeCheck {
     self.resumeGeneration++; [self.resumeCheck cancel]; self.resumeCheck=nil;
+    self.routeRecoveryPending=NO;
 }
-- (void)invalidateRecoveryGrace {
-    self.recoveryGraceRevision++;
-    self.recoveryGraceEligible=NO; self.recoveryGraceTask=nil;
+- (void)cancelYieldCheck {
+    self.yieldCheckGeneration++;
+    [self.yieldCheck cancel]; self.yieldCheck=nil;
+}
+- (void)invalidateHostHandoff:(NSString *)reason {
+    if (self.handoffPending && reason) [self recordEventWithSource:@"交接取消" detail:reason];
+    self.handoffPending=NO; self.handoffAttempted=NO;
+    self.handoffCleanupRetried=NO;
+    self.handoffEpisode=0; self.handoffObservationIdentifier=0;
+}
+- (void)invalidateSuccessfulResources {
+    self.resourceRevision++;
+    self.resourceSuccessEligible=NO; self.resourceTask=nil;
 }
 - (void)cancelChecks {
-    [self invalidateRecoveryGrace]; self.nextPeriodicDeadline=-1;
+    [self invalidateSuccessfulResources]; self.nextPeriodicDeadline=-1;
     self.checkGeneration++; [self.scheduledCheck cancel]; self.scheduledCheck=nil;
     [self.graceCheck cancel]; self.graceCheck=nil;
     [self cancelResumeCheck];
+    [self cancelYieldCheck];
 }
 - (void)releaseResources {
     self.generation++; self.cycleActive=NO;
@@ -277,7 +313,8 @@ static NSString *CSRunRecordedBudget(NSTimeInterval remaining) {
 - (void)finishCycle:(NSString *)reason {
     [self recordStop:reason];
     self.cycleEnded=YES; [self releaseResources];
-    [self publish:reason phase:CSRunEnded];
+    BOOL waiting=self.background && self.resourcesRequested && (self.handoffPending || self.hostYielded || self.hostAudioBusy);
+    [self publish:waiting?@"有限后台任务已结束，等待音频交接机会":reason phase:waiting?CSRunWaiting:CSRunEnded];
 }
 - (void)reconcileDemandFrom:(BOOL)previouslyRequested stopReason:(NSString *)stopReason {
     BOOL requested=self.resourcesRequested;
@@ -289,7 +326,7 @@ static NSString *CSRunRecordedBudget(NSTimeInterval remaining) {
                 if (!self.observationOpen) [self beginObservationWithKnownEntry:NO];
                 self.lastBackgroundStoppedAt=nil; self.lastBackgroundStopReason=@"尚未结束";
                 self.checkRecordRequested=YES;
-            } else { [self recordStop:stopReason]; self.checkRecordRequested=NO; }
+            } else { [self invalidateHostHandoff:@"后台需求已关闭"]; [self recordStop:stopReason]; self.checkRecordRequested=NO; }
         }
     }
     [self reconcile];
@@ -332,8 +369,9 @@ static NSString *CSRunRecordedBudget(NSTimeInterval remaining) {
     BOOL valid=candidate.valid;
     if (observationIdentifier==self.observationIdentifier) [self recordEventWithSource:source detail:valid?@"后台任务申请获准；不代表系统已增加剩余执行时间":@"后台任务申请未获准"];
     if (!valid) { [candidate end]; return NO; }
-    // Keep the live task until UIKit actually grants its replacement.
+    // Keep the current task until the request returns a valid identifier.
     id<CSBackgroundRunTask> old=self.task;
+    [self invalidateSuccessfulResources];
     self.task=candidate;
     [old end];
     return generation==self.generation && self.task==candidate && candidate.valid;
@@ -344,7 +382,11 @@ static NSString *CSRunRecordedBudget(NSTimeInterval remaining) {
     self.pendingCheckObservationIdentifier=self.observationIdentifier;
     if (self.observationOpen) {
         NSDate *date=self.runtime.currentDate;
-        if ([source isEqual:@"首次检查"] && !self.firstScheduledCheckAt) self.firstScheduledCheckAt=date;
+        if ([source isEqual:@"首次检查"] && !self.firstScheduledCheckAt) {
+            // Keep the real visit's first check; only subsequent adjacent checks
+            // may reuse an earlier successful recovery or handoff.
+            [self invalidateSuccessfulResources]; self.firstScheduledCheckAt=date;
+        }
         if ([source isEqual:@"周期检查"]) { self.lastPeriodicCheckAt=date; self.periodicCheckCount++; }
         [self recordEventWithSource:source detail:@"本次检查已开始；剩余执行时间与处理结果见后续事件" date:date uptime:self.runtime.uptime];
     }
@@ -382,39 +424,186 @@ static NSString *CSRunRecordedBudget(NSTimeInterval remaining) {
         [manager performScheduledCheckWithSource:@"首次检查"];
     }];
 }
+- (void)requestHostHandoffForEpisode:(NSUInteger)episode {
+    CSBackgroundRunAudioState *state=[self currentAudioState];
+    if (!episode || !self.background || !self.resourcesRequested ||
+        !self.observationOpen || self.mediaLost || (state?state.hostBusy:self.audio.hostBusy)) return;
+    if (state && (!state.hostReleaseConfirmed || state.hostReleaseEpisode!=episode)) return;
+    if (episode<=self.lastHandledReleaseEpisode) {
+        // A later native cleanup can revoke a just-acquired lease. Allow one
+        // correction on that real callback, using the existing task only.
+        if (episode==self.handoffEpisode && self.handoffObservationIdentifier==self.observationIdentifier &&
+            self.handoffAttempted && !self.handoffCleanupRetried && !(state?state.sessionOwned:self.audio.sessionOwned) &&
+            self.task.valid && self.runtime.backgroundTimeRemaining>0) {
+            self.handoffCleanupRetried=YES; self.handoffPending=YES; self.handoffAttempted=NO;
+            self.checkRecordRequested=YES;
+            if (!self.routeRecoveryPending) [self cancelResumeCheck];
+            [self recordEventWithSource:@"交接清理补偿" detail:@"微信后续清理已撤销本次音频租约；仅复用当前任务补偿一次，不重新申请桥接任务"];
+        }
+        return;
+    }
+    self.lastHandledReleaseEpisode=episode;
+    self.handoffEpisode=episode; self.handoffObservationIdentifier=self.observationIdentifier;
+    self.handoffPending=YES; self.handoffAttempted=NO; self.handoffCleanupRetried=NO;
+    self.hostYielded=NO; self.checkRecordRequested=YES;
+    if (!self.routeRecoveryPending) [self cancelResumeCheck];
+    [self cancelYieldCheck];
+    NSString *timing=self.routeRecoveryPending?@"输出路由正在恢复，复用已安排的恢复检查":@"在当前主线程回调中评估，不等待普通周期或固定恢复延时";
+    [self recordEventWithSource:@"交接待处理" detail:[NSString stringWithFormat:@"已确认微信释放音频（交接 %lu）；%@",(unsigned long)episode,timing]];
+}
+- (BOOL)hostHandoffIsCurrent:(NSUInteger)episode observation:(NSUInteger)observation {
+    if (!self.handoffPending || self.handoffEpisode!=episode || self.handoffObservationIdentifier!=observation ||
+        self.observationIdentifier!=observation || !self.background || !self.resourcesRequested ||
+        self.mediaLost || self.hostYielded) return NO;
+    CSBackgroundRunAudioState *state=[self currentAudioState];
+    if (state) return !state.hostBusy && state.hostReleaseConfirmed && state.hostReleaseEpisode==episode;
+    if (self.audio.hostBusy) return NO;
+    if ([self.audio respondsToSelector:@selector(hostReleaseConfirmed)] && !self.audio.hostReleaseConfirmed) return NO;
+    return ![self.audio respondsToSelector:@selector(hostReleaseEpisode)] || self.audio.hostReleaseEpisode==episode;
+}
+- (void)attemptHostHandoff {
+    if (self.handoffInProgress || !self.handoffPending || self.handoffAttempted || self.resumeCheck || self.routeRecoveryPending) return;
+    NSUInteger episode=self.handoffEpisode, observation=self.handoffObservationIdentifier;
+    if (![self hostHandoffIsCurrent:episode observation:observation]) {
+        [self invalidateHostHandoff:@"微信已重新占用音频，或交接事件已失效"];
+        return;
+    }
+    self.handoffAttempted=YES; self.handoffInProgress=YES;
+    @try {
+        if (!self.supportsBackgroundAudio) {
+            [self recordEventWithSource:@"交接跳过" detail:@"当前微信包未声明后台音频能力"];
+            return;
+        }
+        BOOL reopened=!self.cycleActive;
+        if (reopened) {
+            self.cycleActive=YES; self.cycleEnded=NO; self.generation++;
+            [self recordEventWithSource:@"恢复机会" detail:@"有限任务结束后收到新的明确音频释放事件；本次最多申请一次桥接任务"];
+        }
+        NSUInteger generation=self.generation;
+        NSTimeInterval remaining=self.runtime.backgroundTimeRemaining;
+        BOOL usable=self.task.valid && !isnan(remaining) && remaining>0;
+        if (!usable && !self.handoffCleanupRetried) {
+            [self replaceTaskWithSource:@"交接桥接申请" observationIdentifier:observation];
+            if (generation!=self.generation || ![self hostHandoffIsCurrent:episode observation:observation]) return;
+            remaining=self.runtime.backgroundTimeRemaining;
+            usable=self.task.valid && !isnan(remaining) && remaining>0;
+        } else if (usable) [self recordEventWithSource:@"交接资源复用" detail:@"复用仍有效的有限后台任务，本次不重复申请"];
+        if (!usable) {
+            [self recordEventWithSource:@"交接等待" detail:self.handoffCleanupRetried?@"清理补偿时原任务已无可用预算；保留交接记录等待新的真实事件，不再申请桥接任务":@"桥接后仍无可用执行预算；保留交接记录和音频监听，等待新的真实执行机会，不循环申请"];
+            [self finishCycle:@"当前没有可用后台执行时间，等待新的音频事件"];
+            return;
+        }
+        // A newly observed release is different from a periodic renewal. A large
+        // or unbounded reading must not suppress this one bounded handoff.
+        NSString *budget=isfinite(remaining) && remaining<DBL_MAX/2?
+            [NSString stringWithFormat:@"当前报告剩余约 %.3f 秒",remaining]:@"系统未提供有限倒计时";
+        [self recordEventWithSource:@"交接检查" detail:[budget stringByAppendingString:@"；已确认释放，尝试一次短音频，结果不保证系统增加执行时间"]];
+        if (reopened) { [self schedulePeriodicCheck]; [self scheduleGraceCheck]; }
+        NSUInteger resourceRevision=self.resourceRevision;
+        self.recordedAudioAttempt=YES; self.recordedAudioGeneration=generation;
+        self.recordedAudioObservationIdentifier=observation;
+        NSError *error=nil;
+        BOOL started=[self.audio startWithError:&error];
+        if (generation!=self.generation || ![self hostHandoffIsCurrent:episode observation:observation]) return;
+        self.audioFailure=started?nil:[NSString stringWithFormat:@"启动失败：%@",error.localizedDescription?:@"系统未允许播放 blank.caf"];
+        if (started && self.audio.sessionOwned) {
+            self.handoffPending=NO;
+            self.lastBackgroundStoppedAt=nil; self.lastBackgroundStopReason=@"尚未结束";
+            [self recordEventWithSource:@"交接成功" detail:@"短音频播放请求成功且会话所有权检查通过；后续执行仍由系统决定"];
+            [self rememberSuccessfulResourcesForGeneration:generation observation:observation revision:resourceRevision];
+        } else {
+            self.recordedAudioAttempt=NO;
+            [self recordEventWithSource:@"交接失败" detail:self.audioFailure?:@"播放期间微信已接管音频"];
+        }
+    } @finally {
+        self.handoffInProgress=NO;
+        self.reconcileAgain=YES;
+    }
+}
+- (void)scheduleYieldCheckIfNeeded {
+    if (self.yieldCheck || self.yieldProbeCount>=CSRunYieldProbeLimit || !self.cycleActive || self.cycleEnded ||
+        !self.background || !self.resourcesRequested || self.mediaLost || !self.supportsBackgroundAudio || !self.task.valid) return;
+    NSTimeInterval remaining=self.runtime.backgroundTimeRemaining;
+    if (!isfinite(remaining) || remaining<=0 || remaining>=DBL_MAX/2) return;
+    if (!self.yieldProbeCount) [self recordEventWithSource:@"让出复核" detail:@"有限任务有效期间轻量复核音频释放，间隔 1 秒，余量不超过 8 秒时为 0.5 秒；本次后台最多 30 次，不增加任务或播放请求"];
+    NSUInteger generation=self.generation, revision=self.yieldCheckGeneration, observation=self.observationIdentifier;
+    __weak typeof(self) weakSelf=self;
+    self.yieldCheck=[self.runtime scheduleAfter:remaining<=8?.5:1 handler:^{
+        CSBackgroundRunManager *manager=weakSelf;
+        if (!manager || generation!=manager.generation || revision!=manager.yieldCheckGeneration || observation!=manager.observationIdentifier) return;
+        manager.yieldCheck=nil;
+        NSTimeInterval budget=manager.runtime.backgroundTimeRemaining;
+        if (!manager.task.valid || !isfinite(budget) || budget<=0 || budget>=DBL_MAX/2) { [manager reconcile]; return; }
+        manager.yieldProbeCount++;
+        CSBackgroundRunAudioState *state=[manager currentAudioState];
+        if (state) {
+            if (state.hostReleaseConfirmed && !state.hostBusy) [manager requestHostHandoffForEpisode:state.hostReleaseEpisode];
+        } else if ([manager.audio respondsToSelector:@selector(hostReleaseConfirmed)] && manager.audio.hostReleaseConfirmed &&
+            [manager.audio respondsToSelector:@selector(hostReleaseEpisode)] && !manager.audio.hostBusy)
+            [manager requestHostHandoffForEpisode:manager.audio.hostReleaseEpisode];
+        if (manager.yieldProbeCount==CSRunYieldProbeLimit) [manager recordEventWithSource:@"让出复核结束" detail:@"本次后台已达到 30 次轻量复核上限；继续保留音频事件监听与普通周期检查"];
+        [manager reconcile];
+    }];
+}
 - (void)scheduleAudioRecoveryReopeningCycle:(BOOL)reopen {
-    if (!self.background || !self.resourcesRequested || self.mediaLost || self.hostYielded) return;
+    if (!self.background || !self.resourcesRequested || self.mediaLost || self.hostYielded) {
+        // A route barrier belongs to an actual recovery timer, never to an
+        // ended cycle or a host-owned session awaiting a future release.
+        self.routeRecoveryPending=NO;
+        return;
+    }
     if (reopen && self.cycleEnded) {
-        NSUInteger observationIdentifier=self.observationIdentifier;
         self.cycleEnded=NO; self.audioFailure=nil;
         self.lastBackgroundStoppedAt=nil; self.lastBackgroundStopReason=@"尚未结束";
         [self recordEventWithSource:@"恢复机会" detail:@"收到新的音频状态事件，重新申请有限后台任务；此前的停止记录仍保留在时间线中"];
         [self reconcile];
-        // A real visit's first check must always retain its normal behavior.
-        if (self.cycleActive && self.graceCheck && self.firstScheduledCheckAt && observationIdentifier==self.observationIdentifier) {
-            self.recoveryGraceEligible=YES; self.recoveryGraceTask=nil;
-            self.recoveryGraceGeneration=self.generation;
-            self.recoveryGraceObservationIdentifier=observationIdentifier;
-        }
     }
-    if (!self.cycleActive || self.resumeCheck) return;
+    if (!self.cycleActive) {
+        self.routeRecoveryPending=NO;
+        if (self.handoffPending && !self.handoffAttempted) [self reconcile];
+        return;
+    }
+    if (self.resumeCheck) return;
     NSUInteger generation=self.generation, resumeGeneration=self.resumeGeneration;
     __weak typeof(self) weakSelf=self;
     self.resumeCheck=[self.runtime scheduleAfter:CSRunResumeInterval handler:^{
         CSBackgroundRunManager *manager=weakSelf;
         if (!manager || generation!=manager.generation || resumeGeneration!=manager.resumeGeneration || !manager.cycleActive) return;
-        manager.resumeCheck=nil;
-        if (!manager.background || !manager.resourcesRequested || manager.mediaLost || manager.hostYielded || manager.audio.hostBusy) return;
+        manager.resumeCheck=nil; manager.routeRecoveryPending=NO;
+        if (!manager.background || !manager.resourcesRequested || manager.mediaLost || manager.hostYielded || manager.hostAudioBusy) return;
         [manager performScheduledCheckWithSource:@"恢复检查"];
     }];
 }
-- (BOOL)canReuseRecoveryForGraceWithRemaining:(NSTimeInterval)remaining {
+- (void)rememberSuccessfulResourcesForGeneration:(NSUInteger)generation observation:(NSUInteger)observation revision:(NSUInteger)revision {
+    id<CSBackgroundRunTask> task=self.task;
+    if (revision!=self.resourceRevision || generation!=self.generation || observation!=self.observationIdentifier ||
+        !self.cycleActive || !self.background || !self.resourcesRequested || !self.task.valid || self.audioFailure || self.mediaLost) return;
+    CSBackgroundRunAudioState *state=[self currentAudioState];
+    if (state?(state.hostBusy || !state.sessionOwned):(self.audio.hostBusy || !self.audio.sessionOwned)) return;
     NSTimeInterval now=self.runtime.uptime;
-    return self.recoveryGraceEligible && self.recoveryGraceGeneration==self.generation &&
-        self.recoveryGraceObservationIdentifier==self.observationIdentifier &&
-        self.recoveryGraceTask && self.recoveryGraceTask==self.task && self.task.valid &&
-        !self.mediaLost && !self.hostYielded && !self.audioFailure && !self.resumeCheck &&
-        !self.audio.hostBusy && self.audio.sessionOwned && isfinite(now) && now>=0 &&
+    if (!isfinite(now) || now<0 || revision!=self.resourceRevision || generation!=self.generation ||
+        observation!=self.observationIdentifier || task!=self.task || !task.valid ||
+        !self.cycleActive || !self.background || !self.resourcesRequested || self.audioFailure || self.mediaLost) return;
+    self.resourceSuccessEligible=YES; self.resourceTask=task;
+    self.resourceGeneration=generation; self.resourceObservationIdentifier=observation;
+    self.resourceSuccessUptime=now; self.resourceUsesSnapshot=state!=nil;
+    self.resourceConfigurationRevision=state.configurationRevision;
+    self.resourceMediaGeneration=state.mediaGeneration;
+}
+- (BOOL)successfulResourcesMatchState:(CSBackgroundRunAudioState *)state {
+    if (!self.resourceSuccessEligible || self.resourceGeneration!=self.generation ||
+        self.resourceObservationIdentifier!=self.observationIdentifier || !self.resourceTask ||
+        self.resourceTask!=self.task || !self.task.valid || self.mediaLost || self.hostYielded || self.audioFailure) return NO;
+    if (self.resourceUsesSnapshot) return state && !state.hostBusy && state.sessionOwned &&
+        state.configurationRevision==self.resourceConfigurationRevision && state.mediaGeneration==self.resourceMediaGeneration;
+    return !self.audio.hostBusy && self.audio.sessionOwned;
+}
+- (BOOL)canReuseSuccessfulResourcesWithRemaining:(NSTimeInterval)remaining {
+    NSTimeInterval now=self.runtime.uptime;
+    // Adjacency limits coalescing to grace/recovery overlap; successful pulses
+    // never suppress the normal cadence solely because a lease remains owned.
+    return [self successfulResourcesMatchState:[self currentAudioState]] && !self.resumeCheck && !self.handoffPending &&
+        isfinite(now) && now>=self.resourceSuccessUptime && now-self.resourceSuccessUptime<=CSRunGraceInterval &&
         isfinite(self.nextPeriodicDeadline) && self.nextPeriodicDeadline>now &&
         isfinite(remaining) && remaining>self.nextPeriodicDeadline-now+CSRunRecoveryBudgetMargin;
 }
@@ -433,30 +622,28 @@ static NSString *CSRunRecordedBudget(NSTimeInterval remaining) {
         // Native changes remain tracked while delivery is off. Enable first,
         // then resample so a release during that gap cannot leave stale yield.
         // Keep delivery on after a cycle ends: a host release may reopen it.
-        if (hostNotificationsEnabled) self.hostYielded=self.audio.hostBusy;
+        if (hostNotificationsEnabled) self.hostYielded=self.hostAudioBusy;
     }
+    CSBackgroundRunAudioState *currentState=[self currentAudioState];
+    if (currentState) self.hostYielded=currentState.hostBusy;
     if (!self.resourcesRequested || !self.background) {
         self.checkRecordRequested=NO;
+        [self invalidateHostHandoff:nil];
         [self releaseResources]; self.cycleEnded=NO;
         NSString *status=self.enabled?@"前台待机":(self.groupChatRequested?@"群聊实时待机":@"未启用");
         [self publish:status phase:self.resourcesRequested?CSRunStandby:CSRunDisabled];
         return;
     }
-    if (self.cycleEnded) { [self publish:self.statusText phase:CSRunEnded]; return; }
     if (self.taskExpirationPending) {
         self.taskExpirationPending=NO;
-        if (!self.task.valid && !self.backgroundAudioActive) { [self finishCycle:@"后台任务已到期，本轮运行结束"]; return; }
+        if (!self.task.valid && !self.backgroundAudioActive) {
+            [self finishCycle:@"后台任务已到期，本轮运行结束"];
+            if (self.handoffPending && !self.handoffAttempted) self.reconcileAgain=YES;
+            return;
+        }
     }
     NSTimeInterval now=self.runtime.uptime;
     if (!isfinite(now) || now<0) { [self finishCycle:@"后台时钟不可用，本轮运行结束"]; return; }
-    if (!self.cycleActive) {
-        self.cycleActive=YES; self.generation++;
-        [self replaceTaskWithSource:@"任务初次申请" observationIdentifier:self.observationIdentifier];
-        if (!self.cycleActive || !self.resourcesRequested || !self.background) return;
-        if (!self.task.valid) { [self finishCycle:@"系统未允许后台任务，本轮运行结束"]; return; }
-        // The entry grace check and periodic clock are independent (1.5, 25, 50...).
-        [self schedulePeriodicCheck]; [self scheduleGraceCheck];
-    }
     NSUInteger generation=self.generation;
     NSUInteger observationIdentifier=self.observationIdentifier;
     if (self.task && !self.task.valid) {
@@ -469,13 +656,28 @@ static NSString *CSRunRecordedBudget(NSTimeInterval remaining) {
                 self.checkRecordRequested=YES;
             } else [self recordEventWithSource:@"任务失效" detail:@"检查发现当前后台任务已失效；未收到对应的系统到期通知"];
         }
-        if (!self.backgroundAudioActive) { [self finishCycle:@"后台任务已到期，本轮运行结束"]; return; }
+        if (!self.backgroundAudioActive) {
+            [self finishCycle:@"后台任务已到期，本轮运行结束"];
+            if (self.handoffPending && !self.handoffAttempted) self.reconcileAgain=YES;
+            return;
+        }
     }
+    if (self.handoffPending && !self.handoffAttempted && !self.handoffInProgress && !self.resumeCheck && !self.routeRecoveryPending) { [self attemptHostHandoff]; return; }
+    if (self.cycleEnded) { [self publish:self.statusText phase:self.handoffPending || self.hostYielded?CSRunWaiting:CSRunEnded]; return; }
+    if (!self.cycleActive) {
+        self.cycleActive=YES; self.generation++;
+        [self replaceTaskWithSource:@"任务初次申请" observationIdentifier:self.observationIdentifier];
+        if (!self.cycleActive || !self.resourcesRequested || !self.background) return;
+        if (!self.task.valid) { [self finishCycle:@"系统未允许后台任务，本轮运行结束"]; return; }
+        // The entry grace check and periodic clock are independent (1.5, 25, 50...).
+        [self schedulePeriodicCheck]; [self scheduleGraceCheck];
+    }
+    generation=self.generation;
     NSString *audioBlocked=nil;
     CSBackgroundRunPhase blockedPhase=CSRunWaiting;
     if (!self.supportsBackgroundAudio) audioBlocked=@"当前微信包未声明后台音频能力";
     else if (self.mediaLost) audioBlocked=@"音频服务不可用，保留有限任务与周期检查";
-    else if (self.hostYielded || self.audio.hostBusy) {
+    else if (self.hostYielded || self.hostAudioBusy) {
         [self.audio relinquish];
         audioBlocked=@"微信正在使用音频，保活已让出"; blockedPhase=CSRunYielding;
     }
@@ -486,27 +688,37 @@ static NSString *CSRunRecordedBudget(NSTimeInterval remaining) {
     NSTimeInterval remaining=self.runtime.backgroundTimeRemaining;
     NSString *recordedBudget=checkSource?CSRunRecordedBudget(remaining):nil;
     if (checkSource) [self recordEventWithSource:@"剩余时间" detail:[NSString stringWithFormat:@"%@：%@",checkSource,recordedBudget]];
-    BOOL reuseRecovery=[checkSource isEqual:@"首次检查"] && !audioBlocked && [self canReuseRecoveryForGraceWithRemaining:remaining];
-    if ([checkSource isEqual:@"首次检查"]) [self invalidateRecoveryGrace];
+    BOOL reuseResources=checkSource && !audioBlocked && [self canReuseSuccessfulResourcesWithRemaining:remaining];
     // Only a real check and a positive finite budget below 30s trigger a pulse.
     // Large/unbounded UIKit readings do not prove a need for audio renewal.
     if (checkDue && isfinite(remaining) && remaining>0 && remaining<CSRunAudioThreshold) {
-        if (reuseRecovery) {
-            [self recordEventWithSource:@"资源复用" detail:@"恢复检查已成功请求短音频并续接当前任务；系统报告的有限余量可覆盖下次周期检查及 1 秒余量，本次不重复播放或申请任务"];
+        if (reuseResources) {
+            [self recordEventWithSource:@"资源复用" detail:@"相邻检查已有成功的短音频请求，当前任务、会话所有权和媒体代际仍有效；有限余量可覆盖下次周期检查及 1 秒余量，本次复用资源"];
         } else {
-            BOOL audioStarted=NO;
-            NSUInteger recoveryRevision=self.recoveryGraceRevision;
+            NSUInteger resourceRevision=self.resourceRevision;
             // A periodic check must not bypass the 0.4s audio recovery window.
             if (!audioBlocked && !self.resumeCheck) {
+                // Ordinary checks retain a valid task. Only actual audio work
+                // lacking a task may request one; skips/failures never churn it.
+                if (!self.task.valid) {
+                    [self replaceTaskWithSource:@"任务补充申请" observationIdentifier:observationIdentifier];
+                    if (generation!=self.generation || !self.cycleActive || !self.resourcesRequested || !self.background) return;
+                    resourceRevision=self.resourceRevision;
+                }
                 NSError *error=nil;
                 if (observationIdentifier==self.observationIdentifier) {
                     self.recordedAudioAttempt=YES; self.recordedAudioGeneration=generation;
                     self.recordedAudioObservationIdentifier=observationIdentifier;
                 }
                 BOOL started=[self.audio startWithError:&error];
-                audioStarted=started;
                 if (generation!=self.generation || !self.cycleActive || !self.resourcesRequested || !self.background) return;
                 self.audioFailure=started?nil:[NSString stringWithFormat:@"启动失败：%@",error.localizedDescription?:@"系统未允许播放 blank.caf"];
+                if (started && self.handoffPending && self.handoffObservationIdentifier==observationIdentifier) {
+                    self.handoffPending=NO;
+                    [self recordEventWithSource:@"交接成功" detail:@"后续正常检查的短音频请求成功；不代表系统已补充执行时间"];
+                }
+                if (started) [self rememberSuccessfulResourcesForGeneration:generation observation:observationIdentifier revision:resourceRevision];
+                else [self invalidateSuccessfulResources];
                 if (observationIdentifier==self.observationIdentifier) {
                     if (!started) self.recordedAudioAttempt=NO;
                     [self recordEventWithSource:@"音频尝试" detail:started?@"微信自带短音频播放请求成功；不代表系统已增加剩余执行时间":self.audioFailure];
@@ -514,14 +726,6 @@ static NSString *CSRunRecordedBudget(NSTimeInterval remaining) {
             } else {
                 if (observationIdentifier==self.observationIdentifier) [self recordEventWithSource:@"音频跳过" detail:audioBlocked?:@"音频恢复等待窗口尚未结束，本次不启动播放"];
             }
-            BOOL renewed=[self replaceTaskWithSource:@"任务替换" observationIdentifier:observationIdentifier];
-            if (generation!=self.generation || !self.cycleActive || !self.resourcesRequested || !self.background) return;
-            // Approval and playback are independent results, neither proves that
-            // UIKit extended the budget. The grace callback still rechecks it.
-            if ([checkSource isEqual:@"恢复检查"] && audioStarted && renewed && self.graceCheck &&
-                self.recoveryGraceEligible && recoveryRevision==self.recoveryGraceRevision &&
-                self.recoveryGraceGeneration==generation && self.recoveryGraceObservationIdentifier==self.observationIdentifier &&
-                observationIdentifier==self.observationIdentifier && !self.audioFailure) self.recoveryGraceTask=self.task;
         }
     } else if (checkSource) {
         [self recordEventWithSource:@"音频跳过" detail:recordedBudget];
@@ -538,6 +742,8 @@ static NSString *CSRunRecordedBudget(NSTimeInterval remaining) {
     else if (audioBlocked) { status=[@"有限后台任务运行中 · " stringByAppendingString:audioBlocked]; phase=blockedPhase; }
     else if (self.audioFailure) { status=[@"有限后台任务运行中 · " stringByAppendingString:self.audioFailure]; phase=CSRunTask; }
     else { status=@"有限后台任务运行中"; phase=CSRunTask; }
+    if (blockedPhase==CSRunYielding && audioBlocked) [self scheduleYieldCheckIfNeeded];
+    else if (self.yieldCheck) [self cancelYieldCheck];
     [self publish:status phase:phase];
 }
 - (void)setBackgroundState:(BOOL)background {
@@ -546,6 +752,7 @@ static NSString *CSRunRecordedBudget(NSTimeInterval remaining) {
             [self beginObservationWithKnownEntry:YES];
             self.checkRecordRequested=YES;
         } else if (!background) [self recordForegroundReturn];
+        [self invalidateHostHandoff:background?nil:@"返回前台，旧交接已取消"];
         self.background=background; self.cycleEnded=NO;
         self.hostYielded=NO; self.audioFailure=nil;
     }
@@ -574,7 +781,7 @@ static NSString *CSRunRecordedBudget(NSTimeInterval remaining) {
     if ([name isEqual:AVAudioSessionInterruptionNotification]) {
         NSNumber *type=note.userInfo[AVAudioSessionInterruptionTypeKey];
         if (![type isKindOfClass:NSNumber.class]) return;
-        [self invalidateRecoveryGrace];
+        [self invalidateSuccessfulResources];
         if (type.unsignedIntegerValue==AVAudioSessionInterruptionTypeBegan) {
             // iOS has already deactivated this session. Discard only the stale
             // player; native task renewal and the periodic audio attempts stay.
@@ -592,25 +799,46 @@ static NSString *CSRunRecordedBudget(NSTimeInterval remaining) {
             recover=YES; reopen=YES;
         } else return;
     } else if ([name isEqual:AVAudioSessionMediaServicesWereLostNotification]) {
-        [self invalidateRecoveryGrace];
+        [self invalidateSuccessfulResources];
+        [self invalidateHostHandoff:@"媒体服务已失效，等待新的音频事件"];
+        [self cancelYieldCheck];
         self.mediaLost=YES; [self cancelResumeCheck]; [self.audio invalidateForMediaServicesLoss];
         self.recordedAudioAttempt=NO;
         [self recordEventWithSource:@"音频服务丢失" detail:@"音频服务暂不可用；保留有限后台任务和周期检查，等待服务重置"];
     } else if ([name isEqual:AVAudioSessionMediaServicesWereResetNotification]) {
-        [self invalidateRecoveryGrace];
+        [self invalidateSuccessfulResources];
+        [self invalidateHostHandoff:@"媒体服务代际已改变，旧交接已取消"];
         [self.audio resetAfterMediaServicesReset]; self.mediaLost=NO; self.hostYielded=NO;
         [self recordEventWithSource:@"音频服务恢复" detail:@"旧音频会话状态已失效；等待 0.4 秒后重新检查"];
         recover=YES; reopen=YES;
     } else if ([name isEqual:CSBackgroundRunHostAudioChangedNotification]) {
-        [self invalidateRecoveryGrace];
-        if ([note.userInfo[@"released"] boolValue] && !self.audio.hostBusy) {
-            self.hostYielded=NO; recover=YES; reopen=YES;
+        CSBackgroundRunAudioState *state=[self currentAudioState];
+        // Delivery may lag a newer activation/release. Production decisions use
+        // one current sample; the notification is diagnostic, not permission.
+        BOOL busy=state?state.hostBusy:(![note.userInfo[@"released"] boolValue] || self.audio.hostBusy);
+        BOOL confirmed=state?state.hostReleaseConfirmed:[note.userInfo[@"releaseConfirmed"] boolValue];
+        NSUInteger episode=state?state.hostReleaseEpisode:[note.userInfo[@"releaseEpisode"] unsignedIntegerValue];
+        if (!state || ![self successfulResourcesMatchState:state]) [self invalidateSuccessfulResources];
+        if (self.background && self.resourcesRequested) {
+            NSString *source=state?state.source:([note.userInfo[@"source"] isKindOfClass:NSString.class]?note.userInfo[@"source"]:@"会话状态变化");
+            [self recordEventWithSource:@"微信音频状态" detail:[NSString stringWithFormat:@"%@；当前释放确认 %@，交接编号 %lu，在途调用 %@",source,confirmed?@"是":@"否",(unsigned long)episode,state?@(state.hostCalls):(note.userInfo[@"hostCalls"]?:@"未知")]];
+        }
+        self.hostYielded=busy;
+        if (!busy) {
+            if (confirmed) {
+                [self requestHostHandoffForEpisode:episode];
+                [self reconcile]; return;
+            }
+            // Older adapters retain recovery behavior. Unconfirmed native
+            // configuration writes cannot repeatedly reopen an expired cycle.
+            recover=YES; reopen=!state && note.userInfo[@"releaseConfirmed"]==nil;
         } else {
-            self.hostYielded=YES; [self cancelResumeCheck]; [self.audio relinquish];
+            [self invalidateHostHandoff:@"微信重新占用音频，交接已取消"];
+            [self cancelResumeCheck]; [self.audio relinquish];
         }
     } else if ([name isEqual:CSBackgroundRunPlaybackFailedNotification]) {
         if (note.object!=self.audio) return;
-        [self invalidateRecoveryGrace];
+        [self invalidateSuccessfulResources];
         if (self.recordedAudioAttempt && self.recordedAudioGeneration==self.generation && self.recordedAudioObservationIdentifier==self.observationIdentifier) {
             [self recordEventWithSource:@"音频失败" detail:@"收到当前单次音频的播放失败通知；沿用原有后续检查策略"];
             self.recordedAudioAttempt=NO;
@@ -624,7 +852,22 @@ static NSString *CSRunRecordedBudget(NSTimeInterval remaining) {
         }
         // A short file completing normally neither fails nor immediately replays.
     } else if ([name isEqual:AVAudioSessionRouteChangeNotification]) {
-        [self invalidateRecoveryGrace];
+        NSNumber *value=note.userInfo[AVAudioSessionRouteChangeReasonKey];
+        AVAudioSessionRouteChangeReason reason=[value isKindOfClass:NSNumber.class]?value.unsignedIntegerValue:AVAudioSessionRouteChangeReasonUnknown;
+        CSBackgroundRunAudioState *state=[self currentAudioState];
+        // Our category write can notify synchronously, before startWithError:
+        // has installed its lease. It must not schedule recovery of itself.
+        if (reason==AVAudioSessionRouteChangeReasonCategoryChange && state.ownChangeInProgress) return;
+        BOOL benign=reason==AVAudioSessionRouteChangeReasonCategoryChange || reason==AVAudioSessionRouteChangeReasonNewDeviceAvailable ||
+            reason==AVAudioSessionRouteChangeReasonOverride || reason==AVAudioSessionRouteChangeReasonRouteConfigurationChange;
+        BOOL owned=state?(!state.hostBusy && state.sessionOwned):(!self.audio.hostBusy && self.audio.sessionOwned);
+        if (benign && owned && !self.mediaLost && !self.audioFailure) return;
+        [self invalidateSuccessfulResources];
+        if (reason==AVAudioSessionRouteChangeReasonOldDeviceUnavailable || reason==AVAudioSessionRouteChangeReasonNoSuitableRouteForCategory) {
+            self.routeRecoveryPending=YES;
+            [self invalidateHostHandoff:@"音频输出路由已失效，等待恢复检查"];
+            [self.audio suspend]; self.recordedAudioAttempt=NO;
+        }
         recover=YES;
     }
     [self reconcile];
