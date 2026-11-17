@@ -2,7 +2,7 @@
 
 面向 iOS 微信的 Theos 插件，使用 Objective-C / Logos 接入微信原生界面，提供聊天分组、气泡与列表样式、消息操作和配置管理等功能。各项功能可在插件设置中按需开启。
 
-**当前版本：`2.6-8`（后台交接与资源复用优化）** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+**当前版本：`2.6-9`（新增广告净化模块）** · **编译架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
 
 [功能概览](#功能概览) · [安装与入口](#安装与入口) · [使用说明](#使用说明) · [配置与备份](#配置与备份) · [源码编译](#源码编译) · [开发与验证](#开发与验证) · [常见问题](#常见问题)
 
@@ -14,7 +14,7 @@
 | 聊天气泡 | 气泡样式 | 经典圆角、连续圆角、效果预览；浅深色背景与收发字体颜色；连续消息合并、间距和头像位置 |
 | 列表外观 | 列表圆角 | 会话、通讯录、发现和“我”页面的卡片样式；圆角、左右边距、顶部距离与浅深色背景 |
 | 导航外观 | 底栏样式、顶栏信息、头像设置 | 悬浮底栏、图标与文字、描边动画；聊天顶栏头像与名称、分隔符；聊天头像隐藏、圆角和旋转 |
-| 页面定制 | 界面简化、界面净化、布局设置、后台模糊 | 标题与菜单文字定制、页面入口和聊天提示隐藏、全局缩放与聊天字体、后台页面模糊 |
+| 页面定制 | 界面简化、界面净化、布局设置、后台模糊、广告净化 | 标题与菜单文字定制、页面入口和聊天提示隐藏、全局缩放与聊天字体、后台页面模糊；六个广告范围及可选订阅号推荐净化 |
 | 聊天布局 | 附件布局、信息时间、文本占位、触摸轨迹 | 附件按钮排序与列数、消息时间格式与位置、输入框占位文字与外观、触摸轨迹效果 |
 | 消息操作 | 防止撤回、消息手势、语音转发、复读功能、表情功能、小丑功能 | 防撤回与提示显示；己方/对方消息的左右滑动作；语音转发和消息复读；临时修改当前聊天的文字、时间、图片与转账金额显示 |
 | 群聊工具 | 群聊功能（小丑功能下方） | 自定义入群欢迎与真实 @、本地退群提示及可选本群通知、后台有执行机会时处理群事件、自动保存到通讯录、原生批量退群 |
@@ -34,12 +34,16 @@
 | 运行方式 | 需要能够向微信加载插件的 iOS 注入环境，直接构建产物为 `.deb` |
 | 近期适配参考 | 微信 `8.0.78` 与 `8.0.80`；既有适配参考用户提供的 `8.0.80.34` IPA，小丑功能在两版微信中的显示与交互仍待真机验收 |
 | 系统目标 | Makefile 的最低编译目标为 iOS `15.0`，不代表所有系统与微信组合均已验证 |
-| Rootless | `2.6-8` 安装包，包含 arm64／arm64e |
-| Rootful | `2.6-8` 安装包及重签用 dylib，包含 arm64／arm64e |
+| Rootless | `2.6-9-beta02` 安装包，包含 arm64／arm64e |
+| Rootful | `2.6-9-beta02` 安装包及重签用 dylib，包含 arm64／arm64e |
 | Roothide | Makefile 保留构建入口；当前版本没有对应的运行验证结论 |
 | 注入依赖 | `control` 声明 `mobilesubstrate >= 0.9.5000`，实际加载取决于设备的注入环境 |
 
 微信私有接口会随版本变化。主机回归和成功打包只能验证相应代码与产物，真实设备上的显示、交互及其他插件组合仍需实际确认。
+
+`2.6-9-beta02` 修复公众号列表中广告图片为空但品牌、文案和整块占位仍在的问题。补齐普通／Box 两套列表加载期间的整卡丢弃判断，按微信独立广告卡标记过滤，保留普通文章与推荐内容，关闭时恢复原输出且不修改缓存源。修复依据与核心验证见 [2.6-9-beta02 发布记录](packages/2.6-9-beta02/README.md)。
+
+`2.6-9-beta01` 在“界面定制 → 后台模糊”之后新增“广告净化”，提供总开关、六个广告范围和独立的订阅号推荐内容选项，默认全部关闭。基于用户提供的微信 `8.0.80.34` IPA 适配原生广告入口、模型和网页桥接；搜一搜仅过滤明确广告标记，保留普通结果。配置支持备份和重置，缺失或不兼容接口保留原行为。使用方式与范围边界见 [广告净化说明](docs/features/ad-purification.md)，产物与核心回归见 [2.6-9-beta01 发布记录](packages/2.6-9-beta01/README.md)。
 
 `2.6-8` 优化微信音频释放后的后台保活交接：确认释放后立即评估，复用可用任务并按同一次释放限制桥接申请；有限任务到期后保留交接意图和音频监听，有效有限任务内增加有次数上限的短复核。普通检查复用有效任务，相邻成功检查仅在任务、音频所有权、媒体代际及有限预算均满足条件时合并重复请求；良性路由通知不再重复安排恢复。占用与释放统一读取当前一致快照，保护失败调用后的原始配置及结束清理。初次任务申请时机、首次 1.5 秒检查、普通周期及 `blank.caf` 单次混音播放保持，补齐占用、释放、桥接与取消原因记录。系统挂起后的恢复仍需新的执行机会。产物与核心回归见 [2.6-8 发布记录](packages/2.6-8/README.md)。
 
@@ -95,7 +99,7 @@
 
 ### 安装步骤
 
-1. 用户当前为 Rootless 环境，使用 [2.6-8 Rootless 安装包](packages/2.6-8/com.wechat.improve_2.6-8_iphoneos-arm64.deb)。另提供 [Rootful 安装包](packages/2.6-8/com.wechat.improve_2.6-8_iphoneos-arm.deb)、[重签用 dylib](packages/2.6-8/WeChatImprove.dylib)、[调试符号](packages/2.6-8/symbols.zip) 与 [SHA-256 清单](packages/2.6-8/SHA256SUMS)。验证记录见 [2.6-8 发布记录](packages/2.6-8/README.md)；历史包继续保留。
+1. 用户当前为 Rootless 环境，使用 [2.6-9-beta02 Rootless 安装包](packages/2.6-9-beta02/com.wechat.improve_2.6-9-beta02_iphoneos-arm64.deb)。另提供 [Rootful 安装包](packages/2.6-9-beta02/com.wechat.improve_2.6-9-beta02_iphoneos-arm.deb)、[重签用 dylib](packages/2.6-9-beta02/WeChatImprove.dylib)、[调试符号](packages/2.6-9-beta02/symbols.zip) 与 [SHA-256 清单](packages/2.6-9-beta02/SHA256SUMS)。验证记录见 [2.6-9-beta02 发布记录](packages/2.6-9-beta02/README.md)；历史包继续保留。
 
    密友头像五击快捷入口不验证身份：任何能操作已解锁手机并到达头像的人，都能查看或修改配置，并经两级确认不可撤销地完整重置当前账号的密友配置。此风险继续存在；修改密码仍须普通入口验证。
 2. 使用设备上适配该环境的包管理器或安装工具安装，并按工具提示重新加载注入环境。
@@ -332,7 +336,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootless \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出文件名：`packages/com.wechat.improve_2.6-8_iphoneos-arm64.deb`。本轮交付为 [2.6-8 Rootless 安装包](packages/2.6-8/com.wechat.improve_2.6-8_iphoneos-arm64.deb)。
+当前版本默认输出文件名：`packages/com.wechat.improve_2.6-9-beta02_iphoneos-arm64.deb`。本轮交付为 [2.6-9-beta02 Rootless 安装包](packages/2.6-9-beta02/com.wechat.improve_2.6-9-beta02_iphoneos-arm64.deb)。
 
 ### Rootful
 
@@ -341,7 +345,7 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
   PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
 ```
 
-当前版本默认输出文件名：`packages/com.wechat.improve_2.6-8_iphoneos-arm.deb`。本轮交付为 [2.6-8 Rootful 安装包](packages/2.6-8/com.wechat.improve_2.6-8_iphoneos-arm.deb)。
+当前版本默认输出文件名：`packages/com.wechat.improve_2.6-9-beta02_iphoneos-arm.deb`。本轮交付为 [2.6-9-beta02 Rootful 安装包](packages/2.6-9-beta02/com.wechat.improve_2.6-9-beta02_iphoneos-arm.deb)。
 
 | 方案 | 动态库安装目录 |
 | --- | --- |
@@ -365,12 +369,14 @@ make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
 `PACKAGE_VERSION` 只覆盖当次打包版本，不会更新插件内显示版本。安装了 `dpkg-deb` 后，可以检查包元数据：
 
 ```bash
-dpkg-deb -f packages/2.6-8/com.wechat.improve_2.6-8_iphoneos-arm64.deb Version Architecture
+dpkg-deb -f packages/2.6-9-beta02/com.wechat.improve_2.6-9-beta02_iphoneos-arm64.deb Version Architecture
 ```
 
 插件内通过 **关于 → 版本信息** 查看随包提供的离线更新说明。
 
 ## 开发与验证
+
+广告净化的本轮实现与聚焦回归见 [功能说明](docs/features/ad-purification.md) 和 [2.6-9-beta02 发布记录](packages/2.6-9-beta02/README.md)。
 
 后台运行的当前音频交接策略与核心验证见 [2.6-8 发布记录](packages/2.6-8/README.md)。历史梳理见 [后台运行审查](docs/audits/background-run-2026-11-16/README.md)；已从工作树清理的旧审计链接保留其历史版本含义。
 
@@ -406,6 +412,11 @@ Makefile 自动收集 `Hooks/*.xm` 和 `Controllers/*.m` 参与编译。Hook 负
 ```bash
 # 设置单元格图标、复用及后台页面刷新
 bash Tests/verify-setting-cell-layout.sh
+bash Tests/verify-ad-purification-preferences.sh
+bash Tests/verify-ad-purification-filters.sh
+bash Tests/verify-ad-purification-native.sh
+bash Tests/verify-ad-purification-subscriptions.sh
+bash Tests/verify-ad-purification-web.sh
 bash Tests/verify-background-run-view-refresh.sh
 
 # 分组配置与列表圆角
@@ -499,6 +510,7 @@ bash Tests/verify-background-sync-budget.sh
 | 列表圆角 | [配置与实现](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/list-corner-radius.md) · [圆角优化](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/list-corners.md) |
 | 气泡与消息合并 | [消息合并说明](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/message-merge.md) · [1.8-36 转文字语音间距](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/merge-voice-translation-1.8-36/README.md) |
 | 悬浮底栏 | [原生底栏改造](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/tabbar-native-1.6-36.md) · [描边动画](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/tabbar-animation-options-1.6-39.md) · [切换轻弹特效](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/audits/tabbar-click-effect-1.9-10/README.md) |
+| 广告净化 | [设置与实现范围](docs/features/ad-purification.md) · [微信 8.0.80.34 接口审计](docs/audits/ad-purification-8.0.80/README.md) |
 | 后台模糊 | [功能说明](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/background-blur-1.7-13.md) · [过渡与清理](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/background-blur-cleanup-1.7-17.md) |
 | 历史分析与验证 | [专项记录](docs/audits/) · [验证材料](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/evidence/) · [性能记录](https://github.com/ZhangSCzybh/WeChatImprove/blob/a227b1677255fe0e2dc727dcc2e6f62386fc3afd/docs/performance/) |
 

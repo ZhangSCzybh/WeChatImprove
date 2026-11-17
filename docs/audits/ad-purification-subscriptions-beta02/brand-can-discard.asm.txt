@@ -1,0 +1,38 @@
+
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-8.0.80-ad-audit-oaztrb2m/WeChat:	file format mach-o arm64
+
+Disassembly of section __TEXT,__text:
+
+0000000100008000 <__text>:
+100758990: a9be4ff4    	stp	x20, x19, [sp, #-0x20]!
+100758994: a9017bfd    	stp	x29, x30, [sp, #0x10]
+100758998: 910043fd    	add	x29, sp, #0x10
+10075899c: aa0203f3    	mov	x19, x2
+1007589a0: aa0203e0    	mov	x0, x2
+1007589a4: 95d33cb4    	bl	0x107c27c74 <_Flutter_MMFoundation_BindContext+0x3eae940>
+1007589a8: d00f13a8    	adrp	x8, 0x11e9ce000 <dyld_stub_binder+0x11e9ce000>
+1007589ac: f941f914    	ldr	x20, [x8, #0x3f0]  // @0x11e9ce3f0 selector m_uiMessageType
+1007589b0: aa1303e0    	mov	x0, x19
+1007589b4: aa1403e1    	mov	x1, x20
+1007589b8: 95d33cab    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1007589bc: 7100041f    	cmp	w0, #0x1
+1007589c0: 540000c0    	b.eq	0x1007589d8 <__text+0x7509d8>
+1007589c4: aa1303e0    	mov	x0, x19
+1007589c8: aa1403e1    	mov	x1, x20
+1007589cc: 95d33ca6    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1007589d0: 7100881f    	cmp	w0, #0x22
+1007589d4: 54000061    	b.ne	0x1007589e0 <__text+0x7509e0>
+1007589d8: 52800034    	mov	w20, #0x1               ; =1
+1007589dc: 14000006    	b	0x1007589f4 <__text+0x7509f4>
+1007589e0: aa1303e0    	mov	x0, x19
+1007589e4: aa1403e1    	mov	x1, x20
+1007589e8: 95d33c9f    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1007589ec: 71000c1f    	cmp	w0, #0x3
+1007589f0: 1a9f17f4    	cset	w20, eq
+1007589f4: aa1303e0    	mov	x0, x19
+1007589f8: 95d33c9e    	bl	0x107c27c70 <_Flutter_MMFoundation_BindContext+0x3eae93c>
+1007589fc: aa1403e0    	mov	x0, x20
+100758a00: a9417bfd    	ldp	x29, x30, [sp, #0x10]
+100758a04: a8c24ff4    	ldp	x20, x19, [sp], #0x20
+100758a08: d65f03c0    	ret
+100758a0c: a9be4ff4    	stp	x20, x19, [sp, #-0x20]!

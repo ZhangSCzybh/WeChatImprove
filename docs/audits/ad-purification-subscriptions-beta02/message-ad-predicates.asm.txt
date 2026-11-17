@@ -1,0 +1,48 @@
+
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-8.0.80-ad-audit-oaztrb2m/WeChat:	file format mach-o arm64
+
+Disassembly of section __TEXT,__text:
+
+0000000103d79334 <_Flutter_MMFoundation_BindContext>:
+104e676c4: a9be4ff4    	stp	x20, x19, [sp, #-0x20]!
+104e676c8: a9017bfd    	stp	x29, x30, [sp, #0x10]
+104e676cc: 910043fd    	add	x29, sp, #0x10
+104e676d0: aa0003f3    	mov	x19, x0
+104e676d4: f00cdb28    	adrp	x8, 0x11e9ce000 <dyld_stub_binder+0x11e9ce000>
+104e676d8: f941f901    	ldr	x1, [x8, #0x3f0]  // @0x11e9ce3f0 selector m_uiMessageType
+104e676dc: 94b70162    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+104e676e0: 5284e248    	mov	w8, #0x2712             ; =10002
+104e676e4: 6b08001f    	cmp	w0, w8
+104e676e8: 54000101    	b.ne	0x104e67708 <_Flutter_MMFoundation_BindContext+0x10ee3d4>
+104e676ec: f00cdb68    	adrp	x8, 0x11e9d6000 <dyld_stub_binder+0x11e9d6000>
+104e676f0: f9453901    	ldr	x1, [x8, #0xa70]  // @0x11e9d6a70 selector m_bizMsgType
+104e676f4: aa1303e0    	mov	x0, x19
+104e676f8: 94b7015b    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+104e676fc: f100201f    	cmp	x0, #0x8
+104e67700: 1a9f17e0    	cset	w0, eq
+104e67704: 14000002    	b	0x104e6770c <_Flutter_MMFoundation_BindContext+0x10ee3d8>
+104e67708: 52800000    	mov	w0, #0x0                ; =0
+104e6770c: a9417bfd    	ldp	x29, x30, [sp, #0x10]
+104e67710: a8c24ff4    	ldp	x20, x19, [sp], #0x20
+104e67714: d65f03c0    	ret
+104e67718: a9be4ff4    	stp	x20, x19, [sp, #-0x20]!
+104e6771c: a9017bfd    	stp	x29, x30, [sp, #0x10]
+104e67720: 910043fd    	add	x29, sp, #0x10
+104e67724: aa0003f3    	mov	x19, x0
+104e67728: f00cdb28    	adrp	x8, 0x11e9ce000 <dyld_stub_binder+0x11e9ce000>
+104e6772c: f941f901    	ldr	x1, [x8, #0x3f0]  // @0x11e9ce3f0 selector m_uiMessageType
+104e67730: 94b7014d    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+104e67734: 5284e248    	mov	w8, #0x2712             ; =10002
+104e67738: 6b08001f    	cmp	w0, w8
+104e6773c: 54000101    	b.ne	0x104e6775c <_Flutter_MMFoundation_BindContext+0x10ee428>
+104e67740: f00cdb68    	adrp	x8, 0x11e9d6000 <dyld_stub_binder+0x11e9d6000>
+104e67744: f9453901    	ldr	x1, [x8, #0xa70]  // @0x11e9d6a70 selector m_bizMsgType
+104e67748: aa1303e0    	mov	x0, x19
+104e6774c: 94b70146    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+104e67750: f100181f    	cmp	x0, #0x6
+104e67754: 1a9f17e0    	cset	w0, eq
+104e67758: 14000002    	b	0x104e67760 <_Flutter_MMFoundation_BindContext+0x10ee42c>
+104e6775c: 52800000    	mov	w0, #0x0                ; =0
+104e67760: a9417bfd    	ldp	x29, x30, [sp, #0x10]
+104e67764: a8c24ff4    	ldp	x20, x19, [sp], #0x20
+104e67768: d65f03c0    	ret

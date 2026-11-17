@@ -1,0 +1,82 @@
+[
+  {
+    "selector": "canTimlineMsgDiscard:",
+    "slot": "0x11e9cd568",
+    "adrp": "0x101d687c4",
+    "load": "0x101d687c8",
+    "rt": 8,
+    "rn": 8
+  },
+  {
+    "selector": "canTimlineMsgDiscard:",
+    "slot": "0x11e9cd568",
+    "adrp": "0x100441b5c",
+    "load": "0x100441b60",
+    "rt": 22,
+    "rn": 8
+  },
+  {
+    "selector": "canTimlineMsgDiscard:",
+    "slot": "0x11e9cd568",
+    "adrp": "0x100714530",
+    "load": "0x100714534",
+    "rt": 22,
+    "rn": 8
+  },
+  {
+    "selector": "canTimlineMsgDiscard:",
+    "slot": "0x11e9cd568",
+    "adrp": "0x100083c34",
+    "load": "0x100083c38",
+    "rt": 27,
+    "rn": 8
+  },
+  {
+    "selector": "canTimlineMsgDiscard:",
+    "slot": "0x11e9cd568",
+    "adrp": "0x10041f02c",
+    "load": "0x10041f030",
+    "rt": 27,
+    "rn": 8
+  },
+  {
+    "selector": "canTimlineMsgDiscard:",
+    "slot": "0x11e9cd568",
+    "adrp": "0x101d4eb50",
+    "load": "0x101d4eb54",
+    "rt": 27,
+    "rn": 8
+  },
+  {
+    "selector": "convertAffMsgInfoDataListToMsgWrapList:",
+    "slot": "0x11e9d4f80",
+    "adrp": "0x1001a1e94",
+    "load": "0x1001a1e98",
+    "rt": 1,
+    "rn": 8
+  },
+  {
+    "selector": "convertAffMsgInfoDataListToMsgWrapList:",
+    "slot": "0x11e9d4f80",
+    "adrp": "0x1001a209c",
+    "load": "0x1001a20a0",
+    "rt": 1,
+    "rn": 8
+  },
+  {
+    "selector": "convertAffMsgInfoDataListToMsgWrapList:",
+    "slot": "0x11e9d4f80",
+    "adrp": "0x1004487b4",
+    "load": "0x1004487b8",
+    "rt": 1,
+    "rn": 8
+  },
+  {
+    "selector": "convertAffMsgInfoDataListToMsgWrapList:",
+    "slot": "0x11e9d4f80",
+    "adrp": "0x10071b7a8",
+    "load": "0x10071b7ac",
+    "rt": 1,
+    "rn": 8
+  }
+]

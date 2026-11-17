@@ -1,0 +1,2459 @@
+{
+  "description": "Static comparison of production Hook candidates against the supplied WeChat 8.0.80.34 metadata. Not a runtime installation or effect report.",
+  "ipa_sha256": "5cacb443b743793ccfe6026bc81c1f2678cb5cfdcd38584ad73ac7f19ecf4a5f",
+  "binary_sha256": "1d626426df97058a8a87c661532b2801cd27b7d9fcc12e27609c751f5877b7ed",
+  "source_sha256": {
+    "Controllers/CSAdPurificationNativeHooks.m": "33f41256bcce531e6bf6b623de219f0b2974cff999ba56a745317914f9916eac",
+    "Controllers/CSAdPurificationWebHooks.m": "94049f0cad9736c1a295d429ac4ae11589b44880e7c8801c35c3059ce436da65"
+  },
+  "candidate_count": 95,
+  "module_counts": {
+    "Native": 83,
+    "Web": 12
+  },
+  "status_counts": {
+    "declared": 83,
+    "dynamic-property-no-declared-imp": 11,
+    "external-class": 1,
+    "inherited": 0,
+    "undeclared-safe-skip": 0,
+    "encoding-mismatch-safe-skip": 0
+  },
+  "encoding_mismatch_count": 0,
+  "coverage_findings": [
+    "Current Finder VM initializers omit the obsolete dataScene: segment and match the 8.0.80.34 method encodings.",
+    "Current Finder advertisement router includes commentScene: and matches its full scalar/object signature.",
+    "The 11 protobuf dynamic getter candidates have property contracts but no declared IMP in the snapshot. Runtime installation depends on generated methods becoming available; absent methods safely skip.",
+    "No remaining class/selector rename was found among production candidates with declared metadata.",
+    "Shared JSFunctionDef and generic Web bridge filtering is intentionally gated on all six advertising scopes; per-scope product entry points remain independently registered. This is an implementation scope restriction, not a version mismatch.",
+    "NSURL is external to the main image. The expected Foundation signature is not validated against an iOS shared cache by this audit."
+  ],
+  "limitations": [
+    "Candidates were expanded from literal production calls and local for-loops; scope enablement and method availability determine runtime installation.",
+    "Runtime installer rejects absent classes/methods and nonmatching complete signatures; safe skip does not imply equivalent advertising coverage.",
+    "Static declarations and encodings do not prove execution, ad suppression, correctness of field semantics, or stability."
+  ],
+  "hooks": [
+    {
+      "module": "Native",
+      "scope": "Articles",
+      "cls": "WebviewJSEventHandler_adDataReport",
+      "kind": "-",
+      "selector": "handleJSEvent:HandlerFacade:ExtraData:",
+      "expected_encodings": [
+        "v@:@@@"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WebviewJSEventHandler_adDataReport",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "handleJSEvent:HandlerFacade:ExtraData:",
+          "encoding": "v40@0:8@16@24@32",
+          "implementation": "0x10ac7dba4",
+          "metadata_address": "0x1178218e8",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WebviewJSEventHandler_adDataReport handleJSEvent:HandlerFacade:ExtraData:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Articles",
+      "cls": "WebviewJSEventHandler_getAdIdInfo",
+      "kind": "-",
+      "selector": "handleJSEvent:HandlerFacade:ExtraData:",
+      "expected_encodings": [
+        "v@:@@@"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WebviewJSEventHandler_getAdIdInfo",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "handleJSEvent:HandlerFacade:ExtraData:",
+          "encoding": "v40@0:8@16@24@32",
+          "implementation": "0x10acc6714",
+          "metadata_address": "0x117823648",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WebviewJSEventHandler_getAdIdInfo handleJSEvent:HandlerFacade:ExtraData:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Subscriptions",
+      "cls": "BrandTLExptConfig",
+      "kind": "-",
+      "selector": "isExptNotShowAd",
+      "expected_encodings": [
+        "B@:",
+        "c@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "BrandTLExptConfig",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "isExptNotShowAd",
+          "encoding": "B16@0:8",
+          "implementation": "0x1006d8150",
+          "metadata_address": "0x11712f5ac",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[BrandTLExptConfig isExptNotShowAd]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Subscriptions",
+      "cls": "BrandTLFlutterViewController",
+      "kind": "-",
+      "selector": "enableAd",
+      "expected_encodings": [
+        "B@:",
+        "c@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "BrandTLFlutterViewController",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "enableAd",
+          "encoding": "B16@0:8",
+          "implementation": "0x1006dc700",
+          "metadata_address": "0x11712f974",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[BrandTLFlutterViewController enableAd]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Subscriptions",
+      "cls": "BrandTLCanvasCardMgr",
+      "kind": "+",
+      "selector": "isAdRequestOpen",
+      "expected_encodings": [
+        "B@:",
+        "c@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "BrandTLCanvasCardMgr",
+      "actual_methods": [
+        {
+          "kind": "+",
+          "selector": "isAdRequestOpen",
+          "encoding": "B16@0:8",
+          "implementation": "0x1006d74c4",
+          "metadata_address": "0x11700b7e8",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "+[BrandTLCanvasCardMgr isAdRequestOpen]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Subscriptions",
+      "cls": "BrandTLCanvasCardMgr",
+      "kind": "+",
+      "selector": "isAdCardOpen",
+      "expected_encodings": [
+        "B@:",
+        "c@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "BrandTLCanvasCardMgr",
+      "actual_methods": [
+        {
+          "kind": "+",
+          "selector": "isAdCardOpen",
+          "encoding": "B16@0:8",
+          "implementation": "0x1006d7340",
+          "metadata_address": "0x11700b7d0",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "+[BrandTLCanvasCardMgr isAdCardOpen]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Subscriptions",
+      "cls": "BrandTLFlutterViewController",
+      "kind": "-",
+      "selector": "getMagicBrushFlutterPlugins",
+      "expected_encodings": [
+        "@@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "BrandTLFlutterViewController",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "getMagicBrushFlutterPlugins",
+          "encoding": "@16@0:8",
+          "implementation": "0x1006d97ec",
+          "metadata_address": "0x11712f71c",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[BrandTLFlutterViewController getMagicBrushFlutterPlugins]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Subscriptions",
+      "cls": "BrandTLFlutterViewController",
+      "kind": "-",
+      "selector": "reportAdBrandCardOnClick",
+      "expected_encodings": [
+        "v@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "BrandTLFlutterViewController",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "reportAdBrandCardOnClick",
+          "encoding": "v16@0:8",
+          "implementation": "0x1006dc244",
+          "metadata_address": "0x11712f7f4",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[BrandTLFlutterViewController reportAdBrandCardOnClick]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Subscriptions",
+      "cls": "BrandTLCanvasCardMgr",
+      "kind": "-",
+      "selector": "handleBizAdNotifyNewXml:",
+      "expected_encodings": [
+        "v@:@"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "BrandTLCanvasCardMgr",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "handleBizAdNotifyNewXml:",
+          "encoding": "v24@0:8@16",
+          "implementation": "0x1006d797c",
+          "metadata_address": "0x11712f55c",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[BrandTLCanvasCardMgr handleBizAdNotifyNewXml:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Subscriptions",
+      "cls": "MagicAdPushMgrService",
+      "kind": "-",
+      "selector": "handleAdMsg:",
+      "expected_encodings": [
+        "v@:@"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "MagicAdPushMgrService",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "handleAdMsg:",
+          "encoding": "v24@0:8@16",
+          "implementation": "0x104c9971c",
+          "metadata_address": "0x117401fd0",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[MagicAdPushMgrService handleAdMsg:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Subscriptions",
+      "cls": "MagicAdPushMgrService",
+      "kind": "-",
+      "selector": "OnGetNewXmlMsg:Type:MsgWrap:",
+      "expected_encodings": [
+        "v@:@@@"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "MagicAdPushMgrService",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "OnGetNewXmlMsg:Type:MsgWrap:",
+          "encoding": "v40@0:8@16@24@32",
+          "implementation": "0x104c99c40",
+          "metadata_address": "0x117401ff4",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[MagicAdPushMgrService OnGetNewXmlMsg:Type:MsgWrap:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Subscriptions",
+      "cls": "MBEventHandler_getAdPushMsg",
+      "kind": "-",
+      "selector": "invoke:",
+      "expected_encodings": [
+        "v@:@"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "MBEventHandler_getAdPushMsg",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "invoke:",
+          "encoding": "v24@0:8@16",
+          "implementation": "0x10242b91c",
+          "metadata_address": "0x117271ecc",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[MBEventHandler_getAdPushMsg invoke:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Subscriptions",
+      "cls": "MBEventHandler_getOldAdInfo",
+      "kind": "-",
+      "selector": "invoke:",
+      "expected_encodings": [
+        "v@:@"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "MBEventHandler_getOldAdInfo",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "invoke:",
+          "encoding": "v24@0:8@16",
+          "implementation": "0x10242c8d8",
+          "metadata_address": "0x11727201c",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[MBEventHandler_getOldAdInfo invoke:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Subscriptions",
+      "cls": "MBEventHandler_setAdCardRequestInfo",
+      "kind": "-",
+      "selector": "invoke:",
+      "expected_encodings": [
+        "v@:@"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "MBEventHandler_setAdCardRequestInfo",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "invoke:",
+          "encoding": "v24@0:8@16",
+          "implementation": "0x10243b7a0",
+          "metadata_address": "0x117272af4",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[MBEventHandler_setAdCardRequestInfo invoke:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Subscriptions",
+      "cls": "MBEventHandler_setAdRequestInfo",
+      "kind": "-",
+      "selector": "invoke:",
+      "expected_encodings": [
+        "v@:@"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "MBEventHandler_setAdRequestInfo",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "invoke:",
+          "encoding": "v24@0:8@16",
+          "implementation": "0x10243b978",
+          "metadata_address": "0x117272b14",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[MBEventHandler_setAdRequestInfo invoke:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Subscriptions",
+      "cls": "MBEventHandler_setFeedsAdRequestInfo",
+      "kind": "-",
+      "selector": "invoke:",
+      "expected_encodings": [
+        "v@:@"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "MBEventHandler_setFeedsAdRequestInfo",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "invoke:",
+          "encoding": "v24@0:8@16",
+          "implementation": "0x10243c274",
+          "metadata_address": "0x117272bb4",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[MBEventHandler_setFeedsAdRequestInfo invoke:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Subscriptions",
+      "cls": "BrandAdDataParser",
+      "kind": "+",
+      "selector": "adDataItemForContent:",
+      "expected_encodings": [
+        "@@:@"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "BrandAdDataParser",
+      "actual_methods": [
+        {
+          "kind": "+",
+          "selector": "adDataItemForContent:",
+          "encoding": "@24@0:8@16",
+          "implementation": "0x100520854",
+          "metadata_address": "0x117009a3c",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "+[BrandAdDataParser adDataItemForContent:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Subscriptions",
+      "cls": "BrandAdDataParser",
+      "kind": "+",
+      "selector": "adDataItemForMsgWrap:",
+      "expected_encodings": [
+        "@@:@"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "BrandAdDataParser",
+      "actual_methods": [
+        {
+          "kind": "+",
+          "selector": "adDataItemForMsgWrap:",
+          "encoding": "@24@0:8@16",
+          "implementation": "0x1005207b0",
+          "metadata_address": "0x117009a30",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "+[BrandAdDataParser adDataItemForMsgWrap:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Subscriptions",
+      "cls": "BrandAdDataParser",
+      "kind": "+",
+      "selector": "adInfoDicForContent:",
+      "expected_encodings": [
+        "@@:@"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "BrandAdDataParser",
+      "actual_methods": [
+        {
+          "kind": "+",
+          "selector": "adInfoDicForContent:",
+          "encoding": "@24@0:8@16",
+          "implementation": "0x100520c64",
+          "metadata_address": "0x117009a54",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "+[BrandAdDataParser adInfoDicForContent:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Subscriptions",
+      "cls": "BrandAdDataParser",
+      "kind": "+",
+      "selector": "adInfoDicForMsgWrap:",
+      "expected_encodings": [
+        "@@:@"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "BrandAdDataParser",
+      "actual_methods": [
+        {
+          "kind": "+",
+          "selector": "adInfoDicForMsgWrap:",
+          "encoding": "@24@0:8@16",
+          "implementation": "0x100520bc0",
+          "metadata_address": "0x117009a48",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "+[BrandAdDataParser adInfoDicForMsgWrap:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Subscriptions",
+      "cls": "BrandAdDataItem",
+      "kind": "-",
+      "selector": "dicAdInfo",
+      "expected_encodings": [
+        "@@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "BrandAdDataItem",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "dicAdInfo",
+          "encoding": "@16@0:8",
+          "implementation": "0x100520708",
+          "metadata_address": "0x11711c454",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[BrandAdDataItem dicAdInfo]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Subscriptions",
+      "cls": "BrandAdDataItem",
+      "kind": "-",
+      "selector": "content",
+      "expected_encodings": [
+        "@@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "BrandAdDataItem",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "content",
+          "encoding": "@16@0:8",
+          "implementation": "0x1005206f8",
+          "metadata_address": "0x11711c43c",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[BrandAdDataItem content]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Recommendations",
+      "cls": "BrandTLExptConfig",
+      "kind": "-",
+      "selector": "isExptNotShowRecCard",
+      "expected_encodings": [
+        "B@:",
+        "c@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "BrandTLExptConfig",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "isExptNotShowRecCard",
+          "encoding": "B16@0:8",
+          "implementation": "0x1006d8194",
+          "metadata_address": "0x11712f5b8",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[BrandTLExptConfig isExptNotShowRecCard]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Recommendations",
+      "cls": "BrandTLExptConfig",
+      "kind": "-",
+      "selector": "isExptNotShowFinderLiveBar",
+      "expected_encodings": [
+        "B@:",
+        "c@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "BrandTLExptConfig",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "isExptNotShowFinderLiveBar",
+          "encoding": "B16@0:8",
+          "implementation": "0x1006d81dc",
+          "metadata_address": "0x11712f5c4",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[BrandTLExptConfig isExptNotShowFinderLiveBar]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Recommendations",
+      "cls": "BrandTLExptConfig",
+      "kind": "-",
+      "selector": "isExptNotShowRecoFlow",
+      "expected_encodings": [
+        "B@:",
+        "c@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "BrandTLExptConfig",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "isExptNotShowRecoFlow",
+          "encoding": "B16@0:8",
+          "implementation": "0x1006d8220",
+          "metadata_address": "0x11712f5d0",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[BrandTLExptConfig isExptNotShowRecoFlow]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Recommendations",
+      "cls": "BrandTLExptConfig",
+      "kind": "-",
+      "selector": "showDynamicCard",
+      "expected_encodings": [
+        "B@:",
+        "c@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "BrandTLExptConfig",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "showDynamicCard",
+          "encoding": "B16@0:8",
+          "implementation": "0x1006d8688",
+          "metadata_address": "0x11712f648",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[BrandTLExptConfig showDynamicCard]",
+      "reference_audit_status": "new-production-target-not-in-reference-registration-list"
+    },
+    {
+      "module": "Native",
+      "scope": "Recommendations",
+      "cls": "BrandTLExptConfig",
+      "kind": "-",
+      "selector": "showDynamicCardToast",
+      "expected_encodings": [
+        "B@:",
+        "c@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "BrandTLExptConfig",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "showDynamicCardToast",
+          "encoding": "B16@0:8",
+          "implementation": "0x1006d8698",
+          "metadata_address": "0x11712f660",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[BrandTLExptConfig showDynamicCardToast]",
+      "reference_audit_status": "new-production-target-not-in-reference-registration-list"
+    },
+    {
+      "module": "Native",
+      "scope": "Moments",
+      "cls": "WCAdvertiseDataHelper",
+      "kind": "-",
+      "selector": "IsAdvertiseDataValid:dataItem:",
+      "expected_encodings": [
+        "B@:@@",
+        "c@:@@"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WCAdvertiseDataHelper",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "IsAdvertiseDataValid:dataItem:",
+          "encoding": "B32@0:8@16@24",
+          "implementation": "0x106dc92f0",
+          "metadata_address": "0x1175bb46c",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WCAdvertiseDataHelper IsAdvertiseDataValid:dataItem:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Moments",
+      "cls": "WCAdvertiseDataHelper",
+      "kind": "-",
+      "selector": "isAdPreviewExpired:",
+      "expected_encodings": [
+        "B@:@",
+        "c@:@"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WCAdvertiseDataHelper",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "isAdPreviewExpired:",
+          "encoding": "B24@0:8@16",
+          "implementation": "0x106dc90d8",
+          "metadata_address": "0x1175bb460",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WCAdvertiseDataHelper isAdPreviewExpired:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Moments",
+      "cls": "WCAdvertiseInfo",
+      "kind": "-",
+      "selector": "adExpired",
+      "expected_encodings": [
+        "B@:",
+        "c@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WCAdvertiseInfo",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "adExpired",
+          "encoding": "B16@0:8",
+          "implementation": "0x106be7154",
+          "metadata_address": "0x1175bd480",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WCAdvertiseInfo adExpired]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Moments",
+      "cls": "WCAdDynamicCanvasServerData",
+      "kind": "-",
+      "selector": "isValid",
+      "expected_encodings": [
+        "B@:",
+        "c@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WCAdDynamicCanvasServerData",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "isValid",
+          "encoding": "B16@0:8",
+          "implementation": "0x106c345f4",
+          "metadata_address": "0x1175a3898",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WCAdDynamicCanvasServerData isValid]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Moments",
+      "cls": "WCAdvertisePushService",
+      "kind": "-",
+      "selector": "handlePushMsg:",
+      "expected_encodings": [
+        "v@:@"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WCAdvertisePushService",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "handlePushMsg:",
+          "encoding": "v24@0:8@16",
+          "implementation": "0x106df6404",
+          "metadata_address": "0x1175be2c0",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WCAdvertisePushService handlePushMsg:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Moments",
+      "cls": "WCAdvertisePushService",
+      "kind": "-",
+      "selector": "OnGetNewXmlMsg:Type:MsgWrap:",
+      "expected_encodings": [
+        "v@:@@@"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WCAdvertisePushService",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "OnGetNewXmlMsg:Type:MsgWrap:",
+          "encoding": "v40@0:8@16@24@32",
+          "implementation": "0x106df6324",
+          "metadata_address": "0x1175be2b4",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WCAdvertisePushService OnGetNewXmlMsg:Type:MsgWrap:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Moments",
+      "cls": "WCCanvasDynamicDataLoader",
+      "kind": "-",
+      "selector": "handleAdCanvasInfoResponse:",
+      "expected_encodings": [
+        "v@:@"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WCCanvasDynamicDataLoader",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "handleAdCanvasInfoResponse:",
+          "encoding": "v24@0:8@16",
+          "implementation": "0x106faed70",
+          "metadata_address": "0x1175d0a88",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WCCanvasDynamicDataLoader handleAdCanvasInfoResponse:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Moments",
+      "cls": "WCAdvertiseStatMgr",
+      "kind": "-",
+      "selector": "getAdvertiseInfoForItem:",
+      "expected_encodings": [
+        "@@:@"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WCAdvertiseStatMgr",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "getAdvertiseInfoForItem:",
+          "encoding": "@24@0:8@16",
+          "implementation": "0x106e1ecc0",
+          "metadata_address": "0x1175bebf4",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WCAdvertiseStatMgr getAdvertiseInfoForItem:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Moments",
+      "cls": "WCAdvertiseInfo",
+      "kind": "-",
+      "selector": "h5PageWrap",
+      "expected_encodings": [
+        "@@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WCAdvertiseInfo",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "h5PageWrap",
+          "encoding": "@16@0:8",
+          "implementation": "0x106be6be4",
+          "metadata_address": "0x1175bcdcc",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WCAdvertiseInfo h5PageWrap]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Moments",
+      "cls": "WCAdvertiseInfo",
+      "kind": "-",
+      "selector": "poiH5PageWrap",
+      "expected_encodings": [
+        "@@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WCAdvertiseInfo",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "poiH5PageWrap",
+          "encoding": "@16@0:8",
+          "implementation": "0x106be6c34",
+          "metadata_address": "0x1175bce2c",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WCAdvertiseInfo poiH5PageWrap]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Moments",
+      "cls": "WCAdDynamicCanvasPageInfo",
+      "kind": "-",
+      "selector": "fetchRealUxInfo",
+      "expected_encodings": [
+        "@@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WCAdDynamicCanvasPageInfo",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "fetchRealUxInfo",
+          "encoding": "@16@0:8",
+          "implementation": "0x106c3527c",
+          "metadata_address": "0x1175a34d0",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WCAdDynamicCanvasPageInfo fetchRealUxInfo]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Moments",
+      "cls": "WCAdDynamicCanvasPageInfo",
+      "kind": "-",
+      "selector": "fetchPageInfoExtraDic",
+      "expected_encodings": [
+        "@@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WCAdDynamicCanvasPageInfo",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "fetchPageInfoExtraDic",
+          "encoding": "@16@0:8",
+          "implementation": "0x106c35188",
+          "metadata_address": "0x1175a34c4",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WCAdDynamicCanvasPageInfo fetchPageInfoExtraDic]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Moments",
+      "cls": "WCAdDynamicCanvasPageInfo",
+      "kind": "-",
+      "selector": "fetchPageInfoDic",
+      "expected_encodings": [
+        "@@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WCAdDynamicCanvasPageInfo",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "fetchPageInfoDic",
+          "encoding": "@16@0:8",
+          "implementation": "0x106c34a64",
+          "metadata_address": "0x1175a34b8",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WCAdDynamicCanvasPageInfo fetchPageInfoDic]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Moments",
+      "cls": "WCAdDynamicCanvasPageInfo",
+      "kind": "-",
+      "selector": "fetchLaunchString",
+      "expected_encodings": [
+        "@@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WCAdDynamicCanvasPageInfo",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "fetchLaunchString",
+          "encoding": "@16@0:8",
+          "implementation": "0x106c34870",
+          "metadata_address": "0x1175a34ac",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WCAdDynamicCanvasPageInfo fetchLaunchString]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Moments",
+      "cls": "WCAdvertiseStatMgr",
+      "kind": "-",
+      "selector": "logHeadImageH5:",
+      "expected_encodings": [
+        "v@:@"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WCAdvertiseStatMgr",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "logHeadImageH5:",
+          "encoding": "v24@0:8@16",
+          "implementation": "0x106e14ae0",
+          "metadata_address": "0x1175be9d8",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WCAdvertiseStatMgr logHeadImageH5:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Moments",
+      "cls": "WCAdvertiseStatMgr",
+      "kind": "-",
+      "selector": "logADBrandProfile:",
+      "expected_encodings": [
+        "v@:@"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WCAdvertiseStatMgr",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "logADBrandProfile:",
+          "encoding": "v24@0:8@16",
+          "implementation": "0x106e147e0",
+          "metadata_address": "0x1175be9cc",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WCAdvertiseStatMgr logADBrandProfile:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Moments",
+      "cls": "WCAdvertiseStatMgr",
+      "kind": "-",
+      "selector": "logADFloatView:",
+      "expected_encodings": [
+        "v@:@"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WCAdvertiseStatMgr",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "logADFloatView:",
+          "encoding": "v24@0:8@16",
+          "implementation": "0x106e144e0",
+          "metadata_address": "0x1175be9c0",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WCAdvertiseStatMgr logADFloatView:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Moments",
+      "cls": "WCAdvertiseStatMgr",
+      "kind": "-",
+      "selector": "logADPoiH5:",
+      "expected_encodings": [
+        "v@:@"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WCAdvertiseStatMgr",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "logADPoiH5:",
+          "encoding": "v24@0:8@16",
+          "implementation": "0x106e141f8",
+          "metadata_address": "0x1175be9b4",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WCAdvertiseStatMgr logADPoiH5:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Moments",
+      "cls": "WCAdvertiseStatMgr",
+      "kind": "-",
+      "selector": "logADH5:",
+      "expected_encodings": [
+        "v@:@"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WCAdvertiseStatMgr",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "logADH5:",
+          "encoding": "v24@0:8@16",
+          "implementation": "0x106e13c3c",
+          "metadata_address": "0x1175be99c",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WCAdvertiseStatMgr logADH5:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Moments",
+      "cls": "WCAdvertiseStatMgr",
+      "kind": "-",
+      "selector": "logADCommentLog:",
+      "expected_encodings": [
+        "v@:@"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WCAdvertiseStatMgr",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "logADCommentLog:",
+          "encoding": "v24@0:8@16",
+          "implementation": "0x106e11f50",
+          "metadata_address": "0x1175be984",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WCAdvertiseStatMgr logADCommentLog:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Moments",
+      "cls": "WCAdvertiseStatMgr",
+      "kind": "-",
+      "selector": "logADBodyLog:",
+      "expected_encodings": [
+        "v@:@"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WCAdvertiseStatMgr",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "logADBodyLog:",
+          "encoding": "v24@0:8@16",
+          "implementation": "0x106e11bb4",
+          "metadata_address": "0x1175be978",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WCAdvertiseStatMgr logADBodyLog:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Moments",
+      "cls": "WCAdvertiseStatMgr",
+      "kind": "-",
+      "selector": "logADDetail:dataItem:",
+      "expected_encodings": [
+        "v@:@@"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WCAdvertiseStatMgr",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "logADDetail:dataItem:",
+          "encoding": "v32@0:8@16@24",
+          "implementation": "0x106e1223c",
+          "metadata_address": "0x1175be990",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WCAdvertiseStatMgr logADDetail:dataItem:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Moments",
+      "cls": "WCAdvertiseStatMgr",
+      "kind": "-",
+      "selector": "logSphereViewInDetailWithWrapInfo:dataItem:",
+      "expected_encodings": [
+        "v@:@@"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WCAdvertiseStatMgr",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "logSphereViewInDetailWithWrapInfo:dataItem:",
+          "encoding": "v32@0:8@16@24",
+          "implementation": "0x106e14e94",
+          "metadata_address": "0x1175be9f0",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WCAdvertiseStatMgr logSphereViewInDetailWithWrapInfo:dataItem:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Moments",
+      "cls": "WCAdvertiseStatMgr",
+      "kind": "-",
+      "selector": "logSphereViewInTimeLineWithWrapInfo:dataItem:",
+      "expected_encodings": [
+        "v@:@@"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WCAdvertiseStatMgr",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "logSphereViewInTimeLineWithWrapInfo:dataItem:",
+          "encoding": "v32@0:8@16@24",
+          "implementation": "0x106e14de0",
+          "metadata_address": "0x1175be9e4",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WCAdvertiseStatMgr logSphereViewInTimeLineWithWrapInfo:dataItem:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Moments",
+      "cls": "WCAdvertiseStatMgr",
+      "kind": "-",
+      "selector": "reportAllFeedsADLog",
+      "expected_encodings": [
+        "v@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WCAdvertiseStatMgr",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "reportAllFeedsADLog",
+          "encoding": "v16@0:8",
+          "implementation": "0x106e1193c",
+          "metadata_address": "0x1175be96c",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WCAdvertiseStatMgr reportAllFeedsADLog]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Moments",
+      "cls": "WCAdvertiseStatMgr",
+      "kind": "-",
+      "selector": "logADH5:withUserInfo:reportType:",
+      "expected_encodings": [
+        "v@:@@Q"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WCAdvertiseStatMgr",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "logADH5:withUserInfo:reportType:",
+          "encoding": "v40@0:8@16@24Q32",
+          "implementation": "0x106e13f70",
+          "metadata_address": "0x1175be9a8",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WCAdvertiseStatMgr logADH5:withUserInfo:reportType:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Moments",
+      "cls": "WCAdvertiseStatMgr",
+      "kind": "-",
+      "selector": "logSphereViewWithSphereReportInfo:dataItem:scene:",
+      "expected_encodings": [
+        "v@:@@I"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WCAdvertiseStatMgr",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "logSphereViewWithSphereReportInfo:dataItem:scene:",
+          "encoding": "v36@0:8@16@24I32",
+          "implementation": "0x106e14f48",
+          "metadata_address": "0x1175be9fc",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WCAdvertiseStatMgr logSphereViewWithSphereReportInfo:dataItem:scene:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Moments",
+      "cls": "WCAdXmlParser",
+      "kind": "+",
+      "selector": "SetAdvertiseInfo:ByAdInfo:",
+      "expected_encodings": [
+        "B@:@@",
+        "c@:@@"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WCAdXmlParser",
+      "actual_methods": [
+        {
+          "kind": "+",
+          "selector": "SetAdvertiseInfo:ByAdInfo:",
+          "encoding": "B32@0:8@16@24",
+          "implementation": "0x106d536b8",
+          "metadata_address": "0x1170b2ca8",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "+[WCAdXmlParser SetAdvertiseInfo:ByAdInfo:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Moments",
+      "cls": "WCAdXmlParser",
+      "kind": "+",
+      "selector": "SetAdvertiseXml:ByAdXml:",
+      "expected_encodings": [
+        "B@:@@",
+        "c@:@@"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WCAdXmlParser",
+      "actual_methods": [
+        {
+          "kind": "+",
+          "selector": "SetAdvertiseXml:ByAdXml:",
+          "encoding": "B32@0:8@16@24",
+          "implementation": "0x106d58cd4",
+          "metadata_address": "0x1170b2cd8",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "+[WCAdXmlParser SetAdvertiseXml:ByAdXml:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Moments",
+      "cls": "WCAdXmlParser",
+      "kind": "+",
+      "selector": "ExtractRecommendAdInfo:ByAdMsgXml:",
+      "expected_encodings": [
+        "B@:@@",
+        "c@:@@"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WCAdXmlParser",
+      "actual_methods": [
+        {
+          "kind": "+",
+          "selector": "ExtractRecommendAdInfo:ByAdMsgXml:",
+          "encoding": "B32@0:8@16@24",
+          "implementation": "0x106d6e890",
+          "metadata_address": "0x1170b2d5c",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "+[WCAdXmlParser ExtractRecommendAdInfo:ByAdMsgXml:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Finder",
+      "cls": "WCFinderDataItem",
+      "kind": "+",
+      "selector": "finderDataItemFromObject:",
+      "expected_encodings": [
+        "@@:@"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WCFinderDataItem",
+      "actual_methods": [
+        {
+          "kind": "+",
+          "selector": "finderDataItemFromObject:",
+          "encoding": "@24@0:8@16",
+          "implementation": "0x1078980fc",
+          "metadata_address": "0x116ea4578",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "+[WCFinderDataItem finderDataItemFromObject:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Finder",
+      "cls": "WCFinderFeedContentVM",
+      "kind": "-",
+      "selector": "initWithDataItem:scene:",
+      "expected_encodings": [
+        "@@:@i"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WCFinderFeedContentVM",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "initWithDataItem:scene:",
+          "encoding": "@28@0:8@16i24",
+          "implementation": "0x107a85c04",
+          "metadata_address": "0x116fafd7c",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WCFinderFeedContentVM initWithDataItem:scene:]",
+      "reference_audit_status": "new-production-target-not-in-reference-registration-list"
+    },
+    {
+      "module": "Native",
+      "scope": "Finder",
+      "cls": "WCFinderFeedContentVM",
+      "kind": "-",
+      "selector": "initWithDataItem:scene:sessionExtraKey:",
+      "expected_encodings": [
+        "@@:@i@"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WCFinderFeedContentVM",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "initWithDataItem:scene:sessionExtraKey:",
+          "encoding": "@36@0:8@16i24@28",
+          "implementation": "0x107a85800",
+          "metadata_address": "0x116fafd4c",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WCFinderFeedContentVM initWithDataItem:scene:sessionExtraKey:]",
+      "reference_audit_status": "new-production-target-not-in-reference-registration-list"
+    },
+    {
+      "module": "Native",
+      "scope": "Finder",
+      "cls": "WCFinderFeedContentVM",
+      "kind": "-",
+      "selector": "initWithDataItem:scene:isFinderIdentity:",
+      "expected_encodings": [
+        "@@:@iB",
+        "@@:@ic"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WCFinderFeedContentVM",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "initWithDataItem:scene:isFinderIdentity:",
+          "encoding": "@32@0:8@16i24B28",
+          "implementation": "0x107a85534",
+          "metadata_address": "0x116fafd40",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WCFinderFeedContentVM initWithDataItem:scene:isFinderIdentity:]",
+      "reference_audit_status": "new-production-target-not-in-reference-registration-list"
+    },
+    {
+      "module": "Native",
+      "scope": "Finder",
+      "cls": "WCFinderRouterHelper",
+      "kind": "+",
+      "selector": "pushFinderAdPageViewControllerWithEncrytedObjectidTid:nonceId:currentNavController:enterScene:customParam:reportModel:cardType:commentScene:requestScene:functionalParams:",
+      "expected_encodings": [
+        "v@:@@@Q@@iiQ@"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WCFinderRouterHelper",
+      "actual_methods": [
+        {
+          "kind": "+",
+          "selector": "pushFinderAdPageViewControllerWithEncrytedObjectidTid:nonceId:currentNavController:enterScene:customParam:reportModel:cardType:commentScene:requestScene:functionalParams:",
+          "encoding": "v88@0:8@16@24@32Q40@48@56i64i68Q72@80",
+          "implementation": "0x108d9c41c",
+          "metadata_address": "0x116ea7a98",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "+[WCFinderRouterHelper pushFinderAdPageViewControllerWithEncrytedObjectidTid:nonceId:currentNavController:enterScene:customParam:reportModel:cardType:commentScene:requestScene:functionalParams:]",
+      "reference_audit_status": "new-production-target-not-in-reference-registration-list"
+    },
+    {
+      "module": "Native",
+      "scope": "Finder",
+      "cls": "_TtC6WeChat31MBJsEventOnFinderMediaAdPreload",
+      "kind": "+",
+      "selector": "startPreloadAdMedia",
+      "expected_encodings": [
+        "@@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "_TtC6WeChat31MBJsEventOnFinderMediaAdPreload",
+      "actual_methods": [
+        {
+          "kind": "+",
+          "selector": "startPreloadAdMedia",
+          "encoding": "@16@0:8",
+          "implementation": "0x10b1df7e4",
+          "metadata_address": "0x116e7d064",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "+[_TtC6WeChat31MBJsEventOnFinderMediaAdPreload startPreloadAdMedia]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Finder",
+      "cls": "WCAdFinderInfo",
+      "kind": "-",
+      "selector": "isValid",
+      "expected_encodings": [
+        "B@:",
+        "c@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WCAdFinderInfo",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "isValid",
+          "encoding": "B16@0:8",
+          "implementation": "0x106ba304c",
+          "metadata_address": "0x1175a7390",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WCAdFinderInfo isValid]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Finder",
+      "cls": "FinderObjectAdInfo",
+      "kind": "-",
+      "selector": "adDesc",
+      "expected_encodings": [
+        "@@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "dynamic-property-no-declared-imp",
+      "property": {
+        "name": "adDesc",
+        "attributes": "T@\"ObjectAdDesc\",&,D,N"
+      },
+      "encoding_match": null,
+      "safe_skip_when_method_absent": true,
+      "identity": "-[FinderObjectAdInfo adDesc]",
+      "reference_audit_status": "not-in-declared-methods"
+    },
+    {
+      "module": "Native",
+      "scope": "Finder",
+      "cls": "FinderObjectAdInfo",
+      "kind": "-",
+      "selector": "adH5",
+      "expected_encodings": [
+        "@@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "dynamic-property-no-declared-imp",
+      "property": {
+        "name": "adH5",
+        "attributes": "T@\"ObjectAdContentH5\",&,D,N"
+      },
+      "encoding_match": null,
+      "safe_skip_when_method_absent": true,
+      "identity": "-[FinderObjectAdInfo adH5]",
+      "reference_audit_status": "not-in-declared-methods"
+    },
+    {
+      "module": "Native",
+      "scope": "Finder",
+      "cls": "FinderObjectAdInfo",
+      "kind": "-",
+      "selector": "adLeadLink",
+      "expected_encodings": [
+        "@@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "dynamic-property-no-declared-imp",
+      "property": {
+        "name": "adLeadLink",
+        "attributes": "T@\"ObjectAdContentLeadLink\",&,D,N"
+      },
+      "encoding_match": null,
+      "safe_skip_when_method_absent": true,
+      "identity": "-[FinderObjectAdInfo adLeadLink]",
+      "reference_audit_status": "not-in-declared-methods"
+    },
+    {
+      "module": "Native",
+      "scope": "Finder",
+      "cls": "FinderObjectAdInfo",
+      "kind": "-",
+      "selector": "adMiniApp",
+      "expected_encodings": [
+        "@@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "dynamic-property-no-declared-imp",
+      "property": {
+        "name": "adMiniApp",
+        "attributes": "T@\"ObjectAdContentMiniApp\",&,D,N"
+      },
+      "encoding_match": null,
+      "safe_skip_when_method_absent": true,
+      "identity": "-[FinderObjectAdInfo adMiniApp]",
+      "reference_audit_status": "not-in-declared-methods"
+    },
+    {
+      "module": "Native",
+      "scope": "Finder",
+      "cls": "FinderObjectAdInfo",
+      "kind": "-",
+      "selector": "adItems",
+      "expected_encodings": [
+        "@@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "dynamic-property-no-declared-imp",
+      "property": {
+        "name": "adItems",
+        "attributes": "T@\"NSMutableArray\",&,D,N"
+      },
+      "encoding_match": null,
+      "safe_skip_when_method_absent": true,
+      "identity": "-[FinderObjectAdInfo adItems]",
+      "reference_audit_status": "not-in-declared-methods"
+    },
+    {
+      "module": "Native",
+      "scope": "Finder",
+      "cls": "ObjectAdItem",
+      "kind": "-",
+      "selector": "adDesc",
+      "expected_encodings": [
+        "@@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "dynamic-property-no-declared-imp",
+      "property": {
+        "name": "adDesc",
+        "attributes": "T@\"ObjectAdDesc\",&,D,N"
+      },
+      "encoding_match": null,
+      "safe_skip_when_method_absent": true,
+      "identity": "-[ObjectAdItem adDesc]",
+      "reference_audit_status": "not-in-declared-methods"
+    },
+    {
+      "module": "Native",
+      "scope": "Finder",
+      "cls": "ObjectAdItem",
+      "kind": "-",
+      "selector": "adH5",
+      "expected_encodings": [
+        "@@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "dynamic-property-no-declared-imp",
+      "property": {
+        "name": "adH5",
+        "attributes": "T@\"ObjectAdContentH5\",&,D,N"
+      },
+      "encoding_match": null,
+      "safe_skip_when_method_absent": true,
+      "identity": "-[ObjectAdItem adH5]",
+      "reference_audit_status": "not-in-declared-methods"
+    },
+    {
+      "module": "Native",
+      "scope": "Finder",
+      "cls": "ObjectAdItem",
+      "kind": "-",
+      "selector": "adLeadLink",
+      "expected_encodings": [
+        "@@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "dynamic-property-no-declared-imp",
+      "property": {
+        "name": "adLeadLink",
+        "attributes": "T@\"ObjectAdContentLeadLink\",&,D,N"
+      },
+      "encoding_match": null,
+      "safe_skip_when_method_absent": true,
+      "identity": "-[ObjectAdItem adLeadLink]",
+      "reference_audit_status": "not-in-declared-methods"
+    },
+    {
+      "module": "Native",
+      "scope": "Finder",
+      "cls": "ObjectAdItem",
+      "kind": "-",
+      "selector": "adMiniApp",
+      "expected_encodings": [
+        "@@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "dynamic-property-no-declared-imp",
+      "property": {
+        "name": "adMiniApp",
+        "attributes": "T@\"ObjectAdContentMiniApp\",&,D,N"
+      },
+      "encoding_match": null,
+      "safe_skip_when_method_absent": true,
+      "identity": "-[ObjectAdItem adMiniApp]",
+      "reference_audit_status": "not-in-declared-methods"
+    },
+    {
+      "module": "Native",
+      "scope": "Finder",
+      "cls": "ObjectAdItem",
+      "kind": "-",
+      "selector": "uxinfo",
+      "expected_encodings": [
+        "@@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "dynamic-property-no-declared-imp",
+      "property": {
+        "name": "uxinfo",
+        "attributes": "T@\"NSString\",&,D,N"
+      },
+      "encoding_match": null,
+      "safe_skip_when_method_absent": true,
+      "identity": "-[ObjectAdItem uxinfo]",
+      "reference_audit_status": "not-in-declared-methods"
+    },
+    {
+      "module": "Native",
+      "scope": "Finder",
+      "cls": "ObjectAdContentH5",
+      "kind": "-",
+      "selector": "url",
+      "expected_encodings": [
+        "@@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "dynamic-property-no-declared-imp",
+      "property": {
+        "name": "url",
+        "attributes": "T@\"NSString\",&,D,N"
+      },
+      "encoding_match": null,
+      "safe_skip_when_method_absent": true,
+      "identity": "-[ObjectAdContentH5 url]",
+      "reference_audit_status": "not-in-declared-methods"
+    },
+    {
+      "module": "Native",
+      "scope": "MiniPrograms",
+      "cls": "WAAppTask",
+      "kind": "-",
+      "selector": "isSplashADFinished",
+      "expected_encodings": [
+        "B@:",
+        "c@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WAAppTask",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "isSplashADFinished",
+          "encoding": "B16@0:8",
+          "implementation": "0x11504fbc0",
+          "metadata_address": "0x116f88da8",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WAAppTask isSplashADFinished]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "MiniPrograms",
+      "cls": "WAAppTaskSplashADConfig",
+      "kind": "-",
+      "selector": "canShowSplashADWindow",
+      "expected_encodings": [
+        "B@:",
+        "c@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WAAppTaskSplashADConfig",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "canShowSplashADWindow",
+          "encoding": "B16@0:8",
+          "implementation": "0x11532f8a4",
+          "metadata_address": "0x11752eff8",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WAAppTaskSplashADConfig canShowSplashADWindow]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "MiniPrograms",
+      "cls": "WAAppTaskSplashADConfig",
+      "kind": "-",
+      "selector": "canHotStartShowSplashAD",
+      "expected_encodings": [
+        "B@:",
+        "c@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WAAppTaskSplashADConfig",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "canHotStartShowSplashAD",
+          "encoding": "B16@0:8",
+          "implementation": "0x11532f8c4",
+          "metadata_address": "0x11752f028",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WAAppTaskSplashADConfig canHotStartShowSplashAD]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "MiniPrograms",
+      "cls": "WAAppTaskSplashADConfig",
+      "kind": "-",
+      "selector": "splashADHasContent",
+      "expected_encodings": [
+        "B@:",
+        "c@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WAAppTaskSplashADConfig",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "splashADHasContent",
+          "encoding": "B16@0:8",
+          "implementation": "0x11532f884",
+          "metadata_address": "0x11752efc8",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WAAppTaskSplashADConfig splashADHasContent]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "MiniPrograms",
+      "cls": "WAJSEventHandler_showSplashAd",
+      "kind": "-",
+      "selector": "handleJSEvent:",
+      "expected_encodings": [
+        "v@:@"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WAJSEventHandler_showSplashAd",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "handleJSEvent:",
+          "encoding": "v24@0:8@16",
+          "implementation": "0x1151e65d4",
+          "metadata_address": "0x117551360",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WAJSEventHandler_showSplashAd handleJSEvent:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "MiniPrograms",
+      "cls": "WAJSEventHandler_showSplashAdMenu",
+      "kind": "-",
+      "selector": "handleJSEvent:",
+      "expected_encodings": [
+        "v@:@"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WAJSEventHandler_showSplashAdMenu",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "handleJSEvent:",
+          "encoding": "v24@0:8@16",
+          "implementation": "0x114f178c8",
+          "metadata_address": "0x117551378",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WAJSEventHandler_showSplashAdMenu handleJSEvent:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "MiniPrograms",
+      "cls": "WAJSEventHandler_adOperateWXData",
+      "kind": "-",
+      "selector": "handleJSEvent:",
+      "expected_encodings": [
+        "v@:@"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WAJSEventHandler_adOperateWXData",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "handleJSEvent:",
+          "encoding": "v24@0:8@16",
+          "implementation": "0x11541b3fc",
+          "metadata_address": "0x117547310",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WAJSEventHandler_adOperateWXData handleJSEvent:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Native",
+      "scope": "Search",
+      "cls": "WCAdSearchH5Info",
+      "kind": "-",
+      "selector": "isValid",
+      "expected_encodings": [
+        "B@:",
+        "c@:"
+      ],
+      "source_path": "Controllers/CSAdPurificationNativeHooks.m",
+      "status": "declared",
+      "declaring_class": "WCAdSearchH5Info",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "isValid",
+          "encoding": "B16@0:8",
+          "implementation": "0x106bb055c",
+          "metadata_address": "0x1175b3fd8",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WCAdSearchH5Info isValid]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Web",
+      "scope": "Articles|Moments|MiniPrograms",
+      "cls": "NSURL",
+      "kind": "+",
+      "selector": "URLWithString:",
+      "expected_encodings": [
+        "@@:@"
+      ],
+      "source_path": "Controllers/CSAdPurificationWebHooks.m",
+      "status": "external-class",
+      "encoding_match": null,
+      "identity": "+[NSURL URLWithString:]",
+      "reference_audit_status": "class-not-in-main-image"
+    },
+    {
+      "module": "Web",
+      "scope": "ALL_SIX_AD_SCOPES",
+      "cls": "JSFunctionDef",
+      "kind": "+",
+      "selector": "FuncDefWithFunc:Selector:FuncType:PermissionBitSet:RunInWebViewType:",
+      "expected_encodings": [
+        "@@:@:qIQ"
+      ],
+      "source_path": "Controllers/CSAdPurificationWebHooks.m",
+      "status": "declared",
+      "declaring_class": "JSFunctionDef",
+      "actual_methods": [
+        {
+          "kind": "+",
+          "selector": "FuncDefWithFunc:Selector:FuncType:PermissionBitSet:RunInWebViewType:",
+          "encoding": "@52@0:8@16:24q32I40Q44",
+          "implementation": "0x1021d060c",
+          "metadata_address": "0x117050e80",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "+[JSFunctionDef FuncDefWithFunc:Selector:FuncType:PermissionBitSet:RunInWebViewType:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Web",
+      "scope": "ALL_SIX_AD_SCOPES",
+      "cls": "JSFunctionDef",
+      "kind": "+",
+      "selector": "FuncDefWithFunc:Selector:FuncType:PermissionBitSet2:RunInWebViewType:",
+      "expected_encodings": [
+        "@@:@:qIQ"
+      ],
+      "source_path": "Controllers/CSAdPurificationWebHooks.m",
+      "status": "declared",
+      "declaring_class": "JSFunctionDef",
+      "actual_methods": [
+        {
+          "kind": "+",
+          "selector": "FuncDefWithFunc:Selector:FuncType:PermissionBitSet2:RunInWebViewType:",
+          "encoding": "@52@0:8@16:24q32I40Q44",
+          "implementation": "0x1021d0760",
+          "metadata_address": "0x117050e8c",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "+[JSFunctionDef FuncDefWithFunc:Selector:FuncType:PermissionBitSet2:RunInWebViewType:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Web",
+      "scope": "ALL_SIX_AD_SCOPES",
+      "cls": "JSFunctionDef",
+      "kind": "+",
+      "selector": "FuncDefWithFunc:Selector:FuncType:PermissionBitSet3:RunInWebViewType:",
+      "expected_encodings": [
+        "@@:@:qIQ"
+      ],
+      "source_path": "Controllers/CSAdPurificationWebHooks.m",
+      "status": "declared",
+      "declaring_class": "JSFunctionDef",
+      "actual_methods": [
+        {
+          "kind": "+",
+          "selector": "FuncDefWithFunc:Selector:FuncType:PermissionBitSet3:RunInWebViewType:",
+          "encoding": "@52@0:8@16:24q32I40Q44",
+          "implementation": "0x1021d08b4",
+          "metadata_address": "0x117050e98",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "+[JSFunctionDef FuncDefWithFunc:Selector:FuncType:PermissionBitSet3:RunInWebViewType:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Web",
+      "scope": "ALL_SIX_AD_SCOPES",
+      "cls": "JSFunctionDef",
+      "kind": "+",
+      "selector": "FuncDefWithFunc:Selector:FuncType:PermissionByteIndex:RunInWebViewType:",
+      "expected_encodings": [
+        "@@:@:qqQ"
+      ],
+      "source_path": "Controllers/CSAdPurificationWebHooks.m",
+      "status": "declared",
+      "declaring_class": "JSFunctionDef",
+      "actual_methods": [
+        {
+          "kind": "+",
+          "selector": "FuncDefWithFunc:Selector:FuncType:PermissionByteIndex:RunInWebViewType:",
+          "encoding": "@56@0:8@16:24q32q40Q48",
+          "implementation": "0x1021d0a08",
+          "metadata_address": "0x117050ea4",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "+[JSFunctionDef FuncDefWithFunc:Selector:FuncType:PermissionByteIndex:RunInWebViewType:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Web",
+      "scope": "MiniPrograms",
+      "cls": "WAJSInvoker",
+      "kind": "-",
+      "selector": "invokeInJsContext:",
+      "expected_encodings": [
+        "@@:@"
+      ],
+      "source_path": "Controllers/CSAdPurificationWebHooks.m",
+      "status": "declared",
+      "declaring_class": "WAJSInvoker",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "invokeInJsContext:",
+          "encoding": "@24@0:8@16",
+          "implementation": "0x1151bc26c",
+          "metadata_address": "0x1175525f8",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WAJSInvoker invokeInJsContext:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Web",
+      "scope": "Search",
+      "cls": "WXSearchJSLogicImpl",
+      "kind": "-",
+      "selector": "functionCall:withParams:withCallbackID:",
+      "expected_encodings": [
+        "v@:@@@"
+      ],
+      "source_path": "Controllers/CSAdPurificationWebHooks.m",
+      "status": "declared",
+      "declaring_class": "WXSearchJSLogicImpl",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "functionCall:withParams:withCallbackID:",
+          "encoding": "v40@0:8@16@24@32",
+          "implementation": "0x10aa74398",
+          "metadata_address": "0x11780b2b4",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WXSearchJSLogicImpl functionCall:withParams:withCallbackID:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Web",
+      "scope": "Search",
+      "cls": "LocalJSLogicBase",
+      "kind": "-",
+      "selector": "sendEvent:handler:result:",
+      "expected_encodings": [
+        "v@:@@@"
+      ],
+      "source_path": "Controllers/CSAdPurificationWebHooks.m",
+      "status": "declared",
+      "declaring_class": "LocalJSLogicBase",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "sendEvent:handler:result:",
+          "encoding": "v40@0:8@16@24@32",
+          "implementation": "0x1023fc73c",
+          "metadata_address": "0x116ef1fbc",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[LocalJSLogicBase sendEvent:handler:result:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Web",
+      "scope": "Articles",
+      "cls": "JSEvent",
+      "kind": "-",
+      "selector": "initWithDelegate:parameters:",
+      "expected_encodings": [
+        "@@:@@"
+      ],
+      "source_path": "Controllers/CSAdPurificationWebHooks.m",
+      "status": "declared",
+      "declaring_class": "JSEvent",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "initWithDelegate:parameters:",
+          "encoding": "@32@0:8@16@24",
+          "implementation": "0x1021d0118",
+          "metadata_address": "0x117249f28",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[JSEvent initWithDelegate:parameters:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Web",
+      "scope": "MiniPrograms_OR_ALL_SIX_AD_SCOPES",
+      "cls": "WCJSInvoker",
+      "kind": "-",
+      "selector": "initWithObj:Func:Args:",
+      "expected_encodings": [
+        "@@:@@@"
+      ],
+      "source_path": "Controllers/CSAdPurificationWebHooks.m",
+      "status": "declared",
+      "declaring_class": "WCJSInvoker",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "initWithObj:Func:Args:",
+          "encoding": "@40@0:8@16@24@32",
+          "implementation": "0x1157987e8",
+          "metadata_address": "0x11772a6fc",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WCJSInvoker initWithObj:Func:Args:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Web",
+      "scope": "MiniPrograms_OR_ALL_SIX_AD_SCOPES",
+      "cls": "WCJSInvoker",
+      "kind": "-",
+      "selector": "initWithJavascript:",
+      "expected_encodings": [
+        "@@:@"
+      ],
+      "source_path": "Controllers/CSAdPurificationWebHooks.m",
+      "status": "declared",
+      "declaring_class": "WCJSInvoker",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "initWithJavascript:",
+          "encoding": "@24@0:8@16",
+          "implementation": "0x11579877c",
+          "metadata_address": "0x11772a6f0",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[WCJSInvoker initWithJavascript:]",
+      "reference_audit_status": "declared-on-class"
+    },
+    {
+      "module": "Web",
+      "scope": "ALL_SIX_AD_SCOPES",
+      "cls": "LocalJSEventHandler_WebAPIBridge",
+      "kind": "-",
+      "selector": "initWithEvent:context:",
+      "expected_encodings": [
+        "@@:@@"
+      ],
+      "source_path": "Controllers/CSAdPurificationWebHooks.m",
+      "status": "declared",
+      "declaring_class": "LocalJSEventHandler_WebAPIBridge",
+      "actual_methods": [
+        {
+          "kind": "-",
+          "selector": "initWithEvent:context:",
+          "encoding": "@32@0:8@16@24",
+          "implementation": "0x1023dafdc",
+          "metadata_address": "0x11726c358",
+          "origin": "class"
+        }
+      ],
+      "encoding_match": true,
+      "identity": "-[LocalJSEventHandler_WebAPIBridge initWithEvent:context:]",
+      "reference_audit_status": "declared-on-class"
+    }
+  ],
+  "evidence_inputs": {
+    "objc-metadata.json": "47534af4123d6f56235c2dd68c9071752f029adf8ee4c7554fc8aca547322210",
+    "hook-compatibility.csv": "a819ebddbf8d2ec714f163d032216d9174ab8f5fa00d2ede13f376e224767a1c"
+  },
+  "source_snapshot_still_current": true
+}

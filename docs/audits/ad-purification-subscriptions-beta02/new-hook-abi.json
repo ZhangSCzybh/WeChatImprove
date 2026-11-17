@@ -1,0 +1,69 @@
+{
+  "scope": "beta02 new subscription hooks only; beta01 audit remains unchanged",
+  "count": 5,
+  "matching": 5,
+  "source_file": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSAdPurificationSubscriptionHooks.m",
+  "source_sha256": "fdd472e532a6fc67e9324f71cebc356dc7ab8bf5e07749d926d261de56b72ffa",
+  "hooks": [
+    {
+      "cls": "FlutterBrandTLApiImplementation",
+      "kind": "-",
+      "selector": "getMassSendDataLastOrderId:initData:resetData:completion:",
+      "expected": "v@:qBB@?",
+      "actual": "v40@0:8q16B24B28@?32",
+      "compact_actual": "v@:qBB@?",
+      "implementation": "0x101d4e9a4",
+      "superclass": "NSObject",
+      "origin": "class",
+      "matches": true
+    },
+    {
+      "cls": "FlutterFinderBoxApiImplementation",
+      "kind": "-",
+      "selector": "getMassSendDataLastOrderId:initData:resetData:completion:",
+      "expected": "v@:qBB@?",
+      "actual": "v40@0:8q16B24B28@?32",
+      "compact_actual": "v@:qBB@?",
+      "implementation": "0x101d685c8",
+      "superclass": "NSObject",
+      "origin": "class",
+      "matches": true
+    },
+    {
+      "cls": "BrandTimelineMsgMgr",
+      "kind": "+",
+      "selector": "canTimlineMsgDiscard:",
+      "expected": "B@:@",
+      "actual": "B24@0:8@16",
+      "compact_actual": "B@:@",
+      "implementation": "0x100758990",
+      "superclass": "MMUserService",
+      "origin": "class",
+      "matches": true
+    },
+    {
+      "cls": "AffBizCppToNativeManagerImpl",
+      "kind": "-",
+      "selector": "doDataMigrate",
+      "expected": "@@:",
+      "actual": "@16@0:8",
+      "compact_actual": "@@:",
+      "implementation": "0x1000839a0",
+      "superclass": "NSObject",
+      "origin": "class",
+      "matches": true
+    },
+    {
+      "cls": "BoxAffBizCppToNativeManagerImpl",
+      "kind": "-",
+      "selector": "doDataMigrate",
+      "expected": "@@:",
+      "actual": "@16@0:8",
+      "compact_actual": "@@:",
+      "implementation": "0x10041ed98",
+      "superclass": "NSObject",
+      "origin": "class",
+      "matches": true
+    }
+  ]
+}

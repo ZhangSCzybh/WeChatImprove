@@ -1,0 +1,50 @@
+
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-8.0.80-ad-audit-oaztrb2m/WeChat:	file format mach-o arm64
+
+Disassembly of section __TEXT,__text:
+
+0000000100008000 <__text>:
+100448744: a9bd57f6    	stp	x22, x21, [sp, #-0x30]!
+100448748: a9014ff4    	stp	x20, x19, [sp, #0x10]
+10044874c: a9027bfd    	stp	x29, x30, [sp, #0x20]
+100448750: 910083fd    	add	x29, sp, #0x20
+100448754: aa0203f3    	mov	x19, x2
+100448758: aa0003f4    	mov	x20, x0
+10044875c: d00f2c68    	adrp	x8, 0x11e9d6000 <dyld_stub_binder+0x11e9d6000>
+100448760: f9437d01    	ldr	x1, [x8, #0x6f8]  // @0x11e9d66f8 selector isCurFlutterAffEnable
+100448764: 95df7d40    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+100448768: 340003a0    	cbz	w0, 0x1004487dc <__text+0x4407dc>
+10044876c: d00f2c68    	adrp	x8, 0x11e9d6000 <dyld_stub_binder+0x11e9d6000>
+100448770: f943e501    	ldr	x1, [x8, #0x7c8]  // @0x11e9d67c8 selector getAffBizManagerShareInstance
+100448774: aa1403e0    	mov	x0, x20
+100448778: 95df7d3b    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+10044877c: aa1d03fd    	mov	x29, x29
+100448780: 95df7d40    	bl	0x107c27c80 <_Flutter_MMFoundation_BindContext+0x3eae94c>
+100448784: aa0003f4    	mov	x20, x0
+100448788: b00f2ce8    	adrp	x8, 0x11e9e5000 <dyld_stub_binder+0x11e9e5000>
+10044878c: f940c501    	ldr	x1, [x8, #0x188]  // @0x11e9e5188 selector getTopNData:
+100448790: aa1303e2    	mov	x2, x19
+100448794: 95df7d34    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+100448798: aa1d03fd    	mov	x29, x29
+10044879c: 95df7d39    	bl	0x107c27c80 <_Flutter_MMFoundation_BindContext+0x3eae94c>
+1004487a0: aa0003f5    	mov	x21, x0
+1004487a4: aa1403e0    	mov	x0, x20
+1004487a8: 95df7d32    	bl	0x107c27c70 <_Flutter_MMFoundation_BindContext+0x3eae93c>
+1004487ac: d00f4648    	adrp	x8, 0x11ed12000 <dyld_stub_binder+0x11ed12000>
+1004487b0: f947cd00    	ldr	x0, [x8, #0xf98]  // @0x11ed12f98 class BrandAffDataConverter
+1004487b4: 900f2c68    	adrp	x8, 0x11e9d4000 <dyld_stub_binder+0x11e9d4000>
+1004487b8: f947c101    	ldr	x1, [x8, #0xf80]  // @0x11e9d4f80 selector convertAffMsgInfoDataListToMsgWrapList:
+1004487bc: aa1503e2    	mov	x2, x21
+1004487c0: 95df7d29    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1004487c4: aa1d03fd    	mov	x29, x29
+1004487c8: 95df7d2e    	bl	0x107c27c80 <_Flutter_MMFoundation_BindContext+0x3eae94c>
+1004487cc: aa0003f3    	mov	x19, x0
+1004487d0: aa1503e0    	mov	x0, x21
+1004487d4: 95df7d27    	bl	0x107c27c70 <_Flutter_MMFoundation_BindContext+0x3eae93c>
+1004487d8: 14000002    	b	0x1004487e0 <__text+0x4407e0>
+1004487dc: d2800013    	mov	x19, #0x0               ; =0
+1004487e0: aa1303e0    	mov	x0, x19
+1004487e4: a9427bfd    	ldp	x29, x30, [sp, #0x20]
+1004487e8: a9414ff4    	ldp	x20, x19, [sp, #0x10]
+1004487ec: a8c357f6    	ldp	x22, x21, [sp], #0x30
+1004487f0: 15df7d0c    	b	0x107c27c20 <_Flutter_MMFoundation_BindContext+0x3eae8ec>

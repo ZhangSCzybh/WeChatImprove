@@ -1,0 +1,46 @@
+{
+  "README.md": {
+    "bytes": 11614,
+    "sha256": "7714322aa978beab073fcd341ace445167aa649a3ae233f310a8354a24127a88"
+  },
+  "actual-hook-compatibility.json": {
+    "bytes": 76840,
+    "sha256": "7c30ebdfe3adfd767e0940e7bd7a12cdd3c30f33ff0382180235dd6a808c5061"
+  },
+  "actual-hook-compatibility.md": {
+    "bytes": 13494,
+    "sha256": "1b57130810ca5cd535646e4e2394b73d53be75a836ce3ce0a762a6abb92abc9a"
+  },
+  "artifact-identity.json": {
+    "bytes": 508,
+    "sha256": "546fb876f918ea3445aa5a6840e3ddfc09edfd8259e165f98e5debc1a4b5d274"
+  },
+  "finder-init-assembly.txt": {
+    "bytes": 18284,
+    "sha256": "7b49608881ccf653f6f8269290799f80b1d0cbbb46bf53b418d63cbc466b64a6"
+  },
+  "hook-compatibility.csv": {
+    "bytes": 27511,
+    "sha256": "a819ebddbf8d2ec714f163d032216d9174ab8f5fa00d2ede13f376e224767a1c"
+  },
+  "inspect_objc_metadata.py": {
+    "bytes": 8968,
+    "sha256": "5ceefa952ff461a44dbe1e83db9d087a2f8b25968883efcaca43f7f037c57c3c"
+  },
+  "load-commands.txt": {
+    "bytes": 52594,
+    "sha256": "8603916226170a9c0a37dc543a6755bb1fa13a1425faace46a4497211c3e0afc"
+  },
+  "objc-metadata.json": {
+    "bytes": 2109787,
+    "sha256": "47534af4123d6f56235c2dd68c9071752f029adf8ee4c7554fc8aca547322210"
+  },
+  "plist-evidence.json": {
+    "bytes": 16027,
+    "sha256": "c6c7bb976473c129e248a33791569794527c9458735354bc85c94b6066496aec"
+  },
+  "rea-evidence-bundle.json": {
+    "bytes": 10941,
+    "sha256": "080e74cc953854361ba55894619ef6ed9f627b07f93dcaed3d1ae04cef332b51"
+  }
+}

@@ -1,0 +1,69 @@
+
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-8.0.80-ad-audit-oaztrb2m/WeChat:	file format mach-o arm64
+
+Disassembly of section __TEXT,__text:
+
+0000000100008000 <__text>:
+10041f894: a9bd57f6    	stp	x22, x21, [sp, #-0x30]!
+10041f898: a9014ff4    	stp	x20, x19, [sp, #0x10]
+10041f89c: a9027bfd    	stp	x29, x30, [sp, #0x20]
+10041f8a0: 910083fd    	add	x29, sp, #0x20
+10041f8a4: f00f4788    	adrp	x8, 0x11ed12000 <dyld_stub_binder+0x11ed12000>
+10041f8a8: f943c100    	ldr	x0, [x8, #0x780]  // @0x11ed12780 class MMContext
+10041f8ac: d00f2d48    	adrp	x8, 0x11e9c9000 <dyld_stub_binder+0x11e9c9000>
+10041f8b0: f9440101    	ldr	x1, [x8, #0x800]  // @0x11e9c9800 selector currentContext
+10041f8b4: 95e020ec    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+10041f8b8: aa1d03fd    	mov	x29, x29
+10041f8bc: 95e020f1    	bl	0x107c27c80 <_Flutter_MMFoundation_BindContext+0x3eae94c>
+10041f8c0: aa0003f3    	mov	x19, x0
+10041f8c4: f00f4788    	adrp	x8, 0x11ed12000 <dyld_stub_binder+0x11ed12000>
+10041f8c8: f9444900    	ldr	x0, [x8, #0x890]  // @0x11ed12890 class ExptService
+10041f8cc: f00f4428    	adrp	x8, 0x11eca6000 <dyld_stub_binder+0x11eca6000>
+10041f8d0: f9428501    	ldr	x1, [x8, #0x508]  // @0x11eca6508 selector class
+10041f8d4: 95e020e4    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+10041f8d8: aa0003e2    	mov	x2, x0
+10041f8dc: d00f2d48    	adrp	x8, 0x11e9c9000 <dyld_stub_binder+0x11e9c9000>
+10041f8e0: f9452101    	ldr	x1, [x8, #0xa40]  // @0x11e9c9a40 selector getService:
+10041f8e4: aa1303e0    	mov	x0, x19
+10041f8e8: 95e020df    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+10041f8ec: aa1d03fd    	mov	x29, x29
+10041f8f0: 95e020e4    	bl	0x107c27c80 <_Flutter_MMFoundation_BindContext+0x3eae94c>
+10041f8f4: aa0003f4    	mov	x20, x0
+10041f8f8: d00f2d48    	adrp	x8, 0x11e9c9000 <dyld_stub_binder+0x11e9c9000>
+10041f8fc: f9472501    	ldr	x1, [x8, #0xe48]  // @0x11e9c9e48 selector getExpt:withBoolDef:
+10041f900: 900e5c22    	adrp	x2, 0x11cfa3000 <dyld_stub_binder+0x11cfa3000>
+10041f904: 9114e042    	add	x2, x2, #0x538
+10041f908: 52800003    	mov	w3, #0x0                ; =0
+10041f90c: 95e020d6    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+10041f910: aa0003f5    	mov	x21, x0
+10041f914: aa1403e0    	mov	x0, x20
+10041f918: 95e020d6    	bl	0x107c27c70 <_Flutter_MMFoundation_BindContext+0x3eae93c>
+10041f91c: aa1303e0    	mov	x0, x19
+10041f920: 95e020d4    	bl	0x107c27c70 <_Flutter_MMFoundation_BindContext+0x3eae93c>
+10041f924: aa1503e0    	mov	x0, x21
+10041f928: a9427bfd    	ldp	x29, x30, [sp, #0x20]
+10041f92c: a9414ff4    	ldp	x20, x19, [sp, #0x10]
+10041f930: a8c357f6    	ldp	x22, x21, [sp], #0x30
+10041f934: d65f03c0    	ret
+10041f938: d10203ff    	sub	sp, sp, #0x80
+10041f93c: a90557f6    	stp	x22, x21, [sp, #0x50]
+10041f940: a9064ff4    	stp	x20, x19, [sp, #0x60]
+10041f944: a9077bfd    	stp	x29, x30, [sp, #0x70]
+10041f948: 9101c3fd    	add	x29, sp, #0x70
+10041f94c: aa0303f3    	mov	x19, x3
+10041f950: aa0203f4    	mov	x20, x2
+10041f954: aa0003f5    	mov	x21, x0
+10041f958: b00f9908    	adrp	x8, 0x11f740000 <dyld_stub_binder+0x11f740000>
+10041f95c: 52800029    	mov	w9, #0x1                ; =1
+10041f960: 39391d09    	strb	w9, [x8, #0xe47]
+10041f964: f00f4788    	adrp	x8, 0x11ed12000 <dyld_stub_binder+0x11ed12000>
+10041f968: f9430d00    	ldr	x0, [x8, #0x618]  // @0x11ed12618 class iConsole
+10041f96c: d00f2d48    	adrp	x8, 0x11e9c9000 <dyld_stub_binder+0x11e9c9000>
+10041f970: f9418901    	ldr	x1, [x8, #0x310]  // @0x11e9c9310 selector logWithLevel:module:errorCode:file:line:func:format:
+10041f974: a900cff4    	stp	x20, x19, [sp, #0x8]
+10041f978: 900e5c28    	adrp	x8, 0x11cfa3000 <dyld_stub_binder+0x11cfa3000>
+10041f97c: 91156108    	add	x8, x8, #0x558
+10041f980: f90003e8    	str	x8, [sp]
+10041f984: b00cbde5    	adrp	x5, 0x119bdc000 <dyld_stub_binder+0x119bdc000>
+10041f988: 9116b4a5    	add	x5, x5, #0x5ad
+10041f98c: b00cbde7    	adrp	x7, 0x119bdc000 <dyld_stub_binder+0x119bdc000>

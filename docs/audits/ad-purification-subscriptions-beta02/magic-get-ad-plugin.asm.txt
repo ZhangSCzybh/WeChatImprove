@@ -1,0 +1,38 @@
+
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-8.0.80-ad-audit-oaztrb2m/WeChat:	file format mach-o arm64
+
+Disassembly of section __TEXT,__text:
+
+000000010aec2da4 <_mmkv_importFrom>:
+10b2443f4: 900a2cc9    	adrp	x9, 0x11f7dc000 <dyld_stub_binder+0x11f7dc000>
+10b2443f8: f944c529    	ldr	x9, [x9, #0x988]
+10b2443fc: b4000049    	cbz	x9, 0x10b244404 <_mmkv_importFrom+0x381660>
+10b244400: d61f0120    	br	x9
+10b244404: a9be4ff4    	stp	x20, x19, [sp, #-0x20]!
+10b244408: a9017bfd    	stp	x29, x30, [sp, #0x10]
+10b24440c: 910043fd    	add	x29, sp, #0x10
+10b244410: aa0003f4    	mov	x20, x0
+10b244414: 95186dfb    	bl	0x10f85fc00 <_GetBoxIamBizTLRecFeedsDataUtil+0xdece4>
+10b244418: 97ffffea    	bl	0x10b2443c0 <_mmkv_importFrom+0x38161c>
+10b24441c: aa0003f3    	mov	x19, x0
+10b244420: aa1403e0    	mov	x0, x20
+10b244424: 95186df5    	bl	0x10f85fbf8 <_GetBoxIamBizTLRecFeedsDataUtil+0xdecdc>
+10b244428: aa1303e0    	mov	x0, x19
+10b24442c: a9417bfd    	ldp	x29, x30, [sp, #0x10]
+10b244430: a8c24ff4    	ldp	x20, x19, [sp], #0x20
+10b244434: 15186dda    	b	0x10f85fb9c <_GetBoxIamBizTLRecFeedsDataUtil+0xdec80>
+10b244438: 900a2cc9    	adrp	x9, 0x11f7dc000 <dyld_stub_binder+0x11f7dc000>
+10b24443c: f944c929    	ldr	x9, [x9, #0x990]
+10b244440: b4000049    	cbz	x9, 0x10b244448 <_mmkv_importFrom+0x3816a4>
+10b244444: d61f0120    	br	x9
+10b244448: a9bf7bfd    	stp	x29, x30, [sp, #-0x10]!
+10b24444c: 910003fd    	mov	x29, sp
+10b244450: d00a0860    	adrp	x0, 0x11f352000 <dyld_stub_binder+0x11f352000>
+10b244454: 912fc000    	add	x0, x0, #0xbf0
+10b244458: 90000421    	adrp	x1, 0x10b2c8000 <_mmkv_importFrom+0x40525c>
+10b24445c: 91379021    	add	x1, x1, #0xde4
+10b244460: f00a0882    	adrp	x2, 0x11f357000 <dyld_stub_binder+0x11f357000>
+10b244464: 913d8042    	add	x2, x2, #0xf60
+10b244468: 97ffff0d    	bl	0x10b24409c <_mmkv_importFrom+0x3812f8>
+10b24446c: a8c17bfd    	ldp	x29, x30, [sp], #0x10
+10b244470: d65f03c0    	ret

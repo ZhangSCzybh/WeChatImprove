@@ -1,0 +1,178 @@
+
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-8.0.80-ad-audit-oaztrb2m/WeChat:	file format mach-o arm64
+
+Disassembly of section __TEXT,__text:
+
+0000000100008000 <__text>:
+1006d8150: a9be4ff4    	stp	x20, x19, [sp, #-0x20]!
+1006d8154: a9017bfd    	stp	x29, x30, [sp, #0x10]
+1006d8158: 910043fd    	add	x29, sp, #0x10
+1006d815c: aa0003f3    	mov	x19, x0
+1006d8160: b00f1868    	adrp	x8, 0x11e9e5000 <dyld_stub_binder+0x11e9e5000>
+1006d8164: f947bd01    	ldr	x1, [x8, #0xf78]  // @0x11e9e5f78 selector isExptOrControlGroup
+1006d8168: 95d53ebf    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1006d816c: 340000e0    	cbz	w0, 0x1006d8188 <__text+0x6d0188>
+1006d8170: b00f17e8    	adrp	x8, 0x11e9d5000 <dyld_stub_binder+0x11e9d5000>
+1006d8174: f9438501    	ldr	x1, [x8, #0x708]  // @0x11e9d5708 selector exptShowOption
+1006d8178: aa1303e0    	mov	x0, x19
+1006d817c: 95d53eba    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1006d8180: 721f001f    	tst	w0, #0x2
+1006d8184: 1a9f17e0    	cset	w0, eq
+1006d8188: a9417bfd    	ldp	x29, x30, [sp, #0x10]
+1006d818c: a8c24ff4    	ldp	x20, x19, [sp], #0x20
+1006d8190: d65f03c0    	ret
+1006d8194: a9be4ff4    	stp	x20, x19, [sp, #-0x20]!
+1006d8198: a9017bfd    	stp	x29, x30, [sp, #0x10]
+1006d819c: 910043fd    	add	x29, sp, #0x10
+1006d81a0: aa0003f3    	mov	x19, x0
+1006d81a4: b00f1868    	adrp	x8, 0x11e9e5000 <dyld_stub_binder+0x11e9e5000>
+1006d81a8: f947bd01    	ldr	x1, [x8, #0xf78]  // @0x11e9e5f78 selector isExptOrControlGroup
+1006d81ac: 95d53eae    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1006d81b0: 34000100    	cbz	w0, 0x1006d81d0 <__text+0x6d01d0>
+1006d81b4: b00f17e8    	adrp	x8, 0x11e9d5000 <dyld_stub_binder+0x11e9d5000>
+1006d81b8: f9438501    	ldr	x1, [x8, #0x708]  // @0x11e9d5708 selector exptShowOption
+1006d81bc: aa1303e0    	mov	x0, x19
+1006d81c0: 95d53ea9    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1006d81c4: 528000a8    	mov	w8, #0x5                ; =5
+1006d81c8: 6a08001f    	tst	w0, w8
+1006d81cc: 1a9f17e0    	cset	w0, eq
+1006d81d0: a9417bfd    	ldp	x29, x30, [sp, #0x10]
+1006d81d4: a8c24ff4    	ldp	x20, x19, [sp], #0x20
+1006d81d8: d65f03c0    	ret
+1006d81dc: a9be4ff4    	stp	x20, x19, [sp, #-0x20]!
+1006d81e0: a9017bfd    	stp	x29, x30, [sp, #0x10]
+1006d81e4: 910043fd    	add	x29, sp, #0x10
+1006d81e8: aa0003f3    	mov	x19, x0
+1006d81ec: b00f1868    	adrp	x8, 0x11e9e5000 <dyld_stub_binder+0x11e9e5000>
+1006d81f0: f947bd01    	ldr	x1, [x8, #0xf78]  // @0x11e9e5f78 selector isExptOrControlGroup
+1006d81f4: 95d53e9c    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1006d81f8: 340000e0    	cbz	w0, 0x1006d8214 <__text+0x6d0214>
+1006d81fc: b00f17e8    	adrp	x8, 0x11e9d5000 <dyld_stub_binder+0x11e9d5000>
+1006d8200: f9438501    	ldr	x1, [x8, #0x708]  // @0x11e9d5708 selector exptShowOption
+1006d8204: aa1303e0    	mov	x0, x19
+1006d8208: 95d53e97    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1006d820c: 721d001f    	tst	w0, #0x8
+1006d8210: 1a9f17e0    	cset	w0, eq
+1006d8214: a9417bfd    	ldp	x29, x30, [sp, #0x10]
+1006d8218: a8c24ff4    	ldp	x20, x19, [sp], #0x20
+1006d821c: d65f03c0    	ret
+1006d8220: a9be4ff4    	stp	x20, x19, [sp, #-0x20]!
+1006d8224: a9017bfd    	stp	x29, x30, [sp, #0x10]
+1006d8228: 910043fd    	add	x29, sp, #0x10
+1006d822c: aa0003f3    	mov	x19, x0
+1006d8230: b00f1868    	adrp	x8, 0x11e9e5000 <dyld_stub_binder+0x11e9e5000>
+1006d8234: f947bd01    	ldr	x1, [x8, #0xf78]  // @0x11e9e5f78 selector isExptOrControlGroup
+1006d8238: 95d53e8b    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1006d823c: 340000e0    	cbz	w0, 0x1006d8258 <__text+0x6d0258>
+1006d8240: b00f17e8    	adrp	x8, 0x11e9d5000 <dyld_stub_binder+0x11e9d5000>
+1006d8244: f9438501    	ldr	x1, [x8, #0x708]  // @0x11e9d5708 selector exptShowOption
+1006d8248: aa1303e0    	mov	x0, x19
+1006d824c: 95d53e86    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1006d8250: 721c001f    	tst	w0, #0x10
+1006d8254: 1a9f17e0    	cset	w0, eq
+1006d8258: a9417bfd    	ldp	x29, x30, [sp, #0x10]
+1006d825c: a8c24ff4    	ldp	x20, x19, [sp], #0x20
+1006d8260: d65f03c0    	ret
+1006d8264: a9bc5ff8    	stp	x24, x23, [sp, #-0x40]!
+1006d8268: a90157f6    	stp	x22, x21, [sp, #0x10]
+1006d826c: a9024ff4    	stp	x20, x19, [sp, #0x20]
+1006d8270: a9037bfd    	stp	x29, x30, [sp, #0x30]
+1006d8274: 9100c3fd    	add	x29, sp, #0x30
+1006d8278: aa0003f4    	mov	x20, x0
+1006d827c: b00f8348    	adrp	x8, 0x11f741000 <dyld_stub_binder+0x11f741000>
+1006d8280: 52800029    	mov	w9, #0x1                ; =1
+1006d8284: 39234909    	strb	w9, [x8, #0x8d2]
+1006d8288: b00f1868    	adrp	x8, 0x11e9e5000 <dyld_stub_binder+0x11e9e5000>
+1006d828c: f947bd01    	ldr	x1, [x8, #0xf78]  // @0x11e9e5f78 selector isExptOrControlGroup
+1006d8290: 95d53e75    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1006d8294: 340006e0    	cbz	w0, 0x1006d8370 <__text+0x6d0370>
+1006d8298: f00f31c8    	adrp	x8, 0x11ed13000 <dyld_stub_binder+0x11ed13000>
+1006d829c: f9413100    	ldr	x0, [x8, #0x260]  // @0x11ed13260 bind _OBJC_CLASS_$_NSMutableSet
+1006d82a0: d00f2e88    	adrp	x8, 0x11ecaa000 <dyld_stub_binder+0x11ecaa000>
+1006d82a4: f9465501    	ldr	x1, [x8, #0xca8]  // @0x11ecaaca8 selector set
+1006d82a8: 95d53e6f    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1006d82ac: aa1d03fd    	mov	x29, x29
+1006d82b0: 95d53e74    	bl	0x107c27c80 <_Flutter_MMFoundation_BindContext+0x3eae94c>
+1006d82b4: aa0003f3    	mov	x19, x0
+1006d82b8: b00f17e8    	adrp	x8, 0x11e9d5000 <dyld_stub_binder+0x11e9d5000>
+1006d82bc: f9438501    	ldr	x1, [x8, #0x708]  // @0x11e9d5708 selector exptShowOption
+1006d82c0: aa1403e0    	mov	x0, x20
+1006d82c4: 95d53e68    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1006d82c8: aa0003f4    	mov	x20, x0
+1006d82cc: d00f31d7    	adrp	x23, 0x11ed12000 <dyld_stub_binder+0x11ed12000>
+1006d82d0: b00f2e98    	adrp	x24, 0x11eca9000 <dyld_stub_binder+0x11eca9000>
+1006d82d4: d00f1796    	adrp	x22, 0x11e9ca000 <dyld_stub_binder+0x11e9ca000>
+1006d82d8: 360805a0    	tbz	w0, #0x1, 0x1006d838c <__text+0x6d038c>
+1006d82dc: 36000754    	tbz	w20, #0x0, 0x1006d83c4 <__text+0x6d03c4>
+1006d82e0: 371001d4    	tbnz	w20, #0x2, 0x1006d8318 <__text+0x6d0318>
+1006d82e4: f94362e0    	ldr	x0, [x23, #0x6c0]  // @0x11ed126c0 bind _OBJC_CLASS_$_NSNumber
+1006d82e8: f942db01    	ldr	x1, [x24, #0x5b0]  // @0x11eca95b0 selector numberWithInteger:
+1006d82ec: 52800102    	mov	w2, #0x8                ; =8
+1006d82f0: 95d53e5d    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1006d82f4: aa1d03fd    	mov	x29, x29
+1006d82f8: 95d53e62    	bl	0x107c27c80 <_Flutter_MMFoundation_BindContext+0x3eae94c>
+1006d82fc: aa0003f4    	mov	x20, x0
+1006d8300: f942c2c1    	ldr	x1, [x22, #0x580]  // @0x11e9ca580 selector safeAddObject:
+1006d8304: aa1303e0    	mov	x0, x19
+1006d8308: aa1403e2    	mov	x2, x20
+1006d830c: 95d53e56    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1006d8310: aa1403e0    	mov	x0, x20
+1006d8314: 95d53e57    	bl	0x107c27c70 <_Flutter_MMFoundation_BindContext+0x3eae93c>
+1006d8318: d00f31c8    	adrp	x8, 0x11ed12000 <dyld_stub_binder+0x11ed12000>
+1006d831c: f9434514    	ldr	x20, [x8, #0x688]  // @0x11ed12688 bind _OBJC_CLASS_$_NSArray
+1006d8320: b00f2e68    	adrp	x8, 0x11eca5000 <dyld_stub_binder+0x11eca5000>
+1006d8324: f945d501    	ldr	x1, [x8, #0xba8]  // @0x11eca5ba8 selector allObjects
+1006d8328: aa1303e0    	mov	x0, x19
+1006d832c: 95d53e4e    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1006d8330: aa1d03fd    	mov	x29, x29
+1006d8334: 95d53e53    	bl	0x107c27c80 <_Flutter_MMFoundation_BindContext+0x3eae94c>
+1006d8338: aa0003f5    	mov	x21, x0
+1006d833c: b00f2e68    	adrp	x8, 0x11eca5000 <dyld_stub_binder+0x11eca5000>
+1006d8340: f946d101    	ldr	x1, [x8, #0xda0]  // @0x11eca5da0 selector arrayWithArray:
+1006d8344: aa1403e0    	mov	x0, x20
+1006d8348: aa1503e2    	mov	x2, x21
+1006d834c: 95d53e46    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1006d8350: aa1d03fd    	mov	x29, x29
+1006d8354: 95d53e4b    	bl	0x107c27c80 <_Flutter_MMFoundation_BindContext+0x3eae94c>
+1006d8358: aa0003f4    	mov	x20, x0
+1006d835c: aa1503e0    	mov	x0, x21
+1006d8360: 95d53e44    	bl	0x107c27c70 <_Flutter_MMFoundation_BindContext+0x3eae93c>
+1006d8364: aa1303e0    	mov	x0, x19
+1006d8368: 95d53e42    	bl	0x107c27c70 <_Flutter_MMFoundation_BindContext+0x3eae93c>
+1006d836c: 14000002    	b	0x1006d8374 <__text+0x6d0374>
+1006d8370: d2800014    	mov	x20, #0x0               ; =0
+1006d8374: aa1403e0    	mov	x0, x20
+1006d8378: a9437bfd    	ldp	x29, x30, [sp, #0x30]
+1006d837c: a9424ff4    	ldp	x20, x19, [sp, #0x20]
+1006d8380: a94157f6    	ldp	x22, x21, [sp, #0x10]
+1006d8384: a8c45ff8    	ldp	x24, x23, [sp], #0x40
+1006d8388: 15d53e26    	b	0x107c27c20 <_Flutter_MMFoundation_BindContext+0x3eae8ec>
+1006d838c: f94362e0    	ldr	x0, [x23, #0x6c0]  // @0x11ed126c0 bind _OBJC_CLASS_$_NSNumber
+1006d8390: f942db01    	ldr	x1, [x24, #0x5b0]
+1006d8394: 528000c2    	mov	w2, #0x6                ; =6
+1006d8398: 95d53e33    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1006d839c: aa1d03fd    	mov	x29, x29
+1006d83a0: 95d53e38    	bl	0x107c27c80 <_Flutter_MMFoundation_BindContext+0x3eae94c>
+1006d83a4: aa0003f5    	mov	x21, x0
+1006d83a8: f942c2c1    	ldr	x1, [x22, #0x580]
+1006d83ac: aa1303e0    	mov	x0, x19
+1006d83b0: aa1503e2    	mov	x2, x21
+1006d83b4: 95d53e2c    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1006d83b8: aa1503e0    	mov	x0, x21
+1006d83bc: 95d53e2d    	bl	0x107c27c70 <_Flutter_MMFoundation_BindContext+0x3eae93c>
+1006d83c0: 3707f914    	tbnz	w20, #0x0, 0x1006d82e0 <__text+0x6d02e0>
+1006d83c4: f94362e0    	ldr	x0, [x23, #0x6c0]  // @0x11ed126c0 bind _OBJC_CLASS_$_NSNumber
+1006d83c8: f942db01    	ldr	x1, [x24, #0x5b0]
+1006d83cc: 52800042    	mov	w2, #0x2                ; =2
+1006d83d0: 95d53e25    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1006d83d4: aa1d03fd    	mov	x29, x29
+1006d83d8: 95d53e2a    	bl	0x107c27c80 <_Flutter_MMFoundation_BindContext+0x3eae94c>
+1006d83dc: aa0003f5    	mov	x21, x0
+1006d83e0: f942c2c1    	ldr	x1, [x22, #0x580]
+1006d83e4: aa1303e0    	mov	x0, x19
+1006d83e8: aa1503e2    	mov	x2, x21
+1006d83ec: 95d53e1e    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+1006d83f0: aa1503e0    	mov	x0, x21
+1006d83f4: 95d53e1f    	bl	0x107c27c70 <_Flutter_MMFoundation_BindContext+0x3eae93c>
+1006d83f8: 3617f774    	tbz	w20, #0x2, 0x1006d82e4 <__text+0x6d02e4>
+1006d83fc: 17ffffc7    	b	0x1006d8318 <__text+0x6d0318>

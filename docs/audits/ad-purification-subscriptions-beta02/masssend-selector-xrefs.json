@@ -1,0 +1,50 @@
+[
+  {
+    "selector": "convertMsgWrapToMassSendMsg:",
+    "slot": "0x11ea53210",
+    "adrp": "0x101d57420",
+    "load": "0x101d57424",
+    "rt": 1,
+    "rn": 8
+  },
+  {
+    "selector": "convertMsgWrapToMassSendMsg:",
+    "slot": "0x11ea53210",
+    "adrp": "0x101d5761c",
+    "load": "0x101d57620",
+    "rt": 1,
+    "rn": 8
+  },
+  {
+    "selector": "convertMsgWrapToMassSendMsg:",
+    "slot": "0x11ea53210",
+    "adrp": "0x101d72984",
+    "load": "0x101d72988",
+    "rt": 1,
+    "rn": 8
+  },
+  {
+    "selector": "convertMsgWrapToMassSendMsg:",
+    "slot": "0x11ea53210",
+    "adrp": "0x101d72ad0",
+    "load": "0x101d72ad4",
+    "rt": 1,
+    "rn": 8
+  },
+  {
+    "selector": "convertMsgWrapToMassSendMsg:",
+    "slot": "0x11ea53210",
+    "adrp": "0x101d4eb58",
+    "load": "0x101d4eb5c",
+    "rt": 9,
+    "rn": 8
+  },
+  {
+    "selector": "convertMsgWrapToMassSendMsg:",
+    "slot": "0x11ea53210",
+    "adrp": "0x101d687d0",
+    "load": "0x101d687d4",
+    "rt": 9,
+    "rn": 8
+  }
+]

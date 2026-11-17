@@ -1,0 +1,78 @@
+
+/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-8.0.80-ad-audit-oaztrb2m/WeChat:	file format mach-o arm64
+
+Disassembly of section __TEXT,__text:
+
+0000000100008000 <__text>:
+10071b6e0: aa1503e0    	mov	x0, x21
+10071b6e4: d63f0100    	blr	x8
+10071b6e8: 39c07fe8    	ldrsb	w8, [sp, #0x1f]
+10071b6ec: 36f800a8    	tbz	w8, #0x1f, 0x10071b700 <__text+0x713700>
+10071b6f0: f94007e0    	ldr	x0, [sp, #0x8]
+10071b6f4: f9400fe8    	ldr	x8, [sp, #0x18]
+10071b6f8: 9240f901    	and	x1, x8, #0x7fffffffffffffff
+10071b6fc: 95d42ffd    	bl	0x107c276f0 <_Flutter_MMFoundation_BindContext+0x3eae3bc>
+10071b700: aa1303e0    	mov	x0, x19
+10071b704: 95d4315b    	bl	0x107c27c70 <_Flutter_MMFoundation_BindContext+0x3eae93c>
+10071b708: 14000005    	b	0x10071b71c <__text+0x71371c>
+10071b70c: 900f2fe8    	adrp	x8, 0x11ed17000 <dyld_stub_binder+0x11ed17000>
+10071b710: f9425100    	ldr	x0, [x8, #0x4a0]  // @0x11ed174a0 class BizBoxCovTimeInfoNative
+10071b714: 95d4313e    	bl	0x107c27c0c <_Flutter_MMFoundation_BindContext+0x3eae8d8>
+10071b718: aa0003f4    	mov	x20, x0
+10071b71c: aa1403e0    	mov	x0, x20
+10071b720: a9457bfd    	ldp	x29, x30, [sp, #0x50]
+10071b724: a9444ff4    	ldp	x20, x19, [sp, #0x40]
+10071b728: a94357f6    	ldp	x22, x21, [sp, #0x30]
+10071b72c: a9425ff8    	ldp	x24, x23, [sp, #0x20]
+10071b730: 910183ff    	add	sp, sp, #0x60
+10071b734: 15d4313b    	b	0x107c27c20 <_Flutter_MMFoundation_BindContext+0x3eae8ec>
+10071b738: a9bd57f6    	stp	x22, x21, [sp, #-0x30]!
+10071b73c: a9014ff4    	stp	x20, x19, [sp, #0x10]
+10071b740: a9027bfd    	stp	x29, x30, [sp, #0x20]
+10071b744: 910083fd    	add	x29, sp, #0x20
+10071b748: aa0203f3    	mov	x19, x2
+10071b74c: f00f15c8    	adrp	x8, 0x11e9d6000 <dyld_stub_binder+0x11e9d6000>
+10071b750: f9437d01    	ldr	x1, [x8, #0x6f8]  // @0x11e9d66f8 selector isCurFlutterAffEnable
+10071b754: 95d43144    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+10071b758: 340003c0    	cbz	w0, 0x10071b7d0 <__text+0x7137d0>
+10071b75c: f00f2fa8    	adrp	x8, 0x11ed12000 <dyld_stub_binder+0x11ed12000>
+10071b760: f947ad00    	ldr	x0, [x8, #0xf58]  // @0x11ed12f58 class BrandTimelineMsgMgr
+10071b764: f00f15c8    	adrp	x8, 0x11e9d6000 <dyld_stub_binder+0x11e9d6000>
+10071b768: f943e501    	ldr	x1, [x8, #0x7c8]  // @0x11e9d67c8 selector getAffBizManagerShareInstance
+10071b76c: 95d4313e    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+10071b770: aa1d03fd    	mov	x29, x29
+10071b774: 95d43143    	bl	0x107c27c80 <_Flutter_MMFoundation_BindContext+0x3eae94c>
+10071b778: aa0003f4    	mov	x20, x0
+10071b77c: d00f1648    	adrp	x8, 0x11e9e5000 <dyld_stub_binder+0x11e9e5000>
+10071b780: f940c501    	ldr	x1, [x8, #0x188]  // @0x11e9e5188 selector getTopNData:
+10071b784: aa1303e2    	mov	x2, x19
+10071b788: 95d43137    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+10071b78c: aa1d03fd    	mov	x29, x29
+10071b790: 95d4313c    	bl	0x107c27c80 <_Flutter_MMFoundation_BindContext+0x3eae94c>
+10071b794: aa0003f5    	mov	x21, x0
+10071b798: aa1403e0    	mov	x0, x20
+10071b79c: 95d43135    	bl	0x107c27c70 <_Flutter_MMFoundation_BindContext+0x3eae93c>
+10071b7a0: f00f2fa8    	adrp	x8, 0x11ed12000 <dyld_stub_binder+0x11ed12000>
+10071b7a4: f947cd00    	ldr	x0, [x8, #0xf98]  // @0x11ed12f98 class BrandAffDataConverter
+10071b7a8: b00f15c8    	adrp	x8, 0x11e9d4000 <dyld_stub_binder+0x11e9d4000>
+10071b7ac: f947c101    	ldr	x1, [x8, #0xf80]  // @0x11e9d4f80 selector convertAffMsgInfoDataListToMsgWrapList:
+10071b7b0: aa1503e2    	mov	x2, x21
+10071b7b4: 95d4312c    	bl	0x107c27c64 <_Flutter_MMFoundation_BindContext+0x3eae930>
+10071b7b8: aa1d03fd    	mov	x29, x29
+10071b7bc: 95d43131    	bl	0x107c27c80 <_Flutter_MMFoundation_BindContext+0x3eae94c>
+10071b7c0: aa0003f3    	mov	x19, x0
+10071b7c4: aa1503e0    	mov	x0, x21
+10071b7c8: 95d4312a    	bl	0x107c27c70 <_Flutter_MMFoundation_BindContext+0x3eae93c>
+10071b7cc: 14000002    	b	0x10071b7d4 <__text+0x7137d4>
+10071b7d0: d2800013    	mov	x19, #0x0               ; =0
+10071b7d4: aa1303e0    	mov	x0, x19
+10071b7d8: a9427bfd    	ldp	x29, x30, [sp, #0x20]
+10071b7dc: a9414ff4    	ldp	x20, x19, [sp, #0x10]
+10071b7e0: a8c357f6    	ldp	x22, x21, [sp], #0x30
+10071b7e4: 15d4310f    	b	0x107c27c20 <_Flutter_MMFoundation_BindContext+0x3eae8ec>
+10071b7e8: d10183ff    	sub	sp, sp, #0x60
+10071b7ec: a9025ff8    	stp	x24, x23, [sp, #0x20]
+10071b7f0: a90357f6    	stp	x22, x21, [sp, #0x30]
+10071b7f4: a9044ff4    	stp	x20, x19, [sp, #0x40]
+10071b7f8: a9057bfd    	stp	x29, x30, [sp, #0x50]
+10071b7fc: 910143fd    	add	x29, sp, #0x50
