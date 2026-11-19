@@ -1,0 +1,2 @@
+2026-11-19 14:23:30.178 tests[81329:11650159] WARNING: This app's CFBundleDevelopmentRegion is not a string value. This can lead to unexpected results at runtime. Please change CFBundleDevelopmentRegion in your Info.plist to a string value.
+Moments header backdrop: 143 checks passed (real UIKit pixels, seam, theme, sampling, pull, reuse, replacement, restore).

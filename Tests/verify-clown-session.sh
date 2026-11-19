@@ -7,5 +7,6 @@ xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -framework Fo
   -I"$project_dir/Controllers" \
   "$project_dir/Controllers/CSMessageActionContext.m" \
   "$project_dir/Controllers/CSClownSession.m" \
+  "$project_dir/Controllers/CSClownTextRules.m" \
   "$project_dir/Tests/ClownSessionTests.m" -o "$test_dir/tests"
 "$test_dir/tests"

@@ -14,6 +14,7 @@ xcrun --sdk macosx clang -target "${test_arch}-apple-ios15.0-macabi" \
   -I"$project_dir/Controllers" -I"$project_dir/Tests" \
   "$project_dir/Controllers/CSClownPreferences.m" \
   "$project_dir/Controllers/CSClownSession.m" \
+  "$project_dir/Controllers/CSClownTextRules.m" \
   "$project_dir/Controllers/CSClownLayout.m" \
   "$project_dir/Controllers/CSClownMenuAdapter.m" \
   "$project_dir/Controllers/CSMessageActionContext.m" \

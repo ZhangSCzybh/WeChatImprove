@@ -56,6 +56,7 @@ static char ClownTestPresentingOwnerKey;
 static char ClownTestActionHandlerKey;
 static IMP ClownTestOriginalActionFactory;
 @implementation BaseMsgContentViewController
+- (void)AsyncSendMessage:(id)text replyingMsg:(id)reply referPartialInfo:(id)partial isPasted:(BOOL)pasted { }
 - (id)getCurrentChatName { return self.testChat; }
 - (id)GetMessageNodeDataArray { return self.testNodes; }
 - (id)getTableView { return self.testTable; }

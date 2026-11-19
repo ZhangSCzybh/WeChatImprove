@@ -117,6 +117,37 @@ static void TestSettings(CSClownCountingDefaults *defaults, NSString *suite) {
     CHECK(!preferences.snapshot.enabled);
     [NSNotificationCenter.defaultCenter removeObserver:observer];
 }
+static void TestWarmthScope(NSUserDefaults *defaults) {
+    CSClownPreferences *preferences = [[CSClownPreferences alloc] initWithDefaults:defaults];
+    [defaults setBool:YES forKey:CSClownEnabledKey];
+    [defaults setBool:YES forKey:CSClownWarmthEnabledKey];
+    [defaults setBool:YES forKey:CSClownFakeQuoteEnabledKey];
+    [preferences requestRefresh]; Drain();
+    CHECK(preferences.snapshot.warmthEnabled && preferences.snapshot.fakeQuoteEnabled);
+    CHECK(![preferences.snapshot warmsConversation:@"friend" account:@"me"]);
+    [preferences setWarmthTargets:@[@"friend",@"friend",@"room@chatroom"] account:@"me" groups:NO];
+    [preferences setWarmthTargets:@[@"room@chatroom",@"friend"] account:@"me" groups:YES];
+    Drain();
+    CHECK([preferences.snapshot warmsConversation:@"friend" account:@"me"]);
+    CHECK([preferences.snapshot warmsConversation:@"room@chatroom" account:@"me"]);
+    CHECK(![preferences.snapshot warmsConversation:@"other" account:@"me"]);
+    CHECK(![preferences.snapshot warmsConversation:@"friend" account:@"other-account"]);
+    CHECK([preferences.snapshot warmthTargetsForAccount:@"me" groups:NO].count == 1);
+    [preferences setWarmthTargets:@[] account:@"me" groups:NO]; Drain();
+    CHECK(![preferences.snapshot warmsConversation:@"friend" account:@"me"]);
+    CHECK([preferences.snapshot warmsConversation:@"room@chatroom" account:@"me"]);
+    [defaults setBool:NO forKey:CSClownEnabledKey]; [preferences requestRefresh]; Drain();
+    CHECK(!preferences.snapshot.warmthEnabled && !preferences.snapshot.fakeQuoteEnabled);
+    CHECK([preferences.snapshot warmthTargetsForAccount:@"me" groups:YES].count == 1);
+    NSDictionary *entry = [CSBackupRegistry entryForDomain:@"standard" key:CSClownWarmthTargetsKey];
+    CHECK([CSBackupRegistry validateValue:[defaults objectForKey:CSClownWarmthTargetsKey] entry:entry error:nil]);
+    CHECK(![CSBackupRegistry validateValue:@{@"me":@{@"groups":@[@"friend"]}} entry:entry error:nil]);
+    CHECK(![CSBackupRegistry validateValue:@{@"me":@{@"contacts":@[@"room@chatroom"]}} entry:entry error:nil]);
+    CHECK(![CSBackupRegistry validateValue:@{@"me":@{@"bogus":@[]}} entry:entry error:nil]);
+    for (NSString *key in @[CSClownWarmthEnabledKey, CSClownFakeQuoteEnabledKey]) {
+        CHECK([CSBackupRegistry validateValue:@YES entry:[CSBackupRegistry entryForDomain:@"standard" key:key] error:nil]);
+    }
+}
 static void TestBackupRegistration(void) {
     for (NSString *key in Keys()) {
         NSDictionary *entry = [CSBackupRegistry entryForDomain:@"standard" key:key];
@@ -141,6 +172,7 @@ int main(void) {
         CSClownCountingDefaults *defaults = [[CSClownCountingDefaults alloc] initWithSuiteName:suite];
         TestSettings(defaults, suite);
         TestBackupRegistration();
+        TestWarmthScope(defaults);
         [defaults removePersistentDomainForName:suite];
         NSLog(@"Clown preferences and backup passed %lu checks (isolated defaults suite)", (unsigned long)checks);
     }

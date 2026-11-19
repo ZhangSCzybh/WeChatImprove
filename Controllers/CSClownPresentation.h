@@ -15,6 +15,12 @@ FOUNDATION_EXPORT void CSClownRenderCell(id cell);
 FOUNDATION_EXPORT void CSClownReuseCell(id cell);
 FOUNDATION_EXPORT void CSClownBindTimeCell(id cell);
 FOUNDATION_EXPORT void CSClownTimeDisplayModeDidChange(id controller);
+// Input validation precedes native resetText. The async boundary carries an opaque
+// per-submission token; only the wrap formed inside that native send is eligible.
+FOUNDATION_EXPORT void CSClownSubmitInput(id controller, id text, void (^native)(id text));
+FOUNDATION_EXPORT void CSClownSendInput(id controller, id text, id reply, id partial, void (^native)(id text));
+FOUNDATION_EXPORT void CSClownDidFormText(id target, id text, id wrap);
+FOUNDATION_EXPORT void CSClownDidAddMessage(id target, id wrap);
 
 #if __has_include(<UIKit/UIKit.h>)
 #import <UIKit/UIKit.h>

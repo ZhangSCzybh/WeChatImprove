@@ -2,6 +2,7 @@
 #import "CSClownPreferences.h"
 #import "CSClownSession.h"
 #import "CSClownLayout.h"
+#import "CSClownTextRules.h"
 #import "CSChatNativeBridge.h"
 #import "CSMessageActionContext.h"
 #import "CSMessageNativeActionAdapter.h"
@@ -14,6 +15,8 @@
 // Native wrappers, models, rich-text content and image caches remain untouched.
 // Only view geometry and an independent, noninteractive overlay are projected.
 static char CSClownPageKey, CSClownModelKey, CSClownCellKey, CSClownTimeKey, CSClownAmountKey;
+static char CSClownSubmissionKey, CSClownSentWrapKey;
+static NSString *const CSClownSendScope = @"CSClownInputSendScope";
 static _Atomic(NSUInteger) CSClownAccountEpoch = 1;
 static NSHashTable *CSClownPages;
 static NSRange CSClownAmountRange(NSString *text);
@@ -49,6 +52,24 @@ static UILabel *CSClownAmountLabel(id cell);
 - (id)getCurrentMessageWrap { return CSMessageActionObjectGetter(self.viewModel, NSSelectorFromString(@"messageWrap")); }
 @end
 
+@interface CSClownQuoteSubmission : NSObject
+@property(nonatomic, weak) CSClownPage *page;
+@property(nonatomic) NSUInteger epoch;
+@property(nonatomic, copy) NSString *body;
+@property(nonatomic, copy) NSString *quote;
+@property(nonatomic, weak) id formedWrap;
+@property(nonatomic) BOOL claimed;
+@end
+@implementation CSClownQuoteSubmission @end
+
+@interface CSClownSentSource : NSObject
+@property(nonatomic, strong) id wrap;
+- (id)getCurrentMessageWrap;
+@end
+@implementation CSClownSentSource
+- (id)getCurrentMessageWrap { return self.wrap; }
+@end
+
 @interface CSClownEditRequest : NSObject
 @property(nonatomic, weak) CSClownPage *page;
 @property(nonatomic, weak) id cell;
@@ -69,6 +90,7 @@ static UILabel *CSClownAmountLabel(id cell);
 
 @interface CSClownCellState : NSObject
 @property(nonatomic, strong) UIView *overlay;
+@property(nonatomic, strong) UILabel *quoteView;
 @property(nonatomic, weak) UIView *source;
 @property(nonatomic, strong) CALayer *nativeMask;
 @property(nonatomic, strong) CALayer *concealMask;
@@ -157,6 +179,17 @@ static id CSClownRowModel(id root, NSUInteger row) {
     if ([children isKindOfClass:NSArray.class] && row < [children count]) return children[row];
     return row ? nil : root;
 }
+static BOOL CSClownIsLastRow(id model, NSUInteger row) {
+    id root = CSClownRoot(model);
+    for (NSString *type in @[@"q", @"Q", @"i", @"I"]) {
+        if (CSMessageNativeSupports(root, @"numberOfRowsInSection", type, @[])) {
+            NSUInteger count = [CSMessageNativeInvoke(root, @"numberOfRowsInSection", @[]) unsignedIntegerValue];
+            return count > 0 && row == count-1;
+        }
+    }
+    id children = CSClownObject(root, @"subViewModels");
+    return [children isKindOfClass:NSArray.class] && [children count] ? row == [children count]-1 : row == 0;
+}
 static void CSClownAssociateModel(CSClownPage *page, id root, id model, NSUInteger row) {
     if (!model) return;
     CSClownModelBinding *binding = [CSClownModelBinding new]; binding.page = page; binding.root = root; binding.row = row;
@@ -168,6 +201,7 @@ void CSClownRestoreCell(id cell) {
     CSClownCellState *state = objc_getAssociatedObject(cell, &CSClownCellKey);
     if (!state.active) return;
     state.overlay.hidden = YES;
+    state.quoteView.hidden = YES;
     [CATransaction begin]; [CATransaction setDisableActions:YES];
     if (state.source.layer.mask == state.concealMask) state.source.layer.mask = state.nativeMask;
     [CATransaction commit];
@@ -181,6 +215,7 @@ void CSClownReuseCell(id cell) {
     CSClownRestoreCell(cell);
     CSClownCellState *state = objc_getAssociatedObject(cell, &CSClownCellKey);
     [state.overlay removeFromSuperview];
+    [state.quoteView removeFromSuperview];
     objc_setAssociatedObject(cell, &CSClownCellKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
@@ -228,6 +263,8 @@ static void CSClownInitialize(void) {
                     if (!settings.imageEnabled) [page.session clearImages];
                     if (!settings.timeEnabled) [page.session clearTimes];
                     if (!settings.amountEnabled) [page.session clearAmounts];
+                    if (![settings warmsConversation:page.session.conversationID account:page.session.accountID]) [page.session clearWarmTexts];
+                    if (!settings.fakeQuoteEnabled) [page.session clearFakeQuotes];
                     CSClownCloseEditor(page);
                     CSClownRefresh(page);
                 }
@@ -257,6 +294,86 @@ static CSClownPage *CSClownPageForController(id controller, BOOL create) {
 static CSClownPage *CSClownPageForCell(id cell, BOOL create) {
     id owner = [[CSMessageNativeEnvironment new] controllerForCell:cell];
     return CSClownPageForController(owner, create);
+}
+static void CSClownInputAlert(id controller, NSString *text) {
+    if (![controller isKindOfClass:UIViewController.class] || [controller presentedViewController]) return;
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"假的引用好玩吗" message:text preferredStyle:UIAlertControllerStyleAlert];
+    [alert addAction:[UIAlertAction actionWithTitle:@"知道了" style:UIAlertActionStyleCancel handler:nil]];
+    [controller presentViewController:alert animated:YES completion:nil];
+}
+void CSClownSubmitInput(id controller, id text, void (^native)(id)) {
+    if (!NSThread.isMainThread || !CSClownPreferences.sharedPreferences.snapshot.fakeQuoteEnabled ||
+        ![text isKindOfClass:NSString.class] || ![text hasPrefix:@"#假引用"]) { native(text); return; }
+    NSString *error = nil; CSClownFakeQuoteInput *input = [CSClownFakeQuoteInput parse:text error:&error];
+    if (!input) { CSClownInputAlert(controller, error); return; }
+    id presenter = CSClownObject(controller, @"inputPresenter");
+    if (CSClownObject(controller, @"getReplyingMessage") || CSClownObject(presenter, @"replyingMessage") ||
+        CSClownObject(presenter, @"replyingReferPartialInfo")) {
+        CSClownInputAlert(controller, @"请先取消输入框中的真实引用，再发送假引用。草稿已保留。"); return;
+    }
+    // WeChat's mention tokens end with a four-per-em space. Preserve the draft
+    // rather than stripping a native member selection while parsing the command.
+    if ([text rangeOfString:@"\u2005"].location != NSNotFound) {
+        CSClownInputAlert(controller, @"请先移除输入框中的 @ 成员，再发送假引用。草稿已保留。"); return;
+    }
+    if (!CSMessageNativeSupports(controller, @"AsyncSendMessage:replyingMsg:referPartialInfo:isPasted:", @"v", @[@"@",@"@",@"@",@"B"])) {
+        CSClownInputAlert(controller, @"当前微信发送接口不兼容，草稿已保留。"); return;
+    }
+    CSClownPage *page = CSClownPageForController(controller, YES);
+    if (!CSClownPageIsCurrent(page)) { CSClownInputAlert(controller, @"当前会话已变化，草稿已保留。"); return; }
+    CSClownQuoteSubmission *submission = [CSClownQuoteSubmission new]; submission.page = page; submission.epoch = page.session.epoch;
+    submission.body = input.body;
+    CSMessageNativeEnvironment *environment = [CSMessageNativeEnvironment new];
+    id manager = [environment serviceNamed:@"CContactMgr"]; id contact = CSClownObject(manager, @"getSelfContact");
+    NSString *name = CSClownString(CSClownObject(contact, @"m_nsNickName"));
+    if ([page.session.conversationID hasSuffix:@"@chatroom"] &&
+        CSMessageNativeSupports(contact, @"getChatRoomDisplayName:", @"@", @[@"@"])) {
+        id roomName = CSMessageNativeInvoke(contact, @"getChatRoomDisplayName:", @[page.session.conversationID]);
+        if ([roomName isKindOfClass:NSString.class] && [roomName length]) name = roomName;
+    }
+    submission.quote = [NSString stringWithFormat:@"%@：%@", name.length ? name : @"我", input.quote];
+    // A unique mutable carrier prevents NSString interning from sharing tokens.
+    // Native 8.0.80 retains this exact object in its main-queue submission block.
+    NSMutableString *carrier = [input.body mutableCopy];
+    objc_setAssociatedObject(carrier, &CSClownSubmissionKey, submission, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    native(carrier);
+}
+void CSClownSendInput(id controller, id text, id reply, id partial, void (^native)(id)) {
+    CSClownQuoteSubmission *submission = NSThread.isMainThread && text ? objc_getAssociatedObject(text, &CSClownSubmissionKey) : nil;
+    if (!submission) { native(text); return; }
+    objc_setAssociatedObject(text, &CSClownSubmissionKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    if (submission.page.owner != controller || !CSClownPageIsCurrent(submission.page) ||
+        submission.epoch != submission.page.session.epoch) return; // a queued submission must not cross chats/accounts
+    if (reply || partial || !CSClownPreferences.sharedPreferences.snapshot.fakeQuoteEnabled) { native(text); return; }
+    NSMutableDictionary *thread = NSThread.currentThread.threadDictionary; id prior = thread[CSClownSendScope];
+    thread[CSClownSendScope] = submission;
+    @try { native(text); }
+    @finally { if (prior) thread[CSClownSendScope] = prior; else [thread removeObjectForKey:CSClownSendScope]; }
+}
+void CSClownDidFormText(id target, id text, id wrap) {
+    if (!NSThread.isMainThread || !wrap) return;
+    CSClownQuoteSubmission *submission = NSThread.currentThread.threadDictionary[CSClownSendScope];
+    CSClownPage *page = submission.page;
+    if (!submission || submission.formedWrap || !CSClownPageIsCurrent(page) ||
+        ![CSClownString(target) isEqual:page.session.conversationID] || ![submission.body isEqual:text]) return;
+    submission.formedWrap = wrap;
+    objc_setAssociatedObject(wrap, &CSClownSentWrapKey, submission, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+void CSClownDidAddMessage(id target, id wrap) {
+    if (!NSThread.isMainThread || !wrap) return;
+    CSClownQuoteSubmission *submission = objc_getAssociatedObject(wrap, &CSClownSentWrapKey);
+    CSClownPage *page = submission.page;
+    if (!submission || submission.claimed || submission.formedWrap != wrap || !CSClownPageIsCurrent(page) ||
+        submission.epoch != page.session.epoch || ![CSClownString(target) isEqual:page.session.conversationID]) return;
+    submission.claimed = YES;
+    objc_setAssociatedObject(wrap, &CSClownSentWrapKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    CSClownSentSource *source = [CSClownSentSource new]; source.wrap = wrap;
+    CSMessageActionContext *context = [CSMessageActionContext contextWithCell:source controller:page.owner
+        accountID:page.session.accountID accountEpoch:page.accountEpoch conversationID:page.session.conversationID bindingGeneration:page.session.epoch];
+    if (!context.localID && !context.serverID) return;
+    if ([page.session setFakeQuote:submission.quote forContext:context]) dispatch_async(dispatch_get_main_queue(), ^{
+        if (CSClownPageIsCurrent(page)) CSClownRefresh(page);
+    });
 }
 void CSClownPageDidAppear(id controller) {
     CSClownPage *page = CSClownPageForController(controller, YES);
@@ -318,12 +435,40 @@ static CGSize CSClownTextSize(NSString *text, id model, CGFloat width) {
         options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading context:nil];
     return CGSizeMake(MAX(1, ceil(MIN(maximum, rect.size.width))), MAX(ceil(CSClownFont(model).lineHeight), ceil(rect.size.height)));
 }
+static NSString *CSClownDisplayText(CSClownPage *page, CSMessageActionContext *context) {
+    CSClownSettings *settings = CSClownPreferences.sharedPreferences.snapshot;
+    NSString *manual = settings.textEnabled ? [page.session textForContext:context] : nil;
+    if (manual) return manual;
+    if (!context || context.outgoing || context.messageType != 1 ||
+        ![settings warmsConversation:page.session.conversationID account:page.session.accountID]) return nil;
+    NSString *text = CSClownString(CSClownObject(context.sourceWrap, @"m_nsContent"));
+    if ([page.session.conversationID hasSuffix:@"@chatroom"]) {
+        NSString *sender = CSClownString(CSClownObject(context.sourceWrap, @"m_nsRealChatUsr"));
+        if ([sender isEqual:page.session.accountID]) return nil;
+        if (sender.length) {
+            NSString *prefix = [sender stringByAppendingString:@":\n"];
+            if ([text hasPrefix:prefix]) text = [text substringFromIndex:prefix.length];
+        }
+    }
+    return [page.session warmTextForContext:context original:text];
+}
+static NSString *CSClownQuote(CSClownPage *page, CSMessageActionContext *context) {
+    return CSClownPreferences.sharedPreferences.snapshot.fakeQuoteEnabled ? [page.session fakeQuoteForContext:context] : nil;
+}
+static CGSize CSClownQuoteSize(NSString *text, id model, CGFloat width) {
+    if (!text) return CGSizeZero;
+    CGFloat maximum = MAX(40, MIN(420, width - 136));
+    UIFont *font = [UIFont systemFontOfSize:MAX(12, CSClownFont(model).pointSize - 2)];
+    CGRect rect = [text boundingRectWithSize:CGSizeMake(MAX(1, maximum-20), CGFLOAT_MAX)
+        options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName:font} context:nil];
+    return CGSizeMake(MIN(maximum, ceil(rect.size.width)+20), ceil(rect.size.height)+16);
+}
 static CGSize CSClownReplacementSize(CSClownPage *page, id model, CGFloat width, BOOL *suppressed) {
     if (suppressed) *suppressed = NO;
     CSMessageActionContext *context = CSClownContext(page, model);
     if (!context) return CGSizeZero;
-    if (CSClownPreferences.sharedPreferences.snapshot.textEnabled && context.messageType == 1) {
-        NSString *text = [page.session textForContext:context];
+    if (context.messageType == 1) {
+        NSString *text = CSClownDisplayText(page, context);
         if (text) {
             if (CSClownBinding(page, model).row > 0) { if (suppressed) *suppressed = YES; return CGSizeZero; }
             return CSClownTextSize(text, model, width);
@@ -344,15 +489,25 @@ CGFloat CSClownRowHeight(id controller, UITableView *table, NSIndexPath *path, C
     CSClownAssociateModel(page, root, model, path.row);
     BOOL suppressed = NO; CGSize replacement = CSClownReplacementSize(page, model, table.bounds.size.width, &suppressed);
     if (suppressed) return .01;
-    if (replacement.height <= 0) return nativeHeight;
+    CSMessageActionContext *context = CSClownContext(page, model);
+    // Native split text is projected only once, on its final row.
+    BOOL lastRow = CSClownIsLastRow(root, path.row);
+    CGSize quote = lastRow ? CSClownQuoteSize(CSClownQuote(page, context), model, table.bounds.size.width) : CGSizeZero;
+    CGFloat extra = quote.height > 0 ? quote.height+6 : 0;
+    if (replacement.height <= 0) return nativeHeight + extra;
     CGSize original = CSClownSize(model, @"contentTextSize");
     if (original.height <= 0) original = CSClownSize(model, @"thumbImageSize");
     if (original.height <= 0 && root != model) {
         original = CSClownSize(root, @"contentTextSize");
         original.height = MIN(nativeHeight, original.height);
     }
-    if (original.height <= 0) return nativeHeight;
-    return MAX(MIN(44, nativeHeight), CSClownProjectedRowHeight(nativeHeight, original.height, replacement.height));
+    if (original.height <= 0) return nativeHeight + extra;
+    // Replacement text suppresses subsequent split rows, so its quote belongs to row zero.
+    if (CSClownDisplayText(page, context) && !lastRow) {
+        quote = CSClownQuoteSize(CSClownQuote(page, context), model, table.bounds.size.width);
+        extra = quote.height > 0 ? quote.height+6 : 0;
+    }
+    return MAX(MIN(44, nativeHeight), CSClownProjectedRowHeight(nativeHeight, original.height, replacement.height)) + extra;
 }
 void CSClownBindRow(id controller, UITableView *table, NSIndexPath *path, id cell) {
     CSClownPage *page = CSClownPageForController(controller, NO);
@@ -394,7 +549,7 @@ static void CSClownShowOverlay(UIView *source, UIView *overlay) {
     if (overlay.superview != source.superview) [source.superview addSubview:overlay];
     else [source.superview bringSubviewToFront:overlay];
 }
-void CSClownRenderCell(id cell) {
+static void CSClownRenderContent(id cell) {
     if (!NSThread.isMainThread || ![cell isKindOfClass:UIView.class]) return;
     CSClownRestoreCell(cell);
     if (!CSClownPreferences.sharedPreferences.snapshot.enabled) return;
@@ -429,7 +584,7 @@ void CSClownRenderCell(id cell) {
         if (!source) return;
         UILabel *label = (id)CSClownExistingOverlay(cell, UILabel.class) ?: [UILabel new]; label.numberOfLines = 0; label.backgroundColor = UIColor.clearColor;
         id color = CSClownObject(source, @"oTextColor") ?: CSClownObject(model, @"contentTextColor");
-        label.attributedText = CSClownText([page.session textForContext:context], CSClownFont(model), [color isKindOfClass:UIColor.class] ? color : nil);
+        label.attributedText = CSClownText(CSClownDisplayText(page, context), CSClownFont(model), [color isKindOfClass:UIColor.class] ? color : nil);
         overlay = label;
     } else if (context.messageType == 3) {
         source = CSClownView(CSClownIvar(cell, "m_imageView"));
@@ -468,6 +623,42 @@ void CSClownRenderCell(id cell) {
     CSClownShowOverlay(source, overlay);
     SEL positionTime = NSSelectorFromString(@"cs_messageTimeLayout");
     if (CSMessageNativeSupports(cell, NSStringFromSelector(positionTime), @"v", @[])) CSMessageNativeInvoke(cell, NSStringFromSelector(positionTime), @[]);
+}
+
+void CSClownRenderCell(id cell) {
+    CSClownRenderContent(cell);
+    if (!NSThread.isMainThread || ![cell isKindOfClass:UIView.class]) return;
+    CSClownPage *page = CSClownPageForCell(cell, NO);
+    if (!CSClownPageIsCurrent(page)) return;
+    id model = CSClownObject(cell, @"viewModel"); CSMessageActionContext *context = CSClownContext(page, model);
+    NSString *quote = CSClownQuote(page, context);
+    if (!quote) return;
+    CSClownModelBinding *binding = CSClownBinding(page, model);
+    if (CSClownDisplayText(page, context) ? binding.row > 0 : !CSClownIsLastRow(model, binding.row)) return;
+    UIView *bubble = CSClownView(CSClownObject(cell, @"getBgImageView"));
+    if (!bubble.superview || !CGAffineTransformIsIdentity(bubble.transform)) return;
+    CSClownCellState *state = objc_getAssociatedObject(cell, &CSClownCellKey);
+    if (!state) {
+        state = [CSClownCellState new]; state.frames = [NSMutableArray array];
+        objc_setAssociatedObject(cell, &CSClownCellKey, state, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    state.active = YES;
+    UILabel *label = state.quoteView;
+    if (!label) { label = [UILabel new]; label.numberOfLines = 0; label.userInteractionEnabled = NO; state.quoteView = label; }
+    label.font = [UIFont systemFontOfSize:MAX(12, CSClownFont(model).pointSize-2)];
+    label.textColor = UIColor.secondaryLabelColor; label.backgroundColor = UIColor.secondarySystemFillColor;
+    label.layer.cornerRadius = 5; label.clipsToBounds = YES;
+    // A paragraph indent keeps both first and wrapped lines inside the grey surface.
+    NSMutableParagraphStyle *paragraph = [NSMutableParagraphStyle new]; paragraph.firstLineHeadIndent = 10; paragraph.headIndent = 10; paragraph.tailIndent = -10;
+    label.attributedText = [[NSAttributedString alloc] initWithString:quote attributes:@{NSFontAttributeName:label.font,
+        NSForegroundColorAttributeName:label.textColor, NSParagraphStyleAttributeName:paragraph}];
+    CGSize size = CSClownQuoteSize(quote, model, CSMessageNativeTable(page.owner).bounds.size.width);
+    CGRect bubbleRect = [bubble.superview convertRect:bubble.frame toView:cell];
+    label.frame = CGRectMake(MAX(0, CGRectGetMaxX(bubbleRect)-size.width), CGRectGetMaxY(bubbleRect)+6, size.width, size.height);
+    if (label.superview != cell) [cell addSubview:label];
+    CGRect cellFrame = [cell frame]; cellFrame.size.height = MAX(cellFrame.size.height, CGRectGetMaxY(label.frame)+8);
+    CSClownSetFrame(state, cell, cellFrame);
+    label.hidden = NO; [cell bringSubviewToFront:label];
 }
 
 static BOOL CSClownRequestValid(CSClownEditRequest *request, BOOL requireCell) {

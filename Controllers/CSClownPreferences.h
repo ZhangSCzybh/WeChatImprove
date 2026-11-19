@@ -7,6 +7,9 @@ FOUNDATION_EXPORT NSString *const CSClownTextEnabledKey;
 FOUNDATION_EXPORT NSString *const CSClownTimeEnabledKey;
 FOUNDATION_EXPORT NSString *const CSClownImageEnabledKey;
 FOUNDATION_EXPORT NSString *const CSClownAmountEnabledKey;
+FOUNDATION_EXPORT NSString *const CSClownWarmthEnabledKey;
+FOUNDATION_EXPORT NSString *const CSClownWarmthTargetsKey;
+FOUNDATION_EXPORT NSString *const CSClownFakeQuoteEnabledKey;
 // Delivered on the main thread after the effective settings change; object is the preferences instance.
 FOUNDATION_EXPORT NSNotificationName const CSClownSettingsDidChangeNotification;
 
@@ -17,6 +20,10 @@ FOUNDATION_EXPORT NSNotificationName const CSClownSettingsDidChangeNotification;
 @property(nonatomic, readonly) BOOL timeEnabled;
 @property(nonatomic, readonly) BOOL imageEnabled;
 @property(nonatomic, readonly) BOOL amountEnabled;
+@property(nonatomic, readonly) BOOL warmthEnabled;
+@property(nonatomic, readonly) BOOL fakeQuoteEnabled;
+- (NSArray<NSString *> *)warmthTargetsForAccount:(NSString *)account groups:(BOOL)groups;
+- (BOOL)warmsConversation:(NSString *)conversation account:(NSString *)account;
 @end
 
 @interface CSClownPreferences : NSObject
@@ -26,6 +33,7 @@ FOUNDATION_EXPORT NSNotificationName const CSClownSettingsDidChangeNotification;
 - (instancetype)initWithDefaults:(NSUserDefaults *)defaults;
 // Coalesced main-thread refresh, also requested on defaults changes and app activation.
 - (void)requestRefresh;
+- (void)setWarmthTargets:(NSArray<NSString *> *)names account:(NSString *)account groups:(BOOL)groups;
 @end
 
 NS_ASSUME_NONNULL_END

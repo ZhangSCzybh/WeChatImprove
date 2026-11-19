@@ -24,6 +24,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable NSString *)textForContext:(nullable CSMessageActionContext *)context;
 // A nonnil value adds/replaces; nil removes an existing replacement.
 - (BOOL)setText:(nullable NSString *)text forContext:(nullable CSMessageActionContext *)context;
+- (nullable NSString *)warmTextForContext:(nullable CSMessageActionContext *)context original:(NSString *)original;
+- (void)clearWarmTexts;
+- (nullable NSString *)fakeQuoteForContext:(nullable CSMessageActionContext *)context;
+- (BOOL)setFakeQuote:(NSString *)quote forContext:(CSMessageActionContext *)context;
+- (void)clearFakeQuotes;
 - (nullable id)imageForContext:(nullable CSMessageActionContext *)context;
 - (BOOL)setImage:(nullable id)image forContext:(nullable CSMessageActionContext *)context;
 - (nullable NSString *)amountForContext:(nullable CSMessageActionContext *)context;

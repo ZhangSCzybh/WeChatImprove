@@ -1,4 +1,6 @@
 #import "CSClownSession.h"
+#import "CSClownTextRules.h"
+#include <stdlib.h>
 #include <math.h>
 
 @interface CSClownMessageReplacement : NSObject
@@ -10,6 +12,8 @@
 @implementation CSClownMessageReplacement @end
 
 @interface CSClownSession ()
+@property(nonatomic, strong) CSClownSession *warmTexts;
+@property(nonatomic, strong) CSClownSession *fakeQuotes;
 @property(nonatomic, strong) NSMutableArray<CSClownMessageReplacement *> *messages;
 @property(nonatomic, strong) NSMutableArray<CSClownMessageReplacement *> *amounts;
 @property(nonatomic, strong) NSMapTable<id, NSDate *> *times;
@@ -75,6 +79,29 @@
     if (!entry) return NO;
     entry.text=text; [self removeEmptyReplacement:entry]; return YES;
 }
+- (NSString *)warmTextForContext:(CSMessageActionContext *)context original:(NSString *)original {
+    if (![self acceptsContext:context] || context.outgoing || context.messageType != 1) return nil;
+    NSArray *expressions = CSClownWarmExpressions(original);
+    if (!expressions.count) return nil;
+    if (!self.warmTexts) self.warmTexts = [[CSClownSession alloc] initWithAccountID:self.accountID conversationID:self.conversationID];
+    NSString *text = [self.warmTexts textForContext:context];
+    if (!text || ![expressions containsObject:text]) {
+        text = expressions[arc4random_uniform((uint32_t)expressions.count)];
+        if (![self.warmTexts setText:text forContext:context]) return nil;
+    }
+    return text;
+}
+- (void)clearWarmTexts { if (!NSThread.isMainThread) return; [self.warmTexts invalidate]; self.warmTexts = nil; }
+- (NSString *)fakeQuoteForContext:(CSMessageActionContext *)context {
+    if (![self acceptsContext:context] || !context.outgoing || context.messageType != 1) return nil;
+    return [self.fakeQuotes textForContext:context];
+}
+- (BOOL)setFakeQuote:(NSString *)quote forContext:(CSMessageActionContext *)context {
+    if (![self acceptsContext:context] || !context.outgoing || context.messageType != 1 || ![quote isKindOfClass:NSString.class] || !quote.length) return NO;
+    if (!self.fakeQuotes) self.fakeQuotes = [[CSClownSession alloc] initWithAccountID:self.accountID conversationID:self.conversationID];
+    return [self.fakeQuotes setText:quote forContext:context];
+}
+- (void)clearFakeQuotes { if (!NSThread.isMainThread) return; [self.fakeQuotes invalidate]; self.fakeQuotes = nil; }
 - (id)imageForContext:(CSMessageActionContext *)context {
     return [self replacementForContext:context create:NO].image;
 }
@@ -127,5 +154,6 @@
 - (void)invalidate {
     if (!NSThread.isMainThread) return;
     _epoch++; _active=NO; [_messages removeAllObjects]; [_times removeAllObjects]; [_amounts removeAllObjects];
+    [self clearWarmTexts]; [self clearFakeQuotes];
 }
 @end

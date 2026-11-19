@@ -481,6 +481,98 @@ static void TestPhotoAsyncBoundaries(void) {
     CSClownPageDidDisappear(owner);
 }
 
+static void TestWarmthAndFakeQuote(void) {
+    SetCapability(CSClownWarmthEnabledKey, YES); SetCapability(CSClownFakeQuoteEnabledKey, YES);
+    [ClownTestPreferences setWarmthTargets:@[@"chat"] account:@"me" groups:NO]; Drain();
+    ClownPresentationModel *incoming = Model(1, 400, NO); incoming.messageWrap.m_nsContent = @"好";
+    ClownPresentationModel *outgoing = Model(1, 401, YES); outgoing.messageWrap.m_nsContent = @"好";
+    BaseMsgContentViewController *owner = Controller(@[incoming, outgoing]);
+    ClownPresentationCell *cell = TextCell(owner, incoming);
+    CSClownPage *page = CSClownPageForController(owner, NO);
+    CSMessageActionContext *context = CSClownContext(page, incoming);
+    NSString *warm = CSClownDisplayText(page, context);
+    CHECK([CSClownWarmExpressions(@"好") containsObject:warm]);
+    for (NSUInteger i = 0; i < 20; i++) {
+        CHECK([warm isEqual:CSClownDisplayText(page, context)]);
+        CSClownRenderCell(cell); CHECK([((UILabel *)CSClownExistingOverlay(cell, UILabel.class)).text isEqual:warm]);
+    }
+    CHECK([incoming.messageWrap.m_nsContent isEqual:@"好"]);
+    CHECK(!CSClownDisplayText(page, CSClownContext(page, outgoing)));
+    incoming.messageWrap.m_nsContent = @"好。"; CHECK(!CSClownDisplayText(page, context));
+    incoming.messageWrap.m_nsContent = @"好";
+    CHECK([page.session setText:@"手动优先" forContext:context]);
+    CHECK([CSClownDisplayText(page, context) isEqual:@"手动优先"]);
+    [ClownTestPreferences setWarmthTargets:@[] account:@"me" groups:NO]; Drain();
+    CHECK([CSClownDisplayText(page, context) isEqual:@"手动优先"]);
+    [page.session setText:nil forContext:context]; CHECK(!CSClownDisplayText(page, context));
+    SetCapability(CSClownTextEnabledKey, NO);
+    [ClownTestPreferences setWarmthTargets:@[@"chat"] account:@"me" groups:NO]; Drain();
+    CHECK(CSClownDisplayText(page, CSClownContext(page, incoming)).length);
+
+    __block BOOL invalidSent = NO;
+    CSClownSubmitInput(owner, @"#假引用+旧格式；正文", ^(id text) { invalidSent = YES; });
+    CHECK(!invalidSent && [owner.testPresented isKindOfClass:UIAlertController.class]); owner.testPresented = nil;
+    CSClownSubmitInput(owner, @"#假引用 引用；  ", ^(id text) { invalidSent = YES; });
+    CHECK(!invalidSent); owner.testPresented = nil;
+    __block id firstCarrier, secondCarrier;
+    CSClownSubmitInput(owner, @"#假引用 第一条；好", ^(id text) { firstCarrier = text; });
+    CSClownSubmitInput(owner, @"#假引用 第二条;好", ^(id text) { secondCarrier = text; });
+    CHECK([firstCarrier isEqual:@"好"] && [secondCarrier isEqual:@"好"] && firstCarrier != secondCarrier);
+    ClownPresentationModel *first = Model(1, 410, YES), *second = Model(1, 411, YES), *normal = Model(1, 412, YES);
+    for (ClownPresentationModel *model in @[first, second, normal]) model.messageWrap.m_nsContent = @"好";
+    owner.testNodes = @[first, normal, second];
+    CSClownSendInput(owner, firstCarrier, nil, nil, ^(id text) {
+        CSClownDidAddMessage(@"chat", normal.messageWrap); // Equal text cannot claim a submission.
+        CSClownDidFormText(@"chat", text, first.messageWrap);
+        CSClownDidAddMessage(@"other", first.messageWrap); // Wrong destination cannot claim it.
+        CSClownDidAddMessage(@"chat", first.messageWrap);
+        CSClownDidAddMessage(@"chat", first.messageWrap); // Duplicate callback is harmless.
+    });
+    CSClownSendInput(owner, secondCarrier, nil, nil, ^(id text) {
+        CSClownDidFormText(@"chat", text, second.messageWrap); CSClownDidAddMessage(@"chat", second.messageWrap);
+    });
+    CHECK([[page.session fakeQuoteForContext:CSClownContext(page, first)] hasSuffix:@"：第一条"]);
+    CHECK([[page.session fakeQuoteForContext:CSClownContext(page, second)] hasSuffix:@"：第二条"]);
+    CHECK(![page.session fakeQuoteForContext:CSClownContext(page, normal)]);
+    CGFloat nativeHeight = 80, projected = CSClownRowHeight(owner, owner.testTable, Path(0,0), nativeHeight);
+    CHECK(projected > nativeHeight);
+    cell.viewModel = first; CSClownRenderCell(cell);
+    CSClownCellState *state = objc_getAssociatedObject(cell, &CSClownCellKey);
+    CHECK(state.quoteView && !state.quoteView.hidden && [state.quoteView.text hasSuffix:@"：第一条"]);
+    CHECK(CGRectGetMinY(state.quoteView.frame) >= CGRectGetMaxY(cell.nativeBubble.frame)+5);
+    CHECK(CGRectGetMaxX(state.quoteView.frame) == CGRectGetMaxX(cell.nativeBubble.frame));
+    CSClownRestoreCell(cell); CHECK(state.quoteView.hidden);
+    CSClownRenderCell(cell); CSClownReuseCell(cell); CHECK(!state.quoteView.superview);
+    cell.viewModel = normal; CSClownRenderCell(cell);
+    CHECK(!((CSClownCellState *)objc_getAssociatedObject(cell, &CSClownCellKey)).quoteView);
+    ClownPresentationSplit *head = [ClownPresentationSplit new], *tail = [ClownPresentationSplit new];
+    head.parentModel = first; tail.parentModel = first; first.subViewModels = @[head, tail];
+    CHECK(CSClownRowHeight(owner, owner.testTable, Path(0,0), nativeHeight) == nativeHeight);
+    CHECK(CSClownRowHeight(owner, owner.testTable, Path(0,1), nativeHeight) > nativeHeight);
+    cell.viewModel = head; CSClownRenderCell(cell);
+    CHECK(!((CSClownCellState *)objc_getAssociatedObject(cell, &CSClownCellKey)).quoteView);
+    cell.viewModel = tail; CSClownRenderCell(cell);
+    CHECK(!((CSClownCellState *)objc_getAssociatedObject(cell, &CSClownCellKey)).quoteView.hidden);
+    CSClownReuseCell(cell); first.subViewModels = @[];
+    SetCapability(CSClownFakeQuoteEnabledKey, NO);
+    CHECK(CSClownRowHeight(owner, owner.testTable, Path(0,0), nativeHeight) == nativeHeight);
+    SetCapability(CSClownFakeQuoteEnabledKey, YES);
+    CHECK(![page.session fakeQuoteForContext:CSClownContext(page, first)]);
+    __block id delayed;
+    CSClownSubmitInput(owner, @"#假引用 不应错发；正文", ^(id text) { delayed = text; });
+    CSClownPageDidDisappear(owner); __block BOOL sent = NO;
+    CSClownSendInput(owner, delayed, nil, nil, ^(id text) { (void)text; sent = YES; }); CHECK(!sent);
+    [ClownTestPreferences setWarmthTargets:@[@"room@chatroom"] account:@"me" groups:YES]; Drain();
+    ClownPresentationModel *group = Model(1, 420, NO); group.messageWrap.m_nsFromUsr = @"room@chatroom";
+    group.messageWrap.m_nsRealChatUsr = @"friend"; group.messageWrap.m_nsContent = @"friend:\n嗯";
+    BaseMsgContentViewController *room = Controller(@[group]); room.testChat = @"room@chatroom"; CSClownPageDidAppear(room);
+    CSClownPage *groupPage = CSClownPageForController(room, NO);
+    CHECK([CSClownWarmExpressions(@"嗯") containsObject:CSClownDisplayText(groupPage, CSClownContext(groupPage, group))]);
+    group.messageWrap.m_nsRealChatUsr = @"me"; CHECK(!CSClownDisplayText(groupPage, CSClownContext(groupPage, group)));
+    CSClownPageDidDisappear(room);
+    SetCapability(CSClownTextEnabledKey, YES); SetCapability(CSClownWarmthEnabledKey, NO); SetCapability(CSClownFakeQuoteEnabledKey, NO);
+}
+
 static void TestUnsupportedAndDisabled(void) {
     ClownPresentationModel *voice=Model(34,6,NO); BaseMsgContentViewController *owner=Controller(@[voice]);
     ClownPresentationCell *cell=TextCell(owner,voice);
@@ -512,7 +604,7 @@ int main(void) {
         Method shared=class_getClassMethod(CSClownPreferences.class,@selector(sharedPreferences));
         IMP originalShared=method_setImplementation(shared,(IMP)TestSharedPreferences);
         ClownPresentationInstallPresentationBoundary();
-        TestUIKitLayerOpacityHitTesting(); TestTextOverlayAndRestore(); TestOffscreenSplitAndCachedExit(); TestImageOverlay(); TestRetargetedControllerRestoresCachedHeights(); TestTimeAndAmount(); TestNativeTimeTapAndDisplayModes(); TestNativeTransferAmountsAndMenus(); TestPhotoAsyncBoundaries(); TestUnsupportedAndDisabled();
+        TestUIKitLayerOpacityHitTesting(); TestTextOverlayAndRestore(); TestOffscreenSplitAndCachedExit(); TestImageOverlay(); TestRetargetedControllerRestoresCachedHeights(); TestTimeAndAmount(); TestNativeTimeTapAndDisplayModes(); TestNativeTransferAmountsAndMenus(); TestPhotoAsyncBoundaries(); TestWarmthAndFakeQuote(); TestUnsupportedAndDisabled();
         [ClownTestDefaults removePersistentDomainForName:suite]; method_setImplementation(shared,originalShared);
         printf("Clown production presentation passed %lu checks (real Mac Catalyst UIKit, isolated defaults).\n",(unsigned long)checks);
     }

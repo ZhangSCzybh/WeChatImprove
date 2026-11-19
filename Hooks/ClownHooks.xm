@@ -11,6 +11,8 @@
 @interface ChatTimeCellView : UIView @end
 @interface MMContextManager : NSObject @end
 @interface BaseMsgContentViewController : UIViewController @end
+@interface BaseMsgContentLogicController : NSObject @end
+@interface CMessageMgr : NSObject @end
 
 // These subclasses may omit super; the shared depth guards own each complete native chain once.
 %hook TextMessageCellView
@@ -32,6 +34,24 @@
 
 %hook BaseMsgContentViewController
 - (void)toggleTimeShowMode:(double)time { %orig; CSClownTimeDisplayModeDidChange(self); }
+- (void)SendTextMessageToolView:(id)text {
+    CSClownSubmitInput(self, text, ^(id value) { %orig(value); });
+}
+- (void)AsyncSendMessage:(id)text replyingMsg:(id)reply referPartialInfo:(id)partial isPasted:(BOOL)pasted {
+    CSClownSendInput(self, text, reply, partial, ^(id value) { %orig(value, reply, partial, pasted); });
+}
+%end
+
+%hook BaseMsgContentLogicController
+- (id)FormTextMsg:(id)target withText:(id)text {
+    id wrap = %orig; CSClownDidFormText(target, text, wrap); return wrap;
+}
+%end
+
+%hook CMessageMgr
+- (void)AddMsg:(id)target MsgWrap:(id)wrap {
+    %orig; CSClownDidAddMessage(target, wrap);
+}
 %end
 
 %hook WCPayTransferMessageCellView

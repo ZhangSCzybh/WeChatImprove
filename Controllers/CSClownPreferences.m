@@ -5,6 +5,9 @@ NSString *const CSClownTextEnabledKey = @"com.wechat.enhance.clown.text.enabled"
 NSString *const CSClownTimeEnabledKey = @"com.wechat.enhance.clown.time.enabled";
 NSString *const CSClownImageEnabledKey = @"com.wechat.enhance.clown.image.enabled";
 NSString *const CSClownAmountEnabledKey = @"com.wechat.enhance.clown.amount.enabled";
+NSString *const CSClownWarmthEnabledKey = @"com.wechat.enhance.clown.warmth.enabled";
+NSString *const CSClownWarmthTargetsKey = @"com.wechat.enhance.clown.warmth.targets";
+NSString *const CSClownFakeQuoteEnabledKey = @"com.wechat.enhance.clown.fake_quote.enabled";
 NSNotificationName const CSClownSettingsDidChangeNotification = @"CSClownSettingsDidChangeNotification";
 
 static BOOL CSClownBool(NSUserDefaults *defaults, NSString *key) {
@@ -13,6 +16,8 @@ static BOOL CSClownBool(NSUserDefaults *defaults, NSString *key) {
 }
 
 @interface CSClownSettings ()
+@property(nonatomic, copy) NSDictionary *warmthTargets;
+@property(nonatomic, copy) NSDictionary<NSString *, NSSet<NSString *> *> *warmthConversations;
 - (instancetype)initWithDefaults:(NSUserDefaults *)defaults;
 - (BOOL)hasSameValuesAs:(CSClownSettings *)other;
 @end
@@ -25,13 +30,38 @@ static BOOL CSClownBool(NSUserDefaults *defaults, NSString *key) {
         _timeEnabled = _enabled && CSClownBool(defaults, CSClownTimeEnabledKey);
         _imageEnabled = _enabled && CSClownBool(defaults, CSClownImageEnabledKey);
         _amountEnabled = _enabled && CSClownBool(defaults, CSClownAmountEnabledKey);
+        _warmthEnabled = _enabled && CSClownBool(defaults, CSClownWarmthEnabledKey);
+        _fakeQuoteEnabled = _enabled && CSClownBool(defaults, CSClownFakeQuoteEnabledKey);
+        id targets = [defaults objectForKey:CSClownWarmthTargetsKey];
+        _warmthTargets = [targets isKindOfClass:NSDictionary.class] ? [targets copy] : @{};
+        NSMutableDictionary *conversations = [NSMutableDictionary dictionary];
+        for (id account in _warmthTargets) if ([account isKindOfClass:NSString.class] && [account length]) {
+            NSMutableSet *names = [NSMutableSet setWithArray:[self warmthTargetsForAccount:account groups:NO]];
+            [names addObjectsFromArray:[self warmthTargetsForAccount:account groups:YES]];
+            conversations[account] = [names copy];
+        }
+        _warmthConversations = conversations;
     }
     return self;
 }
 - (BOOL)hasSameValuesAs:(CSClownSettings *)other {
     return self.enabled == other.enabled && self.textEnabled == other.textEnabled &&
         self.timeEnabled == other.timeEnabled && self.imageEnabled == other.imageEnabled &&
-        self.amountEnabled == other.amountEnabled;
+        self.amountEnabled == other.amountEnabled && self.warmthEnabled == other.warmthEnabled &&
+        self.fakeQuoteEnabled == other.fakeQuoteEnabled && [self.warmthTargets isEqual:other.warmthTargets];
+}
+- (NSArray<NSString *> *)warmthTargetsForAccount:(NSString *)account groups:(BOOL)groups {
+    id profile = account.length ? self.warmthTargets[account] : nil;
+    id names = [profile isKindOfClass:NSDictionary.class] ? profile[groups ? @"groups" : @"contacts"] : nil;
+    if (![names isKindOfClass:NSArray.class]) return @[];
+    NSMutableOrderedSet *valid = [NSMutableOrderedSet orderedSet];
+    for (id name in names) if ([name isKindOfClass:NSString.class] && [name length] &&
+        [name hasSuffix:@"@chatroom"] == groups) [valid addObject:name];
+    return valid.array;
+}
+- (BOOL)warmsConversation:(NSString *)conversation account:(NSString *)account {
+    return self.warmthEnabled && conversation.length && account.length &&
+        [self.warmthConversations[account] containsObject:conversation];
 }
 @end
 
@@ -69,6 +99,20 @@ static BOOL CSClownBool(NSUserDefaults *defaults, NSString *key) {
 }
 - (CSClownSettings *)snapshot {
     @synchronized(self) { return _snapshot; }
+}
+- (void)setWarmthTargets:(NSArray<NSString *> *)names account:(NSString *)account groups:(BOOL)groups {
+    if (!NSThread.isMainThread || !account.length) return;
+    id stored = [_defaults objectForKey:CSClownWarmthTargetsKey];
+    NSMutableDictionary *targets = [stored isKindOfClass:NSDictionary.class] ? [stored mutableCopy] : [NSMutableDictionary dictionary];
+    id prior = targets[account];
+    NSMutableDictionary *profile = [prior isKindOfClass:NSDictionary.class] ? [prior mutableCopy] : [NSMutableDictionary dictionary];
+    NSMutableOrderedSet *valid = [NSMutableOrderedSet orderedSet];
+    for (id name in names) if ([name isKindOfClass:NSString.class] && [name length] &&
+        [name hasSuffix:@"@chatroom"] == groups) [valid addObject:name];
+    profile[groups ? @"groups" : @"contacts"] = valid.array;
+    targets[account] = profile;
+    [_defaults setObject:targets forKey:CSClownWarmthTargetsKey];
+    [self requestRefresh];
 }
 - (void)requestRefresh {
     @synchronized(self) {

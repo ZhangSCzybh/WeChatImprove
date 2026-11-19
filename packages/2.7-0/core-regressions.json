@@ -1,0 +1,77 @@
+{
+  "clown-preferences": {
+    "passed": true,
+    "checks": 266,
+    "log": "regressions/clown-preferences.log"
+  },
+  "clown-presentation": {
+    "passed": true,
+    "checks": 399,
+    "log": "regressions/clown-presentation.log"
+  },
+  "clown-session": {
+    "passed": true,
+    "checks": 120,
+    "log": "regressions/clown-session.log"
+  },
+  "clown-text-rules": {
+    "passed": true,
+    "checks": 68,
+    "log": "regressions/clown-text-rules.log"
+  },
+  "moments-card": {
+    "passed": true,
+    "checks": 73580,
+    "log": "regressions/moments-card.log"
+  },
+  "moments-entry": {
+    "passed": true,
+    "checks": 252,
+    "log": "regressions/moments-entry.log"
+  },
+  "moments-header-backdrop": {
+    "passed": true,
+    "checks": 143,
+    "log": "regressions/moments-header-backdrop.log"
+  },
+  "moments-header-runtime": {
+    "passed": true,
+    "checks": 229,
+    "log": "regressions/moments-header-runtime.log"
+  },
+  "moments-layout-preferences": {
+    "passed": true,
+    "checks": 73,
+    "log": "regressions/moments-layout-preferences.log"
+  },
+  "moments-model": {
+    "passed": true,
+    "checks": 115,
+    "log": "regressions/moments-model.log"
+  },
+  "moments-native-media": {
+    "passed": true,
+    "checks": 24,
+    "log": "regressions/moments-native-media.log"
+  },
+  "moments-native-video": {
+    "passed": true,
+    "checks": 31,
+    "log": "regressions/moments-native-video.log"
+  },
+  "moments-playback": {
+    "passed": true,
+    "checks": 79,
+    "log": "regressions/moments-playback.log"
+  },
+  "moments-position": {
+    "passed": true,
+    "checks": 147,
+    "log": "regressions/moments-position.log"
+  },
+  "moments-runtime": {
+    "passed": true,
+    "checks": 148,
+    "log": "regressions/moments-runtime.log"
+  }
+}

@@ -6,6 +6,7 @@
 @property(nonatomic, copy) NSString *m_nsFromUsr;
 @property(nonatomic, copy) NSString *m_nsToUsr;
 @property(nonatomic, copy) NSString *m_nsContent;
+@property(nonatomic, copy) NSString *m_nsRealChatUsr;
 @property(nonatomic, copy) NSData *m_dtImg;
 @property(nonatomic) unsigned int m_uiMessageType, m_uiMesLocalID, m_uiCreateTime;
 @property(nonatomic) long long m_n64MesSvrID;
@@ -100,6 +101,7 @@
 - (id)getMsgTableView;
 - (BOOL)isNeedShowTimeInDetail;
 - (void)toggleTimeShowMode:(double)timestamp;
+- (void)AsyncSendMessage:(id)text replyingMsg:(id)reply referPartialInfo:(id)partial isPasted:(BOOL)pasted;
 @end
 
 @interface MMContext : NSObject

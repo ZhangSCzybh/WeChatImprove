@@ -13,6 +13,13 @@ int main(void) { @autoreleasepool {
     CHECK(Entry(@"GameCheat_Enabled") != nil);
     CHECK(Entry(@"WCTimeLineMessageTailText") != nil);
     CHECK(Entry(@"kReceiveTransferAutoEnableKey") != nil);
+    NSDictionary *momentsLayout=Entry(@"com.wechat.enhance.moments_layout.enabled");
+    CHECK([momentsLayout[@"module"] isEqual:@"moments_layout"] && [momentsLayout[@"scope"] isEqual:@"global"] && [momentsLayout[@"type"] isEqual:@"bool"]);
+    CHECK([CSBackupRegistry.moduleTitles[@"moments_layout"] isEqual:@"朋友圈布局"]);
+    CHECK(Valid(@YES,momentsLayout) && Valid(@NO,momentsLayout));
+    CHECK(!Valid(@"YES",momentsLayout) && !Valid(@2,momentsLayout));
+    CHECK([CSBackupRegistry entryForDomain:@"legacy" key:@"com.wechat.enhance.moments_layout.enabled"] == nil);
+    CHECK(Entry(@"com.wechat.enhance.moments_layout.unknown") == nil);
     NSArray *guardIdentifiers=@[@"enabled",@"scoped_queries",@"environment",@"frameworks",@"provision_path",
         @"provision_read",@"bundle_info",@"receipt",@"crash_block",@"crash_monitor",@"vendor_id",@"checks",@"images",@"safe_mode",
         @"friend_scope",@"device_checks",@"device_report",@"fingerprint_data",@"basic_data",@"risk_results",@"policy_completion",

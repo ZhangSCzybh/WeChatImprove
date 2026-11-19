@@ -12,6 +12,7 @@
 #import "CSBackgroundRunViewController.h"
 #import "CSBackgroundBlurSettingsViewController.h"
 #import "CSAdPurificationSettingsViewController.h"
+#import "CSMomentsLayoutSettingsViewController.h"
 #import "CSTouchTrailViewController.h"
 #import "CSGameCheatsViewController.h"
 #import "CSFavoriteSettingsViewController.h"
@@ -786,6 +787,11 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
                                                           iconName:@"line.3.horizontal.decrease.circle.fill"
                                                          iconColor:UIColor.systemTealColor
                                                             detail:nil];
+
+    CSSettingItem *momentsLayoutItem = [CSSettingItem itemWithTitle:@"友圈布局"
+                                                         iconName:@"rectangle.grid.2x2.fill"
+                                                        iconColor:UIColor.systemPinkColor
+                                                           detail:nil];
     
     CSSettingSection *uiSection = [CSSettingSection sectionWithHeader:@"界面定制"
                                                               items:@[navigationTitleItem,
@@ -802,7 +808,8 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
                                                                      chatGroupItem,
                                                                      messageTimeItem,
                                                                      backgroundBlurItem,
-                                                                     adPurificationItem]];
+                                                                     adPurificationItem,
+                                                                     momentsLayoutItem]];
     
     // 功能增强组
     CSSettingItem *backgroundRunItem = [CSSettingItem itemWithTitle:@"后台运行" 
@@ -1028,6 +1035,10 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
         else if ([item.title isEqualToString:@"广告净化"]) {
             CSAdPurificationSettingsViewController *adVC = [[CSAdPurificationSettingsViewController alloc] initWithStyle:UITableViewStyleInsetGrouped];
             [self.navigationController pushViewController:adVC animated:YES];
+        }
+        else if ([item.title isEqualToString:@"友圈布局"]) {
+            CSMomentsLayoutSettingsViewController *momentsVC = [[CSMomentsLayoutSettingsViewController alloc] initWithStyle:UITableViewStyleInsetGrouped];
+            [self.navigationController pushViewController:momentsVC animated:YES];
         }
         // 处理触摸轨迹点击
         else if ([item.title isEqualToString:@"触摸轨迹"]) {
