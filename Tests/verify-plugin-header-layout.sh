@@ -9,6 +9,8 @@ import sys
 public = Path('Controllers/CSPluginHeaderView.h').read_text().replace('#import <UIKit/UIKit.h>', '')
 source = Path('Controllers/CSPluginHeaderView.m').read_text()
 assert source.count('#import "CSPluginHeaderView.h"') == 1
+assert source.count('#import "CSSettingsHomeTheme.h"') == 1
+source = source.replace('#import "CSSettingsHomeTheme.h"', '')
 Path(sys.argv[1], 'PluginHeaderUnderTest.h').write_text(source.replace('#import "CSPluginHeaderView.h"', public))
 PY
 xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-parameter -Wno-nullability-completeness \

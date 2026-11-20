@@ -14,9 +14,11 @@ enum {UIApplicationStateActive=0,UIGestureRecognizerStateBegan=1,UIGestureRecogn
 @property(nonatomic) BOOL userInteractionEnabled;
 @property(nonatomic,strong) NSMutableArray *gestures;
 - (void)addGestureRecognizer:(UIGestureRecognizer *)gesture;
+- (BOOL)endEditing:(BOOL)force;
 @end
 @implementation UIView
 - (void)addGestureRecognizer:(UIGestureRecognizer *)gesture {if(!self.gestures)self.gestures=[NSMutableArray new];[self.gestures addObject:gesture];}
+- (BOOL)endEditing:(BOOL)force {return YES;}
 @end
 @interface UIGestureRecognizer : NSObject
 @property(nonatomic) NSInteger state;
@@ -102,7 +104,14 @@ static BOOL CSBackupAccountIsSuspended(void) {return accountSuspended;}
 - (BOOL)settingsEntryVisible {return self.visible;}
 - (void)refreshAccount {[self.runtime synchronizeAccount:currentAccount epoch:accountEpoch suspended:accountSuspended];}
 @end
+@interface EntryAnimator : NSObject
+- (void)cancel;
+@end
+@implementation EntryAnimator
+- (void)cancel {}
+@end
 @interface EntryController : UIViewController
+@property(nonatomic,strong) EntryAnimator *homeAnimator;
 @property(nonatomic,strong) UIView *avatarImageView;
 @property(nonatomic,strong) UILongPressGestureRecognizer *closeFriendEntryGesture;
 @property(nonatomic,copy) NSDictionary *closeFriendEntryToken;
@@ -116,11 +125,15 @@ static BOOL CSBackupAccountIsSuspended(void) {return accountSuspended;}
 @property(nonatomic) NSUInteger confirmations;
 @property(nonatomic,copy) NSDictionary *pendingConfirmationToken;
 - (void)setupData;
+- (void)reloadSettingsKeepingPosition;
+- (void)revealHomeAccountSection;
 - (void)confirmCloseFriendQuickEntryWithToken:(NSDictionary *)token;
 - (void)installBackgroundObserver;
 @end
 @implementation EntryController
 - (void)setupData {self.setups++;self.closeFriendEntryVisible=CSCloseFriendManager.sharedManager.visible;}
+- (void)reloadSettingsKeepingPosition {[self.tableView reloadData];}
+- (void)revealHomeAccountSection {[self setupData];[self reloadSettingsKeepingPosition];}
 - (void)confirmCloseFriendQuickEntryWithToken:(NSDictionary *)token {self.confirmations++;self.pendingConfirmationToken=token;}
 - (void)installBackgroundObserver {
 #import "EntryBackgroundObserverUnderTest.h"

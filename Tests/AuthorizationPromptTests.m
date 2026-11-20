@@ -130,11 +130,14 @@ static UIViewController *CSNativeSettingsHostForContent(UIViewController *conten
 
 @interface CSCustomViewController : UIViewController
 @property(nonatomic, strong) UITableView *tableView;
+@property(nonatomic, strong) UIView *settingsTabBar;
 @property(nonatomic) BOOL isAuthorized;
 @property(nonatomic) BOOL authorizationPromptInFlight;
 @property(nonatomic) BOOL returningFromAuthorization;
 @property(nonatomic) NSUInteger agreementChecks;
 - (void)setupData;
+- (void)reloadSettingsKeepingPosition;
+- (void)finishHeaderVerseVisitIfLeaving;
 - (void)checkUserAgreement;
 - (void)returnFromUnauthorizedSettings;
 @end
@@ -152,9 +155,23 @@ static void CSCloseFriendAuthenticate(UIViewController *controller, void (^compl
 @end
 
 @implementation CSCustomViewController
-- (instancetype)init { if((self=[super init]))_tableView=[UITableView new]; return self; }
+- (instancetype)init {
+    if((self=[super init])) {
+        _tableView=[UITableView new];
+        _settingsTabBar=[UIView new];
+    }
+    return self;
+}
 - (void)setupData {}
-- (void)checkUserAgreement { CHECK(self.isAuthorized && self.tableView.userInteractionEnabled); self.agreementChecks++; }
+// Scrolling is covered separately; keep this lifecycle fixture focused on the
+// observable reload and interaction gates used by the extracted production code.
+- (void)reloadSettingsKeepingPosition { [self.tableView reloadData]; }
+- (void)finishHeaderVerseVisitIfLeaving {} // Visit lifetime has its own production-method fixture.
+- (void)checkUserAgreement {
+    CHECK(self.isAuthorized && self.tableView.userInteractionEnabled);
+    CHECK(self.settingsTabBar.userInteractionEnabled);
+    self.agreementChecks++;
+}
 #import "AuthorizationSettingsUnderTest.h"
 @end
 
@@ -218,6 +235,7 @@ int main(void) { @autoreleasepool {
     UINavigationController *thirdPartyNav=[UINavigationController new]; Attach(thirdPartyNav,@[wechat,host]);
     [content viewDidAppear:NO]; UIAlertController *alert=AlertFrom(content);
     CHECK(!content.isAuthorized && !content.tableView.userInteractionEnabled);
+    CHECK(!content.settingsTabBar.userInteractionEnabled);
     CHECK(content.authorizationPromptInFlight && content.agreementChecks==0);
     NSUInteger presentations=CSNativeSettingsHostForContent(content).presentationCount;
     [content viewDidAppear:NO]; CHECK(CSNativeSettingsHostForContent(content).presentationCount==presentations);
@@ -226,8 +244,10 @@ int main(void) { @autoreleasepool {
     CHECK(thirdPartyNav.popCount+thirdPartyNav.popToCount==1);
     CHECK(wechat.dismissCount==0 && thirdPartyNav.dismissCount==0 && host.dismissCount==0);
     CHECK(!content.authorizationPromptInFlight);
+    CHECK(!content.tableView.userInteractionEnabled && !content.settingsTabBar.userInteractionEnabled);
     presentations=CSNativeSettingsHostForContent(content).presentationCount;
     [content viewDidAppear:NO]; CHECK(CSNativeSettingsHostForContent(content).presentationCount==presentations);
+    CHECK(!content.settingsTabBar.userInteractionEnabled);
     [content viewDidDisappear:NO]; CHECK(!content.returningFromAuthorization);
     Attach(thirdPartyNav,@[wechat,host]); [content viewDidAppear:NO];
     CHECK(CSNativeSettingsHostForContent(content).presentationCount==presentations+1);
@@ -239,6 +259,7 @@ int main(void) { @autoreleasepool {
     [wechat presentViewController:pluginNav animated:NO completion:nil];
     [content viewDidAppear:NO]; Choose(AlertFrom(content),UIAlertActionStyleCancel);
     CHECK(pluginNav.dismissCount==1 && wechat.presentedViewController==nil);
+    CHECK(!content.settingsTabBar.userInteractionEnabled && !content.tableView.userInteractionEnabled);
     CHECK(wechat.dismissCount==0 && host.dismissCount==0 && content.dismissCount==0);
     CHECK(pluginNav.popCount+pluginNav.popToCount==0);
 
@@ -273,6 +294,7 @@ int main(void) { @autoreleasepool {
     ResetManager(); content=ContentInHost(&host); host.presentedViewController=[UIViewController new];
     [content viewDidAppear:NO];
     CHECK(host.presentationCount==0 && !content.authorizationPromptInFlight && !content.tableView.userInteractionEnabled);
+    CHECK(!content.settingsTabBar.userInteractionEnabled);
     host.presentedViewController=nil; [content viewDidAppear:NO]; Choose(AlertFrom(content),UIAlertActionStyleCancel);
 
     // Going to the account leaves settings locked after the native alert closes.
@@ -280,12 +302,14 @@ int main(void) { @autoreleasepool {
     [content viewDidAppear:NO]; Choose(AlertFrom(content),UIAlertActionStyleDefault);
     CHECK(manager.opens==1 && manager.openSource==host);
     CHECK(!content.isAuthorized && !content.tableView.userInteractionEnabled && !content.authorizationPromptInFlight);
+    CHECK(!content.settingsTabBar.userInteractionEnabled);
     CHECK(CSNativeSettingsHostForContent(content).presentedViewController==nil);
     CHECK(thirdPartyNav.topViewController==host && content.agreementChecks==0);
 
     // Returning after following restores interaction before the agreement check.
     manager.authorized=YES; [content viewDidAppear:NO];
     CHECK(content.isAuthorized && content.tableView.userInteractionEnabled);
+    CHECK(content.settingsTabBar.userInteractionEnabled);
     CHECK(content.agreementChecks==1 && CSNativeSettingsHostForContent(content).presentedViewController==nil);
 
     // Follow data can change between the lifecycle read and manager recheck.
@@ -293,7 +317,17 @@ int main(void) { @autoreleasepool {
     ResetManager(); content=ContentInHost(&host); manager.nextReads=@[@NO,@YES];
     [content viewDidAppear:NO]; DrainMainQueue();
     CHECK(content.isAuthorized && content.tableView.userInteractionEnabled);
+    CHECK(content.settingsTabBar.userInteractionEnabled);
     CHECK(!content.authorizationPromptInFlight && content.agreementChecks==1 && CSNativeSettingsHostForContent(content).presentationCount==0);
+
+    // Revocation after a successful visit relocks the sibling Tab/search view as
+    // well as the table; cancelling must never restore either interaction gate.
+    manager.authorized=NO; [content viewDidAppear:NO];
+    CHECK(!content.isAuthorized && !content.tableView.userInteractionEnabled);
+    CHECK(!content.settingsTabBar.userInteractionEnabled && content.authorizationPromptInFlight);
+    Choose(AlertFrom(content),UIAlertActionStyleCancel);
+    CHECK(!content.isAuthorized && !content.tableView.userInteractionEnabled && !content.settingsTabBar.userInteractionEnabled);
+    CHECK(!content.authorizationPromptInFlight && content.agreementChecks==1);
 
     // The manager's already-authorized fast path never constructs an alert.
     ResetManager(); manager.authorized=YES; entry=[UIViewController new]; completions=0;

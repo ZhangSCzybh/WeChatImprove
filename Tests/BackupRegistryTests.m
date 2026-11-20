@@ -13,6 +13,13 @@ int main(void) { @autoreleasepool {
     CHECK(Entry(@"GameCheat_Enabled") != nil);
     CHECK(Entry(@"WCTimeLineMessageTailText") != nil);
     CHECK(Entry(@"kReceiveTransferAutoEnableKey") != nil);
+    NSDictionary *homeIndex=Entry(@"com.wechat.enhance.home_theme.index"),*homeRGB=Entry(@"com.wechat.enhance.home_theme.custom_rgb");
+    CHECK([homeIndex[@"module"] isEqual:@"home_theme"] && [homeIndex[@"scope"] isEqual:@"global"]);
+    CHECK([CSBackupRegistry.moduleTitles[@"home_theme"] isEqual:@"首页调色"]);
+    CHECK(Valid(@0,homeIndex) && Valid(@4,homeIndex));
+    CHECK(!Valid(@(-1),homeIndex) && !Valid(@5,homeIndex) && !Valid(@0.5,homeIndex) && !Valid(@"1",homeIndex));
+    CHECK(Valid(@0,homeRGB) && Valid(@0xffffff,homeRGB));
+    CHECK(!Valid(@(-1),homeRGB) && !Valid(@0x1000000,homeRGB) && !Valid(@1.5,homeRGB) && !Valid(@"ffffff",homeRGB));
     NSDictionary *momentsLayout=Entry(@"com.wechat.enhance.moments_layout.enabled");
     CHECK([momentsLayout[@"module"] isEqual:@"moments_layout"] && [momentsLayout[@"scope"] isEqual:@"global"] && [momentsLayout[@"type"] isEqual:@"bool"]);
     CHECK([CSBackupRegistry.moduleTitles[@"moments_layout"] isEqual:@"朋友圈布局"]);

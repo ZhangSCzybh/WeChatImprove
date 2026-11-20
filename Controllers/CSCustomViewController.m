@@ -51,20 +51,40 @@
 #import "CSPluginVerseProvider.h"
 #import "CSNavigationImageLoader.h"
 #import "CSPreferenceRefresh.h"
+#import "CSSettingsHomeModel.h"
+#import "CSSettingsHomeLayout.h"
+#import "CSSettingsTabBar.h"
+#import "CSSettingsHomeCell.h"
+#import "CSSettingsHomeAnimator.h"
+#import "CSSettingsHomeTheme.h"
+#import "CSSettingsHomePaletteCell.h"
 
 // 用户协议同意标记
 static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agreement.accepted.v3";
 
-@interface CSCustomViewController () <UITableViewDelegate, UITableViewDataSource, UIGestureRecognizerDelegate> {
+@interface CSCustomViewController () <UITableViewDelegate, UITableViewDataSource, UIGestureRecognizerDelegate, UIColorPickerViewControllerDelegate> {
     atomic_bool _headerRefreshPending;
 }
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) NSArray<CSSettingSection *> *sections;
+@property(nonatomic, strong) CSSettingsHomeModel *homeModel;
+@property(nonatomic, strong) CSSettingsTabBar *settingsTabBar;
+@property(nonatomic, strong) UIView *headerContainer;
+@property(nonatomic, strong) UIView *homeFooter;
+@property(nonatomic, strong) UILabel *emptySearchLabel;
+@property(nonatomic, strong) NSMutableDictionary<NSNumber *,NSNumber *> *tabScrollDistances;
+@property(nonatomic, strong) NSNumber *pendingHomeDistance;
+@property(nonatomic) CGFloat laidOutProfileHeight;
+@property(nonatomic) BOOL updatingHomeLayout;
+@property(nonatomic, strong) CSSettingsHomeAnimator *homeAnimator;
+@property(nonatomic) BOOL suppressHomeTransition;
+@property(nonatomic) CGSize lastHomeViewportSize;
 @property (nonatomic, strong) UIImageView *avatarImageView;
 @property (nonatomic, strong) CSPluginHeaderView *headerView;
 @property (nonatomic, strong) CSNavigationImageRequest *avatarRequest;
 @property (nonatomic, copy) NSArray *avatarIdentity;
 @property (nonatomic) NSUInteger headerVerseEntryGeneration;
+@property (nonatomic) BOOL headerVerseVisitActive;
 @property (nonatomic, strong) NSTimer *countdownTimer; // 倒计时计时器
 @property (nonatomic, assign) NSInteger countdownSeconds; // 倒计时剩余秒数
 @property (nonatomic, strong) UIAlertAction *continueAction; // 继续按钮引用
@@ -134,6 +154,7 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
 }
 
 - (void)dealloc {
+    [self.homeAnimator cancel];
     [self.avatarRequest cancel];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
@@ -141,7 +162,7 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
 - (void)settingsDidChange:(NSNotification *)notification {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self setupData];
-        [self.tableView reloadData];
+        [self reloadSettingsKeepingPosition];
         [self refreshHeaderContent];
     });
 }
@@ -150,9 +171,8 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
     [super viewWillAppear:animated];
     // Rebuild before the first frame, including when returning under a different account.
     [self setupData];
-    [self.tableView reloadData];
+    [self reloadSettingsKeepingPosition];
     [self refreshHeaderContent];
-    self.headerVerseEntryGeneration++;
     [self refreshHeaderVerse];
     // Covers direct third-party plugin registration routes before any settings content appears.
     UIView *cover=[self.view viewWithTag:871042];
@@ -177,11 +197,12 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
     [[self.view viewWithTag:871042] removeFromSuperview];
 
     [self setupData];
-    [self.tableView reloadData];
+    [self reloadSettingsKeepingPosition];
 
     CSAuthorizationManager *authManager = [CSAuthorizationManager sharedManager];
     self.isAuthorized = [authManager isAuthorized];
     self.tableView.userInteractionEnabled = self.isAuthorized;
+    self.settingsTabBar.userInteractionEnabled = self.isAuthorized;
     if (!self.isAuthorized) {
         UIViewController *host = CSNativeSettingsHostForContent(self);
         if (host.presentedViewController) return;
@@ -193,6 +214,7 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
             self.authorizationPromptInFlight = NO;
             self.isAuthorized = success;
             self.tableView.userInteractionEnabled = success;
+            self.settingsTabBar.userInteractionEnabled = success;
             if (success) {
                 [self checkUserAgreement];
             } else if ([message isEqualToString:@"用户取消授权"]) {
@@ -207,10 +229,13 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
     self.returningFromAuthorization = NO;
+    [self finishHeaderVerseVisitIfLeaving];
 }
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
+    [self.homeAnimator cancel];
     [self resetCloseFriendQuickEntry];
+    [self.view endEditing:YES];
 }
 
 - (void)returnFromUnauthorizedSettings {
@@ -445,8 +470,27 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
     }];
 }
 
+- (void)finishHeaderVerseVisitIfLeaving {
+    if (!self.headerVerseVisitActive) return;
+    UIViewController *host=CSNativeSettingsHostForContent(self);
+    BOOL leaving=NO;
+    for (UIViewController *container=host; container; container=container.parentViewController) {
+        if (container.isMovingFromParentViewController || container.isBeingDismissed) {
+            leaving=YES;
+            break;
+        }
+    }
+    UINavigationController *navigation=host.navigationController;
+    if (!leaving && navigation && ![navigation.viewControllers containsObject:host]) leaving=YES;
+    // A detail push or a full-screen picker only hides the homepage. End the
+    // visit after a completed plugin exit, never merely because it lost a window.
+    if (leaving) self.headerVerseVisitActive=NO;
+}
+
 - (void)refreshHeaderVerse {
-    NSUInteger generation=self.headerVerseEntryGeneration;
+    if (self.headerVerseVisitActive) return;
+    self.headerVerseVisitActive=YES;
+    NSUInteger generation=++self.headerVerseEntryGeneration;
     CSPluginVerseProvider *provider=CSPluginVerseProvider.sharedProvider;
     [self.headerView setVerse:provider.currentVerse];
     [self updateHeaderLayout];
@@ -455,30 +499,53 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
         typeof(self) self=weakSelf;
         // A fast reply can arrive during the entry transition, before window is
         // attached. The entry generation rejects old visits without losing it.
-        if (!self || generation!=self.headerVerseEntryGeneration || !self.isViewLoaded) return;
+        if (!self || !self.headerVerseVisitActive || generation!=self.headerVerseEntryGeneration || !self.isViewLoaded) return;
         [self.headerView setVerse:verse];
         [self updateHeaderLayout];
     }];
 }
 
 - (void)updateHeaderLayout {
-    if (!self.tableView || !self.headerView) return;
+    if (!self.tableView || !self.headerView || self.updatingHomeLayout) return;
+    self.updatingHomeLayout=YES;
     CGFloat width=CGRectGetWidth(self.tableView.bounds);
-    if (width<=0) return;
-    UIEdgeInsets margins=self.tableView.layoutMargins;
-    UIEdgeInsets safe=self.tableView.safeAreaInsets;
-    self.headerView.horizontalInset=MAX(20,MAX(MAX(margins.left,margins.right),MAX(safe.left,safe.right)+16));
-    CGFloat height=[self.headerView preferredHeightForWidth:width];
-    CGRect frame=CGRectMake(0,0,width,height);
-    if (!CGRectEqualToRect(self.headerView.frame,frame)) {
-        self.headerView.frame=frame;
-        self.tableView.tableHeaderView=self.headerView;
+    if (width>0) {
+        CGFloat oldHeight=self.laidOutProfileHeight;
+        CGFloat distance=[self currentHomeDistance];
+        UIEdgeInsets margins=self.tableView.layoutMargins, safe=self.tableView.safeAreaInsets;
+        self.headerView.horizontalInset=MAX(20,MAX(MAX(margins.left,margins.right),MAX(safe.left,safe.right)+16));
+        CGFloat height=[self.headerView preferredHeightForWidth:width];
+        self.headerView.frame=CGRectMake(0,0,width,height);
+        CGRect containerFrame=CGRectMake(0,0,width,height+76);
+        if (!CGRectEqualToRect(self.headerContainer.frame,containerFrame)) {
+            [self.homeAnimator cancel];
+            self.headerContainer.frame=containerFrame;
+            self.tableView.tableHeaderView=self.headerContainer;
+            [self.tableView layoutIfNeeded];
+        }
+        self.laidOutProfileHeight=height;
+        if (oldHeight>0 && fabs(height-oldHeight)>0.5) {
+            for (NSNumber *key in self.tabScrollDistances.allKeys)
+                self.tabScrollDistances[key]=@(CSSettingsHomeAdjustedDistance(self.tabScrollDistances[key].doubleValue,oldHeight,height));
+            if (self.pendingHomeDistance)
+                self.pendingHomeDistance=@(CSSettingsHomeAdjustedDistance(self.pendingHomeDistance.doubleValue,oldHeight,height));
+            distance=CSSettingsHomeAdjustedDistance(distance,oldHeight,height);
+            [self updateHomeFooter];
+            [self setHomeDistance:distance];
+        }
+        [self.headerView setNeedsLayout];
+        [self updateHomeFooter];
+        [self positionSettingsTabBar];
     }
-    [self.headerView setNeedsLayout];
+    self.updatingHomeLayout=NO;
 }
 
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
+    if (!CGSizeEqualToSize(self.lastHomeViewportSize,self.tableView.bounds.size)) {
+        [self.homeAnimator cancel];
+        self.lastHomeViewportSize=self.tableView.bounds.size;
+    }
     [self updateHeaderLayout];
 }
 
@@ -538,8 +605,7 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
     self.closeFriendEntryToken=nil;
     [self resetCloseFriendQuickEntry];
     if(![self canDiscoverCloseFriendEntry] || ![CSCloseFriendManager.sharedManager discoverSettingsEntryWithToken:token])return;
-    [self setupData];
-    [self.tableView reloadData];
+    [self revealHomeAccountSection];
     [[[UIImpactFeedbackGenerator alloc] initWithStyle:UIImpactFeedbackStyleLight] impactOccurred];
 }
 - (void)resetCloseFriendQuickEntry {
@@ -595,7 +661,7 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
     if(!self.isViewLoaded)return;
     if(self.closeFriendEntryVisible==[CSCloseFriendManager.sharedManager settingsEntryVisible])return;
     [self setupData];
-    [self.tableView reloadData];
+    [self reloadSettingsKeepingPosition];
 }
 
 - (void)setupData {
@@ -613,7 +679,9 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
     NSMutableArray *accountItems=[NSMutableArray arrayWithArray:@[accountItem,favoriteAuthItem]];
     [accountItems addObject:[CSSettingItem itemWithTitle:@"防封检测" iconName:@"shield.lefthalf.filled"
         iconColor:UIColor.systemBlueColor detail:nil]];
-    self.closeFriendEntryVisible=[CSCloseFriendManager.sharedManager settingsEntryVisible];
+    BOOL entryVisible=[CSCloseFriendManager.sharedManager settingsEntryVisible];
+    if (self.closeFriendEntryVisible!=entryVisible) self.suppressHomeTransition=YES;
+    self.closeFriendEntryVisible=entryVisible;
     if(self.closeFriendEntryVisible) {
         [accountItems addObject:[CSSettingItem itemWithTitle:@"捉迷藏呀" iconName:@"lock.shield" iconColor:UIColor.systemBlueColor detail:nil]];
     }
@@ -819,7 +887,9 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
                                                          iconColor:[UIColor systemGreenColor]
                                                            detail:nil];
     
-    NSMutableArray *pluginItems = [NSMutableArray arrayWithObjects:entrySettingsItem, 
+    CSSettingItem *paletteItem=[CSSettingItem itemWithTitle:@"界面调色" iconName:@"paintpalette"
+        iconColor:UIColor.systemGreenColor detail:nil];
+    NSMutableArray *pluginItems = [NSMutableArray arrayWithObjects:paletteItem, entrySettingsItem,
                                    versionControlItem,
                                    updateControlItem,
                                    backupSettingsItem, nil];
@@ -841,7 +911,22 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
     CSSettingSection *aboutSection = [CSSettingSection sectionWithHeader:@"关于"
                                                                  items:@[versionItem, authorItem]];
     
-    self.sections = @[accountSection, uiSection, enhancementSection, pluginSection, aboutSection];
+    if (!self.homeModel) self.homeModel=[CSSettingsHomeModel new];
+    if (!self.tabScrollDistances) self.tabScrollDistances=[NSMutableDictionary dictionary];
+    BOOL ready=CSBackupIsReady() && !CSBackupAccountIsSuspended();
+    NSString *account=ready ? [CSUserInfoHelper getUserWXID] : @"";
+    NSString *scope=[NSString stringWithFormat:@"%lu:%@",(unsigned long)CSBackupAccountEpoch(),account ?: @""];
+    BOOL reset=[self.homeModel replaceSections:@[accountSection,uiSection,enhancementSection,pluginSection,aboutSection]
+                            accountIdentifier:scope];
+    if (reset) {
+        self.suppressHomeTransition=YES;
+        [self.homeAnimator cancel];
+        [self.tabScrollDistances removeAllObjects];
+        self.pendingHomeDistance=@0;
+        [self.settingsTabBar resetSearch];
+        [self.settingsTabBar setSelectedIndex:0 animated:NO];
+    }
+    self.sections=self.homeModel.displayedSections;
 }
 
 - (void)setupUI {
@@ -853,6 +938,10 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
     // Resolve section titles before the first return frame; reloads must not
     // temporarily replace their measured heights with estimates.
     self.tableView.estimatedSectionHeaderHeight = 0;
+    self.tableView.estimatedRowHeight=0;
+    self.tableView.estimatedSectionFooterHeight=0;
+    self.tableView.rowHeight=MAX(56,ceil([UIFont preferredFontForTextStyle:UIFontTextStyleBody].lineHeight)+26);
+    self.tableView.keyboardDismissMode=UIScrollViewKeyboardDismissModeOnDrag;
     self.tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.tableView.backgroundColor = [UIColor systemGroupedBackgroundColor];
     
@@ -861,7 +950,10 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
     self.tableView.separatorInset = UIEdgeInsetsMake(0, 54, 0, 0);
     
     // 设置tableView的头部视图
-    self.tableView.tableHeaderView = self.headerView;
+    self.headerContainer=[UIView new];
+    [self.headerContainer addSubview:self.headerView];
+    self.headerContainer.frame=CGRectMake(0,0,CGRectGetWidth(self.view.bounds),CGRectGetHeight(self.headerView.frame)+76);
+    self.tableView.tableHeaderView=self.headerContainer;
     
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
@@ -869,7 +961,176 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
     // 注册通用设置cell
     [CSSettingTableViewCell registerToTableView:self.tableView];
     
+    [self.tableView registerClass:CSSettingsHomeCell.class forCellReuseIdentifier:CSSettingsHomeCell.reuseIdentifier];
+    [self.tableView registerClass:CSSettingsHomePaletteCell.class forCellReuseIdentifier:CSSettingsHomePaletteCell.reuseIdentifier];
     [self.view addSubview:self.tableView];
+    self.homeFooter=[UIView new];
+    self.emptySearchLabel=[UILabel new];
+    self.emptySearchLabel.numberOfLines=0;
+    self.emptySearchLabel.textAlignment=NSTextAlignmentCenter;
+    self.emptySearchLabel.textColor=UIColor.secondaryLabelColor;
+    self.emptySearchLabel.font=[UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
+    self.emptySearchLabel.text=@"没有找到相关功能\n试试功能名称或分类名称";
+    [self.homeFooter addSubview:self.emptySearchLabel];
+    self.tableView.tableFooterView=self.homeFooter;
+    self.settingsTabBar=[CSSettingsTabBar new];
+    self.homeAnimator=[CSSettingsHomeAnimator new];
+    self.settingsTabBar.userInteractionEnabled=NO;
+    [self.view addSubview:self.settingsTabBar];
+    __weak typeof(self) weakSelf=self;
+    self.settingsTabBar.selectionChanged=^(NSUInteger index) { [weakSelf selectHomeTab:index]; };
+    self.settingsTabBar.searchOpened=^{ [weakSelf openHomeSearch]; };
+    self.settingsTabBar.queryChanged=^(NSString *query) { [weakSelf updateHomeSearch:query]; };
+    self.settingsTabBar.searchClosed=^{ [weakSelf closeHomeSearch]; };
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(homeThemeChanged:)
+        name:CSSettingsHomeThemeDidChangeNotification object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(homeKeyboardChanged:)
+        name:UIKeyboardWillChangeFrameNotification object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(homeKeyboardChanged:)
+        name:UIKeyboardWillHideNotification object:nil];
+    [self updateHeaderLayout];
+}
+
+#pragma mark - Homepage tabs and search
+
+- (CGFloat)currentHomeDistance {
+    return MAX(0,self.tableView.contentOffset.y+self.tableView.adjustedContentInset.top);
+}
+- (void)setHomeDistance:(CGFloat)distance {
+    UIEdgeInsets inset=self.tableView.adjustedContentInset;
+    CGFloat maximum=CSSettingsHomeMaximumDistance(self.tableView.contentSize.height,self.tableView.bounds.size.height,inset.top,inset.bottom);
+    CGFloat target=CSSettingsHomeClampedDistance(distance,maximum)-inset.top;
+    [self.tableView setContentOffset:CGPointMake(0,target) animated:NO];
+    [self positionSettingsTabBar];
+}
+- (void)positionSettingsTabBar {
+    CGFloat topInset=self.tableView.adjustedContentInset.top;
+    CGFloat y=CSSettingsHomeRailY(self.laidOutProfileHeight,self.tableView.contentOffset.y+topInset,topInset);
+    self.settingsTabBar.horizontalInset=self.headerView.horizontalInset;
+    self.settingsTabBar.frame=CGRectMake(CGRectGetMinX(self.tableView.frame),CGRectGetMinY(self.tableView.frame)+y,
+                                        CGRectGetWidth(self.tableView.bounds),76);
+}
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    [self positionSettingsTabBar];
+}
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
+    [self.homeAnimator cancel];
+}
+- (void)updateHomeFooter {
+    if (!self.homeFooter) return;
+    UIEdgeInsets inset=self.tableView.adjustedContentInset;
+    CGFloat current=CGRectGetHeight(self.homeFooter.frame);
+    CGFloat natural=MAX(0,self.tableView.contentSize.height-current);
+    // Short tabs can retain the pinned rail without inventing rows or invalid offsets.
+    CGFloat minimum=CGRectGetHeight(self.tableView.bounds)+self.laidOutProfileHeight-inset.top-inset.bottom;
+    CGFloat height=MAX(self.sections.count ? 16 : 120,ceil(minimum-natural));
+    CGRect frame=CGRectMake(0,0,CGRectGetWidth(self.tableView.bounds),height);
+    if (!CGRectEqualToRect(self.homeFooter.frame,frame)) {
+        self.homeFooter.frame=frame;
+        self.tableView.tableFooterView=self.homeFooter;
+    }
+    self.emptySearchLabel.hidden=self.sections.count>0;
+    self.emptySearchLabel.frame=CGRectMake(24,20,MAX(0,CGRectGetWidth(frame)-48),80);
+}
+- (void)reloadSettingsKeepingPosition {
+    CGFloat distance=self.pendingHomeDistance ? self.pendingHomeDistance.doubleValue : [self currentHomeDistance];
+    self.pendingHomeDistance=nil;
+    [self reloadHomeAtDistance:distance animated:NO];
+}
+- (void)reloadHomeAtDistance:(CGFloat)distance animated:(BOOL)animated {
+    [self.headerView reloadTheme];
+    [self.settingsTabBar reloadTheme];
+    BOOL transition=animated && !self.suppressHomeTransition;
+    self.suppressHomeTransition=NO;
+    void (^updates)(void)=^{
+        self.sections=self.homeModel.displayedSections;
+        [UIView performWithoutAnimation:^{
+            [self.tableView reloadData];
+            [self.tableView layoutIfNeeded];
+            [self updateHomeFooter];
+            [self.tableView layoutIfNeeded];
+            [self setHomeDistance:distance];
+            [self.tableView layoutIfNeeded];
+        }];
+    };
+    if (transition) [self.homeAnimator transitionTable:self.tableView belowView:self.settingsTabBar updates:updates];
+    else { [self.homeAnimator cancel]; updates(); }
+}
+- (void)selectHomeTab:(NSUInteger)index {
+    self.tabScrollDistances[@(self.homeModel.selectedIndex)]=@([self currentHomeDistance]);
+    CGFloat defaultDistance=MIN([self currentHomeDistance],self.laidOutProfileHeight);
+    [self setupData];
+    if (self.pendingHomeDistance) { [self reloadSettingsKeepingPosition]; return; }
+    self.homeModel.selectedIndex=index;
+    NSNumber *saved=self.tabScrollDistances[@(index)];
+    [self reloadHomeAtDistance:saved ? saved.doubleValue : defaultDistance animated:YES];
+}
+- (void)revealHomeAccountSection {
+    if (!self.homeModel.searching)
+        self.tabScrollDistances[@(self.homeModel.selectedIndex)]=@([self currentHomeDistance]);
+    [self setupData];
+    [self.settingsTabBar resetSearch];
+    self.homeModel.searching=NO;
+    self.homeModel.query=@"";
+    self.homeModel.selectedIndex=0;
+    [self.settingsTabBar setSelectedIndex:0 animated:YES];
+    self.pendingHomeDistance=nil;
+    [self reloadHomeAtDistance:0 animated:YES];
+}
+- (void)openHomeSearch {
+    CGFloat distance=[self currentHomeDistance];
+    self.tabScrollDistances[@(self.homeModel.selectedIndex)]=@(distance);
+    [self setupData];
+    if (self.pendingHomeDistance) { [self reloadSettingsKeepingPosition]; return; }
+    self.homeModel.searching=YES;
+    self.homeModel.query=@"";
+    [self reloadHomeAtDistance:distance animated:YES];
+}
+- (void)updateHomeSearch:(NSString *)query {
+    CGFloat distance=[self currentHomeDistance];
+    [self setupData];
+    if (!self.homeModel.searching) { [self reloadSettingsKeepingPosition]; return; }
+    self.homeModel.query=query;
+    [self reloadHomeAtDistance:distance animated:NO];
+}
+- (void)closeHomeSearch {
+    [self setupData];
+    self.homeModel.searching=NO;
+    self.homeModel.query=@"";
+    NSNumber *saved=self.tabScrollDistances[@(self.homeModel.selectedIndex)];
+    self.pendingHomeDistance=nil;
+    [self reloadHomeAtDistance:saved ? saved.doubleValue : 0 animated:YES];
+}
+- (void)homeKeyboardChanged:(NSNotification *)notification {
+    if (!self.isViewLoaded || (!self.view.window && ![notification.name isEqualToString:UIKeyboardWillHideNotification])) return;
+    [self.homeAnimator cancel];
+    CGFloat distance=[self currentHomeDistance];
+    CGRect end=[self.view convertRect:[notification.userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue] fromView:nil];
+    CGRect intersection=CGRectIntersection(self.view.bounds,end);
+    CGFloat overlap=CGRectIsNull(intersection) || [notification.name isEqualToString:UIKeyboardWillHideNotification]
+        || CGRectGetMaxY(end)<CGRectGetMaxY(self.view.bounds)-1 ? 0 : CGRectGetHeight(intersection);
+    UIEdgeInsets inset=self.tableView.contentInset;
+    inset.bottom=MAX(0,overlap-self.tableView.safeAreaInsets.bottom);
+    self.tableView.contentInset=inset;
+    self.tableView.verticalScrollIndicatorInsets=UIEdgeInsetsMake(76,0,inset.bottom,0);
+    [self updateHomeFooter];
+    [self.tableView layoutIfNeeded];
+    [self setHomeDistance:distance];
+}
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section { return 38; }
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section { return 12; }
+- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
+    UIView *header=[[UIView alloc] initWithFrame:CGRectMake(0,0,CGRectGetWidth(tableView.bounds),38)];
+    CGFloat inset=self.headerView.horizontalInset+16;
+    UILabel *title=[[UILabel alloc] initWithFrame:CGRectMake(inset,6,MAX(0,CGRectGetWidth(tableView.bounds)-2*inset),26)];
+    title.autoresizingMask=UIViewAutoresizingFlexibleWidth;
+    title.font=[[UIFontMetrics metricsForTextStyle:UIFontTextStyleSubheadline]
+        scaledFontForFont:[UIFont systemFontOfSize:14 weight:UIFontWeightSemibold] maximumPointSize:18];
+    title.textColor=UIColor.secondaryLabelColor;
+    title.text=self.sections[section].header;
+    title.accessibilityTraits=UIAccessibilityTraitHeader;
+    [header addSubview:title];
+    return header;
 }
 
 #pragma mark - UITableViewDataSource
@@ -883,14 +1144,18 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    CSSettingTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:[CSSettingTableViewCell reuseIdentifier]];
+    CSSettingItem *item = self.sections[indexPath.section].items[indexPath.row];
+    if ([item.title isEqualToString:@"界面调色"]) {
+        CSSettingsHomePaletteCell *cell=[tableView dequeueReusableCellWithIdentifier:CSSettingsHomePaletteCell.reuseIdentifier forIndexPath:indexPath];
+        __weak typeof(self) weakSelf=self;
+        cell.customColorRequested=^{ [weakSelf presentHomeColorPicker]; };
+        [cell reloadTheme];
+        return cell;
+    }
+    CSSettingsHomeCell *cell=[tableView dequeueReusableCellWithIdentifier:CSSettingsHomeCell.reuseIdentifier forIndexPath:indexPath];
     
     // 获取当前项数据并配置cell
-    CSSettingItem *item = self.sections[indexPath.section].items[indexPath.row];
     [cell configureWithItem:item];
-    if ([item.title isEqualToString:@"版本信息"]) {
-        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-    }
     
     return cell;
 }
@@ -901,7 +1166,34 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
 
 #pragma mark - UITableViewDelegate
 
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    CSSettingItem *item=self.sections[indexPath.section].items[indexPath.row];
+    if ([item.title isEqualToString:@"界面调色"]) return MAX(140,tableView.rowHeight+84);
+    return tableView.rowHeight;
+}
+
+- (void)homeThemeChanged:(NSNotification *)notification {
+    dispatch_async(dispatch_get_main_queue(), ^{ [self reloadSettingsKeepingPosition]; });
+}
+- (void)presentHomeColorPicker {
+    UIViewController *host=CSNativeSettingsHostForContent(self);
+    if (host.presentedViewController) return;
+    UIColorPickerViewController *picker=[UIColorPickerViewController new];
+    picker.title=@"自定义界面颜色";
+    picker.supportsAlpha=NO;
+    picker.selectedColor=CSSettingsHomeTheme.customColor;
+    picker.delegate=self;
+    [host presentViewController:picker animated:YES completion:nil];
+}
+- (void)colorPickerViewControllerDidSelectColor:(UIColorPickerViewController *)viewController {
+    [CSSettingsHomeTheme setCustomColor:viewController.selectedColor];
+}
+- (void)colorPickerViewControllerDidFinish:(UIColorPickerViewController *)viewController {
+    [CSSettingsHomeTheme setCustomColor:viewController.selectedColor];
+}
+
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [self.homeAnimator cancel];
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
     // 获取点击的item

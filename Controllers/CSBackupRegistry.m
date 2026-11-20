@@ -61,6 +61,8 @@ static BOOL CSContacts(id value) {
     dispatch_once(&once, ^{
         // Every row is an exact domain/key identity. Do not replace this with prefix matching.
         NSArray *rows=@[
+            @[@"standard",@"com.wechat.enhance.home_theme.index",@"home_theme",@"number",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.home_theme.custom_rgb",@"home_theme",@"number",@"global",@""],
             @[@"standard",@"com.wechat.enhance.moments_layout.enabled",@"moments_layout",@"bool",@"global",@""],
             @[@"standard",@"com.wechat.enhance.ad_purification.enabled",@"ad_purification",@"bool",@"global",@""],
             @[@"standard",@"com.wechat.enhance.ad_purification.articles",@"ad_purification",@"bool",@"global",@""],
@@ -441,7 +443,7 @@ static BOOL CSContacts(id value) {
     return entries;
 }
 + (NSDictionary<NSString *,NSString *> *)moduleTitles {
-    return @{@"avatar":@"头像",@"background":@"后台与隐私模糊",@"privacy":@"收藏保护",@"layout":@"布局与字体",@"bubble":@"气泡与连续消息",@"groups":@"会话分组",@"list":@"列表圆角",@"input":@"输入文本",@"message_time":@"消息时间",@"red_envelopes":@"红包设置",@"tabbar":@"底栏样式",@"attachments":@"附件布局",@"updates":@"更新控制",@"entry":@"插件入口",@"ui":@"界面精简",@"navigation":@"聊天导航",@"touch":@"触摸轨迹",@"version":@"版本设置",@"backup":@"备份设置",@"revoke":@"防撤回",@"message_actions":@"消息操作",@"transfers":@"转账设置",@"timeline":@"朋友圈尾巴",@"games":@"游戏设置",@"custom_text":@"界面文字",@"scheduled_tasks":@"定时任务",@"ai_reply":@"AI 自动回复",@"group_chat_tools":@"群聊功能",@"automation":@"自动功能",@"client_guard":@"反检测",@"ad_purification":@"广告净化",@"moments_layout":@"朋友圈布局"};
+    return @{@"home_theme":@"首页调色",@"avatar":@"头像",@"background":@"后台与隐私模糊",@"privacy":@"收藏保护",@"layout":@"布局与字体",@"bubble":@"气泡与连续消息",@"groups":@"会话分组",@"list":@"列表圆角",@"input":@"输入文本",@"message_time":@"消息时间",@"red_envelopes":@"红包设置",@"tabbar":@"底栏样式",@"attachments":@"附件布局",@"updates":@"更新控制",@"entry":@"插件入口",@"ui":@"界面精简",@"navigation":@"聊天导航",@"touch":@"触摸轨迹",@"version":@"版本设置",@"backup":@"备份设置",@"revoke":@"防撤回",@"message_actions":@"消息操作",@"transfers":@"转账设置",@"timeline":@"朋友圈尾巴",@"games":@"游戏设置",@"custom_text":@"界面文字",@"scheduled_tasks":@"定时任务",@"ai_reply":@"AI 自动回复",@"group_chat_tools":@"群聊功能",@"automation":@"自动功能",@"client_guard":@"反检测",@"ad_purification":@"广告净化",@"moments_layout":@"朋友圈布局"};
 }
 + (NSDictionary *)entryForDomain:(NSString *)domain key:(NSString *)key {
     if (![domain isKindOfClass:NSString.class] || ![key isKindOfClass:NSString.class]) return nil;
@@ -468,6 +470,8 @@ static BOOL CSContacts(id value) {
         if ([type isEqual:@"bool"]) valid=CSBoolean(value);
         else if ([type isEqual:@"number"]) {
             valid=CSNumber(value);
+            if (valid && [key isEqual:@"com.wechat.enhance.home_theme.index"]) valid=[value doubleValue]>=0 && [value doubleValue]<=4 && floor([value doubleValue])==[value doubleValue];
+            if (valid && [key isEqual:@"com.wechat.enhance.home_theme.custom_rgb"]) valid=[value doubleValue]>=0 && [value doubleValue]<=0xffffff && floor([value doubleValue])==[value doubleValue];
             if (valid && [registered[@"domain"] isEqual:@"legacy"] && [key isEqual:@"BackgroundRunCheckInterval"])
                 valid=[value doubleValue]>=10 && [value doubleValue]<=30 && floor([value doubleValue])==[value doubleValue];
         }

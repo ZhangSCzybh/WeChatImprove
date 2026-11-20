@@ -2,7 +2,7 @@
 
 面向 iOS 微信的 Theos 插件，使用 Objective-C / Logos 接入微信原生界面，提供聊天分组、界面定制、消息增强、自动回复和配置备份等功能，可在插件设置中按需开启。
 
-**源码版本：`2.7-4`** · **架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+**源码版本：`2.7-5`** · **架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
 
 [功能概览](#功能概览) · [安装与入口](#安装与入口) · [使用说明](#使用说明) · [配置与备份](#配置与备份) · [源码编译](#源码编译) · [开发与验证](#开发与验证) · [常见问题](#常见问题)
 
@@ -31,14 +31,14 @@
 
 需要能够向微信加载插件的 iOS 注入环境。近期适配参考为微信 `8.0.78`、`8.0.80`，广告净化等私有接口以 `8.0.80.34` 为核验依据；这不代表所有系统、微信版本及插件组合均已通过真机验证。安装包声明依赖 `mobilesubstrate >= 0.9.5000`。
 
-当前发布版本为正式版 `2.7-4`。本版将随机文案基础字号调整为 16pt，继续适配系统字号与最多两行显示；SVIP 标识参照示例改为固定浅金色背景、黑色衬线文字和小圆角矩形，重新进入与刷新时保持一致。插件版本卡片去除前缀“v”，直接显示版本号。顶部继续按账号信息、随机文案、三张等宽等高状态卡片的顺序展示，文案与卡片随文字高度排列。原设备的最终视觉与触摸交互仍待复验。按设备现有注入环境选择：
+当前发布版本为正式完整版 `2.7-5`。设置首页使用“账号／美化／增强／设置”四个 Tab，每页均保留版本信息与支持作者；右侧搜索按钮在当前 Tab 栏位置展开输入框，搜索与取消保持浏览位置，修复展开时的上移和 Tab 残影。功能组标题、背景与设置项整体进出，增大运动幅度并加快过渡，保留错峰衔接和减少动态效果适配。界面调色的默认绿色更新为 `#05944A`，保留蓝色、紫色、橙色与自定义取色并自动保存；Tab 选中文字与预设色选中对号统一为白色，功能图标、右侧箭头圆形底色和随机文案引号随主题色联动。版本信息与支持作者保持与 SVIP 背景一致的浅金色。顶部账号、文案和状态区域采用宽松布局并适度放大文字，三张状态卡片等宽等高。随机文案仅在重新进入插件时刷新，停留期间下拉、切换 Tab、搜索或从详情返回不再重复请求，继续保留双来源正文提取与失败回退。原设备的最终视觉与触摸交互仍待复验。按设备现有注入环境选择：
 
 | 环境／产物 | 下载 | 说明 |
 | --- | --- | --- |
-| Rootless | [安装包](packages/2.7-4/com.wechat.improve_2.7-4_iphoneos-arm64.deb) | 安装至 `/var/jb/Library/MobileSubstrate/DynamicLibraries/` |
-| Rootful | [安装包](packages/2.7-4/com.wechat.improve_2.7-4_iphoneos-arm.deb) | 安装至 `/Library/MobileSubstrate/DynamicLibraries/` |
-| 重签用动态库 | [WeChatImprove.dylib](packages/2.7-4/WeChatImprove.dylib) | 与 Rootful 包内动态库一致 |
-| 校验与调试 | [SHA-256 清单](packages/2.7-4/SHA256SUMS) · [调试符号](packages/2.7-4/symbols.zip) | 产物详情见[发布说明](packages/2.7-4/README.md) |
+| Rootless | [安装包](packages/2.7-5/com.wechat.improve_2.7-5_iphoneos-arm64.deb) | 安装至 `/var/jb/Library/MobileSubstrate/DynamicLibraries/` |
+| Rootful | [安装包](packages/2.7-5/com.wechat.improve_2.7-5_iphoneos-arm.deb) | 安装至 `/Library/MobileSubstrate/DynamicLibraries/` |
+| 重签用动态库 | [WeChatImprove.dylib](packages/2.7-5/WeChatImprove.dylib) | 与 Rootful 包内动态库一致 |
+| 校验与调试 | [SHA-256 清单](packages/2.7-5/SHA256SUMS) · [调试符号](packages/2.7-5/symbols.zip) | 产物详情见[发布说明](packages/2.7-5/README.md) |
 
 历史版本与附件继续保留，包含 [beta04 文案与状态卡片换位版本](packages/2.7-2-beta04/README.md)、[beta03 文案刷新版本](packages/2.7-2-beta03/README.md)、[beta02 顶部卡片改造版本](packages/2.7-2-beta02/README.md) 和此前的朋友圈布局调整。`2.7-2-beta01` 修复的密友锁定隐藏时朋友圈已选头像、可见范围昵称和上次分组昵称泄露，以及含密友标签的普通好友摘要消失问题继续保留；原始选中成员、朋友圈权限及完整标签关系保持原样。本版基于当前完整源码构建。
 

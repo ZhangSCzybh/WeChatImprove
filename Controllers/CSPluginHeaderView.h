@@ -12,6 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
         pluginVersion:(NSString *)pluginVersion
         wechatVersion:(NSString *)wechatVersion;
 - (void)setVerse:(NSString *)verse;
+- (void)reloadTheme;
 - (void)resetAvatarImage;
 - (CGFloat)preferredHeightForWidth:(CGFloat)width;
 @end

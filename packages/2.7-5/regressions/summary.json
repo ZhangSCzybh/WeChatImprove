@@ -1,0 +1,223 @@
+{
+  "version": "2.7-5",
+  "verified_at": "2026-11-20T16:11:18.855812+08:00",
+  "source_checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "all_passed": true,
+  "total_checks": 10573,
+  "verification_boundary": "Host-side production-method fixtures and iOS15 SDK syntax checks; no physical device install or rendering verification.",
+  "tests": [
+    {
+      "name": "settings-home",
+      "command": [
+        "bash",
+        "Tests/verify-settings-home.sh"
+      ],
+      "exit_code": 0,
+      "result": "passed",
+      "log": "settings-home.log",
+      "log_sha256": "d000d788b535580f36d661bd4df8f496ad98aad2a588aa153fe5fe21aec0aafd",
+      "checks": 868
+    },
+    {
+      "name": "settings-tab-bar",
+      "command": [
+        "bash",
+        "Tests/verify-settings-tab-bar.sh"
+      ],
+      "exit_code": 0,
+      "result": "passed",
+      "log": "settings-tab-bar.log",
+      "log_sha256": "2357cf8bb88cc465e14d6fa41fd0adc6ebeef6d08255baf06c8b5756aca2f25e",
+      "checks": 85
+    },
+    {
+      "name": "settings-home-animation",
+      "command": [
+        "bash",
+        "Tests/verify-settings-home-animation.sh"
+      ],
+      "exit_code": 0,
+      "result": "passed",
+      "log": "settings-home-animation.log",
+      "log_sha256": "72ff2f5f7ebfa07f17fbac0d11847d75d414c34baae3b59d8ceb98f8a7253cbc",
+      "checks": 60
+    },
+    {
+      "name": "settings-home-theme",
+      "command": [
+        "bash",
+        "Tests/verify-settings-home-theme.sh"
+      ],
+      "exit_code": 0,
+      "result": "passed",
+      "log": "settings-home-theme.log",
+      "log_sha256": "1d564a636eb89638822ac54c2be7e727bf9372fefe62129d48ec3e7879d6d46f",
+      "checks": 45
+    },
+    {
+      "name": "plugin-header-entry",
+      "command": [
+        "bash",
+        "Tests/verify-plugin-header-entry.sh"
+      ],
+      "exit_code": 0,
+      "result": "passed",
+      "log": "plugin-header-entry.log",
+      "log_sha256": "7bce0548b50c5251aa664c3bec55e30c5e9661eb67aaf724a1e39e0c4fba76cb",
+      "checks": 35
+    },
+    {
+      "name": "plugin-header-avatar",
+      "command": [
+        "bash",
+        "Tests/verify-plugin-header-avatar.sh"
+      ],
+      "exit_code": 0,
+      "result": "passed",
+      "log": "plugin-header-avatar.log",
+      "log_sha256": "f599a6708143b4af215d78c7634499047ae9c11cccded596f03649f7aa5037a8",
+      "checks": 30
+    },
+    {
+      "name": "plugin-header-layout",
+      "command": [
+        "bash",
+        "Tests/verify-plugin-header-layout.sh"
+      ],
+      "exit_code": 0,
+      "result": "passed",
+      "log": "plugin-header-layout.log",
+      "log_sha256": "8e5691940a8b74298ef7e6612e665546c8b425512c5044eda03819c0bca9193d",
+      "checks": 7258
+    },
+    {
+      "name": "authorization-prompt",
+      "command": [
+        "bash",
+        "Tests/verify-authorization-prompt.sh"
+      ],
+      "exit_code": 0,
+      "result": "passed",
+      "log": "authorization-prompt.log",
+      "log_sha256": "0b4feb1c7858f1f791daf5bbadffb4f28e0064e44f22a866dab30ff5dc532060",
+      "checks": 111
+    },
+    {
+      "name": "close-friend-entry",
+      "command": [
+        "bash",
+        "Tests/verify-close-friend-entry.sh"
+      ],
+      "exit_code": 0,
+      "result": "passed",
+      "log": "close-friend-entry.log",
+      "log_sha256": "727dd70f5968498471acdfc5867b2ffb767a5e500b18af3b211033f25d832132",
+      "checks": 100
+    },
+    {
+      "name": "backup-registry",
+      "command": [
+        "bash",
+        "Tests/verify-backup-registry.sh"
+      ],
+      "exit_code": 0,
+      "result": "passed",
+      "log": "backup-registry.log",
+      "log_sha256": "d391731971b9969c81096139a9f5cc301ffbba0735492263dc0926b77940accf",
+      "checks": 1905
+    },
+    {
+      "name": "ios15-syntax-arm64",
+      "command": [
+        "xcrun",
+        "--sdk",
+        "iphoneos",
+        "clang",
+        "-target",
+        "arm64-apple-ios15.0",
+        "-fobjc-arc",
+        "-fblocks",
+        "-fsyntax-only",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unused-parameter",
+        "-Wno-nullability-completeness",
+        "-IHeaders",
+        "-IControllers",
+        "-IHooks",
+        "Controllers/CSCustomViewController.m",
+        "Controllers/CSSettingsHomeAnimator.m",
+        "Controllers/CSSettingsHomeTheme.m",
+        "Controllers/CSSettingsHomePaletteCell.m",
+        "Controllers/CSSettingsHomeCell.m",
+        "Controllers/CSSettingsTabBar.m"
+      ],
+      "exit_code": 0,
+      "result": "passed",
+      "log": "ios15-syntax-arm64.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "ios15-syntax-arm64e",
+      "command": [
+        "xcrun",
+        "--sdk",
+        "iphoneos",
+        "clang",
+        "-target",
+        "arm64e-apple-ios15.0",
+        "-fobjc-arc",
+        "-fblocks",
+        "-fsyntax-only",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unused-parameter",
+        "-Wno-nullability-completeness",
+        "-IHeaders",
+        "-IControllers",
+        "-IHooks",
+        "Controllers/CSCustomViewController.m",
+        "Controllers/CSSettingsHomeAnimator.m",
+        "Controllers/CSSettingsHomeTheme.m",
+        "Controllers/CSSettingsHomePaletteCell.m",
+        "Controllers/CSSettingsHomeCell.m",
+        "Controllers/CSSettingsTabBar.m"
+      ],
+      "exit_code": 0,
+      "result": "passed",
+      "log": "ios15-syntax-arm64e.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "version-release",
+      "command": [
+        "python3",
+        "/tmp/wechat-2.7-5-release-checks.py"
+      ],
+      "exit_code": 0,
+      "result": "passed",
+      "log": "version-release.log",
+      "log_sha256": "399bc7dd95f1bae5a4119b9b5dc4453a462d36d332323de92511df38636278ac",
+      "checks": 76,
+      "details": "version-release.json"
+    }
+  ],
+  "parameter_expectation_sync": {
+    "reason": "Preserve user-adjusted production animation parameters; update five stale test assertions only.",
+    "production_source_unchanged": true,
+    "outgoing_distance_pt": 160,
+    "outgoing_duration_seconds": 0.14,
+    "incoming_distance_pt": 210,
+    "incoming_duration_seconds": 0.2,
+    "incoming_delay_lead_seconds": 0.01,
+    "incoming_stagger_seconds": 0.02,
+    "incoming_stagger_cap_seconds": 0.04,
+    "total_transition_cap_seconds": 0.25,
+    "initial_summary": "summary-initial.json",
+    "initial_log": "settings-home-animation.initial.log",
+    "initial_failed_assertions": 13,
+    "test_assertions_updated": 5
+  }
+}

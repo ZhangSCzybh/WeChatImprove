@@ -8,7 +8,7 @@ from pathlib import Path
 import re, sys
 source = (Path(sys.argv[1]) / 'Controllers/CSCustomViewController.m').read_text()
 methods = []
-for name in ['viewWillAppear:', 'refreshHeaderVerse', 'settingsDidChange:', 'refreshHeaderFromNotification:']:
+for name in ['viewWillAppear:', 'viewDidDisappear:', 'finishHeaderVerseVisitIfLeaving', 'refreshHeaderVerse', 'settingsDidChange:', 'refreshHeaderFromNotification:']:
     match = re.search(r'^- \([^)]+\)' + re.escape(name) + r'(?=[ (:{])', source, re.M)
     if not match:
         raise SystemExit('Missing real controller method: ' + name)

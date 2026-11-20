@@ -1,0 +1,14 @@
+FAIL: outgoing complete groups fade out together over 200ms
+FAIL: outgoing groups visibly move down twenty-eight points without horizontal displacement
+FAIL: incoming groups fade in over 300ms after a short 40ms lead-in and 30ms section stagger
+FAIL: incoming complete groups rise sixty-four points into their final position
+FAIL: outgoing complete groups fade out together over 200ms
+FAIL: outgoing groups visibly move down twenty-eight points without horizontal displacement
+FAIL: incoming groups fade in over 300ms after a short 40ms lead-in and 30ms section stagger
+FAIL: incoming complete groups rise sixty-four points into their final position
+FAIL: outgoing complete groups fade out together over 200ms
+FAIL: outgoing groups visibly move down twenty-eight points without horizontal displacement
+FAIL: incoming groups fade in over 300ms after a short 40ms lead-in and 30ms section stagger
+FAIL: incoming complete groups rise sixty-four points into their final position
+FAIL: stagger delay caps at 100ms and the complete transition ends within 400ms even with several visible groups
+Settings home group animation: 60 checks, 13 failures

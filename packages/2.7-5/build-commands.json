@@ -1,0 +1,39 @@
+{
+  "version": "2.7-5",
+  "builds": [
+    {
+      "scheme": "rootless",
+      "command": [
+        "make",
+        "package",
+        "-j4",
+        "THEOS=/Users/zhangshichao/theos",
+        "SCHEME=rootless",
+        "_THEOS_LOCAL_DATA_DIR=/tmp/wechat-2.7-5-rootless",
+        "THEOS_PACKAGE_DIR=/Users/zhangshichao/Documents/Workspace/WeChatImprove/packages/2.7-5"
+      ],
+      "source_checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+      "build_directory": "/tmp/wechat-2.7-5-rootless",
+      "started_at": "2026-11-20T16:08:56.242314+08:00",
+      "completed_at": "2026-11-20T16:09:26.984670+08:00",
+      "exit_code": 0
+    },
+    {
+      "scheme": "rootful",
+      "command": [
+        "make",
+        "package",
+        "-j4",
+        "THEOS=/Users/zhangshichao/theos",
+        "SCHEME=rootful",
+        "_THEOS_LOCAL_DATA_DIR=/tmp/wechat-2.7-5-rootful",
+        "THEOS_PACKAGE_DIR=/Users/zhangshichao/Documents/Workspace/WeChatImprove/packages/2.7-5"
+      ],
+      "source_checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+      "build_directory": "/tmp/wechat-2.7-5-rootful",
+      "started_at": "2026-11-20T16:08:56.242588+08:00",
+      "completed_at": "2026-11-20T16:09:26.984820+08:00",
+      "exit_code": 0
+    }
+  ]
+}
