@@ -4,6 +4,8 @@
 extern "C" {
 #endif
 FOUNDATION_EXPORT NSArray *CSCFVisible(NSArray *source, CSCloseFriendSurface surface);
+/// Display names in source order; the native contact/selection models are never changed.
+FOUNDATION_EXPORT NSArray<NSString *> *CSCFContactNames(NSArray *contacts);
 FOUNDATION_EXPORT BOOL CSCFIsClass(id object, NSString *className);
 FOUNDATION_EXPORT BOOL CSCFCallVoid(id object, NSString *selector);
 FOUNDATION_EXPORT BOOL CSCFSetObject(id object, NSString *selector, id value);

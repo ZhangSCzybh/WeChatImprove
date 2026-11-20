@@ -1,7 +1,6 @@
 #import "CSResetSettingsViewController.h"
 #import "CSBackupManager.h"
 #import "CSBackupPreviewViewController.h"
-#import "CSBackupSettingsViewController.h"
 #import "CSBackupSettingsCell.h"
 @interface CSResetSettingsViewController ()
 @property(nonatomic) NSArray<CSSettingSection *> *sections;
@@ -17,12 +16,10 @@
     // Use the same inherited typography as the normal rows on the transfer settings page.
     CSSettingItem *reset=[CSSettingItem itemWithTitle:@"重置范围" iconName:@"arrow.counterclockwise" iconColor:UIColor.systemRedColor detail:nil];
     reset.detail=@"预览";reset.actionBlock=^{[weakSelf previewReset];};
-    CSSettingItem *backup=[CSSettingItem itemWithTitle:@"备份配置" iconName:@"archivebox.fill" iconColor:UIColor.systemBlueColor detail:nil];
-    backup.actionBlock=^{[weakSelf.navigationController pushViewController:[[CSBackupSettingsViewController alloc]initWithStyle:UITableViewStyleInsetGrouped] animated:YES];};
     CSSettingItem *info=[CSSettingItem itemWithTitle:@"功能说明" iconName:@"info.circle" iconColor:UIColor.systemOrangeColor detail:nil];
     info.actionBlock=^{[weakSelf showExplanation];};
     self.sections=@[[CSSettingSection sectionWithHeader:@"重置插件配置" items:@[reset]],
-                    [CSSettingSection sectionWithHeader:@"备份与说明" items:@[backup,info]]];
+                    [CSSettingSection sectionWithHeader:@"说明" items:@[info]]];
 }
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {(void)tableView;return self.sections.count;}
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {(void)tableView;return self.sections[section].items.count;}

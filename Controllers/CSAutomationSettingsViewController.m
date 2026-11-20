@@ -120,7 +120,7 @@ typedef void (^CSAutoCommit)(id value,void (^done)(BOOL success));
 - (void)textViewDidChange:(UITextView *)textView { (void)textView;[self updateState]; }
 - (void)updateState {
     BOOL valid=CSAutoValid(self.context);
-    self.counter.text=valid?[NSString stringWithFormat:@"%lu / %lu 字。支持多行；保存本段后返回上一级，完成列表保存后生效。",(unsigned long)self.editor.text.length,(unsigned long)self.maximum]:@"账号或设置已变化，请返回重新编辑。草稿未保存。";
+    self.counter.text=valid?[NSString stringWithFormat:@"%lu / %lu 字。支持换行，保存后还需保存上级列表。",(unsigned long)self.editor.text.length,(unsigned long)self.maximum]:@"账号或设置已变化，请返回重新编辑。草稿未保存。";
     self.counter.textColor=self.editor.text.length>self.maximum?UIColor.systemRedColor:UIColor.secondaryLabelColor;
     self.navigationItem.rightBarButtonItem.enabled=valid && !self.saving && CSAutoTextValid(self.editor.text,self.maximum);
 }
@@ -205,7 +205,7 @@ typedef void (^CSAutoCommit)(id value,void (^done)(BOOL success));
 - (NSString *)entryDetail:(id)entry { (void)entry;return nil; }
 - (NSUInteger)maximumEntries { return 100; }
 - (BOOL)entriesValid { return YES; }
-- (NSString *)listHelp { return @"编辑后可删除或拖动排序。点击保存后生效，返回不保存。"; }
+- (NSString *)listHelp { return @"点“编辑”可删除或排序，保存后生效，返回不保存。"; }
 @end
 
 @interface CSAutomationContentList : CSAutomationDraftList @end
@@ -213,7 +213,7 @@ typedef void (^CSAutoCommit)(id value,void (^done)(BOOL success));
 - (BOOL)entriesValid { if(self.entries.count>100)return NO;for(NSString *text in self.entries)if(!CSAutoTextValid(text,4000))return NO;return YES; }
 - (NSString *)entryTitle:(id)entry index:(NSUInteger)index { (void)entry;return [NSString stringWithFormat:@"回复 %lu",(unsigned long)index+1]; }
 - (NSString *)entryDetail:(id)entry { return [entry stringByReplacingOccurrencesOfString:@"\n" withString:@" "]; }
-- (NSString *)listHelp { return [@"最多 100 条，每条 1–4000 字，支持多行。每次触发随机选一条；空列表不发送。编辑后可删除或拖动排序。" stringByAppendingString:self.saveHint?:@"点保存后整份内容生效，返回不保存。"]; }
+- (NSString *)listHelp { return [@"最多 100 条，每条 1–4000 字；每次随机回复一条，空列表不回复。点“编辑”可删除或排序。" stringByAppendingString:self.saveHint?:@"保存列表后生效，返回不保存。"]; }
 - (void)addEntry { [self openText:NSNotFound]; }
 - (void)editEntry:(NSUInteger)index { [self openText:index]; }
 - (void)openText:(NSUInteger)index {
@@ -254,7 +254,7 @@ typedef void (^CSAutoCommit)(id value,void (^done)(BOOL success));
 }
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section { (void)tableView;(void)section;return self.rows.count; }
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
-    (void)tableView;(void)section;return CSAutoValid(self.context)?@"全匹配：消息全文相同。开头匹配：消息以关键词开头。模糊匹配：消息中包含关键词。每个关键词独立配置回复内容，触发时随机选择一条。保存本项后，需在关键词列表再次保存才会生效。":@"账号或设置已变化，请返回重新编辑。草稿未保存。";
+    (void)tableView;(void)section;return CSAutoValid(self.context)?@"全匹配：全文相同；开头匹配：以关键词开头；模糊匹配：包含关键词。随机回复一条内容，保存后还需保存关键词列表。":@"账号或设置已变化，请返回重新编辑。草稿未保存。";
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)path {
     CSAutomationSettingsCell *cell=[tableView dequeueReusableCellWithIdentifier:CSAutomationSettingsCell.reuseIdentifier forIndexPath:path];[cell configureWithItem:self.rows[path.row]];
@@ -281,7 +281,7 @@ typedef void (^CSAutoCommit)(id value,void (^done)(BOOL success));
 }
 - (void)editContents {
     CSAutomationContentList *page=[[CSAutomationContentList alloc]initWithStyle:UITableViewStyleInsetGrouped];page.title=@"关键词回复内容";page.context=self.context;page.entries=[self.rule[@"contents"] mutableCopy]?:[NSMutableArray array];
-    page.saveHint=@"此页保存仅更新关键词草稿，完成关键词和列表保存后生效。返回不保存。";
+    page.saveHint=@"保存后还需依次保存关键词和关键词列表，返回不保存。";
     __weak typeof(self) weakSelf=self;page.commit=^(NSArray *contents,void (^done)(BOOL)){typeof(self) owner=weakSelf;if(!owner||!CSAutoValid(owner.context)){done(NO);return;}owner.rule[@"contents"]=contents;[owner reloadRows];done(YES);};
     [self.navigationController pushViewController:page animated:YES];
 }
@@ -301,7 +301,7 @@ typedef void (^CSAutoCommit)(id value,void (^done)(BOOL success));
 }
 - (NSString *)entryTitle:(id)entry index:(NSUInteger)index { (void)index;return entry[@"keyword"]; }
 - (NSString *)entryDetail:(id)entry { return [NSString stringWithFormat:@"%@ · %lu 条",CSAutoMatchTitle(entry[@"match"]),(unsigned long)[entry[@"contents"] count]]; }
-- (NSString *)listHelp { return @"最多 200 个关键词。编辑后可删除或拖动调整优先顺序；同一消息命中多个关键词时，只回复排在最前的一项。点保存后整份列表生效，返回不保存。"; }
+- (NSString *)listHelp { return @"最多 200 个关键词，按顺序匹配首条。点“编辑”可删除或排序，保存列表后生效，返回不保存。"; }
 - (void)addEntry { [self openRule:NSNotFound]; }
 - (void)editEntry:(NSUInteger)index { [self openRule:index]; }
 - (void)openRule:(NSUInteger)index {
@@ -394,12 +394,12 @@ typedef void (^CSAutoCommit)(id value,void (^done)(BOOL success));
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
     (void)tableView;
     if(!CSAutomationManager.sharedManager.ready)return section==0?(CSAutomationManager.sharedManager.statusText.length?CSAutomationManager.sharedManager.statusText:@"当前账号尚未就绪，请稍后重试。"):nil;
-    if(section==(NSInteger)CSAutoModules().count)return @"默认关闭，同时用于拍我自动回拍和拍我自动回复。开启且拍动模块配置有效时，微信有后台执行机会且账号与授权可用，约每 10 秒尝试请求新消息；原生同步忙碌或暂不可用且尚未发出请求时，约 2 秒复查。关闭后仍处理微信原生收到的拍动，并遵守各模块的执行延迟。此开关按账号保存，不会自动开启后台运行；AI 的 45 秒后台兜底补拉由其自身开关控制。";
-    NSArray *details=@[@"仅处理拍到自己的新拍一拍。撤回只针对本功能本次自动发出的回拍，从微信确认发送成功后开始计时，并受微信允许的撤回时间限制。",
-        @"每次从本模块的回复内容中随机选一条。@ 仅在群聊生效；私聊发送普通回复。名单和延迟与其他模块独立。",
-        @"识别群聊中真正 @ 当前账号的消息。每次随机回复一条；同一条消息同时命中关键词时，优先执行本模块。",
-        @"仅匹配文字消息，按关键词列表顺序采用第一条命中的规则。回复自己指在所选会话中回复本人发出的消息，自动功能产生的消息不会再次触发自身。"];
-    NSString *boundary=[NSString stringWithFormat:@"设备首次解锁后，微信有后台执行机会且本功能存储、账号和授权可用时，锁屏也可处理，不要求本插件开启后台运行。条件暂不可用时保留等待；恢复可用或回前台后，未完成的任务在到期后 %.0f 分钟内补发一次，超过不补发。系统挂起或进程退出期间不能实时处理；撤回另受微信原生时间窗口限制。",CSAutomationLateAllowance/60.0];
+    if(section==(NSInteger)CSAutoModules().count)return @"开启后辅助接收后台拍一拍，用于自动回拍和拍我回复，可能增加耗电。默认关闭，后台效果受系统限制；按各模块的会话和延迟设置执行。";
+    NSArray *details=@[@"选择生效会话并设置延迟，被拍后自动回拍。可撤回本次自动回拍，撤回延迟从发送成功后计时。",
+        @"选择生效会话，添加回复内容并设置延迟。被拍后随机回复一条，群聊可选择 @ 对方。",
+        @"选择生效群聊并添加回复内容，被 @ 时随机回复一条。与关键词同时命中时优先回复。",
+        @"选择生效会话，添加关键词和回复内容。仅匹配文字，按列表顺序回复首条命中规则，可选择回复自己或别人。"];
+    NSString *boundary=[NSString stringWithFormat:@"后台执行受系统限制；未完成操作超过原定时间 %.0f 分钟不再补发。",CSAutomationLateAllowance/60.0];
     return [NSString stringWithFormat:@"%@\n\n%@",details[(NSUInteger)MIN(MAX(section,0),3)],boundary];
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)path {
@@ -424,7 +424,7 @@ typedef void (^CSAutoCommit)(id value,void (^done)(BOOL success));
     NSTimeInterval window=revoke?[self.nativeAdapter revokeWindow]:0;
     if(revoke){if(!isfinite(window)||window<=1){CSAutoAlert(self,@"当前微信无法提供可用的拍一拍撤回时间，请稍后重试。");return;}maximum=(NSUInteger)MIN(300,ceil(window)-1);}
     NSUInteger minimum=revoke?1:0;
-    NSString *message=[NSString stringWithFormat:revoke?@"输入 %lu–%lu 的整数秒数，从本次回拍确认发送成功后计时。":@"输入 %lu–%lu 的整数秒数，0 表示立即执行。",(unsigned long)minimum,(unsigned long)maximum];
+    NSString *message=[NSString stringWithFormat:revoke?@"输入 %lu–%lu 秒的整数，从回拍发送成功后计时。":@"输入 %lu–%lu 的整数秒数，0 表示立即执行。",(unsigned long)minimum,(unsigned long)maximum];
     UIAlertController *alert=[UIAlertController alertControllerWithTitle:revoke?@"撤回延迟":@"执行延迟" message:message preferredStyle:UIAlertControllerStyleAlert];__weak UIAlertController *weakAlert=alert;__weak typeof(self) weakSelf=self;
     [alert addTextFieldWithConfigurationHandler:^(UITextField *field){field.keyboardType=UIKeyboardTypeNumberPad;field.text=[CSAutomationManager.sharedManager.configuration[module][key] description];}];
     [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];

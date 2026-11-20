@@ -1,0 +1,164 @@
+PASS current version macro exists
+PASS plugin macro equals formal version
+PASS package control equals formal version
+PASS real method selects by current macro
+PASS existing missing-version fallback retained
+PASS Foundation real-method compilation succeeds
+PASS Foundation real-method execution succeeds
+Runtime release notes: 174 checks passed
+{
+  "version": "2.7-2",
+  "checks": 173,
+  "notes": [
+    {
+      "detail": "头像右侧上下排列昵称与微信号，微信号以普通文字显示并保留“微信号：”前缀；未取得微信号时显示原有提示。",
+      "title": "优化首页账号信息"
+    },
+    {
+      "detail": "昵称后显示白字 SVIP 胶囊，背景从五种预设颜色中随机选择。普通刷新和布局调整时保持选定颜色，长昵称自动省略并为标识预留空间。",
+      "title": "新增 SVIP 胶囊标识"
+    },
+    {
+      "detail": "顶部依次展示账号信息、随机文案和三张状态卡片。状态卡片从左到右显示已开启功能数、插件版本和实际微信版本，随文案高度调整位置，适配小屏与大字号。",
+      "title": "整理顶部布局与状态卡片"
+    },
+    {
+      "detail": "每次进入设置首页请求新文案，诗词与随机一言两个来源按进入次数轮换。仅显示正文，去除末尾标题、作者或署名；上游随机内容可能重复。",
+      "title": "每次进入刷新随机文案"
+    },
+    {
+      "detail": "首个来源失败或内容重复时尝试另一来源一次。请求不阻塞页面，两个来源均失败时保留缓存，无缓存时显示内置文案。",
+      "title": "完善文案回退体验"
+    }
+  ]
+}
+PASS runtime release version equals formal version
+PASS runtime current release contains exactly five notes
+PASS current release title matches existing SVIP display
+PASS current release detail matches existing SVIP display
+PASS root readme paragraph structure preserved
+PASS only current version line, paragraph and download table changed
+PASS root source version line synchronized
+PASS root current publication states formal version
+PASS root current publication omits beta version
+PASS current download table uses formal paths only
+PASS all six current root download links synchronized
+PASS root readme unchanged paragraph 0
+PASS root readme unchanged paragraph 1
+PASS root readme unchanged paragraph 3
+PASS root readme unchanged paragraph 4
+PASS root readme unchanged paragraph 5
+PASS root readme unchanged paragraph 6
+PASS root readme unchanged paragraph 7
+PASS root readme unchanged paragraph 10
+PASS root readme unchanged paragraph 11
+PASS root readme unchanged paragraph 12
+PASS root readme unchanged paragraph 13
+PASS root readme unchanged paragraph 14
+PASS root readme unchanged paragraph 15
+PASS root readme unchanged paragraph 16
+PASS root readme unchanged paragraph 17
+PASS root readme unchanged paragraph 18
+PASS root readme unchanged paragraph 19
+PASS root readme unchanged paragraph 20
+PASS root readme unchanged paragraph 21
+PASS root readme unchanged paragraph 22
+PASS root readme unchanged paragraph 23
+PASS root readme unchanged paragraph 24
+PASS root readme unchanged paragraph 25
+PASS root readme unchanged paragraph 26
+PASS root readme unchanged paragraph 27
+PASS root readme unchanged paragraph 28
+PASS root readme unchanged paragraph 29
+PASS root readme unchanged paragraph 30
+PASS root readme unchanged paragraph 31
+PASS root readme unchanged paragraph 32
+PASS root readme unchanged paragraph 33
+PASS root readme unchanged paragraph 34
+PASS root readme unchanged paragraph 35
+PASS root readme unchanged paragraph 36
+PASS root readme unchanged paragraph 37
+PASS root readme unchanged paragraph 38
+PASS root readme unchanged paragraph 39
+PASS root readme unchanged paragraph 40
+PASS root readme unchanged paragraph 41
+PASS root readme unchanged paragraph 42
+PASS root readme unchanged paragraph 43
+PASS root readme unchanged paragraph 44
+PASS root readme unchanged paragraph 45
+PASS root readme unchanged paragraph 46
+PASS root readme unchanged paragraph 47
+PASS root readme unchanged paragraph 48
+PASS root readme unchanged paragraph 49
+PASS root readme unchanged paragraph 50
+PASS root readme unchanged paragraph 51
+PASS root readme unchanged paragraph 52
+PASS root readme unchanged paragraph 53
+PASS root readme unchanged paragraph 54
+PASS root readme unchanged paragraph 55
+PASS root readme unchanged paragraph 56
+PASS root readme unchanged paragraph 57
+PASS root readme unchanged paragraph 58
+PASS root readme unchanged paragraph 59
+PASS root readme unchanged paragraph 60
+PASS root readme unchanged paragraph 61
+PASS root readme unchanged paragraph 62
+PASS root readme unchanged paragraph 63
+PASS root readme unchanged paragraph 64
+PASS root readme unchanged paragraph 65
+PASS root readme unchanged paragraph 66
+PASS root readme unchanged paragraph 67
+PASS root readme unchanged paragraph 68
+PASS root readme unchanged paragraph 69
+PASS root readme unchanged paragraph 70
+PASS root readme unchanged paragraph 71
+PASS root readme unchanged paragraph 72
+PASS root readme unchanged paragraph 73
+PASS root readme unchanged paragraph 74
+PASS historical release paragraph byte-equivalent
+PASS all old release source bytes preserved after removing inserted current notes
+PASS package readme title synchronized
+PASS package readme states formal release
+PASS current root publication uses existing SVIP name
+PASS new package readme uses existing SVIP name
+PASS new package readme omits beta references
+PASS package readme links com.wechat.improve_2.7-2_iphoneos-arm64.deb
+PASS package readme links com.wechat.improve_2.7-2_iphoneos-arm.deb
+PASS package readme links WeChatImprove.dylib
+PASS package readme links symbols.zip
+PASS package readme links SHA256SUMS
+PASS package readme links build-validation.json
+PASS package readme links source-sha256.json
+PASS package readme links regressions/summary.json
+PASS package readme links build-rootless.log
+PASS package readme links build-rootful.log
+PASS current root release excludes restricted description category 1
+PASS current root release excludes restricted description category 2
+PASS current root release excludes restricted description category 3
+PASS current root release excludes restricted description category 4
+PASS current root release excludes restricted description category 5
+PASS current root release excludes restricted description category 6
+PASS current root release excludes restricted description category 7
+PASS current root release excludes restricted description category 8
+PASS current root release excludes restricted description category 9
+PASS current root release excludes restricted description category 10
+PASS current root release excludes restricted description category 11
+PASS current root release excludes restricted description category 12
+PASS current root release excludes restricted description category 13
+PASS current root release excludes restricted description category 14
+PASS new package readme excludes restricted description category 1
+PASS new package readme excludes restricted description category 2
+PASS new package readme excludes restricted description category 3
+PASS new package readme excludes restricted description category 4
+PASS new package readme excludes restricted description category 5
+PASS new package readme excludes restricted description category 6
+PASS new package readme excludes restricted description category 7
+PASS new package readme excludes restricted description category 8
+PASS new package readme excludes restricted description category 9
+PASS new package readme excludes restricted description category 10
+PASS new package readme excludes restricted description category 11
+PASS new package readme excludes restricted description category 12
+PASS new package readme excludes restricted description category 13
+PASS new package readme excludes restricted description category 14
+Release notes and version: 309 checks passed (135 manifest/document/history checks + 174 real Foundation checks)
+RESULT_JSON {"result": "passed", "checks": 309, "script_sha256": "a8faa0be8a11256a7804919ad34ee37d14e2bd588d5ec323ea147b85aed0202a"}

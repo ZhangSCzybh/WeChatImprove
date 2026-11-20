@@ -38,7 +38,6 @@
 #import "CSGroupChatSettingsViewController.h"
 #import "CSAutomationSettingsViewController.h"
 #import "CSScheduledTaskSettingsViewController.h"
-#import "CSResetSettingsViewController.h"
 #import "CSBackupSettingsViewController.h"
 #import "CSBubbleStyleSettingsViewController.h"
 #import "CSListCornerRadiusSettingsViewController.h"
@@ -47,34 +46,25 @@
 #import "CSTabBarStyleSettingsViewController.h"
 #import "CSAuthorizationManager.h"
 #import "CSClientGuardSettingsViewController.h"
+#import "CSPluginHeaderView.h"
+#import "CSPluginFeatureSummary.h"
+#import "CSPluginVerseProvider.h"
+#import "CSNavigationImageLoader.h"
+#import "CSPreferenceRefresh.h"
 
-// UI 常量
-static CGFloat const kHeaderViewHeight = 150.0f;        // 头部视图高度
-static CGFloat const kAvatarSize = 80.0f;              // 头像大小
-static CGFloat const kAvatarTopMargin = 0.0f;         // 头像顶部间距
-static CGFloat const kNicknameTopMargin = 15.0f;       // 昵称顶部间距
-static CGFloat const kNicknameHeight = 25.0f;          // 昵称高度
-static CGFloat const kWXIDTopMargin = 5.0f;            // 微信号顶部间距
-static CGFloat const kWXIDHeight = 20.0f;              // 微信号高度
-static CGFloat const kLabelHorizontalMargin = 20.0f;   // 标签水平间距
-
-// 字体大小
-static CGFloat const kNicknameFontSize = 20.0f;        // 昵称字体大小
-static CGFloat const kWXIDFontSize = 14.0f;            // 微信号字体大小
-
-// 头像缓存Key
-static NSString * const kAvatarCacheKey = @"com.wechat.tweak.avatar.cache";
 // 用户协议同意标记
 static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agreement.accepted.v3";
 
-@interface CSCustomViewController () <UITableViewDelegate, UITableViewDataSource, UIGestureRecognizerDelegate>
+@interface CSCustomViewController () <UITableViewDelegate, UITableViewDataSource, UIGestureRecognizerDelegate> {
+    atomic_bool _headerRefreshPending;
+}
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) NSArray<CSSettingSection *> *sections;
 @property (nonatomic, strong) UIImageView *avatarImageView;
-@property (nonatomic, strong) UILabel *nicknameLabel;
-@property (nonatomic, strong) UILabel *wxidLabel;
-@property (nonatomic, strong) UIView *headerView;
-@property (nonatomic, strong) UIActivityIndicatorView *loadingIndicator;
+@property (nonatomic, strong) CSPluginHeaderView *headerView;
+@property (nonatomic, strong) CSNavigationImageRequest *avatarRequest;
+@property (nonatomic, copy) NSArray *avatarIdentity;
+@property (nonatomic) NSUInteger headerVerseEntryGeneration;
 @property (nonatomic, strong) NSTimer *countdownTimer; // 倒计时计时器
 @property (nonatomic, assign) NSInteger countdownSeconds; // 倒计时剩余秒数
 @property (nonatomic, strong) UIAlertAction *continueAction; // 继续按钮引用
@@ -119,8 +109,7 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
     [self setupHeaderView];
     [self setupUI];
     
-    // 预加载头像，在界面显示前就开始加载
-    [self preloadAvatarImage];
+    [self refreshHeaderContent];
     
     // 监听配置变更通知
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -137,9 +126,15 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
                                                  name:CSCloseFriendPolicyDidChangeNotification
                                                object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(resetCloseFriendQuickEntry) name:UIApplicationDidEnterBackgroundNotification object:nil];
+    for (NSString *name in [CSPluginFeatureSummary refreshNotificationNames]) {
+        if ([name isEqualToString:@"com.wechat.tweak.settings_changed"] ||
+            [name isEqualToString:@"com.wechat.tweak.local_settings_changed"]) continue;
+        [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshHeaderFromNotification:) name:name object:nil];
+    }
 }
 
 - (void)dealloc {
+    [self.avatarRequest cancel];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -147,6 +142,7 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
     dispatch_async(dispatch_get_main_queue(), ^{
         [self setupData];
         [self.tableView reloadData];
+        [self refreshHeaderContent];
     });
 }
 
@@ -155,6 +151,9 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
     // Rebuild before the first frame, including when returning under a different account.
     [self setupData];
     [self.tableView reloadData];
+    [self refreshHeaderContent];
+    self.headerVerseEntryGeneration++;
+    [self refreshHeaderVerse];
     // Covers direct third-party plugin registration routes before any settings content appears.
     UIView *cover=[self.view viewWithTag:871042];
     if(CSCloseFriendPluginEntryHidden() && !cover) {
@@ -389,182 +388,98 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
            @"8. 开发者保留随时修改、中断或终止本插件的权利，无需事先通知。";
 }
 
-// 预加载头像图片
-- (void)preloadAvatarImage {
-    // 添加加载指示器
-    if (!self.loadingIndicator) {
-        self.loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleMedium];
-        self.loadingIndicator.center = self.avatarImageView.center;
-        [self.headerView addSubview:self.loadingIndicator];
-        [self.loadingIndicator startAnimating];
-    }
-    
-    // 1. 先尝试从内存缓存加载
-    NSData *cachedImageData = [[NSUserDefaults standardUserDefaults] objectForKey:kAvatarCacheKey];
-    if (cachedImageData) {
-        UIImage *cachedImage = [UIImage imageWithData:cachedImageData];
-        if (cachedImage) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                self.avatarImageView.image = cachedImage;
-                [self.loadingIndicator stopAnimating];
-                [self.loadingIndicator removeFromSuperview];
-            });
-            return;
-        }
-    }
-    
-    // 2. 如果内存缓存没有，则从URL加载
-    NSString *avatarURL = [[NSUserDefaults standardUserDefaults] objectForKey:kUserAvatarURLKey];
-    if (avatarURL.length > 0) {
-        NSURL *url = [NSURL URLWithString:avatarURL];
-        if (url) {
-            NSURLSession *session = [NSURLSession sharedSession];
-            NSURLSessionDataTask *task = [session dataTaskWithURL:url completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-                if (error || !data) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [self.loadingIndicator stopAnimating];
-                        [self.loadingIndicator removeFromSuperview];
-                    });
-                    return;
-                }
-                
-                UIImage *image = [UIImage imageWithData:data];
-                if (!image) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [self.loadingIndicator stopAnimating];
-                        [self.loadingIndicator removeFromSuperview];
-                    });
-                    return;
-                }
-                
-                // 缓存图片数据
-                [[NSUserDefaults standardUserDefaults] setObject:data forKey:kAvatarCacheKey];
-                [[NSUserDefaults standardUserDefaults] synchronize];
-                
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    // 设置图片
-                    self.avatarImageView.image = image;
-                    
-                    // 确保圆角
-                    self.avatarImageView.layer.cornerRadius = kAvatarSize / 2;
-                    self.avatarImageView.layer.masksToBounds = YES;
-                    
-                    // 停止加载指示器
-                    [self.loadingIndicator stopAnimating];
-                    [self.loadingIndicator removeFromSuperview];
-                });
-            }];
-            [task resume];
-        }
-    } else {
-        // 如果没有URL，则使用CSUserInfoHelper获取
-        [self loadAvatarImage];
-    }
-}
-
-// 加载头像图片 (备用方法，当预加载失败时使用)
-- (void)loadAvatarImage {
-    NSString *avatarURL = [CSUserInfoHelper getUserAvatarURL];
-    if (avatarURL.length > 0) {
-        NSURL *url = [NSURL URLWithString:avatarURL];
-        if (url) {
-            NSURLSession *session = [NSURLSession sharedSession];
-            NSURLSessionDataTask *task = [session dataTaskWithURL:url completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-                if (error || !data) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [self.loadingIndicator stopAnimating];
-                        [self.loadingIndicator removeFromSuperview];
-                    });
-                    return;
-                }
-                
-                UIImage *image = [UIImage imageWithData:data];
-                if (!image) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [self.loadingIndicator stopAnimating];
-                        [self.loadingIndicator removeFromSuperview];
-                    });
-                    return;
-                }
-                
-                // 缓存图片数据
-                [[NSUserDefaults standardUserDefaults] setObject:data forKey:kAvatarCacheKey];
-                [[NSUserDefaults standardUserDefaults] synchronize];
-                
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    // 设置图片
-                    self.avatarImageView.image = image;
-                    
-                    // 确保圆角
-                    self.avatarImageView.layer.cornerRadius = kAvatarSize / 2;
-                    self.avatarImageView.layer.masksToBounds = YES;
-                    
-                    // 停止加载指示器
-                    [self.loadingIndicator stopAnimating];
-                    [self.loadingIndicator removeFromSuperview];
-                });
-            }];
-            [task resume];
-        }
-    } else {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self.loadingIndicator stopAnimating];
-            [self.loadingIndicator removeFromSuperview];
-        });
-    }
-}
-
+// Keep the same avatar view throughout layout and data refreshes: it owns both entry gestures.
 - (void)setupHeaderView {
-    // 创建头部视图
-    self.headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, kHeaderViewHeight)];
-    self.headerView.backgroundColor = [UIColor clearColor];
-    
-    // 创建头像视图
-    self.avatarImageView = [[UIImageView alloc] initWithFrame:CGRectMake((self.view.bounds.size.width - kAvatarSize) / 2, 
-                                                                        kAvatarTopMargin, 
-                                                                        kAvatarSize, 
-                                                                        kAvatarSize)];
-    self.avatarImageView.layer.cornerRadius = kAvatarSize / 2;
-    self.avatarImageView.layer.masksToBounds = YES;
-    self.avatarImageView.backgroundColor = [UIColor systemGray5Color];
-    self.avatarImageView.contentMode = UIViewContentModeScaleAspectFill;
-    
-    // 设置默认头像
-    {
-        UIImage *defaultAvatar = [UIImage systemImageNamed:@"person.crop.circle.fill"];
-        UIImageSymbolConfiguration *config = [UIImageSymbolConfiguration configurationWithPointSize:60 weight:UIImageSymbolWeightRegular];
-        self.avatarImageView.image = [defaultAvatar imageWithConfiguration:config];
-        self.avatarImageView.tintColor = [UIColor systemGray3Color];
-    }
-    
-    // 创建昵称标签
-    self.nicknameLabel = [[UILabel alloc] initWithFrame:CGRectMake(kLabelHorizontalMargin, 
-                                                                  CGRectGetMaxY(self.avatarImageView.frame) + kNicknameTopMargin,
-                                                                  self.view.bounds.size.width - 2 * kLabelHorizontalMargin, 
-                                                                  kNicknameHeight)];
-    self.nicknameLabel.textAlignment = NSTextAlignmentCenter;
-    self.nicknameLabel.font = [UIFont systemFontOfSize:kNicknameFontSize weight:UIFontWeightMedium];
-    self.nicknameLabel.text = [CSUserInfoHelper getUserNickname];
-    
-    // 创建微信号标签
-    self.wxidLabel = [[UILabel alloc] initWithFrame:CGRectMake(kLabelHorizontalMargin,
-                                                              CGRectGetMaxY(self.nicknameLabel.frame) + kWXIDTopMargin,
-                                                              self.view.bounds.size.width - 2 * kLabelHorizontalMargin,
-                                                              kWXIDHeight)];
-    self.wxidLabel.textAlignment = NSTextAlignmentCenter;
-    self.wxidLabel.font = [UIFont systemFontOfSize:kWXIDFontSize];
-    self.wxidLabel.textColor = [UIColor systemGrayColor];
-    NSString *aliasName = [CSUserInfoHelper getUserAliasName];
-    self.wxidLabel.text = [NSString stringWithFormat:@"微信号: %@", aliasName ?: @"未知"];
-    
-    // 添加视图到headerView
-    [self.headerView addSubview:self.avatarImageView];
-    [self.headerView addSubview:self.nicknameLabel];
-    [self.headerView addSubview:self.wxidLabel];
+    self.headerView=[[CSPluginHeaderView alloc] initWithFrame:CGRectZero];
+    self.avatarImageView=self.headerView.avatarImageView;
+    [self.headerView setVerse:CSPluginVerseProvider.sharedProvider.currentVerse];
+    CGFloat width=CGRectGetWidth(self.view.bounds);
+    self.headerView.frame=CGRectMake(0,0,width,[self.headerView preferredHeightForWidth:width]);
     [self installCloseFriendEntryGesture];
-    
-    // 加载头像
-    [self loadAvatarImage];
+}
+
+- (void)refreshHeaderFromNotification:(NSNotification *)notification {
+    // A notification may arrive while the sender still holds a native/store lock.
+    CSRequestMainRefresh(&_headerRefreshPending, ^{
+        if (!self.isViewLoaded || !self.view.window || UIApplication.sharedApplication.applicationState!=UIApplicationStateActive) return;
+        UIViewController *host=CSNativeSettingsHostForContent(self);
+        if (host.navigationController && host.navigationController.topViewController!=host) return;
+        [self refreshHeaderContent];
+    });
+}
+
+- (void)refreshHeaderContent {
+    if (!self.headerView) return;
+    BOOL ready=CSBackupIsReady() && !CSBackupAccountIsSuspended();
+    NSUInteger epoch=CSBackupAccountEpoch();
+    NSString *account=ready ? [CSUserInfoHelper getUserWXID] : nil;
+    NSString *nickname=account.length ? [CSUserInfoHelper getUserNickname] : @"微信用户";
+    NSString *wechatID=account.length ? [CSUserInfoHelper getUserAliasName] : nil;
+    if ([wechatID isEqualToString:@"未知"]) wechatID=nil;
+    NSString *wechatVersion=[NSBundle.mainBundle objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+    [self.headerView updateNickname:nickname wechatID:wechatID ?: @"" enabledCount:[CSPluginFeatureSummary enabledModuleCount]
+                     pluginVersion:kPluginVersionString wechatVersion:wechatVersion ?: @"未知"];
+    [self loadHeaderAvatarForAccount:account URLString:account.length ? [CSUserInfoHelper getUserAvatarURL] : nil epoch:epoch];
+    [self updateHeaderLayout];
+}
+
+- (void)loadHeaderAvatarForAccount:(NSString *)account URLString:(NSString *)URLString epoch:(NSUInteger)epoch {
+    NSArray *identity=@[account ?: @"",URLString ?: @"",@(epoch)];
+    if ([self.avatarIdentity isEqual:identity]) return;
+    [self.avatarRequest cancel];
+    self.avatarRequest=nil;
+    self.avatarIdentity=identity;
+    [self.headerView resetAvatarImage];
+    NSURL *URL=URLString.length ? [NSURL URLWithString:URLString] : nil;
+    if (!account.length || !URL || ![@[@"http",@"https"] containsObject:URL.scheme.lowercaseString]) return;
+    __weak typeof(self) weakSelf=self;
+    self.avatarRequest=[CSNavigationImageLoader.sharedLoader loadURL:URL fallbackFileURL:nil scope:account
+        maxPixelSize:(NSUInteger)(60*MAX(2,self.traitCollection.displayScale)) completion:^(UIImage *image,__unused NSURL *resolvedURL) {
+        typeof(self) self=weakSelf;
+        if (!self || ![self.avatarIdentity isEqual:identity]) return;
+        self.avatarRequest=nil;
+        if (!CSBackupIsReady() || CSBackupAccountIsSuspended() || CSBackupAccountEpoch()!=epoch ||
+            ![[CSUserInfoHelper getUserWXID] isEqual:account] || ![[CSUserInfoHelper getUserAvatarURL] isEqual:URLString]) return;
+        if (image) self.avatarImageView.image=image;
+        else self.avatarIdentity=nil; // A later page entry/config refresh may retry a failed download.
+    }];
+}
+
+- (void)refreshHeaderVerse {
+    NSUInteger generation=self.headerVerseEntryGeneration;
+    CSPluginVerseProvider *provider=CSPluginVerseProvider.sharedProvider;
+    [self.headerView setVerse:provider.currentVerse];
+    [self updateHeaderLayout];
+    __weak typeof(self) weakSelf=self;
+    [provider refreshWithCompletion:^(NSString *verse) {
+        typeof(self) self=weakSelf;
+        // A fast reply can arrive during the entry transition, before window is
+        // attached. The entry generation rejects old visits without losing it.
+        if (!self || generation!=self.headerVerseEntryGeneration || !self.isViewLoaded) return;
+        [self.headerView setVerse:verse];
+        [self updateHeaderLayout];
+    }];
+}
+
+- (void)updateHeaderLayout {
+    if (!self.tableView || !self.headerView) return;
+    CGFloat width=CGRectGetWidth(self.tableView.bounds);
+    if (width<=0) return;
+    UIEdgeInsets margins=self.tableView.layoutMargins;
+    UIEdgeInsets safe=self.tableView.safeAreaInsets;
+    self.headerView.horizontalInset=MAX(20,MAX(MAX(margins.left,margins.right),MAX(safe.left,safe.right)+16));
+    CGFloat height=[self.headerView preferredHeightForWidth:width];
+    CGRect frame=CGRectMake(0,0,width,height);
+    if (!CGRectEqualToRect(self.headerView.frame,frame)) {
+        self.headerView.frame=frame;
+        self.tableView.tableHeaderView=self.headerView;
+    }
+    [self.headerView setNeedsLayout];
+}
+
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    [self updateHeaderLayout];
 }
 
 - (void)installCloseFriendEntryGesture {
@@ -898,12 +813,6 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
                                                          iconColor:[UIColor systemRedColor]
                                                            detail:nil];
     
-    // 添加重置设置项
-    CSSettingItem *resetSettingsItem = [CSSettingItem itemWithTitle:@"重置设置"
-                                                         iconName:@"arrow.counterclockwise.circle"
-                                                        iconColor:[UIColor systemRedColor]
-                                                          detail:nil];
-    
     // 添加备份配置项
     CSSettingItem *backupSettingsItem = [CSSettingItem itemWithTitle:@"备份配置"
                                                           iconName:@"externaldrive.badge.icloud"
@@ -913,7 +822,6 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
     NSMutableArray *pluginItems = [NSMutableArray arrayWithObjects:entrySettingsItem, 
                                    versionControlItem,
                                    updateControlItem,
-                                   resetSettingsItem,
                                    backupSettingsItem, nil];
     
     CSSettingSection *pluginSection = [CSSettingSection sectionWithHeader:@"插件设置"
@@ -1167,11 +1075,6 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
         else if ([item.title isEqualToString:@"更新控制"]) {
             CSUpdateControlViewController *updateControlVC = [[CSUpdateControlViewController alloc] initWithStyle:UITableViewStyleInsetGrouped];
             [self.navigationController pushViewController:updateControlVC animated:YES];
-        }
-        // 处理重置设置点击
-        else if ([item.title isEqualToString:@"重置设置"]) {
-            CSResetSettingsViewController *resetVC = [[CSResetSettingsViewController alloc] initWithStyle:UITableViewStyleInsetGrouped];
-            [self.navigationController pushViewController:resetVC animated:YES];
         }
         // 处理备份配置点击
         else if ([item.title isEqualToString:@"备份配置"]) {

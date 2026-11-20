@@ -1,4 +1,5 @@
 #import "CSCloseFriendContactAdapter.h"
+#import "CSServiceCenter.h"
 #import <objc/message.h>
 static char SelectionKey, PageEpochKey, ForwardSourcesKey, ForwardUpdateDepthKey;
 BOOL CSCFPageIsCurrent(id owner) {
@@ -9,6 +10,29 @@ BOOL CSCFPageIsCurrent(id owner) {
 BOOL CSCFIsClass(id object,NSString *name) { Class cls=NSClassFromString(name); return cls && [object isKindOfClass:cls]; }
 NSArray *CSCFVisible(NSArray *source,CSCloseFriendSurface surface) {
     return CSCloseFriendVisibleContacts(source,CSCloseFriendCurrentSnapshot(),surface,^NSString *(id item){ return CSCloseFriendUserName(item); });
+}
+NSArray<NSString *> *CSCFContactNames(NSArray *contacts) {
+    if(![contacts isKindOfClass:NSArray.class]) return @[];
+    NSMutableArray<NSString *> *names=[NSMutableArray array];
+    id manager=nil; BOOL requestedManager=NO;
+    for(id value in contacts) {
+        id contact=value; NSString *username=CSCloseFriendUserName(value);
+        @try {
+            if([value isKindOfClass:NSString.class]) {
+                if(!requestedManager) {manager=CSGetService(NSClassFromString(@"CContactMgr")); requestedManager=YES;}
+                SEL selector=NSSelectorFromString(@"getContactByName:");
+                contact=CSCloseFriendMethodMatches(class_getInstanceMethod([manager class],selector),"@@:@") ? ((id(*)(id,SEL,id))objc_msgSend)(manager,selector,value) : nil;
+            }
+            NSString *name=nil;
+            for(NSString *key in @[@"getContactDisplayName",@"m_nsRemark",@"m_nsNickName"]) {
+                id candidate=CSCloseFriendRead(contact,key);
+                if([candidate isKindOfClass:NSString.class] && [candidate length]) {name=candidate; break;}
+            }
+            if(!name.length) name=username;
+            if(name.length) [names addObject:[name copy]];
+        } @catch(__unused NSException *exception) { if(username.length) [names addObject:[username copy]]; }
+    }
+    return [names copy];
 }
 BOOL CSCFCallVoid(id object,NSString *name) {
     SEL selector=NSSelectorFromString(name); if(!object || !CSCloseFriendMethodMatches(class_getInstanceMethod([object class],selector),"v@:")) return NO;
@@ -147,11 +171,25 @@ BOOL CSCFRequireTagAuthentication(id owner) {
         });
     } return YES;
 }
+static NSString *TagMemberCountText(id cell,NSUInteger count) {
+    id original=CSCloseFriendRead(cell,@"memberCountText");
+    NSString *number=[NSString stringWithFormat:@"%lu",(unsigned long)count];
+    if([original isKindOfClass:NSString.class]) {
+        NSCharacterSet *digits=NSCharacterSet.decimalDigitCharacterSet;
+        NSRange range=[original rangeOfCharacterFromSet:digits];
+        if(range.location!=NSNotFound) {
+            NSUInteger end=NSMaxRange(range);
+            while(end<[original length] && [digits characterIsMember:[original characterAtIndex:end]]) end++;
+            return [original stringByReplacingCharactersInRange:NSMakeRange(range.location,end-range.location) withString:number];
+        }
+    }
+    return [NSString stringWithFormat:@"(%@)",number];
+}
 void CSCFUpdateTagSummary(id cell,id tag) {
     NSArray *source=CSCloseFriendRead(tag,@"m_arrContactNameList"); NSArray *visible=CSCFVisible(source,CSCloseFriendSurfaceTag);
     if(visible.count==source.count) return;
-    CSCFSetObject(cell,@"setMemberCountText:",[NSString stringWithFormat:@"%lu",(unsigned long)visible.count]);
-    CSCFSetObject(cell,@"setMemberListText:",@""); CSCFSetObject(cell,@"setMemberListAttributedText:",nil);
+    CSCFSetObject(cell,@"setMemberCountText:",TagMemberCountText(cell,visible.count));
+    CSCFSetObject(cell,@"setMemberListText:",[CSCFContactNames(visible) componentsJoinedByString:@", "]); CSCFSetObject(cell,@"setMemberListAttributedText:",nil);
     CSCFCallVoid(cell,@"updateView"); // tagData is intentionally still the native full business model.
 }
 void CSCFUpdateTagDetail(id owner) {

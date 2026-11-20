@@ -215,11 +215,11 @@ static void CSTaskConfigureTable(UITableView *table) {
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section { return self.sections[section].items.count; }
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section { return self.sections[section].header; }
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
-    if (section==0) return @"每个任务向一个会话发送文字，消息内容最多 4,000 个字符。修改完成后点击右上角“保存”。";
-    if (section==1 && self.windowMode) return [NSString stringWithFormat:@"不早于生效时间执行。包含开始时间，不包含结束时间；每个时段从开始时间重新计算间隔。结束早于开始表示次日，执行星期按开始当天计算。时段外不补发。任务按 %@ 执行；修改手机时区不会改变此任务的时区。",self.task[@"zone"]];
-    if (section==1) return [NSString stringWithFormat:@"分钟/小时规则从首次时间起计算。每天/每周按 %@ 执行；修改手机时区不会改变此任务的时区。",self.task[@"zone"]];
-    NSString *catchUp=@"关闭：错过超过 30 秒即跳过。开启：恢复运行后仅补发最近 10 分钟内的最后一次。总开关关闭期间不补发。";
-    return self.windowMode?[catchUp stringByAppendingString:@"时间段任务仅在原执行时段内补发，时段结束后跳过。"]:catchUp;
+    if (section==0) return @"选择一个会话，填写文字后点击“保存”，最多 4,000 个字符。";
+    if (section==1 && self.windowMode) return [NSString stringWithFormat:@"生效后，每个时段从开始时间按间隔发送，结束时停止。结束早于开始为次日，星期按开始当天计算。任务固定使用 %@ 时区。",self.task[@"zone"]];
+    if (section==1) return [NSString stringWithFormat:@"按分钟或小时重复时，从首次时间计算间隔。任务固定使用 %@ 时区。",self.task[@"zone"]];
+    NSString *catchUp=@"关闭时，超时 30 秒即跳过；开启后，恢复运行时仅补发最近 10 分钟内的最后一次。总开关关闭期间不补发。";
+    return self.windowMode?[catchUp stringByAppendingString:@"仅在原时段内补发。"]:catchUp;
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)path {
     CSScheduledTaskSettingsCell *cell=[tableView dequeueReusableCellWithIdentifier:CSScheduledTaskSettingsCell.reuseIdentifier forIndexPath:path];
@@ -245,7 +245,7 @@ static void CSTaskConfigureTable(UITableView *table) {
     [self presentViewController:sheet animated:YES completion:nil];
 }
 - (void)chooseTarget {
-    UIAlertController *sheet=[UIAlertController alertControllerWithTitle:@"选择发送会话" message:@"每个任务选择一个会话。更换选择时，请先取消原来的勾选。" preferredStyle:UIAlertControllerStyleActionSheet];
+    UIAlertController *sheet=[UIAlertController alertControllerWithTitle:@"选择发送会话" message:@"仅选一个会话，更换时先取消原勾选。" preferredStyle:UIAlertControllerStyleActionSheet];
     [sheet addAction:[UIAlertAction actionWithTitle:@"文件传输助手" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action){ self.task[@"target"]=@"filehelper"; [self reload]; }]];
     __weak typeof(self) weakSelf=self;
     __weak UIAlertController *weakSheet=sheet;
@@ -416,9 +416,9 @@ static void CSTaskConfigureTable(UITableView *table) {
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section { return self.sections[section].items.count; }
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section { return self.sections[section].header; }
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
-    if (section==0) return [CSScheduledTaskManager.sharedManager.statusText stringByAppendingString:@"\n微信被系统挂起、强退或手机关机时无法保证准点发送。可在“后台运行”设置中查看运行状态。未确认的发送不会在重启后自动重试。"];
-    if (section==1) return @"点击任务编辑并查看下次执行时间；左滑可启用、停止或删除。启用单项任务后仍需开启总开关才会执行。任务按账号保存在本机，并纳入配置备份。恢复后总开关关闭，执行记录不恢复；请检查会话和时间规则后手动开启。";
-    return @"点击记录查看执行结果。“已提交微信发送”不代表对方已收到。";
+    if (section==0) return [CSScheduledTaskManager.sharedManager.statusText stringByAppendingString:@"\n微信被系统挂起、退出或手机关机时，无法保证准点发送。"];
+    if (section==1) return @"点击添加或编辑任务，左滑可启用、停止或删除。总开关与任务开关均需开启；恢复备份后请检查并重新开启总开关。";
+    return @"点击查看结果，已提交发送不代表对方已收到。";
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)path {
     CSScheduledTaskSettingsCell *cell=[tableView dequeueReusableCellWithIdentifier:CSScheduledTaskSettingsCell.reuseIdentifier forIndexPath:path];

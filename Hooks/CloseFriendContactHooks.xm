@@ -202,6 +202,9 @@ static void InstallContacts(void) {
     __block IMP summary=NULL;
     IMP replacement=imp_implementationWithBlock(^(id object,id cell,id tag,id text){((void(*)(id,SEL,id,id,id))summary)(object,NSSelectorFromString(@"makeContactItemCellContent:withTagData:searchText:"),cell,tag,text); CSCFUpdateTagSummary(cell,tag); CSCFTrackSurface(object,@"reloadDataAndView");});
     if(!CSCloseFriendInstallHook(@"ContactTagListViewController",@"makeContactItemCellContent:withTagData:searchText:",replacement,&summary,"v@:@@@")) imp_removeBlock(replacement);
+    __block IMP simpleSummary=NULL;
+    replacement=imp_implementationWithBlock(^(id object,id cell,id tag){((void(*)(id,SEL,id,id))simpleSummary)(object,NSSelectorFromString(@"makeContactItemCellContent:withTagData:"),cell,tag); CSCFUpdateTagSummary(cell,tag); CSCFTrackSurface(object,@"reloadDataAndView");});
+    if(!CSCloseFriendInstallHook(@"ContactTagListViewController",@"makeContactItemCellContent:withTagData:",replacement,&simpleSummary,"v@:@@")) imp_removeBlock(replacement);
     // Tag search has no proven isolated result contract. Gate it before search, without changing members.
     __block IMP tagSearch=NULL;
     replacement=imp_implementationWithBlock(^(id object,id text,BOOL prefix){if(!CSCFRequireTagAuthentication(object)) ((void(*)(id,SEL,id,BOOL))tagSearch)(object,NSSelectorFromString(@"doSearch:Pre:"),text,prefix);});

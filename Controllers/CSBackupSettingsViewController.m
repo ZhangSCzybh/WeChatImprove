@@ -1,12 +1,12 @@
 #import "CSBackupSettingsViewController.h"
 #import "CSBackupManager.h"
 #import "CSBackupPreviewViewController.h"
+#import "CSResetSettingsViewController.h"
 #import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 #import "CSNavigationTitleSettingsViewController.h"
 #import "CSTabBarStyleSettingsViewController.h"
 #import "CSTouchTrailViewController.h"
 #import "CSContactSeparatorSettingsViewController.h"
-#import "CSNativeSettingsHost.h"
 #import "CSBackupSettingsCell.h"
 @interface CSBackupRepairViewController : CSSettingsTableViewController
 @property(nonatomic) NSArray<NSString *> *contacts;
@@ -21,18 +21,18 @@
     id contacts=[NSUserDefaults.standardUserDefaults objectForKey:@"com.wechat.tweak.navigation.contact.overrides"];
     self.contacts=[contacts isKindOfClass:NSDictionary.class]?[[contacts allKeys] sortedArrayUsingSelector:@selector(compare:)]:@[];
 }
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView { (void)tableView;return self.contacts.count?3:2; }
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView { (void)tableView;return self.contacts.count?2:1; }
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    (void)tableView;return section==0?3:(section==1&&self.contacts.count?self.contacts.count:1);
+    (void)tableView;return section==0?3:self.contacts.count;
 }
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    (void)tableView;return section==0?@"自定义图片":(section==1&&self.contacts.count?@"联系人分隔图片":@"其他设置");
+    (void)tableView;return section==0?@"自定义图片":@"联系人分隔图片";
 }
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
     (void)tableView;
     if(section==0)return @"在对应设置页重新选择图片，或移除无效引用，然后返回备份页重试。";
     if(section==1&&self.contacts.count)return @"按联系人分别检查分隔图片和专属设置。";
-    return @"修复后可返回备份页手动创建备份，或重新预览恢复。本页不会清除配置；其他设置仍使用原有授权检查。";
+    return nil;
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)path {
     CSSettingItem *item=nil;
@@ -41,10 +41,8 @@
         NSArray *titles=@[@"导航栏分隔图片",@"底栏图标",@"触摸轨迹图片"];
         NSArray *icons=@[@"photo",@"square.grid.2x2",@"hand.draw"];
         item=[CSSettingItem itemWithTitle:titles[path.row] iconName:icons[path.row] iconColor:UIColor.systemBlueColor detail:nil];
-    }else if(contactRow){
-        item=[CSSettingItem itemWithTitle:self.contacts[path.row] iconName:@"person.crop.circle" iconColor:UIColor.systemGreenColor detail:@"编辑"];
     }else{
-        item=[CSSettingItem itemWithTitle:@"其他插件设置" iconName:@"gearshape" iconColor:UIColor.systemGrayColor detail:nil];
+        item=[CSSettingItem itemWithTitle:self.contacts[path.row] iconName:@"person.crop.circle" iconColor:UIColor.systemGreenColor detail:@"编辑"];
     }
     CSBackupSettingsCell *cell=[tableView dequeueReusableCellWithIdentifier:CSBackupSettingsCell.reuseIdentifier];
     [cell configureWithItem:item];cell.accessoryType=UITableViewCellAccessoryDisclosureIndicator;
@@ -61,10 +59,8 @@
             case 1:controller=[CSTabBarStyleSettingsViewController new];break;
             default:controller=[CSTouchTrailViewController new];break;
         }
-    }else if(path.section==1&&self.contacts.count){
-        controller=[[CSContactSeparatorSettingsViewController alloc]initWithContactId:self.contacts[path.row] contactName:nil contactAvatar:nil];
     }else{
-        controller=[[CSNativeSettingsControllerClass() alloc]init];
+        controller=[[CSContactSeparatorSettingsViewController alloc]initWithContactId:self.contacts[path.row] contactName:nil contactAvatar:nil];
     }
     [self.navigationController pushViewController:controller animated:YES];
 }
@@ -119,10 +115,11 @@
     CSSettingItem *retry=[self action:@"重试恢复" icon:@"arrow.clockwise" color:UIColor.systemOrangeColor block:^{[weakSelf retryRestore];}];
     CSSettingItem *repair=[self action:@"修复当前的配置" icon:@"wrench.and.screwdriver" color:UIColor.systemOrangeColor block:^{[weakSelf repair];}];
     CSSettingItem *cancel=[self action:@"取消待执行计划" icon:@"xmark.circle" color:UIColor.systemRedColor block:^{[weakSelf confirmCancel];}];
+    CSSettingItem *reset=[self action:@"重置设置" icon:@"arrow.counterclockwise.circle" color:UIColor.systemRedColor block:^{[weakSelf.navigationController pushViewController:[[CSResetSettingsViewController alloc]initWithStyle:UITableViewStyleInsetGrouped] animated:YES];}];
     CSSettingItem *info=[self action:@"功能说明" icon:@"questionmark.circle" color:UIColor.systemGrayColor block:^{[weakSelf message:@"备份配置说明" detail:@"点击“创建备份”保存插件配置、自定义图片、已存档账号分组和当前账号的定时任务。定时任务恢复后总开关关闭，不导入执行记录或待发送状态。仅支持当前 .wcbak 格式。点击备份可预览恢复、导出、重命名、收藏或删除。\n\n备份由你手动创建或从文件导入。修改配置、更新插件、恢复及重置均不额外创建备份，也不按数量清理历史文件。已有历史备份继续保留和管理。恢复或重置前如需保留当前完整配置，请先手动创建备份。\n\n所有备份都提供手动删除入口，包括收藏、信息待确认和无法读取的备份；无法读取的文件可先导出原件或重新检查。恢复事务正在使用的备份需先取消待执行计划或完成恢复、回滚，再删除。“重试恢复”仅处理未完成的恢复事务。\n\n导出文件未加密，可能包含成员、联系人标识和自定义文字；不包含微信消息、登录凭据或支付账本。"]; }];
     self.sections=[@[[CSSettingSection sectionWithHeader:@"备份设置" items:@[create,import]],
                      [CSSettingSection sectionWithHeader:[NSString stringWithFormat:@"本机备份 · %lu 份",(unsigned long)self.records.count] items:backups],
-                     [CSSettingSection sectionWithHeader:@"恢复管理" items:@[status,retry,repair,cancel]],
+                     [CSSettingSection sectionWithHeader:@"恢复管理" items:@[status,retry,repair,cancel,reset]],
                      [CSSettingSection sectionWithHeader:@"说明" items:@[info]]] mutableCopy];
 }
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {(void)tableView;return self.sections.count;}

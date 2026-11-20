@@ -89,6 +89,7 @@ static id PublishingOwner(id logic) {
     if(editor && ReminderOwner(CSCloseFriendRead(editor,@"contactsSelectorController"))==editor) return editor;
     return ReminderOwner(delegate);
 }
+id CSCFAudiencePublishingOwner(id logic) { return PublishingOwner(logic); }
 static CSCloseFriendContactProjection *Candidates(id logic) {
     id owner=PublishingOwner(logic);
     if(!owner) {
@@ -162,9 +163,6 @@ void CSCFAudienceInstall(void) {
     __block IMP completed=NULL;
     replacement=imp_implementationWithBlock(^BOOL(id owner,id contacts,BOOL finished){return !NeedsUnlock(owner) && ((BOOL(*)(id,SEL,id,BOOL))completed)(owner,NSSelectorFromString(@"onMultiSelectContactCompleted:finished:"),contacts,finished);});
     if(!CSCloseFriendInstallHook(@"WCMomentsPrivacyViewController",@"onMultiSelectContactCompleted:finished:",replacement,&completed,"B@:@B")) imp_removeBlock(replacement);
-    __block IMP summary=NULL;
-    replacement=imp_implementationWithBlock(^id(id owner,id contacts){id visible=[contacts isKindOfClass:NSArray.class] ? CSCFVisible(contacts,CSCloseFriendSurfaceContact) : @[]; return ((id(*)(id,SEL,id))summary)(owner,NSSelectorFromString(@"contactNamesComponentsJoinedByComma:"),visible);});
-    if(!CSCloseFriendInstallHook(@"WCMomentsPrivacyViewController",@"contactNamesComponentsJoinedByComma:",replacement,&summary,"@@:@")) imp_removeBlock(replacement);
     CSCFSocialHook0(@"ContactSelectView",@"layoutSubviews",^(id picker,void(^orig)(void)){
         orig(); CSCFAudienceBinding *binding=objc_getAssociatedObject(picker,&AudienceBindingKey);
         if(binding && !AuthorizationCurrent(binding)) RevokeBinding(binding);
@@ -203,4 +201,5 @@ void CSCFAudienceInstall(void) {
         if(!CSCloseFriendInstallHook(@"ContactsDataLogic",@"getContactCount",replacement,&count,"I@:")) imp_removeBlock(replacement);
     }
     CSCloseFriendRecordCapability(@"social.audience.locked-edit",coupled);
+    CSCFAudiencePresentationInstall();
 }

@@ -170,7 +170,7 @@ void CSAIPresentPresetPicker(UIViewController *controller,NSString *conversation
     [self.keyField addTarget:self action:@selector(keyChanged) forControlEvents:UIControlEventEditingChanged];
     UIButton *visibility=[UIButton buttonWithType:UIButtonTypeSystem];[visibility setTitle:@"显示 / 隐藏新输入的 Key" forState:UIControlStateNormal];[visibility addTarget:self action:@selector(toggleKey) forControlEvents:UIControlEventTouchUpInside];[stack addArrangedSubview:visibility];
     UIButton *clear=[UIButton buttonWithType:UIButtonTypeSystem];[clear setTitle:@"停用当前 Key" forState:UIControlStateNormal];[clear addTarget:self action:@selector(clearKey) forControlEvents:UIControlEventTouchUpInside];[stack addArrangedSubview:clear];
-    UILabel *help=[UILabel new];help.text=@"填写兼容 Chat Completions 的完整 HTTPS 请求地址。保存连接变化后需重新测试。API Key 保存在本机钥匙串中，不随配置备份导出。";help.numberOfLines=0;help.font=[UIFont preferredFontForTextStyle:UIFontTextStyleFootnote];help.textColor=UIColor.secondaryLabelColor;[stack addArrangedSubview:help];
+    UILabel *help=[UILabel new];help.text=@"填写兼容 Chat Completions 的完整 HTTPS 地址、模型和 API Key，保存后测试连接。API Key 不随备份导出。";help.numberOfLines=0;help.font=[UIFont preferredFontForTextStyle:UIFontTextStyleFootnote];help.textColor=UIColor.secondaryLabelColor;[stack addArrangedSubview:help];
 }
 - (void)keyChanged{self.keyEdited=YES;}
 - (void)toggleKey{self.keyField.secureTextEntry=!self.keyField.secureTextEntry;}
@@ -230,7 +230,7 @@ void CSAIPresentPresetPicker(UIViewController *controller,NSString *conversation
 - (void)reload{
     NSMutableArray *rows=[NSMutableArray array];__weak typeof(self) weakSelf=self;
     for(NSDictionary *preset in CSAIReplyManager.sharedManager.store.configuration[@"presets"])[rows addObject:AIRow(preset[@"name"],@"text.bubble",nil,^{[weakSelf open:preset original:preset];})];
-    self.sections=@[[CSSettingSection sectionWithHeader:@"回复预设" items:rows]];self.footers=@[@"点击编辑，左滑复制或删除。每个会话可独立选择预设，未单独选择时跟随全局默认。"];
+    self.sections=@[[CSSettingSection sectionWithHeader:@"回复预设" items:rows]];self.footers=@[@"点击编辑，左滑复制或删除；会话未单独选择预设时使用全局默认。"];
     self.navigationItem.rightBarButtonItem.enabled=[self current];[super reload];
 }
 - (void)remove:(NSDictionary *)preset replacement:(NSString *)replacement completion:(void(^)(BOOL))completion{
@@ -244,7 +244,7 @@ void CSAIPresentPresetPicker(UIViewController *controller,NSString *conversation
     if(presets.count<=1){AIAlert(self,@"至少保留一个回复预设。");return;}
     NSUInteger affected=0;for(NSDictionary *conversation in [config[@"conversations"] allValues])if([conversation[@"presetID"] isEqual:preset[@"id"]] || (![conversation[@"presetID"] length] && [config[@"defaultPreset"] isEqual:preset[@"id"]]))affected++;
     CSAIOptionsPage *picker=[[CSAIOptionsPage alloc]initWithStyle:UITableViewStyleInsetGrouped];picker.account=self.account;picker.epoch=self.epoch;picker.title=@"选择替代预设";
-    picker.footers=@[[NSString stringWithFormat:@"删除“%@”并替换 %lu 个会话的关联。",preset[@"name"],(unsigned long)affected]];
+    picker.footers=@[[NSString stringWithFormat:@"删除“%@”后，%lu 个会话改用所选预设。",preset[@"name"],(unsigned long)affected]];
     NSMutableArray *options=[NSMutableArray array];for(NSDictionary *item in presets)if(![item[@"id"] isEqual:preset[@"id"]])[options addObject:@{@"id":item[@"id"],@"title":item[@"name"]}];picker.options=options;
     __weak typeof(self) weakSelf=self;__weak CSAIOptionsPage *weakPicker=picker;
     picker.choose=^(NSString *replacement){if(weakPicker.saving)return;weakPicker.saving=YES;[weakPicker reload];[weakSelf remove:preset replacement:replacement completion:^(BOOL success){weakPicker.saving=NO;[weakPicker reload];if(success)AIPopIfVisible(weakPicker);}];};[self.navigationController pushViewController:picker animated:YES];
@@ -286,7 +286,7 @@ void CSAIPresentPresetPicker(UIViewController *controller,NSString *conversation
         })];
     }
     if(!rows.count)[rows addObject:AIRow(@"暂无可显示的会话",@"bubble.left",nil,nil)];
-    self.sections=@[[CSSettingSection sectionWithHeader:@"会话" items:rows]];self.footers=@[@"在聊天窗口右上角“…”的聊天详情中，开启该会话的 AI 回复。"];
+    self.sections=@[[CSSettingSection sectionWithHeader:@"会话" items:rows]];self.footers=@[@"进入聊天右上角“…”开启该会话的 AI 回复。"];
     [super reload];
 }
 @end
@@ -302,7 +302,7 @@ void CSAIPresentPresetPicker(UIViewController *controller,NSString *conversation
         NSString *detail=[NSString stringWithFormat:@"%@\n%@\n预设：%@\n%@\n%@",name,[formatter stringFromDate:record[@"date"]],presetName,result,record[@"detail"]];
         [rows addObject:AIRow(name,@"clock",result,^{AIAlert(weakSelf,detail);})];
     }
-    if(!rows.count)[rows addObject:AIRow(@"暂无回复记录",@"clock",nil,nil)];self.sections=@[[CSSettingSection sectionWithHeader:@"最近 200 条" items:rows]];self.footers=@[@"已提交微信不代表对方已收到。记录不保存聊天正文或 API Key。发送结果未知时不会自动重发。"];
+    if(!rows.count)[rows addObject:AIRow(@"暂无回复记录",@"clock",nil,nil)];self.sections=@[[CSSettingSection sectionWithHeader:@"最近 200 条" items:rows]];self.footers=@[@"点击查看回复结果；“已提交微信”不代表已送达，结果未确认时不自动重发。"];
     [super reload];
 }
 @end
@@ -318,12 +318,12 @@ void CSAIPresentPresetPicker(UIViewController *controller,NSString *conversation
     CSAIConnectionEditor *editor=[CSAIConnectionEditor new];editor.account=self.account;editor.epoch=self.epoch;[self.navigationController pushViewController:editor animated:YES];
 }
 - (void)chooseProvider{
-    AIPresentCapabilityPicker(self,@"服务商",@"provider",@[@{@"id":@"openai-compatible",@"title":@"通用兼容接口（默认）"},@{@"id":@"bailian",@"title":@"阿里云百炼"}],CSAIProvider(CSAIReplyManager.sharedManager.store.configuration),@"通用接口使用兼容 Chat Completions 的服务；百炼可配置联网与思考模式。切回通用接口会关闭联网与思考。服务商选择不会修改 API 地址、模型名或 Key，修改后需要重新测试连接。");
+    AIPresentCapabilityPicker(self,@"服务商",@"provider",@[@{@"id":@"openai-compatible",@"title":@"通用兼容接口（默认）"},@{@"id":@"bailian",@"title":@"阿里云百炼"}],CSAIProvider(CSAIReplyManager.sharedManager.store.configuration),@"按所用接口选择服务商；百炼支持联网与思考，切回通用接口时关闭这两项。切换后请检查连接并重新测试。");
 }
 - (void)chooseSearchMode{
     NSDictionary *configuration=CSAIReplyManager.sharedManager.store.configuration;
     if(![CSAIProvider(configuration) isEqual:@"bailian"]){AIAlert(self,@"联网模式仅适用于阿里云百炼接口，请先选择对应服务商。通用接口默认关闭联网。");return;}
-    AIPresentCapabilityPicker(self,@"联网模式",@"searchMode",@[@{@"id":@"off",@"title":@"关闭（默认）"},@{@"id":@"auto",@"title":@"按需联网"},@{@"id":@"always",@"title":@"每次联网"}],CSAISearchMode(configuration),@"按需联网由服务根据问题决定是否搜索；每次联网要求服务执行搜索。需要当前百炼模型支持。连接测试会检查参数是否可用，不代表该次一定执行了搜索。修改后需要重新测试连接。");
+    AIPresentCapabilityPicker(self,@"联网模式",@"searchMode",@[@{@"id":@"off",@"title":@"关闭（默认）"},@{@"id":@"auto",@"title":@"按需联网"},@{@"id":@"always",@"title":@"每次联网"}],CSAISearchMode(configuration),@"按需联网由模型决定是否搜索；每次联网则要求搜索。需百炼模型支持，修改后请重新测试连接。");
 }
 - (void)openPage:(Class)cls{
     CSAISettingsPage *page=[(CSAISettingsPage *)[cls alloc]initWithStyle:UITableViewStyleInsetGrouped];page.account=self.account;page.epoch=self.epoch;[self.navigationController pushViewController:page animated:YES];
@@ -353,7 +353,7 @@ void CSAIPresentPresetPicker(UIViewController *controller,NSString *conversation
         [CSSettingSection sectionWithHeader:@"回复预设" items:@[AIRow(@"默认预设",@"text.bubble",[manager presetNameForConversation:nil],^{CSAIPresentPresetPicker(weakSelf,nil,weakSelf.account,weakSelf.epoch);}),AIRow(@"管理预设",@"square.stack",[NSString stringWithFormat:@"%lu 个",(unsigned long)[config[@"presets"] count]],^{[weakSelf openPage:CSAIPresetsPage.class];})]],
         [CSSettingSection sectionWithHeader:@"回复管理" items:@[AIRow(@"已开启的会话",@"bubble.left.and.bubble.right",[NSString stringWithFormat:@"%lu 个",(unsigned long)count],^{[weakSelf openPage:CSAIConversationsPage.class];}),AIRow(@"回复记录",@"clock",nil,^{[weakSelf openPage:CSAIHistoryPage.class];})]]
     ];
-    self.footers=@[@"总开关与会话开关同时开启才会回复。手动回复不会暂停 AI。关闭时取消尚未提交的任务，重新开启不补回复历史消息。\n后台兜底补拉：默认开启，满足后台运行和 AI 条件时，以约 45 秒为兜底期限尝试补拉会话；已验证的完整同步会顺延下一次补拉。适合免打扰群的后台自动回复；会周期性唤醒网络，收到符合规则的消息后还可能触发模型请求，存在额外耗电。关闭后仅依靠微信自身事件或回到前台时同步，更省电，但后台可能不再自动回复。",@"能力设置作用于当前模型连接及所有已启用的会话。图片识别、联网、思考默认关闭，联网与思考仅支持百炼。修改连接或能力后需重新测试；启用图片时测试会发送合成图文样例，不发送微信消息。API Key 与原始图片不随配置备份导出。",@"启用后，符合规则的文本及有限上下文会发送到你配置的模型服务；开启图片识别后还会发送符合触发规则的图片，并以当前微信账号自动发送生成的回复。",@"群聊可发图后 30 秒内由同一人 @ 提问；免 @ 群可直接发图。群聊默认仅在被单独 @ 时回复，可在当前群开启“免 @ 回复”。微信被系统挂起或退出时无法保证自动回复；本功能不会自动开启后台保活。"];
+    self.footers=@[@"开启总开关后，在聊天详情中开启会话 AI。后台兜底补拉可改善后台收消息，关闭更省电；重新开启不补历史消息。",@"填写 API 地址、Key 和模型并测试连接；修改连接或能力后需重测。联网与思考仅支持百炼，API Key 不随备份导出。",@"预设用于设置角色和回复规则，可按会话单独选择。符合规则的消息、上下文及可选图片会发送至所配服务，并自动回复。",@"群聊默认被单独 @ 时回复，发图后需同一人在 30 秒内 @ 提问；开启“免 @ 回复”可直接发图。微信挂起或退出时无法保证回复。"];
     [super reload];
 }
 @end

@@ -1,0 +1,65 @@
+{
+  "version": "2.7-4",
+  "recorded_at": "2026-11-20T12:18:57.457866+08:00",
+  "result": "passed",
+  "checks": 5682,
+  "runs": [
+    {
+      "name": "header-layout",
+      "command": "bash Tests/verify-plugin-header-layout.sh",
+      "exit_code": 0,
+      "checks": 5374,
+      "scope": "真实顶部视图：16pt随机文案、固定浅金黑字SVIP、真实衬线字体与兜底、小圆角、无v版本号、三卡等宽等高、长短昵称、长版本号、小屏与大字号、文案高度联动、头像实例保留",
+      "log": "regressions/header-layout.log",
+      "script_sha256": "e7b56b3fa020b04cd50bb7ebe53eb12fb71ea3ae236881fca6be940dfd3356cb",
+      "fixture_sha256": "897949929798dc58f0865e9bd3bc99f1e0f3f38282eaa379f5db8e47ee341635",
+      "log_sha256": "8ea45bfee2bc9f3d865b379560c67eb65e4c59322ff70ed041819fbef26483f6"
+    },
+    {
+      "name": "release-notes",
+      "command": "python3 /tmp/wechat-2.7-4-release-checks.py",
+      "exit_code": 0,
+      "scope": "真实Foundation当前三条说明、版本号、16pt文案、固定SVIP样式、去除版本前缀、当前链接、历史说明及既有产物保留",
+      "log": "regressions/release-notes.log",
+      "script_sha256": "b1e2f9c6995a3b439db0c11c365a8320006594d235be412ce1808de811cf0225",
+      "log_sha256": "558e5ec2e8704427b49ab9c2027e81dc2add694aae27191b918bc19237b57c2c",
+      "checks": 259,
+      "document_version_history_checks": 153,
+      "runtime_foundation_checks": 106
+    },
+    {
+      "name": "header-entry",
+      "command": "bash Tests/verify-plugin-header-entry.sh",
+      "exit_code": 0,
+      "started_at": "2026-11-20T12:15:36.168349+08:00",
+      "finished_at": "2026-11-20T12:15:37.325169+08:00",
+      "checks": 19,
+      "failures": 0,
+      "scope": "每次进入刷新文案、配置通知与旧回调隔离",
+      "log": "regressions/header-entry.log",
+      "script_sha256": "573947ea141b59b1065dc267c24fc91952876d946a1c0519d09dd2fea22d4d4f",
+      "fixture_sha256": "34117dc5b5a91c18edcdab5b547703610c7b33fd1a1932bccf93ff1689b4a9ef",
+      "controller_sha256": "4ab674b6ae66bdc6018a6bb21a07f6bc1469b13f640c6bd2c36182f859d1b5bf",
+      "log_sha256": "51cac491d14f01148d15d871863e0e6beaecde4864ef6caa477a6e71d8e734aa",
+      "output": "Plugin header verse entry: 19 checks, 0 failures"
+    },
+    {
+      "name": "header-avatar",
+      "command": "bash Tests/verify-plugin-header-avatar.sh",
+      "exit_code": 0,
+      "started_at": "2026-11-20T12:15:36.168673+08:00",
+      "finished_at": "2026-11-20T12:15:37.325261+08:00",
+      "checks": 30,
+      "failures": 0,
+      "scope": "头像请求去重、账号与URL切换、代次保护及旧回调隔离",
+      "log": "regressions/header-avatar.log",
+      "script_sha256": "8326e2ea7b1338ca0fa1c9026b9fa7ebfaca692cb0eaa4e8237f7e0894e38bd3",
+      "fixture_sha256": "70b8e3740f538db8d4a673595a088545acff7b1ce8d89e3ba102116639010e36",
+      "controller_sha256": "4ab674b6ae66bdc6018a6bb21a07f6bc1469b13f640c6bd2c36182f859d1b5bf",
+      "log_sha256": "f599a6708143b4af215d78c7634499047ae9c11cccded596f03649f7aa5037a8",
+      "output": "Plugin header avatar: 30 checks, 0 failures"
+    }
+  ],
+  "isolation": "原checkout真实方法，临时文件、Foundation运行与内存界面替身；未操作实际账号、聊天数据库或设置。",
+  "device_validation": "未在原设备安装或重启微信；最终外观与原生触摸交互仍需原设备验收。"
+}

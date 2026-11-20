@@ -24,6 +24,8 @@ FOUNDATION_EXPORT void CSCFDetailInstall(void);
 FOUNDATION_EXPORT void CSCFInteractionInstall(void);
 FOUNDATION_EXPORT void CSCFStatusInstall(void);
 FOUNDATION_EXPORT void CSCFAudienceInstall(void);
+FOUNDATION_EXPORT id CSCFAudiencePublishingOwner(id logic);
+FOUNDATION_EXPORT void CSCFAudiencePresentationInstall(void);
 #ifdef __cplusplus
 }
 #endif

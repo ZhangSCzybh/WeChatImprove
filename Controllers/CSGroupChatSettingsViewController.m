@@ -189,12 +189,12 @@ static void CSGCConfigureTable(UITableView *table) {
     }
     self.actionCells=actions;
     if ([self.configurationKey isEqual:@"welcomeTemplate"])
-        self.variableHelp=@"@昵称显示微信昵称并提醒新成员；@备注显示群内备注；@微信ID显示成员的微信账号标识。备注或 ID 缺失时留空。支持换行、标点和表情。";
+        self.variableHelp=@"点“插入变量”添加成员信息：@昵称会提醒新成员，@备注和@微信ID显示对应资料，缺失时留空。支持换行和表情。";
     else if ([self.configurationKey isEqual:@"departureRoomTemplate"])
-        self.variableHelp=@"消息会发到成员离开的群，群内成员可见。@昵称、@备注和@微信ID均为文字，ID 缺失时留空；@离群类型显示已确认的离群原因。";
+        self.variableHelp=@"此文案发送到成员离开的群。@昵称、@备注、@微信ID仅显示文字，缺失时留空；@离群类型显示离群原因。";
     else
-        self.variableHelp=@"此通知仅自己可见，点击昵称可查看成员资料。@备注显示群内备注；@微信ID显示成员的微信账号标识。备注或 ID 缺失时留空；@离群类型显示已确认的离群原因。";
-    self.variableHelp=[self.variableHelp stringByAppendingString:@"\n@群昵称显示群聊名称；@群人数显示群成员人数；@时间显示当前时间。"];
+        self.variableHelp=@"通知仅自己可见，点昵称查看成员资料。@备注、@微信ID显示对应资料，缺失时留空；@离群类型显示离群原因。";
+    self.variableHelp=[self.variableHelp stringByAppendingString:@"\n@群昵称：群名；@群人数：成员数；@时间：当前时间。"];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(stateChanged:) name:CSGroupChatConfigurationDidChange object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(stateChanged:) name:@"CSBackupAccountChanged" object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(keyboardChanged:) name:UIKeyboardWillChangeFrameNotification object:nil];
@@ -219,7 +219,7 @@ static void CSGCConfigureTable(UITableView *table) {
     if (section==0) return [self footerHeightForText:@"4,000 / 4,000"];
     if (section==1) return [self footerHeightForText:self.variableHelp];
     // Reserve both states so account invalidation changes only text, never the card positions.
-    return MAX([self footerHeightForText:@"预览使用示例成员与群聊，不会发送消息。"],
+    return MAX([self footerHeightForText:@"示例预览，不会发送消息。"],
         [self footerHeightForText:@"账号或设置已变化，请返回后重新编辑。当前内容尚未保存。"]);
 }
 - (void)tableView:(UITableView *)tableView willDisplayFooterView:(UIView *)view forSection:(NSInteger)section {
@@ -248,7 +248,7 @@ static void CSGCConfigureTable(UITableView *table) {
     self.navigationItem.rightBarButtonItem.enabled=valid && !self.saving;
     self.navigationItem.rightBarButtonItem.title=self.saving?@"保存中…":@"保存";
     self.textView.editable=valid && !self.saving;
-    self.stateText=valid || self.saving?@"预览使用示例成员与群聊，不会发送消息。":@"账号或设置已变化，请返回后重新编辑。当前内容尚未保存。";
+    self.stateText=valid || self.saving?@"示例预览，不会发送消息。":@"账号或设置已变化，请返回后重新编辑。当前内容尚未保存。";
     [self.tableView footerViewForSection:2].textLabel.text=self.stateText;
 }
 - (void)textViewDidChange:(UITextView *)textView { (void)textView; [self updatePreview]; }
@@ -461,7 +461,7 @@ static void CSGCConfigureTable(UITableView *table) {
     (void)tableView;
     if (!CSGCContextValid(self.context,YES)) return section==2?@"账号或设置已变化，请返回后重新确认。":nil;
     if (section==1) return self.clearHistory?@"退出时同时清空这些群的本地聊天记录，清空后无法撤销。":@"退出后保留已有聊天记录。";
-    return section==2?@"退出后需要重新受邀才能加入。需要先处理的群会单独列出，尚未开始的后续操作可停止。":nil;
+    return section==2?@"退出后需重新受邀加入。可停止尚未开始的退群操作。":nil;
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)path {
     CSGroupChatSettingsCell *cell=[tableView dequeueReusableCellWithIdentifier:CSGroupChatSettingsCell.reuseIdentifier forIndexPath:path];
@@ -568,13 +568,13 @@ static void CSGCConfigureTable(UITableView *table) {
     (void)tableView;
     if (!CSGroupChatManager.sharedManager.ready) return section==0?(CSGroupChatManager.sharedManager.statusText?:@"当前账号尚未就绪，请稍后重试。"):nil;
     if (section==0) {
-        NSString *help=@"变量：@昵称、@备注、@微信ID、@群昵称、@群人数、@时间。第一次取得名单时不欢迎已有成员。";
+        NSString *help=@"选择群聊，设置文案和延迟，新成员入群后自动欢迎。已有成员不补发，文案中使用 @昵称可提醒新成员。";
         NSString *status=CSGroupChatManager.sharedManager.statusText;
         return status.length?[help stringByAppendingFormat:@"\n%@",status]:help;
     }
-    if (section==1) return @"变量：@昵称、@备注、@微信ID、@群昵称、@群人数、@时间、@离群类型。通知仅自己可见；打开「通知发送本群」后，另向成员离开的群发送本群文案。\n\n入群欢迎和退群监控跟随「插件设置 → 后台运行」。开启后，微信有后台执行机会时会尝试实时处理已选群，可能增加耗电；锁屏时受系统和微信连接限制。关闭后台运行、微信挂起或断线时，回到前台会核对名单并补处理仍能确认的变化。";
-    if (section==2) return @"将新加入的群聊保存到微信通讯录，效果与群资料页一致；开启前已有群不补存。";
-    if (section==3) return @"先选择群聊，再核对清单并确认退出。默认保留聊天记录。";
+    if (section==1) return @"选择监控群聊，成员离群时显示仅自己可见的通知。开启“通知发送本群”可另发群消息。后台处理需开启“后台运行”，受系统限制。";
+    if (section==2) return @"自动将新加入的群保存到通讯录，已有群不补存。";
+    if (section==3) return @"选择群聊，核对清单后确认退出。默认保留聊天记录。";
     return nil;
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)path {

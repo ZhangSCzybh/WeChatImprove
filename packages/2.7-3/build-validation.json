@@ -1,0 +1,140 @@
+{
+  "version": "2.7-3",
+  "verified_at": "2026-11-20T11:52:51.474392+08:00",
+  "source_checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "git_head": "4600bba9f79016a8c36d8432b14dda07792c6e3d",
+  "source_inputs_verified": 496,
+  "source_unchanged_during_build": true,
+  "existing_artifacts_preserved": 2467,
+  "builds": {
+    "rootless": {
+      "control": {
+        "Package": "com.wechat.improve",
+        "Name": "WeChatImprove",
+        "Description": "微信插件，支持聊天按钮布局自定义等。",
+        "Maintainer": "再也不会",
+        "Author": "再也不会",
+        "Section": "Tweaks",
+        "Depends": "mobilesubstrate (>= 0.9.5000)",
+        "Architecture": "iphoneos-arm64",
+        "Version": "2.7-3",
+        "Installed-Size": "9364"
+      },
+      "package": "com.wechat.improve_2.7-3_iphoneos-arm64.deb",
+      "package_sha256": "2c749748f77d50e575a222320df174402e32e697324bb44d50a2dd37b7dda70c",
+      "payload_paths": [
+        "var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib",
+        "var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.plist"
+      ],
+      "dylib_sha256": "9da71466d631e164e691e5eb86f7554444b330d97eabc0846053f736711d14e7",
+      "compile_units": 548,
+      "warnings": 8,
+      "warnings_unchanged_from_2_7_2": true,
+      "slices": {
+        "arm64": {
+          "uuid": "7BC521B0-24DA-315D-8BA7-77D46B99CC36",
+          "minimum_ios": "15.0",
+          "dsym_uuid_matches": true,
+          "code_directory_pages": [
+            {
+              "algorithm": "sha1",
+              "slots": 1137,
+              "page_size": 4096,
+              "verified": true
+            },
+            {
+              "algorithm": "sha256",
+              "slots": 1137,
+              "page_size": 4096,
+              "verified": true
+            }
+          ]
+        },
+        "arm64e": {
+          "uuid": "58FE687E-E954-343B-83C2-1836F5555E3B",
+          "minimum_ios": "15.0",
+          "dsym_uuid_matches": true,
+          "code_directory_pages": [
+            {
+              "algorithm": "sha1",
+              "slots": 1169,
+              "page_size": 4096,
+              "verified": true
+            },
+            {
+              "algorithm": "sha256",
+              "slots": 1169,
+              "page_size": 4096,
+              "verified": true
+            }
+          ]
+        }
+      }
+    },
+    "rootful": {
+      "control": {
+        "Package": "com.wechat.improve",
+        "Name": "WeChatImprove",
+        "Description": "微信插件，支持聊天按钮布局自定义等。",
+        "Maintainer": "再也不会",
+        "Author": "再也不会",
+        "Section": "Tweaks",
+        "Depends": "mobilesubstrate (>= 0.9.5000)",
+        "Architecture": "iphoneos-arm",
+        "Version": "2.7-3",
+        "Installed-Size": "9364"
+      },
+      "package": "com.wechat.improve_2.7-3_iphoneos-arm.deb",
+      "package_sha256": "424b6f9a514c9c8279bcc81c3fd9820eaf441408e7772b2a53adf4c86b58f446",
+      "payload_paths": [
+        "Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib",
+        "Library/MobileSubstrate/DynamicLibraries/WeChatImprove.plist"
+      ],
+      "dylib_sha256": "640b5cf9c971b93a64e89387f8ff0448a8bc723c20985d13771a2a5971b36df6",
+      "compile_units": 548,
+      "warnings": 8,
+      "warnings_unchanged_from_2_7_2": true,
+      "slices": {
+        "arm64": {
+          "uuid": "B0C33D33-1E15-3972-B0FD-30CC6459879F",
+          "minimum_ios": "15.0",
+          "dsym_uuid_matches": true,
+          "code_directory_pages": [
+            {
+              "algorithm": "sha1",
+              "slots": 1137,
+              "page_size": 4096,
+              "verified": true
+            },
+            {
+              "algorithm": "sha256",
+              "slots": 1137,
+              "page_size": 4096,
+              "verified": true
+            }
+          ]
+        },
+        "arm64e": {
+          "uuid": "CD48AA03-3F21-3940-AB0A-87213BEA88A8",
+          "minimum_ios": "15.0",
+          "dsym_uuid_matches": true,
+          "code_directory_pages": [
+            {
+              "algorithm": "sha1",
+              "slots": 1169,
+              "page_size": 4096,
+              "verified": true
+            },
+            {
+              "algorithm": "sha256",
+              "slots": 1169,
+              "page_size": 4096,
+              "verified": true
+            }
+          ]
+        }
+      }
+    }
+  },
+  "standalone_dylib_matches_rootful": true
+}
