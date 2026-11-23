@@ -12,13 +12,43 @@ static NSUInteger Assertions;
 // account lookup, ABI gates, name resolution and equality come from production.
 @interface CSMomentsCardModel : NSObject
 @property(nonatomic,strong) id item,media;
-@property(nonatomic,copy) NSString *identifier,*title,*username,*nickname,*locationText;
+@property(nonatomic,copy) NSString *identifier,*title,*username,*nickname,*locationText,*sourceText,*shareCoverURL;
+@property(nonatomic) NSUInteger contentKind;
 @property(nonatomic) CGSize coverSize;
 @property(nonatomic) NSTimeInterval timestamp;
 @property(nonatomic) NSUInteger mediaCount,likes,comments,epoch,revision;
 @property(nonatomic) BOOL video,liked;
 @end
 @implementation CSMomentsCardModel @end
+enum { CSMomentsContentMiniApp=7 };
+@interface MiniAppInfo : NSObject
+@property(nonatomic,strong) id appUserName;
+@end
+@implementation MiniAppInfo @end
+@interface MiniAppItem : NSObject
+@property(nonatomic,strong) id weappInfo;
+@end
+@implementation MiniAppItem @end
+@interface WAContact : NSObject
+@property(nonatomic,strong) id m_nsNickName;
+@end
+@implementation WAContact @end
+@interface WAContactMgr : NSObject
+@property(nonatomic,strong) NSDictionary<NSString *,id> *contacts;
+@property(nonatomic,strong) NSMutableArray<NSString *> *queries;
+@property(nonatomic) BOOL throws;
+@property(nonatomic) NSUInteger forbiddenLookups;
+- (id)getContactFromCache:(NSString *)username;
+- (id)getWeAppContact:(NSString *)username;
+@end
+@implementation WAContactMgr
+- (id)getContactFromCache:(NSString *)username {
+    [self.queries addObject:username];
+    if(self.throws)[NSException raise:@"NativeMiniAppLookupFailure" format:@"fixture"];
+    return self.contacts[username];
+}
+- (id)getWeAppContact:(NSString *)username { (void)username; self.forbiddenLookups++; return nil; }
+@end
 @interface NameContact : NSObject
 @property(nonatomic,strong) id m_nsRemark;
 @end
@@ -39,7 +69,7 @@ static NSUInteger Assertions;
 @interface WCFacade : NSObject @end
 @implementation WCFacade @end
 @interface NameCenter : NSObject
-@property(nonatomic,strong) id manager,facade;
+@property(nonatomic,strong) id manager,facade,miniAppManager;
 @property(nonatomic) NSUInteger services;
 - (id)getService:(Class)serviceClass;
 @end
@@ -48,6 +78,7 @@ static NSUInteger Assertions;
     self.services++;
     if(serviceClass==CContactMgr.class)return self.manager;
     if(serviceClass==WCFacade.class)return self.facade;
+    if(serviceClass==WAContactMgr.class)return self.miniAppManager;
     return nil;
 }
 @end
@@ -79,7 +110,7 @@ static NSUInteger BadCalls;
 - (NSMethodSignature *)methodSignatureForSelector:(SEL)selector { return [self.target methodSignatureForSelector:selector]; }
 - (void)forwardInvocation:(NSInvocation *)invocation { self.forwards++; [invocation invokeWithTarget:self.target]; }
 @end
-static Class ContextLookupClass,ContactLookupClass;
+static Class ContextLookupClass,ContactLookupClass,MiniAppLookupClass;
 static NameCenter *FallbackCenter;
 static NSUInteger FallbackCalls;
 static id CSGetServiceCenter(void) { FallbackCalls++; return FallbackCenter; }
@@ -91,6 +122,7 @@ static id CSCloseFriendRead(id object,NSString *key) {
 static Class LookupClass(NSString *name) {
     if([name isEqual:@"MMContext"])return ContextLookupClass;
     if([name isEqual:@"CContactMgr"])return ContactLookupClass;
+    if([name isEqual:@"WAContactMgr"])return MiniAppLookupClass;
     return NSClassFromString(name);
 }
 #define NSClassFromString LookupClass
@@ -104,11 +136,22 @@ static CSMomentsCardModel *Card(NSString *username,id item) {
     card.locationText=@""; card.epoch=7; card.revision=12; return card;
 }
 static CContactMgr *Begin(void) {
-    ContextLookupClass=MMContext.class; ContactLookupClass=CContactMgr.class;
+    ContextLookupClass=MMContext.class; ContactLookupClass=CContactMgr.class; MiniAppLookupClass=WAContactMgr.class;
     CContactMgr *manager=[CContactMgr new]; manager.contacts=@{}; manager.queries=[NSMutableArray new];
     NameCenter *center=[NameCenter new]; center.manager=manager; center.facade=[WCFacade new]; ActiveContext=center;
     FallbackCenter=[NameCenter new]; FallbackCenter.manager=[CContactMgr new]; FallbackCalls=BadCalls=0;
     return manager;
+}
+static WAContact *MiniContact(id name) { WAContact *contact=[WAContact new]; contact.m_nsNickName=name; return contact; }
+static CSMomentsCardModel *MiniCard(id username) {
+    MiniAppInfo *info=[MiniAppInfo new]; info.appUserName=username;
+    MiniAppItem *item=[MiniAppItem new]; item.weappInfo=info;
+    CSMomentsCardModel *card=Card(@"author",item); card.contentKind=CSMomentsContentMiniApp;
+    card.title=@"小程序"; card.sourceText=@"分享内容标题"; card.shareCoverURL=@""; return card;
+}
+static WAContactMgr *BeginMiniApps(void) {
+    Begin(); WAContactMgr *manager=[WAContactMgr new]; manager.contacts=@{}; manager.queries=[NSMutableArray new];
+    ((NameCenter *)ActiveContext).miniAppManager=manager; return manager;
 }
 static void TestRemarkPriorityAndFallbacks(void) {
     CContactMgr *manager=Begin();
@@ -204,10 +247,88 @@ static void TestSameNativeItemLocationEditsChangeEquality(void) {
     updated.locationText=@"";
     CHECK(!SameCards(@[old],@[updated]));
 }
+static void TestMiniAppLocalNameResolution(void) {
+    WAContactMgr *manager=BeginMiniApps();
+    manager.contacts=@{@"valid":MiniContact(@" \n 探马助手 \t"), @"placeholder":MiniContact(@" 小程序名称 "),
+        @"blank":MiniContact(@" \n"), @"number":MiniContact(@42), @"null":MiniContact(NSNull.null)};
+    NSArray *cards=@[MiniCard(@" valid "), MiniCard(@"valid"), MiniCard(@"placeholder"), MiniCard(@"blank"),
+        MiniCard(@"number"), MiniCard(@"null"), MiniCard(@"missing"), MiniCard(@"missing"),
+        MiniCard(@" \n"), MiniCard(@42), MiniCard(NSNull.null), MiniCard(@[])];
+    ApplyMiniAppNames(cards);
+    CHECK([((CSMomentsCardModel *)cards[0]).title isEqual:@"探马助手"]);
+    CHECK([((CSMomentsCardModel *)cards[1]).title isEqual:@"探马助手"]);
+    for(NSUInteger i=2;i<cards.count;i++)CHECK([((CSMomentsCardModel *)cards[i]).title isEqual:@"小程序"]);
+    for(CSMomentsCardModel *card in cards)CHECK([card.sourceText isEqual:@"分享内容标题"]);
+    CHECK(manager.queries.count==6 && manager.forbiddenLookups==0 && FallbackCalls==0);
+    CHECK([((WAContact *)manager.contacts[@"valid"]).m_nsNickName isEqual:@" \n 探马助手 \t"]);
+    CHECK([((MiniAppInfo *)[(MiniAppItem *)((CSMomentsCardModel *)cards[0]).item weappInfo]).appUserName isEqual:@" valid "]);
+    CSMomentsCardModel *published=MiniCard(@"missing"); published.title=@"发布来源名称";
+    ApplyMiniAppNames(@[published]);
+    CHECK([published.title isEqual:@"发布来源名称"] && manager.queries.count==7 && manager.forbiddenLookups==0);
+    NameCenter *center=ActiveContext; NSUInteger before=center.services;
+    ApplyMiniAppNames(@[Card(@"author",nil)]);
+    CHECK(center.services==before);
+}
+static void TestMiniAppLookupReuseAndRefresh(void) {
+    WAContactMgr *manager=BeginMiniApps(); WAContact *contact=MiniContact(@"原小程序名");
+    manager.contacts=@{@"app":contact};
+    CSMomentsCardModel *old=MiniCard(@"app"),*duplicate=MiniCard(@"app");
+    ApplyMiniAppNames(@[old,duplicate]);
+    CHECK([old.title isEqual:@"原小程序名"] && [duplicate.title isEqual:old.title] && manager.queries.count==1);
+    CSMomentsCardModel *unchanged=MiniCard(@"app"); unchanged.item=old.item;
+    ApplyMiniAppNames(@[unchanged]);
+    CHECK(SameCards(@[old],@[unchanged]) && manager.queries.count==2);
+    contact.m_nsNickName=@" 新小程序名 ";
+    CSMomentsCardModel *updated=MiniCard(@"app"); updated.item=old.item;
+    ApplyMiniAppNames(@[updated]);
+    CHECK([updated.title isEqual:@"新小程序名"] && [old.title isEqual:@"原小程序名"]);
+    CHECK(!SameCards(@[old],@[updated]) && manager.queries.count==3);
+    contact.m_nsNickName=@" \n";
+    CSMomentsCardModel *removed=MiniCard(@"app"); removed.item=old.item;
+    ApplyMiniAppNames(@[removed]);
+    CHECK([removed.title isEqual:@"小程序"] && !SameCards(@[updated],@[removed]));
+    manager.throws=YES; [manager.queries removeAllObjects];
+    CSMomentsCardModel *failed=MiniCard(@"app");
+    ApplyMiniAppNames(@[failed,MiniCard(@"app")]);
+    CHECK(manager.queries.count==1 && [failed.title isEqual:@"小程序"]);
+    ApplyMiniAppNames(@[failed]);
+    CHECK(manager.queries.count==2 && manager.forbiddenLookups==0);
+}
+static void TestMiniAppCurrentAccountAndABIBoundaries(void) {
+    WAContactMgr *first=BeginMiniApps(); first.contacts=@{@"app":MiniContact(@"账号甲小程序")};
+    CSMomentsCardModel *a=MiniCard(@"app"); ApplyMiniAppNames(@[a]);
+    CHECK([a.title isEqual:@"账号甲小程序"]);
+    WAContactMgr *second=[WAContactMgr new]; second.contacts=@{@"app":MiniContact(@"账号乙小程序")}; second.queries=[NSMutableArray new];
+    NameCenter *center=[NameCenter new]; center.miniAppManager=second; ActiveContext=center;
+    CSMomentsCardModel *b=MiniCard(@"app"); ApplyMiniAppNames(@[b]);
+    CHECK([b.title isEqual:@"账号乙小程序"] && first.queries.count==1 && second.queries.count==1);
+    FallbackCenter.miniAppManager=first; ActiveContext=nil;
+    CSMomentsCardModel *loggedOut=MiniCard(@"app"); ApplyMiniAppNames(@[loggedOut]);
+    CHECK([loggedOut.title isEqual:@"小程序"] && FallbackCalls==0 && first.queries.count==1);
+    ActiveContext=center; center.miniAppManager=nil; ApplyMiniAppNames(@[loggedOut]);
+    CHECK([loggedOut.title isEqual:@"小程序"] && FallbackCalls==0);
+    center.miniAppManager=second; MiniAppLookupClass=Nil; ApplyMiniAppNames(@[loggedOut]);
+    CHECK(second.queries.count==1 && FallbackCalls==0);
+    MiniAppLookupClass=WAContactMgr.class; ContextLookupClass=BadContextAccessor.class; ApplyMiniAppNames(@[loggedOut]);
+    CHECK(BadCalls==0 && FallbackCalls==0);
+    ContextLookupClass=MMContext.class;
+    Class badManager=Subclass(@"MomentsNamesBadMiniAppManager",WAContactMgr.class,@selector(getContactFromCache:),(IMP)BadLookup,"q@:@");
+    center.miniAppManager=[badManager new]; ApplyMiniAppNames(@[loggedOut]);
+    CHECK(BadCalls==0 && [loggedOut.title isEqual:@"小程序"]);
+    Class badContact=Subclass(@"MomentsNamesBadMiniAppContact",NSObject.class,@selector(m_nsNickName),(IMP)BadRemark,"q@:");
+    center.miniAppManager=second; second.contacts=@{@"app":[badContact new]}; ApplyMiniAppNames(@[loggedOut]);
+    CHECK(BadCalls==0 && [loggedOut.title isEqual:@"小程序"] && second.forbiddenLookups==0);
+    second.contacts=@{@"app":MiniContact(@"代理缓存名")};
+    NameServiceWrapper *wrapper=[NameServiceWrapper alloc]; wrapper.target=second; center.miniAppManager=wrapper;
+    NestedContext *nested=[NestedContext new]; nested.serviceCenter=center; ActiveContext=nested;
+    ApplyMiniAppNames(@[loggedOut]);
+    CHECK([loggedOut.title isEqual:@"代理缓存名"] && wrapper.forwards==1 && FallbackCalls==0);
+}
 int main(void) { @autoreleasepool {
     TestRemarkPriorityAndFallbacks(); TestLookupReuseIsLimitedToOneUpdate(); TestCurrentAccountAndNilContextBoundaries();
     TestMissingServicesAndABIMismatches(); TestNestedAndForwardedServicesUseNormalMessages(); TestSameNativeItemRemarkEditsChangeEquality();
     TestSameNativeItemLocationEditsChangeEquality();
-    printf("Moments names: %lu checks passed (production current-account services, remark priority/fallback, per-update reuse, nil-context isolation, ABI and proxy forwarding, same-item remark refresh).\n",(unsigned long)Assertions);
+    TestMiniAppLocalNameResolution(); TestMiniAppLookupReuseAndRefresh(); TestMiniAppCurrentAccountAndABIBoundaries();
+    printf("Moments names: %lu checks passed (production current-account services, remarks and cache-only mini app names, per-update reuse, nil-context isolation, ABI and proxy forwarding, same-item name refresh).\n",(unsigned long)Assertions);
     return 0;
 } }

@@ -79,10 +79,10 @@ static NSString *Materialize(NSString *reference,NSString *name,NSDictionary *as
         NSMutableDictionary *f=[field mutableCopy];NSDictionary *entry=[CSBackupRegistry entryForDomain:f[@"domain"] key:f[@"key"]];NSString *resource=entry[@"resource"];
         if([resource isEqual:@"file"]) {
             NSString *path=[f[@"present"] boolValue]?f[@"value"]:nil;
-            // The tab bar falls back to its native icon when an old image no longer
-            // exists. Export that effective unset state without changing live defaults.
-            BOOL optionalIcon=[entry[@"module"] isEqual:@"tabbar"];
-            if(optionalIcon && (!path.length || RecordMissing(path,field,nil,missing ?: [NSMutableArray array]))) {
+            // These renderers use their system appearance when an old image no
+            // longer exists. Export that effective unset state without changing defaults.
+            BOOL optionalImage=[entry[@"module"] isEqual:@"tabbar"] || [field[@"key"] isEqual:@"com.wechat.enhance.quick_panel.background_image_path"];
+            if(optionalImage && (!path.length || RecordMissing(path,field,nil,missing ?: [NSMutableArray array]))) {
                 f[@"present"]=@NO; [f removeObjectForKey:@"value"];
                 [result addObject:f]; continue;
             }

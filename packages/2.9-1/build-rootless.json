@@ -1,0 +1,19 @@
+{
+  "scheme": "rootless",
+  "command": [
+    "make",
+    "package",
+    "-j4",
+    "THEOS=/Users/zhangshichao/theos",
+    "SCHEME=rootless",
+    "PACKAGE_VERSION=2.9-1",
+    "KEEP_LOGOS_INTERMEDIATES=1",
+    "_THEOS_LOCAL_DATA_DIR=/private/tmp/wechat-2.9-1-2_0fdi9b/rootless",
+    "THEOS_PACKAGE_DIR=/Users/zhangshichao/Documents/Workspace/WeChatImprove/packages/2.9-1"
+  ],
+  "source_checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "build_directory": "/private/tmp/wechat-2.9-1-2_0fdi9b/rootless",
+  "started_at": "2026-11-23T11:10:49.659661+08:00",
+  "completed_at": "2026-11-23T11:11:23.042944+08:00",
+  "exit_code": 0
+}

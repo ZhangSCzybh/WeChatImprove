@@ -19,7 +19,7 @@ def body(marker):
             if not depth: return source[start:end + 1]
     raise ValueError('Unclosed production body: ' + marker)
 markers = ['static BOOL Matches(', 'static id Read(', 'static id CurrentService(',
-           'static id CurrentFacade(', 'static void ApplyContactRemarks(', 'static BOOL SameCards(']
+           'static id CurrentFacade(', 'static void ApplyContactRemarks(', 'static void ApplyMiniAppNames(', 'static BOOL SameCards(']
 (output / 'MomentsNamesBodies.h').write_text('\n'.join(body(marker) for marker in markers))
 PY
 xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror \

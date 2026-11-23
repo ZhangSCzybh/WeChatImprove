@@ -2,6 +2,9 @@
 #import "CSSettingsHomeTheme.h"
 #import <math.h>
 
+static const CGFloat CSHeaderMetricLeadingInset=16;
+static const CGFloat CSHeaderMetricCaptionInset=8;
+
 static UIFont *CSHeaderFont(CGFloat size, UIFontWeight weight, UIFontTextStyle style, CGFloat maximum) {
     return [[UIFontMetrics metricsForTextStyle:style] scaledFontForFont:[UIFont systemFontOfSize:size weight:weight]
                                                     maximumPointSize:maximum];
@@ -57,7 +60,7 @@ static UIFont *CSHeaderVIPFont(void) {
     self.iconView.frame=CGRectMake(8,8,12,valueHeight);
     CGFloat valueX=compact ? 8 : 24;
     self.valueLabel.frame=CGRectMake(valueX,8,MAX(0,width-valueX-8),valueHeight);
-    self.captionLabel.frame=CGRectMake(8,9+valueHeight,MAX(0,width-16),MAX(0,height-valueHeight-14));
+    self.captionLabel.frame=CGRectMake(CSHeaderMetricCaptionInset,9+valueHeight,MAX(0,width-2*CSHeaderMetricCaptionInset),MAX(0,height-valueHeight-14));
 }
 @end
 
@@ -199,6 +202,9 @@ static UIFont *CSHeaderVIPFont(void) {
     _horizontalInset=MAX(0,horizontalInset);
     [self setNeedsLayout];
 }
+- (CGFloat)metricCaptionLeadingInset {
+    return self.horizontalInset+CSHeaderMetricLeadingInset+CSHeaderMetricCaptionInset;
+}
 - (void)layoutSubviews {
     [super layoutSubviews];
     CGFloat cardWidth=MAX(0,CGRectGetWidth(self.bounds)-2*self.horizontalInset);
@@ -225,7 +231,7 @@ static UIFont *CSHeaderVIPFont(void) {
     CGFloat metricY=[self metricsTopForWidth:width], metricHeight=[self metricHeight];
     CGFloat available=MAX(0,cardWidth-32-16), metricWidth=available/self.metrics.count;
     for (NSUInteger index=0;index<self.metrics.count;index++) {
-        self.metrics[index].frame=CGRectMake(16+index*(metricWidth+8),metricY,metricWidth,metricHeight);
+        self.metrics[index].frame=CGRectMake(CSHeaderMetricLeadingInset+index*(metricWidth+8),metricY,metricWidth,metricHeight);
     }
 }
 @end

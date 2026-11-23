@@ -1,5 +1,6 @@
 """Extract the production selection and indicator methods for a host replay."""
 from pathlib import Path
+import re
 import sys
 source = (Path(__file__).resolve().parent.parent / 'Controllers/WESessionTabContainerView.m').read_text()
 def extract(marker):
@@ -18,10 +19,31 @@ methods = [extract(marker) for marker in ['- (NSInteger)indexForTabID:', '- (voi
                '- (void)selectTabAtIndex:', '- (void)updateIndicatorPosition {',
                '- (void)updateIndicatorPositionAnimated:', '- (void)moveIndicatorToFrame:',
                '- (void)scrollToSelectedTab', '- (CGRect)indicatorFrameForIndex:', '- (void)updateInteractiveTransitionToIndex:',
-               '- (void)cancelInteractiveTransition', '- (void)updateCapsuleSelectionAnimated:']]
+               '- (void)cancelInteractiveTransition', '- (void)updateCapsuleSelectionAnimated:',
+               '- (CGRect)capsuleFrameForButton:', '- (void)moveCapsuleToFrame:',
+               '- (void)tabButtonPressed:', '- (void)tabButtonPressEntered:',
+               '- (void)tabButtonPressExited:', '- (void)tabButtonTouchCancelled:',
+               '- (void)tabButtonTapped:']]
 output = Path(sys.argv[1])
 output.write_text('\n'.join(methods)+'\n')
-output.with_name('GroupCapsuleHelpers.h').write_text(source[source.index('static NSTimeInterval const kCapsuleDuration'):source.index('// Match the native')])
+output.with_name('GroupCapsuleHelpers.h').write_text(source[source.index('static NSTimeInterval const kCapsulePressDuration'):source.index('// Match the native')])
+# Replay the real UIControl event bindings, so handler tests also cover wiring.
+bindings = re.findall(r'\[button addTarget:self action:@selector\([^)]*\) forControlEvents:[^;]+;', extract('- (void)updateTabs:'))
+if len(bindings) != 5:
+    raise ValueError('Expected all five tab button touch bindings')
+output.with_name('GroupCapsuleTouchBindings.h').write_text('\n'.join(bindings)+'\n')
+output.with_name('GroupTabScrollBody.h').write_text(extract('- (BOOL)touchesShouldCancelInContentView:')+'\n')
+appearance = extract('- (void)refreshAppearance')
+touch_start = appearance.index('CSGroupIndicatorStyle style =')
+touch_end = appearance.index('self.scrollView.delaysContentTouches = !capsule;') + len('self.scrollView.delaysContentTouches = !capsule;')
+output.with_name('GroupCapsuleTouchAppearance.h').write_text(appearance[touch_start:touch_end]+'\n')
+setup = extract('- (void)setupUI')
+cancel_policy = re.search(r'_scrollView\.canCancelContentTouches\s*=\s*[^;]+;', setup)
+if not cancel_policy:
+    raise ValueError('Missing explicit scroll touch cancellation policy')
+output.with_name('GroupCapsuleTouchSetup.h').write_text(cancel_policy.group()+'\n')
 # Skip the declaration in the private interface.
 source = source[source.index('@implementation WETabButton'):]
-output.with_name('GroupCapsuleButtonBody.h').write_text(extract('- (void)setCapsuleProgress:')+'\n'+extract('- (void)configureCapsuleEnabled:')+'\n')
+output.with_name('GroupCapsuleButtonBody.h').write_text('\n'.join(extract(marker) for marker in [
+    '- (void)setCapsuleProgress:', '- (void)configureCapsuleEnabled:',
+    '- (BOOL)beginTrackingWithTouch:', '- (BOOL)continueTrackingWithTouch:'])+'\n')

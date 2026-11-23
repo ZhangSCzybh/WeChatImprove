@@ -1,10 +1,10 @@
 Package: com.wechat.improve
 Name: WeChatImprove
-Description: 微信插件，支持聊天按钮布局自定义等。
+Description: 微信增强插件，支持聊天分组、界面定制、消息增强、朋友圈卡片布局与配置备份。
 Maintainer: 再也不会
 Author: 再也不会
 Section: Tweaks
 Depends: mobilesubstrate (>= 0.9.5000)
 Architecture: iphoneos-arm64
-Version: 2.7-5-spc01
-Installed-Size: 9188
+Version: 2.9-5-spc
+Installed-Size: 9580

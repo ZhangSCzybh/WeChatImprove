@@ -8,7 +8,32 @@ typedef NS_ENUM(NSInteger, UIViewContentMode) { UIViewContentModeScaleToFill, UI
 typedef NS_ENUM(NSInteger, UIUserInterfaceLayoutDirection) { UIUserInterfaceLayoutDirectionLeftToRight, UIUserInterfaceLayoutDirectionRightToLeft };
 typedef NS_ENUM(NSInteger, UIUserInterfaceStyle) { UIUserInterfaceStyleUnspecified,UIUserInterfaceStyleLight,UIUserInterfaceStyleDark };
 typedef NS_ENUM(NSInteger, UIImpactFeedbackStyle) { UIImpactFeedbackStyleLight,UIImpactFeedbackStyleMedium,UIImpactFeedbackStyleHeavy,UIImpactFeedbackStyleSoft };
-typedef NS_OPTIONS(NSUInteger, UIControlEvents) { UIControlEventTouchDown=1,UIControlEventTouchUpInside=2 };
+typedef NS_OPTIONS(NSUInteger, UIControlEvents) {
+    UIControlEventTouchDown=1<<0,
+    UIControlEventTouchDragInside=1<<2,
+    UIControlEventTouchDragOutside=1<<3,
+    UIControlEventTouchUpInside=1<<6,
+    UIControlEventTouchUpOutside=1<<7,
+    UIControlEventTouchCancel=1<<8,
+    UIControlEventAllEvents=0xFFFFFFFFU,
+};
+typedef NS_OPTIONS(NSUInteger, UIViewAnimationOptions) {
+    UIViewAnimationOptionAllowUserInteraction=1<<1,
+    UIViewAnimationOptionBeginFromCurrentState=1<<2,
+    UIViewAnimationOptionCurveEaseInOut=0<<16,
+    UIViewAnimationOptionCurveEaseIn=1<<16,
+    UIViewAnimationOptionCurveEaseOut=2<<16,
+    UIViewAnimationOptionCurveLinear=3<<16,
+};
+@interface CSTestViewAnimation : NSObject
+@property(nonatomic) NSTimeInterval duration,delay;
+@property(nonatomic) CGFloat damping,velocity;
+@property(nonatomic) UIViewAnimationOptions options;
+@property(nonatomic) BOOL spring;
+@end
+extern NSMutableArray<CSTestViewAnimation *> *CSTestViewAnimations;
+// 0=direct write, 1=ordinary animation, 2=spring animation for the visible indicator.
+extern NSMutableArray<NSNumber *> *CSTestIndicatorFrameWrites;
 typedef NS_ENUM(NSInteger, UIBlurEffectStyle) { UIBlurEffectStyleSystemMaterial };
 extern NSString *const UIAccessibilityReduceMotionStatusDidChangeNotification;
 extern NSString *const UIApplicationDidBecomeActiveNotification;
@@ -40,9 +65,13 @@ BOOL UIAccessibilityIsReduceMotionEnabled(void);
 @end
 @interface UIView : NSObject
 + (void)performWithoutAnimation:(void (^)(void))actions;
++ (void)animateWithDuration:(NSTimeInterval)duration delay:(NSTimeInterval)delay options:(UIViewAnimationOptions)options animations:(void (^)(void))animations completion:(void (^)(BOOL))completion;
++ (void)animateWithDuration:(NSTimeInterval)duration delay:(NSTimeInterval)delay usingSpringWithDamping:(CGFloat)damping initialSpringVelocity:(CGFloat)velocity options:(UIViewAnimationOptions)options animations:(void (^)(void))animations completion:(void (^)(BOOL))completion;
 @property(nonatomic) CGRect frame,bounds;
+@property(nonatomic) CGPoint center;
+@property(nonatomic) CGAffineTransform transform;
 @property(nonatomic) CGFloat alpha;
-@property(nonatomic) BOOL hidden,clipsToBounds,userInteractionEnabled;
+@property(nonatomic) BOOL hidden,clipsToBounds,userInteractionEnabled,isAccessibilityElement;
 @property(nonatomic) UIViewContentMode contentMode;
 @property(nonatomic) UIUserInterfaceLayoutDirection effectiveUserInterfaceLayoutDirection;
 @property(nonatomic,strong) CALayer *layer;
@@ -58,6 +87,8 @@ BOOL UIAccessibilityIsReduceMotionEnabled(void);
 - (BOOL)isDescendantOfView:(UIView *)view;
 - (CGRect)convertRect:(CGRect)rect toView:(UIView *)view;
 - (CGPoint)convertPoint:(CGPoint)point toView:(UIView *)view;
+- (CGRect)convertRect:(CGRect)rect fromView:(UIView *)view;
+- (CGPoint)convertPoint:(CGPoint)point fromView:(UIView *)view;
 - (UIView *)hitTest:(CGPoint)point withEvent:(id)event;
 - (void)setNeedsLayout;
 - (void)layoutIfNeeded;
@@ -66,7 +97,15 @@ BOOL UIAccessibilityIsReduceMotionEnabled(void);
 @property(nonatomic,strong) UIWindowScene *windowScene;
 @property(nonatomic) UIEdgeInsets safeAreaInsets;
 @end
-@interface UIEvent : NSObject @end
+@interface UITouch : NSObject
+@property(nonatomic) CGPoint testLocation;
+@property(nonatomic,weak) UIView *testView;
+- (CGPoint)locationInView:(UIView *)view;
+@end
+@interface UIEvent : NSObject
+@property(nonatomic,copy) NSSet<UITouch *> *allTouches;
+- (NSSet<UITouch *> *)touchesForView:(UIView *)view;
+@end
 @interface UIImage : NSObject
 @property(nonatomic,copy) NSString *path;
 + (instancetype)imageWithContentsOfFile:(NSString *)path;
@@ -83,9 +122,13 @@ BOOL UIAccessibilityIsReduceMotionEnabled(void);
 @end
 @interface UIControl : UIView
 @property(nonatomic,strong) NSMutableArray *actions;
+@property(nonatomic) BOOL enabled;
 - (void)addTarget:(id)target action:(SEL)action forControlEvents:(UIControlEvents)events;
 - (void)removeTarget:(id)target action:(SEL)action forControlEvents:(UIControlEvents)events;
 - (void)sendActionsForControlEvents:(UIControlEvents)events;
+- (void)sendActionsForControlEvents:(UIControlEvents)events withEvent:(UIEvent *)event;
+- (void)sendAction:(SEL)action to:(id)target forEvent:(UIEvent *)event;
+- (void)cancelTrackingWithEvent:(UIEvent *)event;
 @end
 @interface UITabBarItem : NSObject @end
 @interface UITabBar : UIView

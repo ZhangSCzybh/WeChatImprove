@@ -1,0 +1,93 @@
+{
+  "group_regressions": {
+    "group-indicator": {
+      "status": "passed",
+      "checks": 127,
+      "output": "Group indicator: 127 checks, 0 failures\n"
+    },
+    "group-interactions": {
+      "status": "blocked_by_existing_host_fixture_compile_errors",
+      "inputs_unchanged_from_before": [
+        "Tests/verify-group-interactions.sh",
+        "Tests/extract-group-interactions.py",
+        "Tests/GroupInteractionTests.m",
+        "Controllers/CSGroupListAdapter.m",
+        "Hooks/SessionGroupHooks.xm"
+      ],
+      "output": "In file included from /Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/GroupInteractionTests.m:229:\n/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-interactions.I1r9mn/GroupInteractionBodies.h:4:11: error: no visible @interface for 'CSGroupListAdapter' declares the selector 'consumeRefreshRequest'\n    4 |     [self consumeRefreshRequest];\n      |      ~~~~ ^~~~~~~~~~~~~~~~~~~~~\n/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-interactions.I1r9mn/GroupInteractionBodies.h:12:10: error: property 'immediateRefreshPending' not found on object of type 'CSGroupListAdapter *'\n   12 |     self.immediateRefreshPending=YES;\n      |          ^\n/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-interactions.I1r9mn/GroupInteractionBodies.h:65:22: error: no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'\n   65 |             [adapter restorePendingViewport];\n      |              ~~~~~~~ ^~~~~~~~~~~~~~~~~~~~~~\n/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-interactions.I1r9mn/GroupInteractionBodies.h:133:11: error: no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'\n  133 |     [self restorePendingViewport];\n      |      ~~~~ ^~~~~~~~~~~~~~~~~~~~~~\n/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-interactions.I1r9mn/GroupInteractionBodies.h:146:11: error: no visible @interface for 'CSGroupListAdapter' declares the selector 'restorePendingViewport'\n  146 |     [self restorePendingViewport];\n      |      ~~~~ ^~~~~~~~~~~~~~~~~~~~~~\n/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-interactions.I1r9mn/GroupInteractionBodies.h:278:38: error: no visible @interface for 'CSGroupListAdapter' declares the selector 'adoptCompatibilityModelIfNeeded'\n  278 |     if (NSThread.isMainThread) [self adoptCompatibilityModelIfNeeded];\n      |                                 ~~~~ ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-interactions.I1r9mn/GroupInteractionBodies.h:279:14: error: property 'usesNativeSessionModel' not found on object of type 'CSGroupListAdapter *'\n  279 |     if (self.usesNativeSessionModel) { [self refreshNativeSessionModel]; return; }\n      |              ^\n/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-interactions.I1r9mn/GroupInteractionBodies.h:279:46: error: no visible @interface for 'CSGroupListAdapter' declares the selector 'refreshNativeSessionModel'\n  279 |     if (self.usesNativeSessionModel) { [self refreshNativeSessionModel]; return; }\n      |                                         ~~~~ ^~~~~~~~~~~~~~~~~~~~~~~~~\n/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-interactions.I1r9mn/GroupInteractionBodies.h:282:40: error: property 'presentationViewport' not found on object of type 'CSGroupListAdapter *'\n  282 |     NSDictionary *sourceViewport=(self.presentationViewport || self.switchViewport) ? nil : [self captureViewportForTabID:self.publishedTabID];\n      |                                        ^\n/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-interactions.I1r9mn/GroupInteractionBodies.h:282:69: error: property 'switchViewport' not found on object of type 'CSGroupListAdapter *'\n  282 |     NSDictionary *sourceViewport=(self.presentationViewport || self.switchViewport) ? nil : [self captureViewportForTabID:self.publishedTabID];\n      |                                                                     ^\n/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-interactions.I1r9mn/GroupInteractionBodies.h:282:99: error: no visible @interface for 'CSGroupListAdapter' declares the selector 'captureViewportForTabID:'\n  282 |     NSDictionary *sourceViewport=(self.presentationViewport || self.switchViewport) ? nil : [self captureViewportForTabID:self.publishedTabID];\n      |                                                                                              ~~~~ ^~~~~~~~~~~~~~~~~~~~~~~\n/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-interactions.I1r9mn/GroupInteractionBodies.h:301:11: error: no visible @interface for 'CSGroupListAdapter' declares the selector 'consumeRefreshRequest'\n  301 |     [self consumeRefreshRequest];\n      |      ~~~~ ^~~~~~~~~~~~~~~~~~~~~\n/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-interactions.I1r9mn/GroupInteractionBodies.h:308:10: error: property 'immediateRefreshPending' not found on object of type 'CSGroupListAdapter *'\n  308 |     self.immediateRefreshPending=YES;\n      |          ^\n/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-interactions.I1r9mn/GroupInteractionBodies.h:325:57: error: property 'immediateRefreshPending' not found on object of type 'CSGroupListAdapter *'\n  325 |     BOOL coalesced=!self.privacyRefreshPending && !self.immediateRefreshPending && self.coalescingNotification && !self.nativeActions.count;\n      |                                                         ^\n/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-interactions.I1r9mn/GroupInteractionBodies.h:334:49: error: property 'refreshCoalescedDue' not found on object of type 'CSGroupListAdapter *'\n  334 |     NSTimeInterval delay=coalesced ? MAX(0,self.refreshCoalescedDue-now) : 0;\n      |                                                 ^\n/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-interactions.I1r9mn/GroupInteractionBodies.h:334:49: error: property 'refreshCoalescedDue' not found on object of type 'CSGroupListAdapter *'\n/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-interactions.I1r9mn/GroupInteractionBodies.h:354:37: error: property 'scheduledRefreshDue' not found on object of type 'CSGroupListAdapter *'\n  354 |         BOOL sameDeadline=fabs(self.scheduledRefreshDue-due)<0.001;\n      |                                     ^\n/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-interactions.I1r9mn/GroupInteractionBodies.h:358:10: error: property 'scheduledRefreshDue' not found on object of type 'CSGroupListAdapter *'\n  358 |     self.scheduledRefreshDue=due;\n      |          ^\n/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T//wechat-group-interactions.I1r9mn/GroupInteractionBodies.h:367:20: error: no visible @interface for 'CSGroupListAdapter' declares the selector 'consumeRefreshRequest'\n  367 |         else [self consumeRefreshRequest];\n      |               ~~~~ ^~~~~~~~~~~~~~~~~~~~~\nfatal error: too many errors emitted, stopping now [-ferror-limit=]\n20 errors generated.\n"
+    }
+  },
+  "group_capsule_press": ".12s EaseOut on Down, centered background expansion up to 1.08x1.04, release retains existing group selection, original .28/.20 transitions preserved",
+  "packaged_group_press_present": true,
+  "version": "2.9-0",
+  "source_checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "builds": [
+    {
+      "scheme": "rootless",
+      "package": "com.wechat.improve_2.9-0_iphoneos-arm64.deb",
+      "metadata": {
+        "Package": "com.wechat.improve",
+        "Version": "2.9-0",
+        "Architecture": "iphoneos-arm64"
+      },
+      "install_path": "/var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib",
+      "binary_architectures": [
+        "arm64",
+        "arm64e"
+      ],
+      "binary_sha256": "49aaefcd1164d43a3ae96cecf79b2479815ef2462980288cd9a55546774ceba5",
+      "dsym": [
+        {
+          "architecture": "arm64",
+          "uuid": "FA318935-5C6D-33CC-9D61-1FE49E58150E",
+          "matches_binary": true
+        },
+        {
+          "architecture": "arm64e",
+          "uuid": "BF6B456D-766B-30D0-9A33-92DA7A73EE87",
+          "matches_binary": true
+        }
+      ],
+      "build_exit_code": 0
+    },
+    {
+      "scheme": "rootful",
+      "package": "com.wechat.improve_2.9-0_iphoneos-arm.deb",
+      "metadata": {
+        "Package": "com.wechat.improve",
+        "Version": "2.9-0",
+        "Architecture": "iphoneos-arm"
+      },
+      "install_path": "/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib",
+      "binary_architectures": [
+        "arm64",
+        "arm64e"
+      ],
+      "binary_sha256": "1186902c96c41fa9b20e2659a5cc01f9af15caf731688a26c987997a07c7d19c",
+      "dsym": [
+        {
+          "architecture": "arm64",
+          "uuid": "FAE1945A-64A0-356A-A811-524A61A44A1A",
+          "matches_binary": true
+        },
+        {
+          "architecture": "arm64e",
+          "uuid": "92C5B78B-C6C8-3742-9179-36ED9082A152",
+          "matches_binary": true
+        }
+      ],
+      "build_exit_code": 0
+    }
+  ],
+  "regression_log": "regressions/tabbar.log",
+  "regression_output": "tabbar geometry: PASS\n2026-11-23 10:38:13.283 native[56594:25512637] tabbar Neo touch/animation: 97 checks passed\n2026-11-23 10:38:13.288 native[56594:25512637] tabbar modern native hierarchy: PASS (121 total touch checks)\n2026-11-23 10:38:13.305 native[56594:25512637] tabbar preferences/native lifecycle: PASS\n",
+  "protected_files_unchanged": 44667,
+  "build_inputs_unchanged": 514,
+  "standalone_matches_rootful": true,
+  "real_device_animation_verified": false,
+  "neo_contract": "ordinary UIKit indicator geometry and animation constants retained; per user request page selection commits final valid target once on release, never during Down/Drag",
+  "interaction_revision": "release-only final page selection; A through B to C activates only C on Up",
+  "packaged_touch_control_class_present": true,
+  "git_diff_check": "passed",
+  "user_environment": "Native iOS plugin source/build only; no services started, no database opened or modified."
+}

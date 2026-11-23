@@ -83,6 +83,58 @@ int main(void) { @autoreleasepool {
     CHECK([clickEffect[@"module"] isEqual:@"tabbar"] && [clickEffect[@"scope"] isEqual:@"global"]);
     CHECK(Valid(@0,clickEffect) && Valid(@1,clickEffect));
     CHECK(!Valid(@"1",clickEffect));
+    NSDictionary *panelEnabled=Entry(@"com.wechat.enhance.quick_panel.enabled");
+    NSDictionary *panelLocations=Entry(@"com.wechat.enhance.quick_panel.trigger_locations");
+    NSDictionary *panelActions=Entry(@"com.wechat.enhance.quick_panel.selected_actions");
+    NSDictionary *panelStyle=Entry(@"com.wechat.enhance.quick_panel.background_style");
+    NSDictionary *panelColor=Entry(@"com.wechat.enhance.quick_panel.background_color_hex");
+    NSDictionary *panelOpacity=Entry(@"com.wechat.enhance.quick_panel.background_opacity");
+    NSDictionary *panelImage=Entry(@"com.wechat.enhance.quick_panel.background_image_path");
+    NSDictionary *panelTextColor=Entry(@"com.wechat.enhance.quick_panel.text_color_hex");
+    NSDictionary *panelIconColor=Entry(@"com.wechat.enhance.quick_panel.icon_color_hex");
+    CHECK([CSBackupRegistry.moduleTitles[@"quick_panel"] isEqual:@"快捷面板"]);
+    CHECK([panelEnabled[@"type"] isEqual:@"bool"] && [panelLocations[@"type"] isEqual:@"number"] && [panelActions[@"type"] isEqual:@"array"]);
+    NSUInteger panelFields=0;
+    for (NSDictionary *entry in CSBackupRegistry.entries) if ([entry[@"module"] isEqual:@"quick_panel"]) panelFields++;
+    CHECK(panelFields==9);
+    for (NSDictionary *entry in @[panelEnabled,panelLocations,panelActions,panelStyle,panelColor,panelOpacity,panelTextColor,panelIconColor]) {
+        CHECK([entry[@"module"] isEqual:@"quick_panel"] && [entry[@"scope"] isEqual:@"global"] && [entry[@"domain"] isEqual:@"standard"] && entry[@"resource"]==nil);
+        CHECK([CSBackupRegistry entryForDomain:@"legacy" key:entry[@"key"]]==nil);
+    }
+    CHECK(Valid(@YES,panelEnabled) && Valid(@NO,panelEnabled) && Valid(@0,panelEnabled) && Valid(@1,panelEnabled));
+    CHECK(!Valid(@"YES",panelEnabled) && !Valid(@2,panelEnabled) && !Valid(@(-1),panelEnabled) && !Valid(@0.5,panelEnabled));
+    CHECK(Valid(@1,panelLocations) && Valid(@2,panelLocations) && Valid(@3,panelLocations));
+    CHECK(!Valid(@0,panelLocations) && !Valid(@4,panelLocations) && !Valid(@(-1),panelLocations) && !Valid(@1.5,panelLocations));
+    CHECK(!Valid(@"1",panelLocations) && !Valid(@(NAN),panelLocations) && !Valid(@(INFINITY),panelLocations));
+    CHECK([panelImage[@"resource"] isEqual:@"file"] && [panelImage[@"module"] isEqual:@"quick_panel"]);
+    CHECK(Valid(@"default",panelStyle) && Valid(@"color",panelStyle) && Valid(@"image",panelStyle));
+    CHECK(!Valid(@"blur",panelStyle) && !Valid(@1,panelStyle));
+    for (NSDictionary *color in @[panelColor,panelTextColor,panelIconColor]) {
+        CHECK([color[@"type"] isEqual:@"string"]);
+        CHECK(Valid(@"#000000",color) && Valid(@"#ABCDEF",color) && Valid(@"#FFFFFF",color));
+        CHECK(!Valid(@"#abcdef",color) && !Valid(@"#GG0000",color) && !Valid(@"ABCDEF",color) && !Valid(@"#000000FF",color));
+        CHECK(!Valid(@"",color) && !Valid(@" #123456",color) && !Valid(@"#12345",color));
+        CHECK(!Valid(@17,color) && !Valid(NSNull.null,color) && !Valid(@{},color));
+    }
+    CHECK(Valid(@0,panelOpacity) && Valid(@1,panelOpacity) && Valid(@0.35,panelOpacity));
+    CHECK(!Valid(@(-0.1),panelOpacity) && !Valid(@1.1,panelOpacity) && !Valid(@(NAN),panelOpacity) && !Valid(@(INFINITY),panelOpacity) && !Valid(@"0.5",panelOpacity));
+    NSArray *legacyPanelIdentifiers=@[@"scan",@"wallet",@"moments",@"my_qrcode",@"favorites",@"plugin_home",@"profile",@"create_group",@"add_friend",@"emoji_store",@"panel_settings"];
+    CHECK(legacyPanelIdentifiers.count==11 && Valid(legacyPanelIdentifiers,panelActions));
+    NSArray *newPanelIdentifiers=@[@"payment_code",@"channels",@"file_transfer"];
+    NSArray *panelIdentifiers=[legacyPanelIdentifiers arrayByAddingObjectsFromArray:newPanelIdentifiers];
+    CHECK(panelIdentifiers.count==14 && Valid(panelIdentifiers,panelActions));
+    NSArray *allPanelIdentifiers=[panelIdentifiers arrayByAddingObject:@"chat_background"];
+    CHECK(allPanelIdentifiers.count==15 && Valid(allPanelIdentifiers,panelActions) && Valid(@[@"chat_background"],panelActions));
+    CHECK(!Valid(@[@"chat_background",@"chat_background"],panelActions));
+    CHECK(Valid(newPanelIdentifiers,panelActions) && Valid(@[@"file_transfer",@"scan",@"payment_code",@"channels"],panelActions));
+    CHECK(Valid(@[],panelActions) && Valid(@[@"panel_settings",@"scan",@"favorites"],panelActions));
+    CHECK(!Valid(@[@"scan",@"scan"],panelActions) && !Valid(@[@"unknown"],panelActions) && !Valid(@[@""],panelActions));
+    CHECK(!Valid(@[@"channels",@"channels"],panelActions) && !Valid(@[@"payment_code",@"payment_code"],panelActions) && !Valid(@[@"file_transfer",@"file_transfer"],panelActions));
+    CHECK(!Valid(@[@1],panelActions) && !Valid(@[NSNull.null],panelActions) && !Valid(@"scan",panelActions) && !Valid(@{},panelActions));
+    CHECK(!Valid([panelIdentifiers arrayByAddingObject:@"scan"],panelActions));
+    for (NSString *suffix in @[@"unknown",@"account",@"avatar",@"selected_actions.extra",@"text_color_hex.extra",@"icon_color_hex.extra"])
+        CHECK(Entry([@"com.wechat.enhance.quick_panel." stringByAppendingString:suffix])==nil);
+    CHECK(!Valid(@YES,@{@"domain":@"standard",@"key":@"com.wechat.enhance.quick_panel.unknown",@"module":@"quick_panel",@"type":@"bool",@"scope":@"global"}));
     for (NSString *base in @[@"sender_light",@"receiver_light",@"sender_dark",@"receiver_dark"]) {
         for (NSString *component in @[@"red",@"green",@"blue",@"alpha"]) CHECK(Entry([NSString stringWithFormat:@"com.wechat.enhance.bubble_style.%@_color.%@",base,component])!=nil);
         for (NSString *component in @[@"red",@"green",@"blue"]) CHECK(Entry([NSString stringWithFormat:@"com.wechat.enhance.bubble_style.%@_text_color.%@",base,component])!=nil);

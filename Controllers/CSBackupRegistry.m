@@ -241,6 +241,15 @@ static BOOL CSContacts(id value) {
             @[@"standard",@"com.wechat.enhance.right_swipe_other.action",@"message_actions",@"number",@"global",@""],
             @[@"standard",@"com.wechat.enhance.right_swipe_self.action",@"message_actions",@"number",@"global",@""],
             @[@"standard",@"com.wechat.enhance.scroll_sensitivity",@"groups",@"number",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.quick_panel.enabled",@"quick_panel",@"bool",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.quick_panel.trigger_locations",@"quick_panel",@"number",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.quick_panel.selected_actions",@"quick_panel",@"array",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.quick_panel.background_style",@"quick_panel",@"string",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.quick_panel.background_color_hex",@"quick_panel",@"string",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.quick_panel.background_opacity",@"quick_panel",@"number",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.quick_panel.background_image_path",@"quick_panel",@"string",@"global",@"file"],
+            @[@"standard",@"com.wechat.enhance.quick_panel.text_color_hex",@"quick_panel",@"string",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.quick_panel.icon_color_hex",@"quick_panel",@"string",@"global",@""],
             @[@"standard",@"com.wechat.enhance.tabbar_style.bg_color.alpha",@"tabbar",@"number",@"global",@""],
             @[@"standard",@"com.wechat.enhance.tabbar_style.bg_color.blue",@"tabbar",@"number",@"global",@""],
             @[@"standard",@"com.wechat.enhance.tabbar_style.bg_color.green",@"tabbar",@"number",@"global",@""],
@@ -443,7 +452,7 @@ static BOOL CSContacts(id value) {
     return entries;
 }
 + (NSDictionary<NSString *,NSString *> *)moduleTitles {
-    return @{@"home_theme":@"首页调色",@"avatar":@"头像",@"background":@"后台与隐私模糊",@"privacy":@"收藏保护",@"layout":@"布局与字体",@"bubble":@"气泡与连续消息",@"groups":@"会话分组",@"list":@"列表圆角",@"input":@"输入文本",@"message_time":@"消息时间",@"red_envelopes":@"红包设置",@"tabbar":@"底栏样式",@"attachments":@"附件布局",@"updates":@"更新控制",@"entry":@"插件入口",@"ui":@"界面精简",@"navigation":@"聊天导航",@"touch":@"触摸轨迹",@"version":@"版本设置",@"backup":@"备份设置",@"revoke":@"防撤回",@"message_actions":@"消息操作",@"transfers":@"转账设置",@"timeline":@"朋友圈尾巴",@"games":@"游戏设置",@"custom_text":@"界面文字",@"scheduled_tasks":@"定时任务",@"ai_reply":@"AI 自动回复",@"group_chat_tools":@"群聊功能",@"automation":@"自动功能",@"client_guard":@"反检测",@"ad_purification":@"广告净化",@"moments_layout":@"朋友圈布局"};
+    return @{@"home_theme":@"首页调色",@"avatar":@"头像",@"background":@"后台与隐私模糊",@"privacy":@"收藏保护",@"layout":@"布局与字体",@"bubble":@"气泡与连续消息",@"groups":@"会话分组",@"list":@"列表圆角",@"input":@"输入文本",@"message_time":@"消息时间",@"red_envelopes":@"红包设置",@"tabbar":@"底栏样式",@"attachments":@"附件布局",@"updates":@"更新控制",@"entry":@"插件入口",@"ui":@"界面精简",@"navigation":@"聊天导航",@"touch":@"触摸轨迹",@"version":@"版本设置",@"backup":@"备份设置",@"revoke":@"防撤回",@"message_actions":@"消息操作",@"transfers":@"转账设置",@"timeline":@"朋友圈尾巴",@"games":@"游戏设置",@"custom_text":@"界面文字",@"scheduled_tasks":@"定时任务",@"ai_reply":@"AI 自动回复",@"group_chat_tools":@"群聊功能",@"automation":@"自动功能",@"client_guard":@"反检测",@"ad_purification":@"广告净化",@"moments_layout":@"朋友圈布局",@"quick_panel":@"快捷面板"};
 }
 + (NSDictionary *)entryForDomain:(NSString *)domain key:(NSString *)key {
     if (![domain isKindOfClass:NSString.class] || ![key isKindOfClass:NSString.class]) return nil;
@@ -472,16 +481,34 @@ static BOOL CSContacts(id value) {
             valid=CSNumber(value);
             if (valid && [key isEqual:@"com.wechat.enhance.home_theme.index"]) valid=[value doubleValue]>=0 && [value doubleValue]<=4 && floor([value doubleValue])==[value doubleValue];
             if (valid && [key isEqual:@"com.wechat.enhance.home_theme.custom_rgb"]) valid=[value doubleValue]>=0 && [value doubleValue]<=0xffffff && floor([value doubleValue])==[value doubleValue];
+            if (valid && [key isEqual:@"com.wechat.enhance.quick_panel.trigger_locations"]) valid=[value doubleValue]>=1 && [value doubleValue]<=3 && floor([value doubleValue])==[value doubleValue];
+            if (valid && [key isEqual:@"com.wechat.enhance.quick_panel.background_opacity"]) valid=[value doubleValue]>=0 && [value doubleValue]<=1;
             if (valid && [registered[@"domain"] isEqual:@"legacy"] && [key isEqual:@"BackgroundRunCheckInterval"])
                 valid=[value doubleValue]>=10 && [value doubleValue]<=30 && floor([value doubleValue])==[value doubleValue];
         }
-        else if ([type isEqual:@"string"]) valid=[value isKindOfClass:NSString.class] && [value length]<=1048576;
+        else if ([type isEqual:@"string"]) {
+            valid=[value isKindOfClass:NSString.class] && [value length]<=1048576;
+            if (valid && [key isEqual:@"com.wechat.enhance.quick_panel.background_style"]) valid=[@[@"default",@"color",@"image"] containsObject:value];
+            if (valid && ([@[@"com.wechat.enhance.quick_panel.background_color_hex",@"com.wechat.enhance.quick_panel.text_color_hex",@"com.wechat.enhance.quick_panel.icon_color_hex"] containsObject:key])) {
+                valid=[value length]==7 && [value hasPrefix:@"#"];
+                if(valid)valid=[[value substringFromIndex:1] rangeOfCharacterFromSet:[[NSCharacterSet characterSetWithCharactersInString:@"0123456789ABCDEF"] invertedSet]].location==NSNotFound;
+            }
+        }
         // Existing UIColor archives are opaque data: never instantiate archive classes from a backup.
         else if ([type isEqual:@"data"]) valid=[value isKindOfClass:NSData.class] && [value length]>0 && [value length]<=1048576;
         else if ([type isEqual:@"array"]) {
             if ([key containsString:@"chat.attachment."]) {
                 valid=[value isKindOfClass:NSArray.class] && [value count]<=1000;
                 if (valid) for (id item in value) if (!CSNumber(item) || floor([item doubleValue])!=[item doubleValue]) { valid=NO; break; }
+            } else if ([key isEqual:@"com.wechat.enhance.quick_panel.selected_actions"]) {
+                // This backup schema stays independent of the UIKit quick-panel implementation.
+                NSSet *known=[NSSet setWithArray:@[@"scan",@"wallet",@"moments",@"my_qrcode",@"favorites",@"plugin_home",@"profile",@"create_group",@"add_friend",@"emoji_store",@"panel_settings",@"payment_code",@"channels",@"file_transfer",@"chat_background"]];
+                valid=[value isKindOfClass:NSArray.class] && [value count]<=known.count;
+                NSMutableSet *seen=[NSMutableSet new];
+                if (valid) for (id identifier in value) {
+                    if (![identifier isKindOfClass:NSString.class] || ![known containsObject:identifier] || [seen containsObject:identifier]) { valid=NO; break; }
+                    [seen addObject:identifier];
+                }
             } else valid=CSStrings(value);
         } else if ([type isEqual:@"dictionary"]) {
             if ([key isEqual:@"com.wechat.enhance.clown.warmth.targets"]) {

@@ -1,0 +1,10 @@
+{
+  "Tests/verify-group-indicator.sh": "f3187f1abd47c540e8ecf11547e5d22289c377d3f64888ecc8c76a542b50f43f",
+  "Tests/extract-group-indicator.py": "0b533deea962e14af0019e0c2f56df36ea5b44ae8e50f678f2ffdc05c2f2b79a",
+  "Tests/GroupIndicatorTests.m": "e9e490c52436238fb7a1d212d6800ca81212de64af2c79f3ab80ce466805ef58",
+  "Tests/verify-tabbar.sh": "9fe317f52263a9504e622cc06f3c12c0b3557f8a5be704d6fd8fcb7cdece684b",
+  "Tests/TabBarNativeTests.m": "7a76f8805aadd4953c74bcb27915ad196ebd34a0ff146670073f38e9600b7b14",
+  "Tests/TabBarClickEffectTests.h": "80497c9ad93cbed854262cc23cecb9c8fcac2c215a483fa9aaa7f6d2bfa926a9",
+  "Tests/TabBarUIKit/TabBarUIKit.m": "48cebf55b71249ea7d90f3f11bfa044edef0f5beff0d993addae2daa4c9022dc",
+  "Tests/TabBarUIKit/UIKit/UIKit.h": "bb697881d46dbb9bbe9a96ac09c18b1ce2e304154529d05a8055a0d634bda231"
+}

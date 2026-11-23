@@ -24,7 +24,9 @@ static NSString * const UIFontTextStyleCaption1=@"Caption1";
 static NSString * const UIFontTextStyleCaption2=@"Caption2";
 static NSString * const UIFontTextStyleHeadline=@"Headline";
 static NSString * const UIFontTextStyleFootnote=@"Footnote";
+static NSString * const UIFontTextStyleSubheadline=@"Subheadline";
 enum {UIViewContentModeScaleAspectFit=1,UIViewContentModeScaleAspectFill=2};
+enum {UIAccessibilityTraitHeader=1};
 static CGFloat fontScale=1;
 static BOOL simulateNamedFontUnavailable;
 
@@ -121,12 +123,15 @@ static UIColor *themeAccent;
 @property(nonatomic,strong) NSMutableArray<UIView *> *subviews;
 @property(nonatomic,weak) UIView *superview;
 @property(nonatomic) BOOL clipsToBounds,isAccessibilityElement,hidden;
+@property(nonatomic) NSUInteger accessibilityTraits;
 @property(nonatomic,copy) NSString *accessibilityLabel;
 - (instancetype)initWithFrame:(CGRect)frame;
 - (void)addSubview:(UIView *)view;
 - (void)setNeedsLayout;
 - (void)layoutSubviews;
 - (void)layoutIfNeeded;
+- (void)didMoveToSuperview;
+- (CGPoint)convertPoint:(CGPoint)point fromView:(UIView *)view;
 @end
 @implementation UIView
 - (instancetype)init {return [self initWithFrame:CGRectZero];}
@@ -134,10 +139,22 @@ static UIColor *themeAccent;
     if((self=[super init])) {self.frame=frame;_layer=[HeaderTestLayer new];_subviews=[NSMutableArray new];}return self;
 }
 - (void)setFrame:(CGRect)frame {_frame=frame;_bounds=(CGRect){CGPointZero,frame.size};}
-- (void)addSubview:(UIView *)view {[self.subviews addObject:view];view.superview=self;}
+- (void)addSubview:(UIView *)view {[self.subviews addObject:view];view.superview=self;[view didMoveToSuperview];}
 - (void)setNeedsLayout {}
 - (void)layoutSubviews {}
 - (void)layoutIfNeeded {[self layoutSubviews];for(UIView *view in self.subviews)[view layoutIfNeeded];}
+- (void)didMoveToSuperview {}
+- (CGPoint)convertPoint:(CGPoint)point fromView:(UIView *)view {
+    for(UIView *ancestor=view;ancestor;ancestor=ancestor.superview) {
+        point.x+=CGRectGetMinX(ancestor.frame)-CGRectGetMinX(ancestor.bounds);
+        point.y+=CGRectGetMinY(ancestor.frame)-CGRectGetMinY(ancestor.bounds);
+    }
+    for(UIView *ancestor=self;ancestor;ancestor=ancestor.superview) {
+        point.x-=CGRectGetMinX(ancestor.frame)-CGRectGetMinX(ancestor.bounds);
+        point.y-=CGRectGetMinY(ancestor.frame)-CGRectGetMinY(ancestor.bounds);
+    }
+    return point;
+}
 @end
 @interface UIImageSymbolConfiguration : NSObject
 + (instancetype)configurationWithPointSize:(CGFloat)size weight:(UIFontWeight)weight;
@@ -188,6 +205,7 @@ static UIColor *themeAccent;
 // UIKit and theme imports are replaced by drawing/preferences doubles; every
 // initializer, theme refresh and layout method is real.
 #import "PluginHeaderUnderTest.h"
+#import "SectionHeaderUnderTest.h"
 
 static NSUInteger checks;
 #define Check(value,message) do {checks++;if(!(value)){fprintf(stderr,"FAIL: %s\n",message);exit(1);}} while(0)
@@ -337,9 +355,82 @@ static void ValidateLayout(CSPluginHeaderView *header,CGFloat width,UIImageView 
     Check([header.vipLabel.font.native.fontName isEqual:@"TimesNewRomanPS-BoldMT"],"identity updates and reflow preserve the selected SVIP serif face");
 }
 
+static void ValidateSectionHeaderAlignment(void) {
+    // Compile the actual section header class. The host fixture models translated
+    // UIView hierarchies and scroll bounds; it does not emulate UIKit scheduling.
+    NSArray<NSString *> *titles=@[@"账号与安全",@"界面定制",@"功能增强",@"插件设置",@"关于"];
+    for(NSNumber *scale in @[@1,@3]) {
+        fontScale=scale.doubleValue;
+        UIView *table=[[UIView alloc] initWithFrame:CGRectMake(17,13,390,844)];
+        UIView *profileContainer=[[UIView alloc] initWithFrame:CGRectMake(0,0,390,320)];
+        CSPluginHeaderView *profile=[[CSPluginHeaderView alloc] initWithFrame:CGRectZero];
+        [profile updateNickname:@"阿北" wechatID:@"wechat_identifier" enabledCount:32
+                 pluginVersion:kPluginVersionString wechatVersion:@"8.0.80"];
+        [profile setVerse:@"春风又绿江南岸。"];
+        [table addSubview:profileContainer];
+        [profileContainer addSubview:profile];
+        UIView *sectionContainer=[[UIView alloc] initWithFrame:CGRectMake(3,400,390,38)];
+        [table addSubview:sectionContainer];
+        for(NSString *title in titles) {
+            CSSettingsHomeSectionHeaderView *section=[[CSSettingsHomeSectionHeaderView alloc]
+                initWithFrame:CGRectMake(0,0,390,38)];
+            section.alignmentReference=profile;
+            section.titleLabel.text=title;
+            [section layoutIfNeeded];
+            Check(fabs(CGRectGetMinX(section.titleLabel.frame)-24)<0.01,
+                  "a detached section uses a stable local fallback before UIKit places it");
+            [sectionContainer addSubview:section];
+            // Reuse the same live section through portrait, landscape, an inset
+            // change at constant width, and different profile/wrapper origins.
+            NSArray<NSArray<NSNumber *> *> *geometry=@[
+                @[@390,@20,@20,@0,@0,@0,@0],
+                @[@844,@75,@59,@0,@0,@0,@0],
+                @[@844,@91,@59,@0,@0,@0,@210],
+                @[@390,@32,@20,@0,@0,@0,@390],
+                @[@430,@32,@20,@11,@7,@9,@120]
+            ];
+            for(NSArray<NSNumber *> *values in geometry) {
+                CGFloat width=values[0].doubleValue,profileInset=values[1].doubleValue;
+                CGFloat sectionInset=values[2].doubleValue,containerX=values[3].doubleValue;
+                CGFloat profileX=values[4].doubleValue,scrollX=values[5].doubleValue;
+                CGFloat scrollY=values[6].doubleValue;
+                table.frame=CGRectMake(17,13,width,844);
+                table.bounds=CGRectMake(scrollX,scrollY,width,844);
+                profileContainer.frame=CGRectMake(containerX,0,width,320);
+                profile.horizontalInset=profileInset;
+                profile.frame=CGRectMake(profileX,0,width,[profile preferredHeightForWidth:width]);
+                sectionContainer.frame=CGRectMake(3,400,width,38);
+                section.frame=CGRectMake(sectionInset-3,0,MAX(0,width-2*sectionInset),38);
+                [profile layoutIfNeeded];
+                [section layoutIfNeeded];
+                UILabel *caption=profile.metrics.firstObject.captionLabel;
+                CGFloat actualCaptionInProfile=[profile convertPoint:CGPointZero fromView:caption].x;
+                CGFloat actualCaptionInTable=[table convertPoint:CGPointZero fromView:caption].x;
+                CGFloat titleInTable=[table convertPoint:CGPointZero fromView:section.titleLabel].x;
+                Check(fabs(profile.metricCaptionLeadingInset-actualCaptionInProfile)<0.01,
+                      "the exposed anchor matches the actual first metric caption after each layout");
+                Check(fabs(titleInTable-actualCaptionInTable)<0.01,
+                      "all section titles align with the actual enabled caption across placement, rotation and safe-area geometry");
+                Check(fabs(CGRectGetMinY(section.titleLabel.frame)-6)<0.01 &&
+                      fabs(CGRectGetHeight(section.titleLabel.frame)-26)<0.01 &&
+                      fabs(CGRectGetHeight(section.bounds)-38)<0.01,
+                      "coordinate conversion preserves the existing vertical section geometry");
+                Check(Contained(section.titleLabel.frame,section.bounds),
+                      "the aligned title remains within the grouped section header");
+                Check(section.titleLabel.textAlignment==NSTextAlignmentLeft &&
+                      section.titleLabel.accessibilityTraits==UIAccessibilityTraitHeader &&
+                      [section.titleLabel.text isEqual:title],
+                      "every tab and shared about title retains left alignment, text and header accessibility");
+            }
+        }
+    }
+    fontScale=1;
+}
+
 int main(void) {@autoreleasepool {
     ValidateQuoteTheme();
     ValidateVIPAppearance();
+    ValidateSectionHeaderAlignment();
     for(NSNumber *scale in @[@1,@3]) {
         fontScale=scale.doubleValue;
         CSPluginHeaderView *header=[[CSPluginHeaderView alloc] initWithFrame:CGRectZero];
@@ -407,5 +498,5 @@ int main(void) {@autoreleasepool {
     CGFloat longHeight=[density preferredHeightForWidth:390];
     Check(shortHeight>=210 && longHeight<=250,"normal 390-point headers gain breathing room while keeping a bounded first-screen footprint");
     Check(844-88-34-longHeight-76-38>=5*56,"a representative tall phone retains room for at least five native function rows below a two-line header, Tab rail and section title");
-    printf("PluginHeaderLayoutTests: %lu checks passed (real view, AppKit fonts, equal cards/gaps/insets, enlarged 15pt random text and profile fonts, current/long beta versions, short/long names, 320/375/390/430pt, inset20/32, fixed gold/black SVIP, real serif face/fallback, 3pt corners, plain WeChat ID, relaxed identity/text/status spacing); 390pt normal header %.0fpt/%.0fpt for one/two lines\n",(unsigned long)checks,(double)shortHeight,(double)longHeight);
+    printf("PluginHeaderLayoutTests: %lu checks passed (real view, AppKit fonts, equal cards/gaps/insets, enlarged 15pt random text and profile fonts, current/long beta versions, short/long names, 320/375/390/430pt, inset20/32, fixed gold/black SVIP, real serif face/fallback, 3pt corners, plain WeChat ID, relaxed identity/text/status spacing, actual section-header/caption coordinate alignment through portrait/landscape/inset/scroll/wrapper changes); 390pt normal header %.0fpt/%.0fpt for one/two lines\n",(unsigned long)checks,(double)shortHeight,(double)longHeight);
 }return 0;}

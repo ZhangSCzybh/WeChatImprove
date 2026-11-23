@@ -29,7 +29,7 @@
             button.layer.cornerRadius=12;
             button.layer.borderWidth=2;
             button.accessibilityLabel=names[index];
-            button.accessibilityHint=index==4 ? @"打开取色器，自定义界面颜色" : @"应用到标签、功能图标和箭头";
+            button.accessibilityHint=index==4 ? @"打开取色器，自定义界面颜色" : @"应用到标签和功能图标";
             [button addTarget:self action:@selector(selectColor:) forControlEvents:UIControlEventTouchUpInside];
             [self.contentView addSubview:button];
             [buttons addObject:button];

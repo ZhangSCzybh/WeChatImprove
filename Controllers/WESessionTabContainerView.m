@@ -11,50 +11,14 @@ static CGFloat const kTabBadgeGap = 3.0;
 static CGFloat const kActionButtonWidth = 44.0;
 static NSTimeInterval const kIndicatorDuration = 0.20;
 static NSString *const kIndicatorAnimationKey = @"CSGroupIndicator.selection";
-static NSTimeInterval const kCapsuleDuration = 0.28;
-static NSString *const kCapsuleAnimationKey = @"CSGroupIndicator.capsule";
+static NSTimeInterval const kCapsulePressDuration = 0.12;
+static NSTimeInterval const kCapsuleSettleDuration = 0.46;
 
 static CGRect CSGroupCapsuleFrame(CGRect title, CGRect bounds) {
     if (CGRectIsEmpty(title) || CGRectIsEmpty(bounds)) return CGRectZero;
     CGRect frame = CGRectInset(title, -10, -7);
     CGRect clipped = CGRectIntersection(frame, CGRectInset(bounds, 3, 3));
     return CGRectIsNull(clipped) || CGRectIsEmpty(clipped) ? CGRectZero : clipped;
-}
-
-// Explicit, finite Core Animation transitions. Unchanged targets preserve their
-// in-flight animation; interactive updates only write model layers, with no timer.
-static void CSGroupSetCapsuleLayer(CALayer *layer, CGFloat opacity, BOOL scales, BOOL animated) {
-    if (!layer) return;
-    CATransform3D transform = scales ? CATransform3DMakeScale(0.42 + 0.58 * opacity, 0.84 + 0.16 * opacity, 1) : CATransform3DIdentity;
-    BOOL unchanged = fabs(layer.opacity - opacity) < 0.0001 && (!scales || CATransform3DEqualToTransform(layer.transform, transform));
-    if (unchanged) {
-        if (!animated && [layer animationForKey:kCapsuleAnimationKey]) [layer removeAnimationForKey:kCapsuleAnimationKey];
-        return;
-    }
-    CALayer *visible = layer.presentationLayer ?: layer;
-    CGFloat startOpacity = visible.opacity;
-    CATransform3D startTransform = visible.transform;
-    [layer removeAnimationForKey:kCapsuleAnimationKey];
-    [CATransaction begin];
-    [CATransaction setDisableActions:YES];
-    layer.opacity = opacity;
-    if (scales) layer.transform = transform;
-    [CATransaction commit];
-    if (!animated || (fabs(startOpacity - opacity) < 0.0001 && (!scales || CATransform3DEqualToTransform(startTransform, transform)))) return;
-    CABasicAnimation *fade = [CABasicAnimation animationWithKeyPath:@"opacity"];
-    fade.fromValue = @(startOpacity); fade.toValue = @(opacity);
-    fade.duration = kCapsuleDuration;
-    CAAnimationGroup *group = [CAAnimationGroup animation];
-    if (scales) {
-        CABasicAnimation *scale = [CABasicAnimation animationWithKeyPath:@"transform"];
-        scale.fromValue = [NSValue valueWithCATransform3D:startTransform];
-        scale.toValue = [NSValue valueWithCATransform3D:transform];
-        scale.duration = kCapsuleDuration;
-        group.animations = @[fade, scale];
-    } else group.animations = @[fade];
-    group.duration = kCapsuleDuration;
-    group.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut];
-    [layer addAnimation:group forKey:kCapsuleAnimationKey];
 }
 
 // Match the native outlined magnifier proportions without relying on private
@@ -85,10 +49,11 @@ static UIImage *CSGroupSearchIcon(void) {
 @property (nonatomic) BOOL hasRedDot;
 @property (nonatomic) CGFloat baseFontSize;
 @property (nonatomic, strong) UILabel *unreadBadge;
-@property (nonatomic, strong) CALayer *capsuleLayer;
 @property (nonatomic, strong) UILabel *capsuleTitleLabel;
 @property (nonatomic) BOOL capsuleEnabled;
 @property (nonatomic) CGFloat capsuleProgress;
+@property (nonatomic) CGPoint capsuleTouchPoint;
+@property (nonatomic) BOOL capsuleHasTouchPoint;
 @property (nonatomic, copy) NSString *measuredTitle;
 @property (nonatomic, strong) UIFont *measuredTitleFont;
 @property (nonatomic) CGSize measuredTitleSize;
@@ -181,21 +146,12 @@ static UIImage *CSGroupSearchIcon(void) {
     if (!CGRectEqualToRect(self.unreadBadge.frame,badgeFrame)) self.unreadBadge.frame = badgeFrame;
     if (self.unreadBadge.layer.cornerRadius != height / 2) self.unreadBadge.layer.cornerRadius = height / 2;
     if (self.capsuleEnabled) {
-        CGRect capsuleFrame = CSGroupCapsuleFrame(titleFrame, self.bounds);
-        CGRect capsuleBounds = (CGRect){CGPointZero, capsuleFrame.size};
-        CGPoint capsulePosition = CGPointMake(CGRectGetMidX(capsuleFrame), CGRectGetMidY(capsuleFrame));
-        BOOL geometryChanged = !CGRectEqualToRect(self.capsuleLayer.bounds,capsuleBounds) ||
-            !CGPointEqualToPoint(self.capsuleLayer.position,capsulePosition) || self.capsuleLayer.cornerRadius != capsuleFrame.size.height / 2;
         BOOL titleChanged = self.capsuleTitleLabel.text != self.currentTitle && ![self.capsuleTitleLabel.text isEqualToString:self.currentTitle];
         BOOL labelChanged = !CGRectEqualToRect(self.capsuleTitleLabel.frame,titleFrame) ||
             titleChanged || ![self.capsuleTitleLabel.font isEqual:self.titleLabel.font];
-        if (!geometryChanged && !labelChanged) return;
+        if (!labelChanged) return;
         [CATransaction begin];
         [CATransaction setDisableActions:YES];
-        // Set bounds/position separately: frame is undefined while scaled.
-        if (!CGRectEqualToRect(self.capsuleLayer.bounds,capsuleBounds)) self.capsuleLayer.bounds = capsuleBounds;
-        if (!CGPointEqualToPoint(self.capsuleLayer.position,capsulePosition)) self.capsuleLayer.position = capsulePosition;
-        if (self.capsuleLayer.cornerRadius != capsuleFrame.size.height / 2) self.capsuleLayer.cornerRadius = capsuleFrame.size.height / 2;
         if (!CGRectEqualToRect(self.capsuleTitleLabel.frame,titleFrame)) self.capsuleTitleLabel.frame = titleFrame;
         if (titleChanged) self.capsuleTitleLabel.text = self.currentTitle;
         if (![self.capsuleTitleLabel.font isEqual:self.titleLabel.font]) self.capsuleTitleLabel.font = self.titleLabel.font;
@@ -204,20 +160,17 @@ static UIImage *CSGroupSearchIcon(void) {
 }
 
 - (void)configureCapsuleEnabled:(BOOL)enabled color:(UIColor *)color textColor:(UIColor *)textColor {
+    (void)color; // The container owns the single moving capsule background.
     BOOL changed = self.capsuleEnabled != enabled;
     self.capsuleEnabled = enabled;
     if (!enabled) {
         if (!changed) return;
         [self setCapsuleProgress:0 animated:NO];
-        [self.capsuleLayer removeFromSuperlayer]; self.capsuleLayer = nil;
         [self.capsuleTitleLabel removeFromSuperview]; self.capsuleTitleLabel = nil;
         return;
     }
-    if (!self.capsuleLayer) {
+    if (!self.capsuleTitleLabel) {
         changed = YES;
-        self.capsuleLayer = [CALayer layer];
-        self.capsuleLayer.opacity = 0;
-        [self.layer insertSublayer:self.capsuleLayer atIndex:0];
         self.capsuleTitleLabel = [[UILabel alloc] init];
         self.capsuleTitleLabel.isAccessibilityElement = NO;
         self.capsuleTitleLabel.userInteractionEnabled = NO;
@@ -225,24 +178,36 @@ static UIImage *CSGroupSearchIcon(void) {
         self.capsuleTitleLabel.layer.opacity = 0;
         [self insertSubview:self.capsuleTitleLabel belowSubview:self.unreadBadge];
     }
-    BOOL backgroundChanged = !CGColorEqualToColor(self.capsuleLayer.backgroundColor,color.CGColor);
-    BOOL textChanged = ![self.capsuleTitleLabel.textColor isEqual:textColor];
-    if (backgroundChanged || textChanged) {
-        [CATransaction begin];
-        [CATransaction setDisableActions:YES];
-        if (backgroundChanged) self.capsuleLayer.backgroundColor = color.CGColor;
-        if (textChanged) self.capsuleTitleLabel.textColor = textColor;
-        [CATransaction commit];
-    }
+    if (![self.capsuleTitleLabel.textColor isEqual:textColor]) self.capsuleTitleLabel.textColor = textColor;
     if (changed) [self setNeedsLayout];
 }
 
 - (void)setCapsuleProgress:(CGFloat)progress animated:(BOOL)animated {
-    if (!self.capsuleLayer) return;
+    if (!self.capsuleTitleLabel) return;
     self.capsuleProgress = MAX(0, MIN(1, progress));
-    CSGroupSetCapsuleLayer(self.capsuleLayer, self.capsuleProgress, YES, animated);
-    CSGroupSetCapsuleLayer(self.capsuleTitleLabel.layer, self.capsuleProgress, NO, animated);
-    CSGroupSetCapsuleLayer(self.titleLabel.layer, 1 - self.capsuleProgress, NO, animated);
+    if (!animated) {
+        [self.capsuleTitleLabel.layer removeAllAnimations];
+        [self.titleLabel.layer removeAllAnimations];
+    }
+    // Share the background's UIKit transaction, including its interruption rules.
+    // Text and unread badges keep their original geometry throughout the press.
+    void (^changes)(void) = ^{
+        self.capsuleTitleLabel.alpha = self.capsuleProgress;
+        self.titleLabel.alpha = 1 - self.capsuleProgress;
+    };
+    if (animated) changes();
+    else [UIView performWithoutAnimation:changes];
+}
+
+- (BOOL)beginTrackingWithTouch:(UITouch *)touch withEvent:(UIEvent *)event {
+    self.capsuleTouchPoint = [touch locationInView:self];
+    self.capsuleHasTouchPoint = YES;
+    return [super beginTrackingWithTouch:touch withEvent:event];
+}
+
+- (BOOL)continueTrackingWithTouch:(UITouch *)touch withEvent:(UIEvent *)event {
+    self.capsuleTouchPoint = [touch locationInView:self];
+    return [super continueTrackingWithTouch:touch withEvent:event];
 }
 
 - (void)updateUnreadCount:(NSInteger)count hasRedDot:(BOOL)hasRedDot {
@@ -265,6 +230,13 @@ static UIImage *CSGroupSearchIcon(void) {
 
 @end
 
+@interface WEGroupTabScrollView : UIScrollView @end
+@implementation WEGroupTabScrollView
+- (BOOL)touchesShouldCancelInContentView:(UIView *)view {
+    return (!self.delaysContentTouches && [view isKindOfClass:WETabButton.class]) || [super touchesShouldCancelInContentView:view];
+}
+@end
+
 @interface WESessionTabContainerView ()
 @property (nonatomic, copy) NSArray *renderedTabRecords;
 @property (nonatomic, strong, readwrite) UIScrollView *scrollView;
@@ -278,6 +250,8 @@ static UIImage *CSGroupSearchIcon(void) {
 @property (nonatomic) NSInteger interactiveTarget;
 @property (nonatomic) CGFloat interactiveProgress;
 @property (nonatomic) CSGroupIndicatorStyle indicatorStyle;
+@property (nonatomic, weak) WETabButton *capsulePressedButton, *capsuleTouchButton;
+@property (nonatomic) BOOL capsuleTouchConsumed;
 @property (nonatomic) BOOL tabLayoutValid;
 @property (nonatomic) CGSize tabLayoutSize;
 @end
@@ -299,16 +273,18 @@ static UIImage *CSGroupSearchIcon(void) {
 - (void)setupUI {
     _selectedIndex = NSNotFound;
     _baseFontSize = CSGroupTabFontSize(NSUserDefaults.standardUserDefaults);
-    _scrollView = [[UIScrollView alloc] init];
+    _scrollView = [[WEGroupTabScrollView alloc] init];
     _scrollView.showsHorizontalScrollIndicator = NO;
     _scrollView.showsVerticalScrollIndicator = NO;
     _scrollView.alwaysBounceHorizontal = YES;
+    _scrollView.canCancelContentTouches = YES;
     _scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
     [self addSubview:_scrollView];
     _tabButtons = [NSMutableArray array];
     _indicatorView = [[UIView alloc] init];
     _indicatorView.layer.cornerRadius = kIndicatorHeight / 2;
     _indicatorView.isAccessibilityElement = NO;
+    _indicatorView.userInteractionEnabled = NO;
     _indicatorView.hidden = YES;
     [_scrollView addSubview:_indicatorView];
     _searchButton = [self searchActionButton];
@@ -359,6 +335,14 @@ static UIImage *CSGroupSearchIcon(void) {
     BOOL styleChanged = self.indicatorStyle != style;
     self.indicatorStyle = style;
     BOOL capsule = style == CSGroupIndicatorStyleCapsule;
+    if (styleChanged) {
+        self.capsulePressedButton = nil;
+        if (self.capsuleTouchButton) self.capsuleTouchConsumed = YES;
+        [self.indicatorView.layer removeAllAnimations];
+        self.indicatorView.hidden = YES;
+        if (!capsule) self.indicatorView.layer.cornerRadius = kIndicatorHeight / 2;
+    }
+    self.scrollView.delaysContentTouches = !capsule;
     self.backgroundColor = dark ? [UIColor.secondarySystemBackgroundColor resolvedColorWithTraitCollection:self.traitCollection] :
         [UIColor colorWithRed:0.929 green:0.929 blue:0.929 alpha:1];
     UIColor *normal = [UIColor.secondaryLabelColor resolvedColorWithTraitCollection:self.traitCollection];
@@ -478,6 +462,7 @@ static UIImage *CSGroupSearchIcon(void) {
     for (WESessionTabItem *tab in tabs) [records addObject:@[tab.tabId ?: @"",tab.displayName ?: @"",@(tab.type)]];
     if ([self.renderedTabRecords isEqual:records]) return;
     self.interactiveTransition=NO;
+    self.capsulePressedButton = nil; self.capsuleTouchButton = nil;
     for (WETabButton *button in self.tabButtons) [button setCapsuleProgress:0 animated:NO];
     self.renderedTabRecords=[records copy];
     self.tabLayoutValid = NO;
@@ -497,6 +482,10 @@ static UIImage *CSGroupSearchIcon(void) {
         }
         if (!button) {
             button = [[WETabButton alloc] init];
+            [button addTarget:self action:@selector(tabButtonPressed:) forControlEvents:UIControlEventTouchDown];
+            [button addTarget:self action:@selector(tabButtonPressEntered:) forControlEvents:UIControlEventTouchDragEnter];
+            [button addTarget:self action:@selector(tabButtonPressExited:) forControlEvents:UIControlEventTouchDragExit];
+            [button addTarget:self action:@selector(tabButtonTouchCancelled:) forControlEvents:UIControlEventTouchUpOutside | UIControlEventTouchCancel];
             [button addTarget:self action:@selector(tabButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
         }
         button.tabID = item.tabId;
@@ -588,7 +577,9 @@ static UIImage *CSGroupSearchIcon(void) {
     // Keep the finger's current geometry when committing; a layout must not
     // snap the indicator back to its old selection before the settle animation.
     BOOL interactive=self.interactiveTransition;
-    if (!interactive) [self layoutIfNeeded];
+    if (!interactive && !self.capsulePressedButton) [self layoutIfNeeded];
+    if (self.capsuleTouchButton) self.capsuleTouchConsumed = YES;
+    self.capsulePressedButton = nil;
     self.interactiveTransition=NO;
     _selectedIndex = index;
     _selectedTabID = [self.tabButtons[index].tabID copy];
@@ -598,7 +589,11 @@ static UIImage *CSGroupSearchIcon(void) {
     self.settlingInteractiveTransition=interactive;
     [self updateIndicatorPositionAnimated:animate];
     self.settlingInteractiveTransition=NO;
-    if (animate) {
+    if (animate && self.indicatorStyle == CSGroupIndicatorStyleCapsule) {
+        [UIView animateWithDuration:kCapsuleSettleDuration delay:0 usingSpringWithDamping:.62 initialSpringVelocity:.82
+            options:UIViewAnimationOptionAllowUserInteraction | UIViewAnimationOptionBeginFromCurrentState
+            animations:^{ [self scrollToSelectedTab]; } completion:nil];
+    } else if (animate) {
         [UIView animateWithDuration:kIndicatorDuration delay:0
             options:UIViewAnimationOptionCurveEaseInOut | UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionAllowUserInteraction
             animations:^{ [self scrollToSelectedTab]; } completion:nil];
@@ -652,11 +647,68 @@ static UIImage *CSGroupSearchIcon(void) {
     [self moveIndicatorToFrame:target animated:animate];
 }
 
+- (CGRect)capsuleFrameForButton:(WETabButton *)button pressed:(BOOL)pressed {
+    CGRect rest = CSGroupCapsuleFrame([button tabTitleFrame], button.bounds);
+    if (CGRectIsEmpty(rest)) return CGRectZero;
+    rest = CGRectOffset(rest, CGRectGetMinX(button.frame), CGRectGetMinY(button.frame));
+    if (!pressed) return rest;
+    CGFloat touchX = CGRectGetMinX(button.frame) + (button.capsuleHasTouchPoint ? button.capsuleTouchPoint.x : CGRectGetMidX(rest) - CGRectGetMinX(button.frame));
+    CGFloat slotWidth = CGRectGetWidth(button.bounds);
+    CGFloat q = 1 - MIN(1, fabs(touchX - CGRectGetMidX(rest)) / MAX(1, slotWidth * .48));
+    CGRect content = CGRectMake(0, 0, self.scrollView.contentSize.width, CGRectGetHeight(self.scrollView.bounds));
+    CGFloat width = MIN(CGRectGetWidth(content) - 4, rest.size.width * (1.02 + .06 * q));
+    CGFloat height = MIN(CGRectGetHeight(content) - 4, rest.size.height * (1.01 + .03 * q));
+    CGFloat x = MAX(CGRectGetMinX(content) + 2 + width / 2,
+        MIN(CGRectGetMaxX(content) - 2 - width / 2, touchX));
+    return CGRectIntegral(CGRectMake(x - width / 2, CGRectGetMidY(rest) - height / 2, width, height));
+}
+
+- (void)moveCapsuleToFrame:(CGRect)target pressed:(BOOL)pressed animated:(BOOL)animated {
+    BOOL wasHidden = self.indicatorView.hidden;
+    self.indicatorView.hidden = CGRectIsEmpty(target);
+    if (self.indicatorView.hidden) {
+        [self.indicatorView.layer removeAllAnimations];
+        return;
+    }
+    // The model frame is the destination. Passive layout/selection acknowledgements
+    // must leave the current presentation and its spring running uninterrupted.
+    if (!wasHidden && animated && CGRectEqualToRect(self.indicatorView.frame, target)) return;
+    WETabButton *active = self.capsulePressedButton;
+    BOOL animate = animated && !wasHidden;
+    void (^changes)(void) = ^{
+        self.indicatorView.frame = target;
+        self.indicatorView.layer.cornerRadius = CGRectGetHeight(target) / 2;
+        self.indicatorView.layer.transform = CATransform3DIdentity;
+        self.indicatorView.alpha = 1;
+        for (WETabButton *button in self.tabButtons)
+            [button setCapsuleProgress:(active ? button == active : button.tabIndex == self.selectedIndex) ? 1 : 0 animated:animate];
+    };
+    if (animate) {
+        UIViewAnimationOptions options = UIViewAnimationOptionAllowUserInteraction | UIViewAnimationOptionBeginFromCurrentState;
+        if (pressed) {
+            [UIView animateWithDuration:kCapsulePressDuration delay:0 options:options | UIViewAnimationOptionCurveEaseOut
+                animations:changes completion:nil];
+        } else {
+            [UIView animateWithDuration:kCapsuleSettleDuration delay:0 usingSpringWithDamping:.62 initialSpringVelocity:.82
+                options:options animations:changes completion:nil];
+        }
+    } else {
+        [self.indicatorView.layer removeAllAnimations];
+        [UIView performWithoutAnimation:changes];
+    }
+}
+
 - (void)updateCapsuleSelectionAnimated:(BOOL)animated {
-    if (!self.indicatorView.hidden) self.indicatorView.hidden = YES;
-    if ([self.indicatorView.layer animationForKey:kIndicatorAnimationKey]) [self.indicatorView.layer removeAnimationForKey:kIndicatorAnimationKey];
-    for (WETabButton *button in self.tabButtons)
-        [button setCapsuleProgress:button.tabIndex == self.selectedIndex ? 1 : 0 animated:animated];
+    WETabButton *pressed = self.capsulePressedButton;
+    if (pressed && (!self.window || ![self.tabButtons containsObject:pressed])) {
+        self.capsulePressedButton = nil; self.capsuleTouchButton = nil;
+        pressed = nil;
+    }
+    WETabButton *target = pressed;
+    if (!target && self.selectedIndex >= 0 && self.selectedIndex < (NSInteger)self.tabButtons.count)
+        target = self.tabButtons[self.selectedIndex];
+    [self moveCapsuleToFrame:target ? [self capsuleFrameForButton:target pressed:pressed != nil] : CGRectZero
+        pressed:pressed != nil animated:animated];
 }
 
 - (CGRect)indicatorFrameForIndex:(NSInteger)index {
@@ -668,9 +720,17 @@ static UIImage *CSGroupSearchIcon(void) {
 }
 
 - (void)updateInteractiveTransitionToIndex:(NSInteger)index progress:(CGFloat)progress {
-    if (!CSGroupIndicatorAnimationEnabled(NSUserDefaults.standardUserDefaults) || !self.window || UIAccessibilityIsReduceMotionEnabled() ||
-        self.selectedIndex<0 || self.selectedIndex>=(NSInteger)self.tabButtons.count || index<0 || index>=(NSInteger)self.tabButtons.count || index==self.selectedIndex || !isfinite(progress)) {
-        if (self.interactiveTransition) { self.interactiveTransition=NO; [self updateIndicatorPositionAnimated:NO]; }
+    BOOL valid = self.selectedIndex >= 0 && self.selectedIndex < (NSInteger)self.tabButtons.count &&
+        index >= 0 && index < (NSInteger)self.tabButtons.count && index != self.selectedIndex && isfinite(progress);
+    BOOL pressed = valid && self.capsulePressedButton != nil;
+    if (valid) {
+        // Gesture ownership does not depend on whether its visual tween is enabled.
+        // A cancelled pan must consume the old button's Up just like a committed pan.
+        if (self.capsuleTouchButton) self.capsuleTouchConsumed = YES;
+        self.capsulePressedButton = nil;
+    }
+    if (!CSGroupIndicatorAnimationEnabled(NSUserDefaults.standardUserDefaults) || !self.window || UIAccessibilityIsReduceMotionEnabled() || !valid) {
+        if (self.interactiveTransition || pressed) { self.interactiveTransition=NO; [self updateIndicatorPositionAnimated:NO]; }
         return;
     }
     self.interactiveTransition=YES; self.interactiveTarget=index;
@@ -678,7 +738,13 @@ static UIImage *CSGroupSearchIcon(void) {
     CGRect from=[self indicatorFrameForIndex:self.selectedIndex], to=[self indicatorFrameForIndex:index];
     CGFloat center=CGRectGetMidX(from)+(CGRectGetMidX(to)-CGRectGetMidX(from))*t;
     if (self.indicatorStyle == CSGroupIndicatorStyleCapsule) {
-        self.indicatorView.hidden = YES;
+        CGRect capsuleFrom = [self capsuleFrameForButton:self.tabButtons[self.selectedIndex] pressed:NO];
+        CGRect capsuleTo = [self capsuleFrameForButton:self.tabButtons[index] pressed:NO];
+        CGRect frame = CGRectMake(capsuleFrom.origin.x + (capsuleTo.origin.x - capsuleFrom.origin.x) * t,
+            capsuleFrom.origin.y + (capsuleTo.origin.y - capsuleFrom.origin.y) * t,
+            capsuleFrom.size.width + (capsuleTo.size.width - capsuleFrom.size.width) * t,
+            capsuleFrom.size.height + (capsuleTo.size.height - capsuleFrom.size.height) * t);
+        [self moveCapsuleToFrame:frame pressed:NO animated:NO];
         for (WETabButton *button in self.tabButtons) {
             CGFloat progress = button.tabIndex == self.selectedIndex ? 1 - t : (button.tabIndex == index ? t : 0);
             [button setCapsuleProgress:progress animated:NO];
@@ -762,8 +828,45 @@ static UIImage *CSGroupSearchIcon(void) {
         [self.scrollView setContentOffset:CGPointMake(offset, 0) animated:NO];
 }
 
+- (void)tabButtonPressed:(WETabButton *)sender {
+    self.capsuleTouchButton = nil; self.capsuleTouchConsumed = NO;
+    if (sender.tabIndex < 0 || sender.tabIndex >= (NSInteger)self.tabButtons.count || self.tabButtons[sender.tabIndex] != sender) return;
+    // Keep input ownership even when visual animation is disabled.
+    self.capsuleTouchButton = sender;
+    [self tabButtonPressEntered:sender];
+}
+
+- (void)tabButtonPressEntered:(WETabButton *)sender {
+    if (self.indicatorStyle != CSGroupIndicatorStyleCapsule || !self.window || self.interactiveTransition ||
+        !CSGroupIndicatorAnimationEnabled(NSUserDefaults.standardUserDefaults) ||
+        self.capsuleTouchConsumed || sender.tabIndex < 0 || sender.tabIndex >= (NSInteger)self.tabButtons.count ||
+        self.tabButtons[sender.tabIndex] != sender) return;
+    self.capsulePressedButton = sender;
+    [self updateCapsuleSelectionAnimated:!UIAccessibilityIsReduceMotionEnabled()];
+}
+
+- (void)tabButtonPressExited:(WETabButton *)sender {
+    if (self.capsulePressedButton != sender) return;
+    self.capsulePressedButton = nil;
+    if (!self.interactiveTransition) [self updateIndicatorPositionAnimated:YES];
+}
+
+- (void)tabButtonTouchCancelled:(WETabButton *)sender {
+    if (self.capsuleTouchButton == sender) self.capsuleTouchConsumed = YES;
+    [self tabButtonPressExited:sender];
+}
+
 - (void)tabButtonTapped:(WETabButton *)sender {
-    if (sender.tabIndex == self.selectedIndex) return;
+    BOOL consumed = self.capsuleTouchButton == sender && self.capsuleTouchConsumed;
+    BOOL pressed = self.capsulePressedButton == sender;
+    self.capsuleTouchButton = nil; self.capsuleTouchConsumed = NO;
+    if (consumed || sender.tabIndex < 0 || sender.tabIndex >= (NSInteger)self.tabButtons.count ||
+        self.tabButtons[sender.tabIndex] != sender) return;
+    if (sender.tabIndex == self.selectedIndex) {
+        self.capsulePressedButton = nil;
+        if (pressed) [self updateIndicatorPositionAnimated:YES];
+        return;
+    }
     [self selectTabAtIndex:sender.tabIndex animated:YES];
     if (self.onTabSelected) self.onTabSelected(sender.tabIndex);
 }

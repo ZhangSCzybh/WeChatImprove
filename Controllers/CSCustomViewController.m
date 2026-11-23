@@ -37,8 +37,10 @@
 #import "CSClownSettingsViewController.h"
 #import "CSGroupChatSettingsViewController.h"
 #import "CSAutomationSettingsViewController.h"
+#import "CSQuickPanelSettingsViewController.h"
 #import "CSScheduledTaskSettingsViewController.h"
 #import "CSBackupSettingsViewController.h"
+#import "CSOtherSettingsViewController.h"
 #import "CSBubbleStyleSettingsViewController.h"
 #import "CSListCornerRadiusSettingsViewController.h"
 #import "CSLayoutSettingsViewController.h"
@@ -57,10 +59,46 @@
 #import "CSSettingsHomeCell.h"
 #import "CSSettingsHomeAnimator.h"
 #import "CSSettingsHomeTheme.h"
+#import "CSSettingsHomeAppearance.h"
 #import "CSSettingsHomePaletteCell.h"
 
 // 用户协议同意标记
 static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agreement.accepted.v3";
+
+@interface CSSettingsHomeSectionHeaderView : UIView
+@property(nonatomic, weak) CSPluginHeaderView *alignmentReference;
+@property(nonatomic, strong) UILabel *titleLabel;
+@end
+
+@implementation CSSettingsHomeSectionHeaderView
+- (instancetype)initWithFrame:(CGRect)frame {
+    if ((self=[super initWithFrame:frame])) {
+        _titleLabel=[UILabel new];
+        _titleLabel.textAlignment=NSTextAlignmentLeft;
+        _titleLabel.font=[[UIFontMetrics metricsForTextStyle:UIFontTextStyleSubheadline]
+            scaledFontForFont:[UIFont systemFontOfSize:14 weight:UIFontWeightSemibold] maximumPointSize:18];
+        _titleLabel.textColor=UIColor.secondaryLabelColor;
+        _titleLabel.accessibilityTraits=UIAccessibilityTraitHeader;
+        [self addSubview:_titleLabel];
+    }
+    return self;
+}
+- (void)didMoveToSuperview {
+    [super didMoveToSuperview];
+    [self setNeedsLayout];
+}
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    CGFloat width=CGRectGetWidth(self.bounds), leading=24;
+    CSPluginHeaderView *reference=self.alignmentReference;
+    if (self.superview && reference.superview) {
+        // Convert only after UIKit has placed the grouped section header.
+        leading=[self convertPoint:CGPointMake(reference.metricCaptionLeadingInset,0) fromView:reference].x;
+    }
+    leading=MIN(width,MAX(0,leading));
+    self.titleLabel.frame=CGRectMake(leading,6,MAX(0,width-leading),26);
+}
+@end
 
 @interface CSCustomViewController () <UITableViewDelegate, UITableViewDataSource, UIGestureRecognizerDelegate, UIColorPickerViewControllerDelegate> {
     atomic_bool _headerRefreshPending;
@@ -68,6 +106,7 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) NSArray<CSSettingSection *> *sections;
 @property(nonatomic, strong) CSSettingsHomeModel *homeModel;
+@property(nonatomic, strong) NSHashTable<CSSettingsHomeSectionHeaderView *> *homeSectionHeaders;
 @property(nonatomic, strong) CSSettingsTabBar *settingsTabBar;
 @property(nonatomic, strong) UIView *headerContainer;
 @property(nonatomic, strong) UIView *homeFooter;
@@ -78,6 +117,7 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
 @property(nonatomic) BOOL updatingHomeLayout;
 @property(nonatomic, strong) CSSettingsHomeAnimator *homeAnimator;
 @property(nonatomic) BOOL suppressHomeTransition;
+@property(nonatomic, copy) NSArray *otherSettingsReturnScope;
 @property(nonatomic) CGSize lastHomeViewportSize;
 @property (nonatomic, strong) UIImageView *avatarImageView;
 @property (nonatomic, strong) CSPluginHeaderView *headerView;
@@ -169,9 +209,12 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    // Rebuild before the first frame, including when returning under a different account.
-    [self setupData];
-    [self reloadSettingsKeepingPosition];
+    if ([self returningFromOtherSettingsInCurrentScope]) [self refreshVisibleHomeAppearance];
+    else {
+        // Rebuild before the first frame, including returns under another account.
+        [self setupData];
+        [self reloadSettingsKeepingPosition];
+    }
     [self refreshHeaderContent];
     [self refreshHeaderVerse];
     // Covers direct third-party plugin registration routes before any settings content appears.
@@ -196,9 +239,11 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
     }
     [[self.view viewWithTag:871042] removeFromSuperview];
 
-    [self setupData];
-    [self reloadSettingsKeepingPosition];
-
+    if (![self returningFromOtherSettingsInCurrentScope]) {
+        [self setupData];
+        [self reloadSettingsKeepingPosition];
+    }
+    self.otherSettingsReturnScope=nil;
     CSAuthorizationManager *authManager = [CSAuthorizationManager sharedManager];
     self.isAuthorized = [authManager isAuthorized];
     self.tableView.userInteractionEnabled = self.isAuthorized;
@@ -534,6 +579,11 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
             [self setHomeDistance:distance];
         }
         [self.headerView setNeedsLayout];
+        for (UIView *sectionHeader in self.homeSectionHeaders.allObjects) {
+            if (!sectionHeader.superview) continue;
+            [sectionHeader setNeedsLayout];
+            [sectionHeader layoutIfNeeded];
+        }
         [self updateHomeFooter];
         [self positionSettingsTabBar];
     }
@@ -847,6 +897,7 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
     CSSettingItem *clownItem = [CSSettingItem itemWithTitle:@"小丑功能" iconName:@"theatermasks.fill" iconColor:UIColor.systemPurpleColor detail:nil];
     CSSettingItem *groupChatToolsItem = [CSSettingItem itemWithTitle:@"群聊功能" iconName:@"person.3.fill" iconColor:UIColor.systemGreenColor detail:nil];
     CSSettingItem *automationItem = [CSSettingItem itemWithTitle:@"自动功能" iconName:@"bolt.circle.fill" iconColor:UIColor.systemOrangeColor detail:nil];
+    CSSettingItem *quickPanelItem = [CSSettingItem itemWithTitle:@"快捷面板" iconName:@"square.grid.2x2.fill" iconColor:UIColor.systemGreenColor detail:nil];
     CSSettingSection *enhancementSection = [CSSettingSection sectionWithHeader:@"功能增强" 
                                                                       items:@[backgroundRunItem,
                                                                              gameCheatsItem,
@@ -861,7 +912,8 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
                                                                              imageStickerItem,
                                                                              clownItem,
                                                                              groupChatToolsItem,
-                                                                             automationItem]];
+                                                                             automationItem,
+                                                                             quickPanelItem]];
     
     // 添加插件设置组
     CSSettingItem *entrySettingsItem = [CSSettingItem itemWithTitle:@"入口设置"
@@ -889,10 +941,12 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
     
     CSSettingItem *paletteItem=[CSSettingItem itemWithTitle:@"界面调色" iconName:@"paintpalette"
         iconColor:UIColor.systemGreenColor detail:nil];
+    CSSettingItem *otherSettingsItem=[CSSettingItem itemWithTitle:@"其他设置" iconName:@"slider.horizontal.3"
+        iconColor:UIColor.systemGreenColor detail:nil];
     NSMutableArray *pluginItems = [NSMutableArray arrayWithObjects:paletteItem, entrySettingsItem,
                                    versionControlItem,
                                    updateControlItem,
-                                   backupSettingsItem, nil];
+                                   backupSettingsItem, otherSettingsItem, nil];
     
     CSSettingSection *pluginSection = [CSSettingSection sectionWithHeader:@"插件设置"
                                                                  items:pluginItems];
@@ -984,6 +1038,8 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
     self.settingsTabBar.searchClosed=^{ [weakSelf closeHomeSearch]; };
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(homeThemeChanged:)
         name:CSSettingsHomeThemeDidChangeNotification object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(homeAppearanceChanged:)
+        name:CSSettingsHomeAppearanceDidChangeNotification object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(homeKeyboardChanged:)
         name:UIKeyboardWillChangeFrameNotification object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(homeKeyboardChanged:)
@@ -1120,16 +1176,12 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section { return 38; }
 - (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section { return 12; }
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
-    UIView *header=[[UIView alloc] initWithFrame:CGRectMake(0,0,CGRectGetWidth(tableView.bounds),38)];
-    CGFloat inset=self.headerView.horizontalInset+16;
-    UILabel *title=[[UILabel alloc] initWithFrame:CGRectMake(inset,6,MAX(0,CGRectGetWidth(tableView.bounds)-2*inset),26)];
-    title.autoresizingMask=UIViewAutoresizingFlexibleWidth;
-    title.font=[[UIFontMetrics metricsForTextStyle:UIFontTextStyleSubheadline]
-        scaledFontForFont:[UIFont systemFontOfSize:14 weight:UIFontWeightSemibold] maximumPointSize:18];
-    title.textColor=UIColor.secondaryLabelColor;
-    title.text=self.sections[section].header;
-    title.accessibilityTraits=UIAccessibilityTraitHeader;
-    [header addSubview:title];
+    CSSettingsHomeSectionHeaderView *header=[[CSSettingsHomeSectionHeaderView alloc]
+        initWithFrame:CGRectMake(0,0,CGRectGetWidth(tableView.bounds),38)];
+    header.alignmentReference=self.headerView;
+    header.titleLabel.text=self.sections[section].header;
+    if (!self.homeSectionHeaders) self.homeSectionHeaders=[NSHashTable weakObjectsHashTable];
+    [self.homeSectionHeaders addObject:header];
     return header;
 }
 
@@ -1173,7 +1225,32 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
 }
 
 - (void)homeThemeChanged:(NSNotification *)notification {
-    dispatch_async(dispatch_get_main_queue(), ^{ [self reloadSettingsKeepingPosition]; });
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.headerView reloadTheme];
+        [self.settingsTabBar reloadTheme];
+        [self refreshVisibleHomeAppearance];
+    });
+}
+- (void)homeAppearanceChanged:(NSNotification *)notification {
+    if (NSThread.isMainThread) [self refreshVisibleHomeAppearance];
+    else dispatch_async(dispatch_get_main_queue(), ^{ [self refreshVisibleHomeAppearance]; });
+}
+- (void)refreshVisibleHomeAppearance {
+    [UIView performWithoutAnimation:^{
+        for (UITableViewCell *cell in self.tableView.visibleCells) {
+            if ([cell isKindOfClass:CSSettingsHomeCell.class]) [(CSSettingsHomeCell *)cell reloadAppearance];
+            else if ([cell isKindOfClass:CSSettingsHomePaletteCell.class]) [(CSSettingsHomePaletteCell *)cell reloadTheme];
+            [cell layoutIfNeeded];
+        }
+    }];
+}
+- (NSArray *)currentOtherSettingsScope {
+    return @[[CSUserInfoHelper getUserWXID] ?: @"",@(CSBackupAccountEpoch()),
+        @([CSCloseFriendManager.sharedManager settingsEntryVisible])];
+}
+- (BOOL)returningFromOtherSettingsInCurrentScope {
+    return self.headerVerseVisitActive && self.otherSettingsReturnScope &&
+        [self.otherSettingsReturnScope isEqual:[self currentOtherSettingsScope]];
 }
 - (void)presentHomeColorPicker {
     UIViewController *host=CSNativeSettingsHostForContent(self);
@@ -1353,6 +1430,9 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
         else if ([item.title isEqualToString:@"自动功能"]) {
             [self.navigationController pushViewController:[[CSAutomationSettingsViewController alloc] initWithStyle:UITableViewStyleInsetGrouped] animated:YES];
         }
+        else if ([item.title isEqualToString:@"快捷面板"]) {
+            [self.navigationController pushViewController:[[CSQuickPanelSettingsViewController alloc] initWithStyle:UITableViewStyleInsetGrouped] animated:YES];
+        }
         // 处理复读功能点击
         else if ([item.title isEqualToString:@"复读功能"]) {
             CSRepeatSettingsViewController *repeatVC = [[CSRepeatSettingsViewController alloc] initWithStyle:UITableViewStyleInsetGrouped];
@@ -1372,6 +1452,11 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
         else if ([item.title isEqualToString:@"备份配置"]) {
             CSBackupSettingsViewController *backupVC = [[CSBackupSettingsViewController alloc] initWithStyle:UITableViewStyleInsetGrouped];
             [self.navigationController pushViewController:backupVC animated:YES];
+        }
+        else if ([item.title isEqualToString:@"其他设置"]) {
+            self.otherSettingsReturnScope=[self currentOtherSettingsScope];
+            [self.navigationController pushViewController:[[CSOtherSettingsViewController alloc]
+                initWithStyle:UITableViewStyleInsetGrouped] animated:YES];
         }
         // 处理当前插件版本的更新说明
         else if ([item.title isEqualToString:@"版本信息"]) {

@@ -10,7 +10,9 @@ typedef NS_ENUM(NSUInteger, CSMomentsContentKind) {
     CSMomentsContentVideo,
     CSMomentsContentFinder,
     CSMomentsContentArticle,
-    CSMomentsContentOtherShare
+    CSMomentsContentOtherShare,
+    CSMomentsContentFinderLive,
+    CSMomentsContentMiniApp
 };
 
 /// Presentation metadata only. Native models and their interaction arrays stay unchanged.
@@ -24,6 +26,7 @@ typedef NS_ENUM(NSUInteger, CSMomentsContentKind) {
 /// Native published location label; empty when absent or not valid for display.
 @property(nonatomic, copy) NSString *locationText;
 @property(nonatomic) CSMomentsContentKind contentKind;
+/// Share metadata row; a mini app uses its shared page title here and its app name in title.
 @property(nonatomic, copy) NSString *sourceText;
 @property(nonatomic, copy) NSString *shareCoverURL;
 @property(nonatomic) CGSize coverSize;

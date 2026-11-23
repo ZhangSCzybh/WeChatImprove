@@ -1,4 +1,5 @@
 #import "CSTabBarNativeAdapter.h"
+#import "CSTabBarSwipeSwitcher.h"
 #import "CSTabBarPreferences.h"
 #import <objc/runtime.h>
 #import <assert.h>
@@ -6,6 +7,7 @@
 // Headless macOS discards CA animations at transaction commit. Record the submitted
 // copies while forwarding to QuartzCore; geometry and masks still use real CG/CA objects.
 static char SubmittedAnimationsKey;
+static char AnimationRemovalCountKey;
 static IMP originalAddAnimation, originalRemoveAnimation, originalLookupAnimation, originalRemoveAllAnimations;
 static NSUInteger submittedAnimationCount;
 static void RecordAnimation(CALayer *layer,SEL selector,CAAnimation *animation,NSString *key) {
@@ -29,6 +31,8 @@ static CAAnimation *LookupAnimation(CALayer *layer,SEL selector,NSString *key) {
     return ((id(*)(id,SEL,id))originalLookupAnimation)(layer,selector,key);
 }
 static void RemoveAllAnimations(CALayer *layer,SEL selector) {
+    NSUInteger removals=[objc_getAssociatedObject(layer,&AnimationRemovalCountKey) unsignedIntegerValue];
+    objc_setAssociatedObject(layer,&AnimationRemovalCountKey,@(removals+1),OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     [objc_getAssociatedObject(layer,&SubmittedAnimationsKey) removeAllObjects];
     ((void(*)(id,SEL))originalRemoveAllAnimations)(layer,selector);
 }
@@ -51,11 +55,46 @@ static NSUserDefaults *TestDefaults(id self,SEL selector) { return isolated; }
 @interface MainTabBarViewController : MMTabBarController
 @property(nonatomic,strong) NSArray *buttons;
 @property(nonatomic) NSInteger nativeClicks;
+@property(nonatomic,strong) NSMutableArray<NSNumber *> *selectionRequests;
+@property(nonatomic) BOOL nativeSelectionUnavailable;
 - (void)nativeClick:(UIControl *)button;
+- (void)handleUserSelectionAtIndex:(unsigned long long)index;
 @end
 @implementation MainTabBarViewController
+- (BOOL)respondsToSelector:(SEL)selector { return selector==@selector(handleUserSelectionAtIndex:) && self.nativeSelectionUnavailable ? NO : [super respondsToSelector:selector]; }
 - (id)getTabBarBtnForIndex:(unsigned long long)i { return i<self.buttons.count ? self.buttons[i] : nil; }
-- (void)nativeClick:(UIControl *)button { self.nativeClicks++;self.selectedIndex=[self.buttons indexOfObjectIdenticalTo:button]; }
+- (void)nativeClick:(UIControl *)button { self.nativeClicks++;self.selectedIndex=[self.buttons indexOfObjectIdenticalTo:button];CSTabBarSelectionDidChange(self); }
+- (void)handleUserSelectionAtIndex:(unsigned long long)index {
+    if (!self.selectionRequests) self.selectionRequests=[NSMutableArray array];
+    [self.selectionRequests addObject:@(index)];self.selectedIndex=index;CSTabBarSelectionDidChange(self);
+}
+@end
+@implementation WCTabBarView @end
+@implementation WCTabBarItemView @end
+@interface MMMainTabBarItemView ()
+@property(nonatomic,strong) MMTabBarItemView *itemView;
+@property(nonatomic,strong) MMTabbarItem *legacyItem;
+@end
+@implementation MMMainTabBarItemView @end
+@interface WCTabBarController ()
+@property(nonatomic,strong) WCTabBarView *tabBarView;
+@end
+@implementation WCTabBarController @end
+@interface NewMainTabBarViewController : WCTabBarController
+@property(nonatomic) NSUInteger selectedIndex,nativeClicks,doubleClicks;
+@property(nonatomic,strong) UIViewController *selectedViewController;
+@property(nonatomic,strong) NSMutableArray<NSNumber *> *selectionRequests;
+- (void)handleUserSelectionAtIndex:(NSUInteger)index;
+- (void)nativeClick:(UIControl *)button;
+- (void)OnMainFrameDoubleClicked:(id)sender;
+@end
+@implementation NewMainTabBarViewController
+- (void)handleUserSelectionAtIndex:(NSUInteger)index {
+    if(!self.selectionRequests)self.selectionRequests=[NSMutableArray array];
+    [self.selectionRequests addObject:@(index)];self.selectedIndex=index;CSTabBarSelectionDidChange((id)self);
+}
+- (void)nativeClick:(UIControl *)button {self.nativeClicks++;self.selectedIndex=[self.tabBarView.itemViews indexOfObjectIdenticalTo:button];CSTabBarSelectionDidChange((id)self);}
+- (void)OnMainFrameDoubleClicked:(id)sender {self.doubleClicks++;}
 @end
 @interface CountingPageView : UIView
 @property(nonatomic) NSUInteger treeReads;
@@ -96,6 +135,8 @@ int main(int argc,const char *argv[]) { @autoreleasepool {
         [CSTabBarPreferences reload];
         assert(CSTabBarPreferences.current.backgroundColor && CSTabBarPreferences.current.backgroundColor.alpha==0);
         assert(CSTabBarPreferences.current.haptic<=4 && CSTabBarPreferences.current.animation==CSTabBarBorderAnimationClassicHeartbeat);
+        [isolated setInteger:0 forKey:kTabBarHapticFeedbackKey];
+        [isolated setBool:NO forKey:kTabBarSwipeSwitchKey];
         [isolated removeObjectForKey:kTabBarBgColorAlphaKey];
         [isolated setBool:YES forKey:kTabBarStyleEnabledKey]; [isolated setBool:YES forKey:kTabBarHideTextKey];
         [isolated setObject:@"Renamed" forKey:kTabBarTextChatKey];
@@ -138,10 +179,11 @@ int main(int argc,const char *argv[]) { @autoreleasepool {
         assert(equal(first.frame.origin.y,31) && first.frame.size.height==52);
         assert(equal(table.contentInset.bottom,2) && equal(table.contentInset.top,7));
         CGRect floating=first.frame, badgeFrame=badge.frame;
+        NSUInteger buttonActionCount=[buttons[0] actions].count;
         for(int i=0;i<100;i++) CSTabBarUpdate(bar);
         assert(CGRectEqualToRect(first.frame,floating) && CGRectEqualToRect(badge.frame,badgeFrame));
         assert(equal(table.contentInset.bottom,2));
-        assert([buttons[0] actions].count==3); // native target plus the two feedback observers
+        assert(buttonActionCount>=1 && [buttons[0] actions].count==buttonActionCount);
         BOOL handled=NO;
         CGPoint center=CGPointMake(CGRectGetMidX(first.frame),CGRectGetMidY(first.frame));
         assert(CSTabBarHitTest(bar,center,nil,&handled)==buttons[0] && handled);
@@ -198,7 +240,7 @@ int main(int argc,const char *argv[]) { @autoreleasepool {
         assert(equal(table.contentInset.bottom,41) && equal(table.verticalScrollIndicatorInsets.bottom,5));
         assert(CGRectEqualToRect(first.frame,floating) && first.textLabel.hidden && first.imageView.image==loaded);
         assert(bar.hidden && !bar.clipsToBounds && bar.backgroundView.hidden);
-        assert([buttons[0] actions].count==3);
+        assert([buttons[0] actions].count==buttonActionCount);
         assert(!CSTabBarContainsPoint(bar,center,&handled) && handled);
         // Native navigation snapshots must include the capsule even while the real bar is hidden.
         UIView *raw=[[UIView alloc] initWithFrame:bar.frame];
@@ -247,6 +289,7 @@ int main(int argc,const char *argv[]) { @autoreleasepool {
         [CSTabBarPreferences reload];CSTabBarUpdate(bar);
         assert(first.imageView.image==nativeImage && !first.textLabel.hidden && [first.textLabel.text isEqual:@"Native"]);
         TestClickEffects(controller,bar,items,buttons,suite,imagePath);
+        TestModernTouchHierarchy(suite);
         // Border pulses must never tint a transparent bar interior or animate its background.
         [isolated setDouble:0 forKey:kTabBarBgColorAlphaKey];
         [isolated setDouble:1 forKey:kTabBarBorderColorAlphaKey];

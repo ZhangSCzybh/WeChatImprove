@@ -1,0 +1,390 @@
+{
+  "version": "2.9-3",
+  "source_checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "builds": [
+    {
+      "scheme": "rootless",
+      "package": "com.wechat.improve_2.9-3_iphoneos-arm64.deb",
+      "package_sha256": "52b2fd2d5134fe8d57526cf8695eff09ed8635e923a12d9845e2120f18d56901",
+      "metadata": {
+        "Package": "com.wechat.improve",
+        "Version": "2.9-3",
+        "Architecture": "iphoneos-arm64",
+        "Depends": "mobilesubstrate (>= 0.9.5000)"
+      },
+      "install_path": "/var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib",
+      "binary_architectures": [
+        "arm64",
+        "arm64e"
+      ],
+      "binary_sha256": "e15b6568eb11adf4789109f97a81947c7c0953e085a0f09aa844e0f5c56e7cee",
+      "binary_uuids": {
+        "arm64": "DBCCE16E-0AB5-37CA-BFE5-268A80D37268",
+        "arm64e": "1B989073-F6F7-3165-BCFC-41C42C41B28E"
+      },
+      "dsym": [
+        {
+          "architecture": "arm64",
+          "uuid": "DBCCE16E-0AB5-37CA-BFE5-268A80D37268",
+          "matches_binary": true
+        },
+        {
+          "architecture": "arm64e",
+          "uuid": "1B989073-F6F7-3165-BCFC-41C42C41B28E",
+          "matches_binary": true
+        }
+      ],
+      "build_exit_code": 0,
+      "quick_panel_classes_in_payload": true,
+      "logos_hook_compiled": true,
+      "linked_dependencies": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2.9-3-full-r0omps1p/extracted-rootless/var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib:\n\t@rpath/WeChatImprove.dylib (compatibility version 0.0.0, current version 0.0.0)\n\t/usr/lib/libobjc.A.dylib (compatibility version 1.0.0, current version 228.0.0)\n\t/System/Library/Frameworks/Foundation.framework/Foundation (compatibility version 300.0.0, current version 5027.1.8)\n\t/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation (compatibility version 150.0.0, current version 5027.1.8)\n\t/System/Library/Frameworks/UIKit.framework/UIKit (compatibility version 1.0.0, current version 9127.1.13)\n\t/System/Library/Frameworks/AVFoundation.framework/AVFoundation (compatibility version 1.0.0, current version 2.0.0)\n\t/System/Library/Frameworks/QuartzCore.framework/QuartzCore (compatibility version 1.2.0, current version 1223.10.19)\n\t/System/Library/Frameworks/LocalAuthentication.framework/LocalAuthentication (compatibility version 1.0.0, current version 2319.42.1)\n\t/System/Library/Frameworks/Security.framework/Security (compatibility version 1.0.0, current version 62460.40.78)\n\t/System/Library/Frameworks/ImageIO.framework/ImageIO (compatibility version 1.0.0, current version 1.0.0)\n\t/System/Library/Frameworks/CoreGraphics.framework/CoreGraphics (compatibility version 64.0.0, current version 2050.1.6)\n\t/System/Library/Frameworks/UniformTypeIdentifiers.framework/UniformTypeIdentifiers (compatibility version 1.0.0, current version 709.0.0)\n\t/System/Library/Frameworks/UserNotifications.framework/UserNotifications (compatibility version 1.0.0, current version 1.0.0)\n\t/System/Library/Frameworks/CoreMotion.framework/CoreMotion (compatibility version 1.0.0, current version 3186.0.22)\n\t/System/Library/Frameworks/PhotosUI.framework/PhotosUI (compatibility version 1.0.0, current version 916.57.154)\n\t/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 2200.32.0)\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1359.40.3)\n\t/System/Library/Frameworks/AVFAudio.framework/AVFAudio (compatibility version 1.0.0, current version 1.0.0)\n\t/System/Library/Frameworks/Photos.framework/Photos (compatibility version 1.0.0, current version 916.57.154)\n\t@rpath/CydiaSubstrate.framework/CydiaSubstrate (compatibility version 0.0.0, current version 0.0.0)",
+      "embedded_version_string_present": true
+    },
+    {
+      "scheme": "rootful",
+      "package": "com.wechat.improve_2.9-3_iphoneos-arm.deb",
+      "package_sha256": "ce5446ae999ba2d11ef844f5642f5de3fddc70e5dbf8570c8c79693ef1d2b76c",
+      "metadata": {
+        "Package": "com.wechat.improve",
+        "Version": "2.9-3",
+        "Architecture": "iphoneos-arm",
+        "Depends": "mobilesubstrate (>= 0.9.5000)"
+      },
+      "install_path": "/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib",
+      "binary_architectures": [
+        "arm64",
+        "arm64e"
+      ],
+      "binary_sha256": "7a1e853d851abbf54631930fc81632627eed7c4df66e913dfce15f518bcd3677",
+      "binary_uuids": {
+        "arm64": "DCD7FDE8-944A-3D2E-86F8-ACBAF36473CE",
+        "arm64e": "D4D88F3D-9DCE-3096-B283-9A374E812D8F"
+      },
+      "dsym": [
+        {
+          "architecture": "arm64",
+          "uuid": "DCD7FDE8-944A-3D2E-86F8-ACBAF36473CE",
+          "matches_binary": true
+        },
+        {
+          "architecture": "arm64e",
+          "uuid": "D4D88F3D-9DCE-3096-B283-9A374E812D8F",
+          "matches_binary": true
+        }
+      ],
+      "build_exit_code": 0,
+      "quick_panel_classes_in_payload": true,
+      "logos_hook_compiled": true,
+      "linked_dependencies": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2.9-3-full-r0omps1p/extracted-rootful/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib:\n\t/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib (compatibility version 0.0.0, current version 0.0.0)\n\t/usr/lib/libobjc.A.dylib (compatibility version 1.0.0, current version 228.0.0)\n\t/System/Library/Frameworks/Foundation.framework/Foundation (compatibility version 300.0.0, current version 5027.1.8)\n\t/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation (compatibility version 150.0.0, current version 5027.1.8)\n\t/System/Library/Frameworks/UIKit.framework/UIKit (compatibility version 1.0.0, current version 9127.1.13)\n\t/System/Library/Frameworks/AVFoundation.framework/AVFoundation (compatibility version 1.0.0, current version 2.0.0)\n\t/System/Library/Frameworks/QuartzCore.framework/QuartzCore (compatibility version 1.2.0, current version 1223.10.19)\n\t/System/Library/Frameworks/LocalAuthentication.framework/LocalAuthentication (compatibility version 1.0.0, current version 2319.42.1)\n\t/System/Library/Frameworks/Security.framework/Security (compatibility version 1.0.0, current version 62460.40.78)\n\t/System/Library/Frameworks/ImageIO.framework/ImageIO (compatibility version 1.0.0, current version 1.0.0)\n\t/System/Library/Frameworks/CoreGraphics.framework/CoreGraphics (compatibility version 64.0.0, current version 2050.1.6)\n\t/System/Library/Frameworks/UniformTypeIdentifiers.framework/UniformTypeIdentifiers (compatibility version 1.0.0, current version 709.0.0)\n\t/System/Library/Frameworks/UserNotifications.framework/UserNotifications (compatibility version 1.0.0, current version 1.0.0)\n\t/System/Library/Frameworks/CoreMotion.framework/CoreMotion (compatibility version 1.0.0, current version 3186.0.22)\n\t/System/Library/Frameworks/PhotosUI.framework/PhotosUI (compatibility version 1.0.0, current version 916.57.154)\n\t/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 2200.32.0)\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1359.40.3)\n\t/Library/Frameworks/CydiaSubstrate.framework/CydiaSubstrate (compatibility version 0.0.0, current version 0.0.0)\n\t/System/Library/Frameworks/AVFAudio.framework/AVFAudio (compatibility version 1.0.0, current version 1.0.0)\n\t/System/Library/Frameworks/Photos.framework/Photos (compatibility version 1.0.0, current version 916.57.154)",
+      "embedded_version_string_present": true
+    }
+  ],
+  "regressions": {
+    "quick-panel-preferences": {
+      "status": "passed",
+      "execution": "reused_verified_identical_functional_sources",
+      "source_release": "2.9-3-beta05",
+      "log": "regressions/quick-panel-preferences.log"
+    },
+    "quick-panel-gesture": {
+      "status": "passed",
+      "execution": "reused_verified_identical_functional_sources",
+      "source_release": "2.9-3-beta05",
+      "log": "regressions/quick-panel-gesture.log"
+    },
+    "quick-panel-router": {
+      "status": "passed",
+      "execution": "reused_verified_identical_functional_sources",
+      "source_release": "2.9-3-beta05",
+      "log": "regressions/quick-panel-router.log"
+    },
+    "backup-registry": {
+      "status": "passed",
+      "execution": "reused_verified_identical_functional_sources",
+      "source_release": "2.9-3-beta05",
+      "log": "regressions/backup-registry.log"
+    },
+    "plugin-feature-summary": {
+      "status": "passed",
+      "execution": "reused_verified_identical_functional_sources",
+      "source_release": "2.9-3-beta05",
+      "log": "regressions/plugin-feature-summary.log"
+    },
+    "settings-home": {
+      "status": "passed",
+      "execution": "reused_verified_identical_functional_sources",
+      "source_release": "2.9-3-beta05",
+      "log": "regressions/settings-home.log"
+    },
+    "tabbar": {
+      "status": "passed",
+      "execution": "reused_verified_identical_functional_sources",
+      "source_release": "2.9-3-beta05",
+      "log": "regressions/tabbar.log"
+    },
+    "setting-cell-layout": {
+      "status": "passed",
+      "execution": "reused_verified_identical_functional_sources",
+      "source_release": "2.9-3-beta05",
+      "log": "regressions/setting-cell-layout.log"
+    },
+    "quick-panel-background": {
+      "status": "passed",
+      "execution": "reused_verified_identical_functional_sources",
+      "source_release": "2.9-3-beta05",
+      "log": "regressions/quick-panel-background.log"
+    },
+    "backup-assets": {
+      "status": "passed",
+      "execution": "reused_verified_identical_functional_sources",
+      "source_release": "2.9-3-beta05",
+      "log": "regressions/backup-assets.log"
+    },
+    "quick-panel-appearance": {
+      "status": "passed",
+      "execution": "reused_verified_identical_functional_sources",
+      "source_release": "2.9-3-beta05",
+      "log": "regressions/quick-panel-appearance.log"
+    },
+    "quick-panel-color-settings": {
+      "status": "passed",
+      "execution": "reused_verified_identical_functional_sources",
+      "source_release": "2.9-3-beta05",
+      "log": "regressions/quick-panel-color-settings.log"
+    }
+  },
+  "source_files_verified": 533,
+  "test_files_verified": 442,
+  "build_inputs_unchanged": true,
+  "strict_ios_syntax_architectures": [
+    "arm64",
+    "arm64e"
+  ],
+  "standalone_dylib_matches_rootful": true,
+  "symbol_archive_verified": true,
+  "on_device_validation": "not_performed",
+  "installed_to_device": false,
+  "validated_at": "2026-11-23T14:44:11.748335+08:00",
+  "release_kind": "full",
+  "compilation_coverage": {
+    "report": "compilation-coverage.json",
+    "sha256": "a792c7bd71ed9f6e99881005f1301d6a4998144748f8690423aedfa4c8a42e43",
+    "scheme_count": 2,
+    "architectures_per_scheme": [
+      "arm64",
+      "arm64e"
+    ],
+    "verified_architecture_builds": 4,
+    "expected_compilations_per_architecture": 292,
+    "verified_compilation_records": 1168,
+    "missing_source_count": 0,
+    "unexpected_source_count": 0,
+    "duplicate_source_count": 0,
+    "unparsed_compile_record_count": 0,
+    "all_passed": true
+  },
+  "version_verification": {
+    "package_control_version": "2.9-3",
+    "source_header_version": "2.9-3",
+    "production_release_notes_function": {
+      "version": "2.9-3",
+      "command": [
+        "xcrun",
+        "--sdk",
+        "macosx",
+        "clang",
+        "-fobjc-arc",
+        "-fblocks",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-framework",
+        "Foundation",
+        "-I/Users/zhangshichao/Documents/Workspace/WeChatImprove/Headers",
+        "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2.9-3-full-r0omps1p/release-metadata.m",
+        "-o",
+        "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2.9-3-full-r0omps1p/release-metadata"
+      ],
+      "exit_code": 0,
+      "production_function_executed": true,
+      "notes_count": 6,
+      "stdout": "PASS: version 2.9-3 selects 6 complete release notes from production function\n",
+      "historical_beta_release_notes_preserved": true,
+      "header_control_readme_consistent": true
+    },
+    "basis": "Package control extraction, verified source header and production release-notes function, fresh isolated full builds; no on-device version observation"
+  },
+  "strict_ios_release_syntax": [
+    {
+      "architecture": "arm64",
+      "file": "Controllers/CSReleaseNotesViewController.m",
+      "command": [
+        "xcrun",
+        "--sdk",
+        "iphoneos",
+        "clang",
+        "-fobjc-arc",
+        "-fblocks",
+        "-target",
+        "arm64-apple-ios15.0",
+        "-fsyntax-only",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unused-parameter",
+        "-IControllers",
+        "-IHeaders",
+        "Controllers/CSReleaseNotesViewController.m"
+      ],
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "architecture": "arm64e",
+      "file": "Controllers/CSReleaseNotesViewController.m",
+      "command": [
+        "xcrun",
+        "--sdk",
+        "iphoneos",
+        "clang",
+        "-fobjc-arc",
+        "-fblocks",
+        "-target",
+        "arm64e-apple-ios15.0",
+        "-fsyntax-only",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unused-parameter",
+        "-IControllers",
+        "-IHeaders",
+        "Controllers/CSReleaseNotesViewController.m"
+      ],
+      "exit_code": 0,
+      "output": ""
+    }
+  ],
+  "regression_provenance": {
+    "report": "regressions/beta05-provenance.json",
+    "source_release": "2.9-3-beta05",
+    "execution": "reused; not rerun for metadata-only release",
+    "source_manifest": "packages/2.9-3-beta05/source-manifest.json",
+    "source_manifest_sha256": "d4dd117ebdcdec65b2fb3d22b05c658d28874f4a683c1dbaac98b5190a34149b",
+    "unchanged_source_files": 530,
+    "metadata_changes_only": [
+      "Controllers/CSReleaseNotesViewController.m",
+      "Headers/CSUserInfoHelper.h",
+      "control"
+    ],
+    "unchanged_test_files": 442,
+    "previous_results": [
+      {
+        "name": "quick-panel-preferences",
+        "exit_code": 0,
+        "seconds": 2.68
+      },
+      {
+        "name": "quick-panel-gesture",
+        "exit_code": 0,
+        "seconds": 0.55
+      },
+      {
+        "name": "quick-panel-router",
+        "exit_code": 0,
+        "seconds": 1.37
+      },
+      {
+        "name": "backup-registry",
+        "exit_code": 0,
+        "seconds": 2.76
+      },
+      {
+        "name": "plugin-feature-summary",
+        "exit_code": 0,
+        "seconds": 0.98
+      },
+      {
+        "name": "settings-home",
+        "exit_code": 0,
+        "seconds": 1.72
+      },
+      {
+        "name": "tabbar",
+        "exit_code": 0,
+        "seconds": 2.96
+      },
+      {
+        "name": "setting-cell-layout",
+        "exit_code": 0,
+        "seconds": 0.95
+      },
+      {
+        "name": "quick-panel-background",
+        "exit_code": 0,
+        "seconds": 2.33
+      },
+      {
+        "name": "backup-assets",
+        "exit_code": 0,
+        "seconds": 3.1
+      },
+      {
+        "name": "quick-panel-appearance",
+        "exit_code": 0,
+        "seconds": 2.03
+      },
+      {
+        "name": "quick-panel-color-settings",
+        "exit_code": 0,
+        "seconds": 0.65
+      }
+    ]
+  },
+  "changes_relative_to_beta05": {
+    "changed_build_inputs": [
+      "Controllers/CSReleaseNotesViewController.m",
+      "Headers/CSUserInfoHelper.h",
+      "control"
+    ],
+    "unchanged_build_inputs": 530,
+    "test_files_identical": 442
+  },
+  "environment_preservation": {
+    "builds_used_isolated_directories": true,
+    "make_clean_executed": false,
+    "baseline_summary": {
+      "files": 829131,
+      "seconds": 31.27,
+      "excluded_release": "packages/2.9-3"
+    },
+    "content_verification": {
+      "files_checked": 829131,
+      "changed": [
+        "packages/.DS_Store"
+      ],
+      "seconds": 30.8
+    },
+    "inventory_comparison": {
+      "files_before": 829131,
+      "files_after": 829133,
+      "added": [
+        "packages/2.9-3-beta03/.DS_Store",
+        "packages/2.9-3-beta04/.DS_Store"
+      ],
+      "removed": []
+    },
+    "strict_all_files_and_inventory_identical": false,
+    "non_finder_artifact_content_and_inventory_preserved": true,
+    "exceptions": "Only Finder .DS_Store directory metadata differs: one existing file changed and two files appeared. These files were left as observed; no restoration or deletion performed.",
+    "non_finder_changes": [],
+    "non_finder_additions": [],
+    "non_finder_removals": []
+  },
+  "documentation": {
+    "release_readme": "README.md",
+    "root_readme_version": "2.9-3",
+    "historical_links_match_present_release_directories": true
+  },
+  "sha256_manifest": "SHA256SUMS",
+  "finalized_at": "2026-11-23T14:47:51.124030+08:00"
+}

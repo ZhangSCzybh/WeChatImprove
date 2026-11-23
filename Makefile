@@ -21,8 +21,9 @@ TARGET = iphone:clang:latest:15.0
 
 # 源文件
 WeChatImprove_FILES = Controllers/CSPluginStorageStartup.m \
+                     Controllers/CSTabBarSwipeSwitcher.m \
                      $(wildcard Hooks/*.xm) \
-                     $(filter-out Controllers/CSPluginStorageStartup.m,$(wildcard Controllers/*.m)) \
+                     $(filter-out Controllers/CSPluginStorageStartup.m Controllers/CSTabBarSwipeSwitcher.m,$(wildcard Controllers/*.m)) \
 
 # 编译标志
 WeChatImprove_CFLAGS = -fobjc-arc \

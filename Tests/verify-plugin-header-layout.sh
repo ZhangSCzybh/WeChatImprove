@@ -12,6 +12,10 @@ assert source.count('#import "CSPluginHeaderView.h"') == 1
 assert source.count('#import "CSSettingsHomeTheme.h"') == 1
 source = source.replace('#import "CSSettingsHomeTheme.h"', '')
 Path(sys.argv[1], 'PluginHeaderUnderTest.h').write_text(source.replace('#import "CSPluginHeaderView.h"', public))
+controller = Path('Controllers/CSCustomViewController.m').read_text()
+start = controller.index('@interface CSSettingsHomeSectionHeaderView : UIView')
+end = controller.index('@interface CSCustomViewController', start)
+Path(sys.argv[1], 'SectionHeaderUnderTest.h').write_text(controller[start:end])
 PY
 xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-unused-parameter -Wno-nullability-completeness \
  -IHeaders -I"$header_work" -framework Foundation -framework AppKit -framework CoreGraphics \

@@ -95,6 +95,13 @@ static NSString *CSMomentsTimestampText(NSTimeInterval timestamp, NSDate *now) {
     return [NSString stringWithFormat:@"%04ld-%02ld-%02ld %@", (long)parts.year, (long)parts.month, (long)parts.day, time];
 }
 
+static CGSize CSMomentsSharedCoverSize(CSMomentsCardModel *model, CGFloat width) {
+    BOOL compactMiniApp = model.contentKind == CSMomentsContentMiniApp && !model.shareCoverURL.length;
+    BOOL compactLink = model.contentKind == CSMomentsContentArticle && !model.media && !model.shareCoverURL.length;
+    if (compactMiniApp || compactLink) return CGSizeMake(width, MIN(88, width));
+    return model.coverSize;
+}
+
 static CSMomentsCardMetrics CSMomentsMetrics(CSMomentsCardModel *model, CGFloat width, UITraitCollection *traits, UIView *nativeTitleView, BOOL *nativeTitleReady) {
     if (nativeTitleReady) *nativeTitleReady = NO;
     if (!model || !isfinite(width) || width <= 0) return (CSMomentsCardMetrics){0};
@@ -121,8 +128,13 @@ static CSMomentsCardMetrics CSMomentsMetrics(CSMomentsCardModel *model, CGFloat 
         ? CSMomentsSmallFont(12.5, 15, traits).lineHeight : 0;
     CGFloat nicknameHeight = CSMomentsWeightedSmallFont(13.5, 17, UIFontWeightSemibold, traits).lineHeight;
     CGFloat locationHeight = model.locationText.length ? CSMomentsSmallFont(12.5, 15, traits).lineHeight : 0;
-    BOOL hasCover = model.media != nil || model.contentKind == CSMomentsContentFinder || model.contentKind == CSMomentsContentArticle;
-    return CSMomentsCardMeasure(hasCover, width, model.coverSize.width, model.coverSize.height,
+    BOOL hasCover = model.media != nil || model.contentKind == CSMomentsContentFinder ||
+        model.contentKind == CSMomentsContentArticle || model.contentKind == CSMomentsContentFinderLive ||
+        model.contentKind == CSMomentsContentMiniApp;
+    // Missing link covers and icon-only mini apps use the same compact row
+    // in both collection sizing and the actual shared-cover presentation.
+    CGSize coverSize = CSMomentsSharedCoverSize(model, width);
+    return CSMomentsCardMeasure(hasCover, width, coverSize.width, coverSize.height,
         titleHeight, lineHeight, nicknameHeight, timestampHeight, locationHeight);
 }
 
@@ -151,6 +163,7 @@ static CGRect CSMomentsCardCGRect(CSMomentsCardRect rect) {
 @property(nonatomic, strong) UITapGestureRecognizer *nativeTap;
 @property(nonatomic) CGSize naturalSize;
 @property(nonatomic) BOOL nativePlayIcon;
+@property(nonatomic) BOOL compact;
 - (void)openNativeContent;
 @end
 
@@ -170,6 +183,17 @@ static CGRect CSMomentsCardCGRect(CSMomentsCardRect rect) {
 }
 - (void)layoutSubviews {
     [super layoutSubviews];
+    if (self.compact) {
+        self.stage.transform = CGAffineTransformIdentity;
+        self.stage.frame = self.bounds;
+        CGFloat inset = MIN(12, self.bounds.size.width / 2);
+        CGFloat side = MIN(56, MAX(0, MIN(self.bounds.size.width, self.bounds.size.height) - 2 * inset));
+        self.thumbnail.frame = CGRectMake(inset, (self.bounds.size.height - side) / 2, side, side);
+        CGFloat textX = inset + side + (side > 0 ? 10 : 0);
+        self.sourceLabel.frame = CGRectMake(textX, inset, MAX(0, self.bounds.size.width - textX - inset),
+            MAX(0, self.bounds.size.height - 2 * inset));
+        return;
+    }
     CGFloat footer = self.sourceLabel.text.length ? 24 : 0;
     CGFloat height = MAX(0, self.bounds.size.height - footer);
     if (self.thumbnail) {
@@ -186,7 +210,7 @@ static CGRect CSMomentsCardCGRect(CSMomentsCardRect rect) {
     self.sourceLabel.frame = CGRectMake(8, height, MAX(0, self.bounds.size.width - 16), footer);
 }
 - (void)openNativeContent {
-    if (!self.nativeOwner || !self.shouldOpen || !self.shouldOpen()) return;
+    if (!self.superview || !self.nativeOwner || !self.shouldOpen || !self.shouldOpen()) return;
     SEL action = NSSelectorFromString(@"throwUrlMessage");
     if (!CSMomentsTitleMethod(object_getClass(self.nativeOwner), NSStringFromSelector(action), "v@:")) return;
     @try { ((void (*)(id, SEL))objc_msgSend)(self.nativeOwner, action); }
@@ -231,7 +255,8 @@ static UIView *CSMomentsShareURLThumbnail(NSString *originalURL) {
         !CSMomentsTitleMethod(cls, @"setImageURL:", "v@:@")) return nil;
     @try {
         NSURL *url = [NSURL URLWithString:originalURL];
-        if (!url) return nil;
+        if (!url.host.length || (![url.scheme.lowercaseString isEqual:@"https"] &&
+            ![url.scheme.lowercaseString isEqual:@"http"])) return nil;
         UIView *view = [(UIView *)[cls alloc] initWithFrame:CGRectMake(0, 0, 160, 100)];
         view.contentMode = UIViewContentModeScaleAspectFill;
         view.clipsToBounds = YES;
@@ -245,31 +270,30 @@ static UIView *CSMomentsShareURLThumbnail(NSString *originalURL) {
 
 static UILabel *CSMomentsShareFallback(CSMomentsCardModel *model, UIViewController *page) {
     UILabel *fallback = [UILabel new];
-    fallback.numberOfLines = 0;
+    fallback.numberOfLines = 2;
+    fallback.lineBreakMode = NSLineBreakByTruncatingTail;
+    fallback.textAlignment = NSTextAlignmentCenter;
     fallback.font = CSMomentsSmallFont(13, 16, page.traitCollection);
     fallback.textColor = UIColor.secondaryLabelColor;
-    id content = nil, link = nil;
-    @try {
-        if (CSMomentsTitleMethod(object_getClass(model.item), @"contentObj", "@@:"))
-            content = ((id (*)(id, SEL))objc_msgSend)(model.item, NSSelectorFromString(@"contentObj"));
-        if (CSMomentsTitleMethod(object_getClass(content), @"linkUrl", "@@:"))
-            link = ((id (*)(id, SEL))objc_msgSend)(content, NSSelectorFromString(@"linkUrl"));
-    } @catch (__unused NSException *exception) {}
-    NSMutableArray *lines = [NSMutableArray new];
-    for (id text in @[model.title ?: @"", model.sourceText ?: @"", [link isKindOfClass:NSString.class] ? link : @""])
-        if ([text length]) [lines addObject:text];
-    fallback.text = lines.count ? [lines componentsJoinedByString:@"\n"] : @"分享内容暂不可用";
+    // Source already has its own label. Navigation keeps the original native
+    // URL; a missing image must never turn its encoded query into cover text.
+    fallback.text = model.title.length ? model.title : @"分享内容暂不可用";
     return fallback;
 }
 
 static UIView *CSMomentsCreateSharedCover(CSMomentsCardModel *model, UIViewController *page, UIView *thumbnail, BOOL (^shouldOpen)(void)) {
     BOOL finder = model.contentKind == CSMomentsContentFinder;
-    NSString *name = model.contentKind == CSMomentsContentFinder ? @"WCContentItemFinderView" : @"WCContentItemViewTemplateNews";
+    BOOL miniApp = model.contentKind == CSMomentsContentMiniApp;
+    BOOL article = model.contentKind == CSMomentsContentArticle;
+    BOOL live = model.contentKind == CSMomentsContentFinderLive;
+    NSString *name = finder ? @"WCContentItemFinderView" : @"WCContentItemViewTemplateNews";
     Class nativeClass = NSClassFromString(name);
     Class cls = Nil;
     UIView *native = nil;
     @try {
-        if ([nativeClass isSubclassOfClass:UIView.class] && [model.item isKindOfClass:NSClassFromString(@"WCDataItem")] &&
+        // Live initialization starts native state/loading/player work. A static
+        // cover leaves selection on the guarded native Moments-detail route.
+        if (!live && [nativeClass isSubclassOfClass:UIView.class] && [model.item isKindOfClass:NSClassFromString(@"WCDataItem")] &&
             CSMomentsTitleMethod(nativeClass, @"initWithWCDataItem:showDetail:withScene:", "@@:@BQ") &&
             CSMomentsTitleMethod(nativeClass, @"throwUrlMessage", "v@:")) cls = CSMomentsShareDisplayClass(nativeClass, finder);
         if (cls) {
@@ -287,11 +311,23 @@ static UIView *CSMomentsCreateSharedCover(CSMomentsCardModel *model, UIViewContr
 
     CGSize size = native.bounds.size;
     BOOL nativeLayout = finder && native && isfinite(size.width) && isfinite(size.height) && size.width > 0 && size.height > 0;
-    if (!nativeLayout && !thumbnail) thumbnail = CSMomentsShareURLThumbnail(model.shareCoverURL);
+    BOOL loadedShareCover = NO;
+    if (!nativeLayout && (!thumbnail || (miniApp && model.shareCoverURL.length))) {
+        UIView *sharedImage = CSMomentsShareURLThumbnail(model.shareCoverURL);
+        if (sharedImage) {
+            CSMomentsReleaseCoverView(thumbnail);
+            thumbnail = sharedImage;
+            loadedShareCover = YES;
+        }
+    }
     CSMomentsNativeShareCover *cover = [CSMomentsNativeShareCover new];
     cover.nativeOwner = native;
     cover.naturalSize = size;
     cover.shouldOpen = shouldOpen;
+    // A failed published image retains its measured cover space and uses the
+    // bounded fallback. Image-less links use the same compact rule as sizing.
+    cover.compact = (miniApp && !loadedShareCover) ||
+        (article && !model.media && !model.shareCoverURL.length && !thumbnail);
     cover.stage = [UIView new];
     cover.stage.userInteractionEnabled = NO;
     native.userInteractionEnabled = NO;
@@ -299,6 +335,12 @@ static UIView *CSMomentsCreateSharedCover(CSMomentsCardModel *model, UIViewContr
         native.frame = (CGRect){CGPointZero, size};
         [cover.stage addSubview:native];
     } else {
+        if (!thumbnail && cover.compact) {
+            UIImageView *icon = [[UIImageView alloc] initWithImage:[UIImage systemImageNamed:miniApp ? @"app.dashed" : @"link"]];
+            icon.tintColor = UIColor.secondaryLabelColor;
+            icon.contentMode = UIViewContentModeScaleAspectFit;
+            thumbnail = icon;
+        }
         cover.thumbnail = thumbnail ?: CSMomentsShareFallback(model, page);
         [cover.stage addSubview:cover.thumbnail];
         // findViewController follows the hierarchy on native action owners.
@@ -308,6 +350,8 @@ static UIView *CSMomentsCreateSharedCover(CSMomentsCardModel *model, UIViewContr
     [cover addSubview:cover.stage];
     cover.sourceLabel = [UILabel new];
     cover.sourceLabel.text = model.sourceText;
+    if (article && cover.compact && !cover.sourceLabel.text.length) cover.sourceLabel.text = @"网页链接";
+    cover.sourceLabel.numberOfLines = cover.compact ? 2 : 1;
     cover.sourceLabel.font = CSMomentsSmallFont(12.5, 15, page.traitCollection);
     cover.sourceLabel.textColor = UIColor.secondaryLabelColor;
     cover.sourceLabel.lineBreakMode = NSLineBreakByTruncatingTail;
@@ -495,8 +539,10 @@ static UIView *CSMomentsCreateSharedCover(CSMomentsCardModel *model, UIViewContr
 }
 
 - (void)configureSharedPresentationForOwner:(UIViewController *)owner shouldOpen:(BOOL (^)(void))shouldOpen {
-    if (!_model || (_model.contentKind != CSMomentsContentFinder && _model.contentKind != CSMomentsContentArticle)) return;
-    UIView *thumbnail = _model.contentKind == CSMomentsContentArticle && [_coverView isKindOfClass:NSClassFromString(@"WCImageView")] ? _coverView : nil;
+    if (!_model || (_model.contentKind != CSMomentsContentFinder && _model.contentKind != CSMomentsContentArticle &&
+        _model.contentKind != CSMomentsContentFinderLive && _model.contentKind != CSMomentsContentMiniApp)) return;
+    UIView *thumbnail = (_model.contentKind == CSMomentsContentArticle || _model.contentKind == CSMomentsContentMiniApp) &&
+        [_coverView isKindOfClass:NSClassFromString(@"WCImageView")] ? _coverView : nil;
     if (!thumbnail) {
         CSMomentsReleaseVideoCoverView(_coverView);
         CSMomentsReleaseCoverView(_coverView);

@@ -30,6 +30,22 @@ for name in ['setupData', 'currentHomeDistance', 'setHomeDistance:', 'positionSe
         depth += (controller[end] == '{') - (controller[end] == '}')
         end += 1
     methods.append(controller[match.start():end])
+selection = re.search(r'^- \(void\)tableView:\(UITableView \*\)tableView didSelectRowAtIndexPath:', controller, re.M)
+if not selection:
+    raise SystemExit('Missing real controller selection method')
+opening = controller.index('{', selection.start())
+depth, end = 1, opening + 1
+while depth:
+    depth += (controller[end] == '{') - (controller[end] == '}')
+    end += 1
+selection_source = controller[selection.start():end]
+methods.append(selection_source)
+# Compile the real selection method against navigation destinations that retain
+# their actual class names. Tests execute every registered navigation branch.
+destinations = sorted(set(re.findall(r'\[\[(\w+) alloc\]', selection_source)))
+(output / 'SettingsHomeRouteControllers.h').write_text('\n'.join(
+    '@interface ' + name + ' : HomeFixtureRouteController @end\n@implementation ' + name + ' @end'
+    for name in destinations))
 (output / 'SettingsHomeControllerUnderTest.h').write_text('\n'.join(methods))
 PY
 xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -Wno-nullability-completeness \

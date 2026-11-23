@@ -7,6 +7,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CSSettingsHomeCell : UITableViewCell
 + (NSString *)reuseIdentifier;
 - (void)configureWithItem:(CSSettingItem *)item;
+- (void)reloadAppearance;
 @end
 
 NS_ASSUME_NONNULL_END

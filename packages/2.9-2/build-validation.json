@@ -1,0 +1,100 @@
+{
+  "version": "2.9-2",
+  "source_checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "builds": [
+    {
+      "scheme": "rootless",
+      "package": "com.wechat.improve_2.9-2_iphoneos-arm64.deb",
+      "metadata": {
+        "Package": "com.wechat.improve",
+        "Version": "2.9-2",
+        "Architecture": "iphoneos-arm64"
+      },
+      "install_path": "/var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib",
+      "binary_architectures": [
+        "arm64",
+        "arm64e"
+      ],
+      "binary_sha256": "317a177c44266824245e575311d045398692e0140cb94db3a0de9c2af2f93be1",
+      "binary_uuids": {
+        "arm64": "9A064165-2285-3D8A-9196-75ACA7785608",
+        "arm64e": "905EA7AD-7C91-3209-8487-9BAB474DB428"
+      },
+      "dsym": [
+        {
+          "architecture": "arm64",
+          "uuid": "9A064165-2285-3D8A-9196-75ACA7785608",
+          "matches_binary": true
+        },
+        {
+          "architecture": "arm64e",
+          "uuid": "905EA7AD-7C91-3209-8487-9BAB474DB428",
+          "matches_binary": true
+        }
+      ],
+      "build_exit_code": 0,
+      "embedded_version_verified": true
+    },
+    {
+      "scheme": "rootful",
+      "package": "com.wechat.improve_2.9-2_iphoneos-arm.deb",
+      "metadata": {
+        "Package": "com.wechat.improve",
+        "Version": "2.9-2",
+        "Architecture": "iphoneos-arm"
+      },
+      "install_path": "/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib",
+      "binary_architectures": [
+        "arm64",
+        "arm64e"
+      ],
+      "binary_sha256": "c212fbe893373900dfb5df870b5ed4e1752c5d659edba0026e3a1974ea321de8",
+      "binary_uuids": {
+        "arm64": "5CDA0782-FB12-3EE2-BD8E-14458D2D6B8B",
+        "arm64e": "9E5255F2-25EC-3FDA-8AE1-BCC4893C2C2A"
+      },
+      "dsym": [
+        {
+          "architecture": "arm64",
+          "uuid": "5CDA0782-FB12-3EE2-BD8E-14458D2D6B8B",
+          "matches_binary": true
+        },
+        {
+          "architecture": "arm64e",
+          "uuid": "9E5255F2-25EC-3FDA-8AE1-BCC4893C2C2A",
+          "matches_binary": true
+        }
+      ],
+      "build_exit_code": 0,
+      "embedded_version_verified": true
+    }
+  ],
+  "regressions": {
+    "model": {
+      "status": "passed",
+      "log": "regressions/moments-model.log"
+    },
+    "names": {
+      "status": "passed",
+      "log": "regressions/moments-names.log"
+    },
+    "share": {
+      "status": "passed",
+      "log": "regressions/moments-share.log"
+    },
+    "card": {
+      "status": "passed",
+      "log": "regressions/moments-card.log"
+    }
+  },
+  "source_files_verified": 516,
+  "build_inputs_unchanged": true,
+  "current_moments_fixes_included": true,
+  "protected_files_checked": 2757,
+  "historical_packages_and_shared_build_unchanged": true,
+  "standalone_dylib_matches_rootful": true,
+  "symbol_archive_verified": true,
+  "on_device_validation": "not_performed",
+  "installed_to_device": false,
+  "validated_at": "2026-11-23T11:28:14.491757+08:00"
+}

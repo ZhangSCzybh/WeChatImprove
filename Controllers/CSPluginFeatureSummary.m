@@ -88,7 +88,7 @@ static NSDictionary *AccountSnapshot(id source, BOOL stored, NSUInteger epoch) {
              @"CSBackgroundRunStateChanged", @"CSMessageActionSettingsDidChangeNotification",
              @"CSVoicePlaybackSettingsDidChangeNotification", @"CSClownSettingsDidChangeNotification",
              @"CSMomentsLayoutChangedNotification", @"CSAdPurificationChangedNotification",
-             @"CSClientGuardChangedNotification", @"CSBackupAccountChanged",
+             @"CSClientGuardChangedNotification", @"CSBackupAccountChanged", @"com.wechat.enhance.quick_panel.changed",
              @"UIApplicationDidBecomeActiveNotification", CSPluginFeatureSummaryDidChangeNotification];
 }
 + (NSUInteger)enabledModuleCount {
@@ -139,6 +139,7 @@ static NSDictionary *AccountSnapshot(id source, BOOL stored, NSUInteger epoch) {
         @[@"bubble", @"standard", @[@"com.wechat.enhance.bubble_style.enabled", @"com.wechat.enhance.merge_messages.enabled"]],
         @[@"list", @"standard", @[@"com.wechat.enhance.list_corner_radius.enabled"]],
         @[@"tabbar", @"standard", @[@"com.wechat.enhance.tabbar_style.enabled"]],
+        @[@"quick_panel", @"standard", @[@"com.wechat.enhance.quick_panel.enabled"]],
         @[@"attachments", @"standard", @[@"com.wechat.tweak.chat.attachment.layout.enabled"]],
         @[@"input", @"standard", @[@"com.wechat.enhance.inputText.enabled", @"com.wechat.enhance.inputText.roundedCorners", @"com.wechat.enhance.inputText.border.enabled"]],
         @[@"groups", @"standard", @[@"com.wechat.enhance.chat_group.enabled"]],

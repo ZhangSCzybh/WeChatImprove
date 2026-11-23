@@ -50,9 +50,12 @@ extern "C" {
 
 void CSTabBarBeginLayout(MMTabBar *bar);
 void CSTabBarEndLayout(MMTabBar *bar);
+// Invalidates only the current call's item/index reuse, never caches across reloads.
+void CSTabBarInvalidateItemGeneration(MMTabBar *bar);
 void CSTabBarBeginControllerLayout(MMTabBarController *controller);
 void CSTabBarEndControllerLayout(MMTabBarController *controller);
 void CSTabBarUpdate(MMTabBar *bar);
+void CSTabBarSelectionDidChange(MMTabBarController *controller);
 MMTabBar *CSTabBarForController(MMTabBarController *controller);
 UIView *CSTabBarStyleSnapshot(MMTabBar *bar, UIView *nativeSnapshot);
 void CSTabBarBeginItemUpdate(MMTabBarItemView *item);
@@ -60,6 +63,12 @@ void CSTabBarEndItemUpdate(MMTabBarItemView *item);
 BOOL CSTabBarContainsPoint(MMTabBar *bar, CGPoint point, BOOL *handled);
 UIView *CSTabBarHitTest(MMTabBar *bar, CGPoint point, UIEvent *event, BOOL *handled);
 void CSTabBarInstallObservers(void);
+// Points are in the native bar's coordinate space. UIControl owns tracking.
+void CSTabBarTouchBegin(MMTabBar *bar, CGPoint pointInBar);
+void CSTabBarTouchMove(MMTabBar *bar, CGPoint pointInBar);
+void CSTabBarTouchEnd(MMTabBar *bar, CGPoint pointInBar);
+void CSTabBarTouchCancel(MMTabBar *bar);
+
 
 #ifdef __cplusplus
 }

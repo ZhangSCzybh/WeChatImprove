@@ -118,6 +118,39 @@ static void ApplyContactRemarks(NSArray<CSMomentsCardModel *> *cards) {
     }
 }
 
+static void ApplyMiniAppNames(NSArray<CSMomentsCardModel *> *cards) {
+    if(!cards.count)return;
+    id manager=nil;
+    NSMutableDictionary<NSString *,NSString *> *names=[NSMutableDictionary new];
+    for(CSMomentsCardModel *card in cards) {
+        if(card.contentKind!=CSMomentsContentMiniApp)continue;
+        id rawUserName=Read(Read(card.item,@"weappInfo"),@"appUserName");
+        NSString *username=[rawUserName isKindOfClass:NSString.class]
+            ? [rawUserName stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet] : @"";
+        if(!username.length)continue;
+        if(!manager) {
+            manager=CurrentService(NSClassFromString(@"WAContactMgr"));
+            // This cache-only selector neither fetches nor updates contacts.
+            // Missing entries retain the published source/name fallback.
+            if(!Matches(manager,@"getContactFromCache:","@@:@"))return;
+        }
+        NSString *name=names[username];
+        if(!name) {
+            name=@"";
+            @try {
+                id contact=((id(*)(id,SEL,id))objc_msgSend)(manager,NSSelectorFromString(@"getContactFromCache:"),username);
+                id value=Matches(contact,@"m_nsNickName","@@:") ? Read(contact,@"m_nsNickName") : nil;
+                if([value isKindOfClass:NSString.class])name=[value stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+                if([name isEqualToString:@"小程序名称"])name=@"";
+            } @catch(__unused NSException *exception) {}
+            // Misses also belong only to this projection; a later native
+            // contact update or an account switch resolves again.
+            names[username]=name;
+        }
+        if(name.length)card.title=name;
+    }
+}
+
 @interface CSMomentsSupplement : UICollectionReusableView
 @property(nonatomic,strong) UIView *embedded;
 @property(nonatomic,strong) UIButton *button;
@@ -531,6 +564,7 @@ static BOOL SameCards(NSArray<CSMomentsCardModel *> *a,NSArray<CSMomentsCardMode
     NSArray *cards=CSMomentsBuildCards(source,snapshot,self.epoch,CSAdPurificationShouldApply(CSAdPurificationMoments),
         ^id(id object,NSString *key){ return Read(object,key); },^CGSize(id media){ return CSMomentsNativeMediaSize(media); });
     ApplyContactRemarks(cards);
+    ApplyMiniAppNames(cards);
     if(!SameCards(self.cards,cards)) {
         self.cards=cards;
         [self.collection reloadData];

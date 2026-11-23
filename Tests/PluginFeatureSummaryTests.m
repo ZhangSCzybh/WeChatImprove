@@ -54,7 +54,12 @@ static NSDictionary *Snapshot(NSDictionary *configuration, BOOL ready, NSUIntege
 
 int main(void) { @autoreleasepool {
     NSDictionary *empty=States(@{}, @{}, 11, YES);
-    Check(empty.count==32 && Count(empty)==0, @"explicit homepage module list starts disabled");
+    Check(empty.count==33 && Count(empty)==0, @"explicit homepage module list starts disabled");
+    Check(Count(States(@{@"standard":@{@"com.wechat.enhance.quick_panel.enabled":@YES}}, @{}, 11, YES))==1,
+          @"quick panel counts once independently of trigger and entry choices");
+    Check(Count(States(@{@"standard":@{@"com.wechat.enhance.quick_panel.trigger_locations":@3,
+                                      @"com.wechat.enhance.quick_panel.selected_actions":@[@"scan"]}}, @{}, 11, YES))==0,
+          @"configured panel entries do not enable a disabled module");
     NSDictionary *noise=@{@"standard":@{@"com.wechat.enhance.backup.auto_enabled":@YES,
                                          @"com.wechat.enhance.close_friend.enabled":@YES,
                                          @"com.wechat.tweak.version.selected":@123,

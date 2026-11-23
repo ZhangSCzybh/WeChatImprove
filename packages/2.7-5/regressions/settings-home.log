@@ -1,2 +1,0 @@
-SettingsHomeModelTests: 803 checks, 0 failures (real production model and layout helpers; four Tabs/shared About, global visible-only search, identity/routes, rebuild/account reset, sticky rail/safe areas, legal scrolling and asynchronous reflow)
-SettingsHomeControllerTests: 65 checks, 0 failures (real setupData and controller methods; selected/search state, inline palette search, current-policy visibility, account-reset races, per-Tab restoration, actual rail geometry, async header reflow and group transition delegation; UIKit layout/animation are fixtures)

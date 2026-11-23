@@ -2,6 +2,13 @@
 #import "CSBackupAssets.h"
 #import "CSBackupCodec.h"
 #import "CSBackupRegistry.h"
+#import "CSQuickPanelBackgroundImageStore.h"
+static NSURL *quickPanelResourceRoot;
+@interface CSQuickPanelBackupTestImageStore : CSQuickPanelBackgroundImageStore
+@end
+@implementation CSQuickPanelBackupTestImageStore
++ (NSURL *)resourceDirectoryURL { return quickPanelResourceRoot; }
+@end
 static NSUInteger checks;
 static void Check(BOOL b,NSString *m){checks++;if(!b){fprintf(stderr,"FAIL: %s\n",m.UTF8String);exit(1);}}
 int main(void){@autoreleasepool{
@@ -56,6 +63,24 @@ int main(void){@autoreleasepool{
     Check([realIcon[0][@"present"] boolValue]&&[realIcon[0][@"value"] hasPrefix:@"csbackup:"]&&iconAssets.count==1,@"valid configured tab icon remains fully backed up");
     bad[@"value"]=[root URLByAppendingPathComponent:@"missing-non-tabbar.png"].path;
     Check(![CSBackupAssets captureFields:@[bad] root:root assets:assets error:&error],@"missing non-tabbar resource retains its existing protection");
+    quickPanelResourceRoot=root;error=nil;
+    NSString *panelPath=[CSQuickPanelBackupTestImageStore storeImageData:png error:&error];
+    NSDictionary *panelField=@{@"domain":@"standard",@"key":@"com.wechat.enhance.quick_panel.background_image_path",@"present":@YES,@"value":panelPath};
+    NSMutableDictionary *panelAssets=[NSMutableDictionary dictionary];
+    NSArray *panelCaptured=[CSBackupAssets captureFields:@[panelField] root:root assets:panelAssets error:&error];
+    Check(panelCaptured.count==1&&panelAssets.count==1&&[panelCaptured[0][@"value"] hasPrefix:@"csbackup:"],@"quick panel backup carries image bytes instead of sandbox path");
+    NSMutableDictionary *panelWrites=[NSMutableDictionary dictionary];
+    NSArray *panelReady=[CSBackupAssets materializeFields:panelCaptured assets:panelAssets root:newRoot writes:panelWrites error:&error];
+    quickPanelResourceRoot=newRoot;
+    Check(panelReady.count==1&&panelWrites.count==1&&[CSQuickPanelBackupTestImageStore isManagedImagePath:panelReady[0][@"value"]],@"quick panel image store accepts backup's canonical owned filename in new container");
+    quickPanelResourceRoot=root;
+    Check([CSQuickPanelBackupTestImageStore removeImageAtPath:panelPath error:&error],@"quick panel selected resource can be cleared independently");
+    NSArray *missingPanel=[CSBackupAssets captureFields:@[panelField] root:root assets:panelAssets error:&error];
+    Check(missingPanel.count==1&&![missingPanel[0][@"present"] boolValue]&&!missingPanel[0][@"value"],@"missing quick panel image exports its effective system fallback");
+    Check([panelField[@"present"] boolValue]&&[panelField[@"value"] isEqual:panelPath],@"missing image backup does not rewrite current panel settings");
+    NSMutableDictionary *corruptPanel=[panelField mutableCopy];corruptPanel[@"value"]=corruptIcon.path;
+    Check(![CSBackupAssets captureFields:@[corruptPanel] root:root assets:panelAssets error:&error],@"corrupt existing panel image still blocks incomplete backup");
+    quickPanelResourceRoot=nil;
     NSArray *fallback=@[@{@"domain":@"standard",@"key":@"com.wechat.tweak.navigation.separator.image",@"present":@NO}];
     NSArray *fallbackCaptured=[CSBackupAssets captureFields:fallback root:root assets:assets error:&error];
     Check(![fallbackCaptured[0][@"present"] boolValue]&&fallbackCaptured[0][@"fallbackAsset"]!=nil,@"fixed fallback survives explicitly absent path key");

@@ -11,11 +11,14 @@ typedef NS_ENUM(NSInteger, CSTabBarBorderAnimation) {
 
 typedef NS_ENUM(NSInteger, CSTabBarClickEffect) {
     CSTabBarClickEffectNone = 0,
-    CSTabBarClickEffectBounce = 1,
+    CSTabBarClickEffectUnderline = 1,
+    CSTabBarClickEffectBounce = CSTabBarClickEffectUnderline, // Persisted legacy value.
+    CSTabBarClickEffectCapsule = 3,
 };
 
 static NSString * const kTabBarStyleEnabledKey = @"com.wechat.enhance.tabbar_style.enabled";
 static NSString * const kTabBarHideTextKey = @"com.wechat.enhance.tabbar_style.hide_text";
+static NSString * const kTabBarSwipeSwitchKey = @"com.wechat.enhance.tabbar_style.swipe_switch";
 
 static NSString * const kTabBarIconChatKey = @"com.wechat.enhance.tabbar_style.icon.chat";
 static NSString * const kTabBarIconContactsKey = @"com.wechat.enhance.tabbar_style.icon.contacts";
@@ -34,6 +37,11 @@ static NSString * const kTabBarScaleKey = @"com.wechat.enhance.tabbar_style.scal
 static NSString * const kTabBarBorderStyleKey = @"com.wechat.enhance.tabbar_style.border_style";
 static NSString * const kTabBarHapticFeedbackKey = @"com.wechat.enhance.tabbar_style.haptic_feedback";
 static NSString * const kTabBarClickEffectKey = @"com.wechat.enhance.tabbar_style.click_effect";
+static NSString * const kTabBarIndicatorColorKey = @"com.wechat.enhance.tabbar_style.indicator_color";
+static NSString * const kTabBarIndicatorColorRedKey = @"com.wechat.enhance.tabbar_style.indicator_color.red";
+static NSString * const kTabBarIndicatorColorGreenKey = @"com.wechat.enhance.tabbar_style.indicator_color.green";
+static NSString * const kTabBarIndicatorColorBlueKey = @"com.wechat.enhance.tabbar_style.indicator_color.blue";
+static NSString * const kTabBarIndicatorColorAlphaKey = @"com.wechat.enhance.tabbar_style.indicator_color.alpha";
 static NSString * const kTabBarBorderAnimationKey = @"com.wechat.enhance.tabbar_style.border_animation";
 static NSString * const kTabBarBorderColorRedKey = @"com.wechat.enhance.tabbar_style.border_color.red";
 static NSString * const kTabBarBorderColorGreenKey = @"com.wechat.enhance.tabbar_style.border_color.green";
@@ -63,15 +71,21 @@ static NSString * const kTabBarBorderWidthKey = @"com.wechat.enhance.tabbar_styl
 static NSString * const CSTabBarPreferencesDidChange = @"com.wechat.enhance.tabbar_style.changed";
 
 @interface CSTabBarPreferences : NSObject
-@property(nonatomic) BOOL enabled, hideText;
+@property(nonatomic) BOOL enabled, hideText, swipeSwitch;
 @property(nonatomic) CGFloat scale, contentHeight, lift, cornerRadius, borderWidth;
 @property(nonatomic) NSInteger borderStyle, haptic, animation;
 @property(nonatomic) CSTabBarClickEffect clickEffect;
 @property(nonatomic, strong) UIColor *backgroundColor, *borderColor;
+// nil keeps the indicator's trait-dependent default; loading never persists it.
+@property(nonatomic, strong) UIColor *indicatorColor;
 @property(nonatomic, copy) NSArray *titles, *icons, *selectedIcons;
 + (instancetype)current;
 + (void)reload;
 + (UIColor *)colorInDefaults:(NSUserDefaults *)defaults prefix:(NSString *)prefix;
+// Shared by preferences and settings previews. The resource identifier is its
+// persisted icon key; file metadata and explicit mutations form its generation.
++ (UIImage *)cachedIconAtPath:(NSString *)path resourceIdentifier:(NSString *)identifier;
++ (void)invalidateIconAtPath:(NSString *)path resourceIdentifier:(NSString *)identifier;
 - (UIImage *)iconAtIndex:(NSUInteger)index selected:(BOOL)selected;
 - (NSString *)titleAtIndex:(NSUInteger)index;
 @end

@@ -1,0 +1,4 @@
+tabbar geometry: PASS
+2026-11-23 11:05:50.760 native[52741:25681010] tabbar Neo touch/animation: 97 checks passed
+2026-11-23 11:05:50.763 native[52741:25681010] tabbar modern native hierarchy: PASS (121 total touch checks)
+2026-11-23 11:05:50.773 native[52741:25681010] tabbar preferences/native lifecycle: PASS

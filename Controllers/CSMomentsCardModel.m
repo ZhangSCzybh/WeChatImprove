@@ -10,6 +10,18 @@ static NSString *Text(id value) {
     return [value stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
 }
 
+static NSString *MiniAppName(id value) {
+    NSString *name = Text(value);
+    return [name isEqualToString:@"小程序名称"] ? @"" : name;
+}
+
+static NSURLComponents *WebLink(id value) {
+    NSString *text = Text(value);
+    NSURLComponents *url = text.length ? [NSURLComponents componentsWithString:text] : nil;
+    NSString *scheme = url.scheme.lowercaseString;
+    return url.host.length && ([scheme isEqualToString:@"http"] || [scheme isEqualToString:@"https"]) ? url : nil;
+}
+
 static BOOL Flag(id value) {
     return [value isKindOfClass:NSNumber.class] && isfinite([value doubleValue]) && [value boolValue];
 }
@@ -40,11 +52,48 @@ static NSString *LocationText(id item, id (^read)(id, NSString *)) {
     return [label isKindOfClass:NSString.class] ? label : @"";
 }
 
+static BOOL HasSharedFields(id share, NSArray<NSString *> *keys, id (^read)(id, NSString *)) {
+    if (!share || share == NSNull.null) return NO;
+    for (NSString *key in keys) if (Text(read(share, key)).length) return YES;
+    return NO;
+}
+
+static BOOL HasLiveShare(id share, id (^read)(id, NSString *)) {
+    return HasSharedFields(share, @[@"finderLiveID", @"finderObjectID", @"finderUsername", @"coverUrl", @"desc", @"nickname"], read);
+}
+
+static BOOL HasThemeLiveShare(id share, id (^read)(id, NSString *)) {
+    return HasSharedFields(share, @[@"imgUrl", @"mainTitle", @"subTitle"], read);
+}
+
+static NSString *ExplicitMiniAppCover(id info, id (^read)(id, NSString *)) {
+    NSString *cover = Text(read(info, @"cover"));
+    NSURLComponents *url = cover.length ? [NSURLComponents componentsWithString:cover] : nil;
+    NSString *scheme = url.scheme.lowercaseString;
+    if (!url.host.length || (![scheme isEqualToString:@"https"] && ![scheme isEqualToString:@"http"])) return @"";
+    id rawWidth = read(info, @"width"), rawHeight = read(info, @"height");
+    if ((rawWidth && ![rawWidth isKindOfClass:NSNumber.class]) ||
+        (rawHeight && ![rawHeight isKindOfClass:NSNumber.class])) return @"";
+    double width = [rawWidth doubleValue], height = [rawHeight doubleValue];
+    if (!isfinite(width) || !isfinite(height) || width < 0 || height < 0) return @"";
+    // Zero is the native default for unpublished dimensions. If dimensions are
+    // published, require enough pixels for a card rather than an app icon.
+    if ((width > 0 || height > 0) && (fmin(width, height) < 180 || fmax(width, height) < 320)) return @"";
+    return cover;
+}
+
 CSMomentsContentKind CSMomentsClassifyContent(id item, id (^read)(id, NSString *)) {
     if (!item || !read) return CSMomentsContentText;
     id content = read(item, @"contentObj");
     id rawType = read(content, @"type");
     NSInteger type = [rawType isKindOfClass:NSNumber.class] ? [rawType integerValue] : -1;
+    // Live uses its own flat share payload and native template, not Finder's
+    // mediaList or the ordinary WCMediaItem photo/video template.
+    if (type == 34 || type == 45 || HasLiveShare(read(content, @"finderLiveShareItem"), read) ||
+        HasThemeLiveShare(read(content, @"finderThemeLiveShareItem"), read)) return CSMomentsContentFinderLive;
+    // A placeholder weappInfo also exists on ordinary shares. Only a published
+    // app identity selects MiniApp before the ordinary article/photo dispatch.
+    if (Text(read(read(item, @"weappInfo"), @"appUserName")).length) return CSMomentsContentMiniApp;
     // WCTimeLineCellView's verified native template dispatch, 8.0.80.34.
     switch (type) {
         case 28: case 36: case 50: case 59: return CSMomentsContentFinder;
@@ -65,7 +114,39 @@ CSMomentsContentKind CSMomentsClassifyContent(id item, id (^read)(id, NSString *
 static void ProjectSharedContent(CSMomentsCardModel *card, id content, id (^read)(id, NSString *)) {
     card.sourceText = @"";
     card.shareCoverURL = @"";
-    if (card.contentKind == CSMomentsContentFinder) {
+    if (card.contentKind == CSMomentsContentFinderLive) {
+        card.media = nil;
+        card.mediaCount = 0;
+        card.video = NO;
+        card.coverSize = CGSizeMake(1, 1);
+        id share = read(content, @"finderLiveShareItem");
+        id theme = read(content, @"finderThemeLiveShareItem");
+        BOOL themed = !HasLiveShare(share, read) && HasThemeLiveShare(theme, read);
+        if (themed) share = theme;
+        NSString *title = Text(read(share, themed ? @"mainTitle" : @"desc"));
+        if (title.length) card.title = title;
+        card.sourceText = Text(read(share, themed ? @"subTitle" : @"nickname"));
+        card.shareCoverURL = Text(read(share, themed ? @"imgUrl" : @"coverUrl"));
+    } else if (card.contentKind == CSMomentsContentMiniApp) {
+        card.video = NO;
+        card.mediaCount = card.media ? 1 : 0;
+        NSString *title = Text(read(content, @"title"));
+        card.sourceText = title.length ? title : card.title;
+        NSString *source = MiniAppName(read(card.item, @"sourceNickName"));
+        if (!source.length) source = MiniAppName(read(read(card.item, @"appInfo"), @"appName"));
+        // The application identity occupies the main title; its shared page
+        // title belongs to the information row beside/below the thumbnail.
+        // The runtime can replace this fallback with the current local contact.
+        card.title = source.length ? source : @"小程序";
+        // Keep WCMediaItem on the native thumbnail path. Full-width display
+        // requires an explicit published cover, never a guessed thumbnail URL.
+        id info = read(content, @"appMsgShareInfo");
+        card.shareCoverURL = ExplicitMiniAppCover(info, read);
+        if (card.shareCoverURL.length) {
+            double width = [read(info, @"width") doubleValue], height = [read(info, @"height") doubleValue];
+            card.coverSize = width > 0 && height > 0 ? CGSizeMake(width, height) : CGSizeMake(1, 0.65);
+        }
+    } else if (card.contentKind == CSMomentsContentFinder) {
         // Finder owns its share media. Do not briefly construct an ordinary
         // WCMedia video/photo cover from content.mediaList before replacing it.
         card.media = nil;
@@ -88,9 +169,13 @@ static void ProjectSharedContent(CSMomentsCardModel *card, id content, id (^read
         NSString *title = Text(read(content, @"title"));
         if (title.length) card.title = title;
         card.sourceText = Text(read(card.item, @"sourceNickName"));
+        NSString *host = WebLink(read(content, @"linkUrl")).host ?: @"";
+        if (!card.sourceText.length) card.sourceText = host;
+        if (!card.title.length) card.title = host.length ? host : @"网页链接";
         // Declared native field, used only if the native WCMediaItem cover is
         // unavailable. Its priority in native News layout is not established.
-        card.shareCoverURL = Text(read(read(content, @"appMsgShareInfo"), @"cover"));
+        NSString *cover = Text(read(read(content, @"appMsgShareInfo"), @"cover"));
+        card.shareCoverURL = WebLink(cover) ? cover : @"";
         card.coverSize = CGSizeMake(1, 0.65);
         card.video = NO;
     }

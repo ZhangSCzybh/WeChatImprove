@@ -1,1 +1,0 @@
-PluginHeaderLayoutTests: 5374 checks passed (real view, AppKit fonts, equal cards/gaps/insets, 16pt random text, current/long beta versions, short/long names, 320/375/430pt, inset20/32, fixed gold/black SVIP, real serif face/fallback, 3pt corners, plain WeChat ID, identity/text/status order)

@@ -1,6 +1,7 @@
 #import "CSPreferenceRefresh.h"
 #import "CSTabBarNativeAdapter.h"
 #import "CSTabBarPreferences.h"
+#import "CSTabBarSwipeSwitcher.h"
 #import "CSTabBarGeometry.h"
 #import <QuartzCore/QuartzCore.h>
 #import <objc/runtime.h>
@@ -9,7 +10,6 @@ static char CSBarStateKey, CSItemStateKey, CSControllerLayoutKey;
 static NSHashTable<MMTabBar *> *CSBars;
 static NSString * const CSOutwardAnimationKey=@"cs.tabbar.outwardPulse";
 static NSString * const CSClassicAnimationKey=@"cs.tabbar.pulse";
-static NSString * const CSClickAnimationKey=@"cs.tabbar.clickBounce";
 static BOOL CSAnimationInactive;
 static NSHashTable *CSInactiveAnimationScenes;
 static CGRect CSRect(CSTabBarRect r) { return CGRectMake(r.x,r.y,r.width,r.height); }
@@ -18,6 +18,15 @@ static void CSSetFrame(UIView *view, CGRect frame) {
         [UIView performWithoutAnimation:^{ view.frame=frame; }];
     }
 }
+
+@interface CSTabBarItemOverlay : NSObject
+@property(nonatomic, strong) UIImage *image;
+@property(nonatomic, copy) NSString *text;
+@property(nonatomic) UIViewContentMode imageMode;
+@property(nonatomic) BOOL imageHidden, textHidden, customHidden;
+@property(nonatomic) CGRect imageFrame, textFrame, badgeFrame, customFrame;
+@end
+@implementation CSTabBarItemOverlay @end
 
 @interface CSTabBarItemState : NSObject
 @property(nonatomic, weak) MMTabBar *bar;
@@ -29,6 +38,15 @@ static void CSSetFrame(UIView *view, CGRect frame) {
 @property(nonatomic, strong) UIImage *image;
 @property(nonatomic, copy) NSString *text;
 @property(nonatomic, weak) UIView *customIcon;
+@property(nonatomic, weak) MMTabBarItemView *renderedItem;
+@property(nonatomic, weak) UIImageView *renderedImageView;
+@property(nonatomic, weak) UILabel *renderedLabel;
+@property(nonatomic, weak) UIView *renderedBadge;
+@property(nonatomic) NSUInteger itemGeneration, styleGeneration, renderedIndex;
+@property(nonatomic) BOOL renderedSelected;
+@property(nonatomic) CGRect renderedBounds;
+@property(nonatomic) CGFloat renderedLineHeight;
+@property(nonatomic, strong) CSTabBarItemOverlay *overlay;
 @end
 @implementation CSTabBarItemState @end
 
@@ -45,17 +63,22 @@ static void CSSetFrame(UIView *view, CGRect frame) {
 @end
 @implementation CSTabBarControllerLayout @end
 
-@interface CSTabBarState : NSObject
+@interface CSTabBarState : NSObject {
+@public
+    CGPoint swipeCenters[4];
+    CGRect swipeFrames[4];
+}
 @property(nonatomic, weak) MMTabBar *bar;
 @property(nonatomic, weak) MMTabBar *snapshotSource;
 @property(nonatomic, weak) MMTabBarController *controller;
 @property(nonatomic) NSUInteger depth;
 @property(nonatomic) BOOL applied, geometryApplied, applying, clips;
+@property(nonatomic) NSUInteger itemGeneration, styleGeneration;
+@property(nonatomic, strong) CSTabBarPreferences *stylePreferences;
 @property(nonatomic) CGRect floatingRect;
 @property(nonatomic, strong) UIColor *nativeBackground;
 @property(nonatomic, strong) NSMapTable<UIView *,NSNumber *> *backgroundHidden;
 @property(nonatomic, strong) NSArray<CSTabBarButtonState *> *buttons;
-@property(nonatomic, strong) NSHashTable<UIControl *> *observedButtons;
 @property(nonatomic, strong) UIView *surface;
 @property(nonatomic, strong) UIVisualEffectView *material;
 @property(nonatomic, strong) CAShapeLayer *border;
@@ -69,13 +92,20 @@ static void CSSetFrame(UIView *view, CGRect frame) {
 @property(nonatomic) CGFloat nativeInset, nativeIndicatorInset, appliedInset, appliedIndicatorInset;
 @property(nonatomic) BOOL insetApplied;
 @property(nonatomic) BOOL insetDeferred;
-@property(nonatomic) NSUInteger selectionBeforeTouch;
-@property(nonatomic) NSUInteger feedbackGeneration;
-@property(nonatomic, weak) UIControl *touchButton;
-@property(nonatomic, weak) UIView *animatedIcon;
-@property(nonatomic, weak) MMTabBarItemView *animatedItem;
-- (void)touchBegan:(UIControl *)sender;
-- (void)touchEnded:(UIControl *)sender;
+@property(nonatomic, strong) UIImpactFeedbackGenerator *hapticGenerator;
+@property(nonatomic) NSInteger hapticStyle;
+@property(nonatomic, strong) UIView *capsuleHost, *capsule;
+@property(nonatomic, strong) NSArray<UIControl *> *trackingControls;
+@property(nonatomic) CSTabBarClickEffect renderedEffect;
+@property(nonatomic) NSUInteger capsuleIndex, feedbackGeneration;
+@property(nonatomic) BOOL touchActive, selecting, touchDragged;
+@property(nonatomic) NSInteger touchStartIndex, touchOriginIndex;
+@property(nonatomic) CFTimeInterval lastFirstTabTapTime;
+@property(nonatomic) NSInteger swipeCount, gestureSelectedIndex, liquidHoverIndex;
+@property(nonatomic) NSUInteger swipeGeneration, swipeItemGeneration, swipeStyleGeneration;
+@property(nonatomic) CGRect swipeBarBounds, swipeFloatingRect;
+@property(nonatomic) CGPoint touchPoint;
+
 @end
 
 // WCTabBarView and WCTabBarController deliberately report compatibility with
@@ -107,7 +137,6 @@ static CSTabBarState *CSState(MMTabBar *bar, BOOL create) {
     if (!s && create && CSOwner(bar)) {
         s=[CSTabBarState new]; s.bar=bar; s.controller=CSOwner(bar);
         s.backgroundHidden=[NSMapTable weakToStrongObjectsMapTable];
-        s.observedButtons=[NSHashTable weakObjectsHashTable];
         objc_setAssociatedObject(bar,&CSBarStateKey,s,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         if (!CSBars) CSBars=[NSHashTable weakObjectsHashTable];
         [CSBars addObject:bar];
@@ -140,6 +169,20 @@ static UIControl *CSNativeButton(MMTabBar *bar, MMTabBarController *controller, 
     }
     return [controller respondsToSelector:@selector(getTabBarBtnForIndex:)] ? [controller getTabBarBtnForIndex:index] : nil;
 }
+static void CSPrepareHaptic(UIImpactFeedbackGenerator *generator) {
+    SEL prepare=NSSelectorFromString(@"prepare");
+    if ([generator respondsToSelector:prepare]) ((void (*)(id,SEL))[generator methodForSelector:prepare])(generator,prepare);
+}
+static void CSReconcileHaptic(CSTabBarState *s) {
+    CSTabBarPreferences *p=CSTabBarPreferences.current;
+    NSInteger style=p.enabled && !s.snapshotSource ? p.haptic : 0;
+    if (!style) { s.hapticGenerator=nil; s.hapticStyle=0; return; }
+    if (s.hapticGenerator && s.hapticStyle==style) return;
+    UIImpactFeedbackStyle styles[]={UIImpactFeedbackStyleSoft,UIImpactFeedbackStyleLight,UIImpactFeedbackStyleMedium,UIImpactFeedbackStyleHeavy};
+    s.hapticGenerator=[[UIImpactFeedbackGenerator alloc] initWithStyle:styles[MIN(4,style)-1]];
+    s.hapticStyle=style;
+    CSPrepareHaptic(s.hapticGenerator);
+}
 static UIView *CSNativeBackground(MMTabBar *bar) {
     return CSModernBar(bar) ? ((WCTabBarView *)bar).backgroundContentView : bar.backgroundView;
 }
@@ -154,13 +197,6 @@ static UIView *CSCustomIcon(MMTabBarItemView *item) {
     id value=((id (*)(id,SEL))[item methodForSelector:selector])(item,selector);
     return [value isKindOfClass:UIView.class] ? value : nil;
 }
-static UIView *CSClickIcon(MMTabBarItemView *item) {
-    UIView *custom=CSCustomIcon(item);
-    UIView *icon=custom && !custom.hidden && custom.alpha>.01 && [custom isDescendantOfView:item] ? custom : item.imageView;
-    if (!icon || ![icon isDescendantOfView:item]) return nil;
-    for (UIView *view=icon;view && view!=item;view=view.superview) if (view.hidden || view.alpha<.01) return nil;
-    return icon;
-}
 static BOOL CSFeedbackVisible(CSTabBarState *s) {
     if (s.snapshotSource || !s.applied || !CSTabBarPreferences.current.enabled || !s.bar.window ||
         CSOwner(s.bar)!=s.controller || CSAnimationInactive || UIApplication.sharedApplication.applicationState!=UIApplicationStateActive) return NO;
@@ -169,63 +205,132 @@ static BOOL CSFeedbackVisible(CSTabBarState *s) {
     for (UIView *view=s.bar;view;view=view.superview) if (view.hidden || view.alpha<.01) return NO;
     return YES;
 }
-static BOOL CSCanAnimateClick(CSTabBarState *s) {
-    return CSFeedbackVisible(s) && CSTabBarPreferences.current.clickEffect==CSTabBarClickEffectBounce &&
-        !UIAccessibilityIsReduceMotionEnabled() && NSProcessInfo.processInfo.thermalState<NSProcessInfoThermalStateSerious;
+static BOOL CSLiquidCanAnimate(CSTabBarState *s) {
+    return CSFeedbackVisible(s) && !UIAccessibilityIsReduceMotionEnabled() &&
+        NSProcessInfo.processInfo.thermalState<NSProcessInfoThermalStateSerious;
 }
-static void CSCancelClickEffect(CSTabBarState *s) {
-    [s.animatedIcon.layer removeAnimationForKey:CSClickAnimationKey];
-    s.animatedIcon=nil; s.animatedItem=nil;
+static BOOL CSFeedbackRequested(void) {
+    CSTabBarPreferences *p=CSTabBarPreferences.current;
+    return p.clickEffect!=CSTabBarClickEffectNone || p.haptic!=0 || p.swipeSwitch;
+}
+static void CSResetSwipe(CSTabBarState *s) {
+    s.touchActive=NO; s.selecting=NO; s.swipeGeneration++;
+    s.gestureSelectedIndex=NSNotFound; s.liquidHoverIndex=NSNotFound;
+    [s.capsule.layer removeAllAnimations];
+    s.capsule.layer.transform=CATransform3DIdentity;
 }
 static void CSInvalidateFeedback(CSTabBarState *s) {
-    s.feedbackGeneration++; s.touchButton=nil;
-    CSCancelClickEffect(s);
+    s.feedbackGeneration++; s.lastFirstTabTapTime=0;
+    CSResetSwipe(s);
+}
+static void CSRemoveCapsule(CSTabBarState *s) {
+    [s.capsule.layer removeAllAnimations];
+    [s.capsuleHost removeFromSuperview];
+    s.capsule=nil; s.capsuleHost=nil;
+}
+static void CSLiquidWrite(CSTabBarState *s, CGRect frame, CGFloat alpha) {
+    s.capsule.frame=frame;
+    s.capsule.layer.cornerRadius=CGRectGetHeight(frame)/2;
+    s.capsule.layer.transform=CATransform3DIdentity;
+    s.capsule.alpha=alpha;
+}
+static void CSLiquidSettle(CSTabBarState *s, BOOL animated) {
+    NSUInteger selected=s.controller.selectedIndex;
+    if (!s.capsule || selected>=(NSUInteger)s.swipeCount) return;
+    CGRect frame=s->swipeFrames[selected];
+    s.capsuleIndex=selected;
+    void (^changes)(void)=^{ CSLiquidWrite(s,frame,1); };
+    if (animated && CSLiquidCanAnimate(s)) {
+        [UIView animateWithDuration:.46 delay:0 usingSpringWithDamping:.62 initialSpringVelocity:.82
+            options:UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState
+            animations:changes completion:nil];
+    } else {
+        [s.capsule.layer removeAllAnimations];
+        [UIView performWithoutAnimation:changes];
+    }
 }
 static void CSReconcileClickEffect(CSTabBarState *s) {
-    if (!CSFeedbackVisible(s)) {CSInvalidateFeedback(s); return;}
-    if (!s.animatedIcon) return;
-    NSUInteger index=CSItemIndex(s.bar,s.animatedItem);
-    if (!CSCanAnimateClick(s) || index==NSNotFound || index!=s.controller.selectedIndex ||
-        ![s.animatedItem isDescendantOfView:s.bar] || s.animatedItem.hidden || CSClickIcon(s.animatedItem)!=s.animatedIcon) CSCancelClickEffect(s);
+    if (!CSFeedbackVisible(s)) CSInvalidateFeedback(s);
 }
-static void CSPlayClickEffect(CSTabBarState *s,MMTabBarItemView *item) {
-    CSCancelClickEffect(s);
-    if (!CSCanAnimateClick(s) || item.hidden || item.alpha<.01) return;
-    UIView *icon=CSClickIcon(item);
-    if (!icon) return;
-    // Additive transforms are presentation-only: the native frame, hit target,
-    // underlying transform, text and badge remain owned by WeChat.
-    CAKeyframeAnimation *bounce=[CAKeyframeAnimation animationWithKeyPath:@"transform"];
-    NSMutableArray *values=[NSMutableArray array];
-    const CGFloat scales[]={1,.92,1.08,.98,1}, offsets[]={0,0,-4,1,0};
-    for (NSUInteger i=0;i<5;i++) {
-        CATransform3D transform=CATransform3DScale(CATransform3DMakeTranslation(0,offsets[i],0),scales[i],scales[i],1);
-        [values addObject:[NSValue valueWithCATransform3D:transform]];
+static void CSReconcileCapsule(CSTabBarState *s, BOOL allowAnimation) {
+    CSTabBarPreferences *p=CSTabBarPreferences.current;
+    if (!s.applied || !s.geometryApplied || !p.enabled || p.clickEffect==CSTabBarClickEffectNone ||
+        !s.surface || s.swipeCount!=4) { CSRemoveCapsule(s); return; }
+    BOOL initial=!s.capsule || s.renderedEffect!=p.clickEffect;
+    if (initial) {
+        CSRemoveCapsule(s);
+        s.capsuleHost=[UIView new]; s.capsuleHost.userInteractionEnabled=NO;
+        s.capsuleHost.clipsToBounds=YES;
+        s.capsule=[UIView new]; s.capsule.userInteractionEnabled=NO;
+        s.capsule.layer.name=@"cs.tabbar.indicator";
+        [s.capsuleHost addSubview:s.capsule]; [s.surface addSubview:s.capsuleHost];
+        s.renderedEffect=p.clickEffect;
     }
-    bounce.values=values; bounce.keyTimes=@[@0,@.18,@.48,@.76,@1];
-    CAMediaTimingFunction *ease=[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
-    bounce.timingFunctions=@[ease,ease,ease,ease];
-    bounce.additive=YES; bounce.duration=.34; bounce.removedOnCompletion=YES;
-    s.animatedIcon=icon; s.animatedItem=item;
-    [icon.layer addAnimation:bounce forKey:CSClickAnimationKey];
+    CSSetFrame(s.capsuleHost,s.surface.bounds);
+    s.capsuleHost.layer.cornerRadius=s.surface.layer.cornerRadius;
+    BOOL dark=s.bar.traitCollection.userInterfaceStyle==UIUserInterfaceStyleDark;
+    s.capsule.backgroundColor=[(p.indicatorColor ?: [UIColor colorWithRed:dark?1:0 green:dark?1:0 blue:dark?1:0 alpha:dark?.12:.08]) resolvedColorWithTraitCollection:s.bar.traitCollection];
+    if (s.touchActive || s.selecting) return;
+    NSUInteger selected=s.controller.selectedIndex;
+    if (selected>=4) return;
+    BOOL changed=s.capsuleIndex!=selected || !CGRectEqualToRect(s.capsule.frame,s->swipeFrames[selected]);
+    if (initial || changed || !allowAnimation) CSLiquidSettle(s,!initial && allowAnimation && changed);
+}
+void CSTabBarSelectionDidChange(MMTabBarController *controller) {
+    CSTabBarState *s=CSState(CSTabBarForController(controller),NO);
+    // Our synchronous native selection may relayout; keep the pressed geometry.
+    if (s.selecting) return;
+    if (s.touchActive) CSResetSwipe(s);
+    if (s && !s.depth && !s.applying) CSReconcileCapsule(s,YES);
 }
 static void CSRestoreItem(MMTabBarItemView *item) {
     CSTabBarItemState *s=objc_getAssociatedObject(item,&CSItemStateKey);
     if (!s.applied) return;
     s.applied=NO;
-    item.imageView.image=s.image; item.imageView.contentMode=s.imageMode;
-    item.imageView.hidden=s.imageHidden; item.textLabel.hidden=s.textHidden;
-    item.textLabel.text=s.text;
+    if (item.imageView.image!=s.image) item.imageView.image=s.image;
+    if (item.imageView.contentMode!=s.imageMode) item.imageView.contentMode=s.imageMode;
+    if (item.imageView.hidden!=s.imageHidden) item.imageView.hidden=s.imageHidden;
+    if (item.textLabel.hidden!=s.textHidden) item.textLabel.hidden=s.textHidden;
+    if (![item.textLabel.text isEqualToString:s.text] && item.textLabel.text!=s.text) item.textLabel.text=s.text;
     CSSetFrame(item.imageView,s.imageFrame); CSSetFrame(item.textLabel,s.textFrame);
     CGRect badge=item.badgeView.frame;
     badge.origin.x-=s.badgeOffset.x; badge.origin.y-=s.badgeOffset.y;
     CSSetFrame(item.badgeView,badge);
-    if (s.customIcon) { s.customIcon.hidden=s.customHidden; CSSetFrame(s.customIcon,s.customFrame); }
+    if (s.customIcon) { if (s.customIcon.hidden!=s.customHidden) s.customIcon.hidden=s.customHidden; CSSetFrame(s.customIcon,s.customFrame); }
 }
-static void CSApplyItem(MMTabBarItemView *item, MMTabBar *bar) {
+static BOOL CSItemTextEqual(NSString *a, NSString *b) { return a==b || [a isEqualToString:b]; }
+static BOOL CSItemAppearanceMatches(MMTabBarItemView *item,CSTabBarItemState *s,BOOL overlay) {
+    CSTabBarItemOverlay *o=s.overlay;
+    return item.imageView.image==(overlay ? o.image : s.image) &&
+        item.imageView.contentMode==(overlay ? o.imageMode : s.imageMode) &&
+        item.imageView.hidden==(overlay ? o.imageHidden : s.imageHidden) &&
+        item.textLabel.hidden==(overlay ? o.textHidden : s.textHidden) &&
+        CSItemTextEqual(item.textLabel.text,overlay ? o.text : s.text) &&
+        CGRectEqualToRect(item.imageView.frame,overlay ? o.imageFrame : s.imageFrame) &&
+        CGRectEqualToRect(item.textLabel.frame,overlay ? o.textFrame : s.textFrame) &&
+        CGRectEqualToRect(item.badgeView.frame,overlay ? o.badgeFrame : s.badgeFrame) &&
+        CSCustomIcon(item)==s.customIcon && (!s.customIcon ||
+        (s.customIcon.hidden==(overlay ? o.customHidden : s.customHidden) &&
+        CGRectEqualToRect(s.customIcon.frame,overlay ? o.customFrame : s.customFrame)));
+}
+static void CSWriteItemOverlay(MMTabBarItemView *item,CSTabBarItemState *s) {
+    CSTabBarItemOverlay *o=s.overlay;
+    if (item.imageView.image!=o.image) item.imageView.image=o.image;
+    if (item.imageView.contentMode!=o.imageMode) item.imageView.contentMode=o.imageMode;
+    if (item.imageView.hidden!=o.imageHidden) item.imageView.hidden=o.imageHidden;
+    if (item.textLabel.hidden!=o.textHidden) item.textLabel.hidden=o.textHidden;
+    if (!CSItemTextEqual(item.textLabel.text,o.text)) item.textLabel.text=o.text;
+    CSSetFrame(item.imageView,o.imageFrame); CSSetFrame(item.textLabel,o.textFrame);
+    CSSetFrame(item.badgeView,o.badgeFrame);
+    if (s.customIcon) {
+        if (s.customIcon.hidden!=o.customHidden) s.customIcon.hidden=o.customHidden;
+        CSSetFrame(s.customIcon,o.customFrame);
+    }
+    s.applied=YES;
+}
+static void CSApplyItemAtIndex(MMTabBarItemView *item, MMTabBar *bar, NSUInteger index) {
     CSTabBarState *host=CSState(bar,NO);
     if (!host.applied || host.depth || !CSTabBarPreferences.current.enabled) return;
-    NSUInteger index=CSItemIndex(bar,item);
     if (index==NSNotFound || index>=4) return;
     CSTabBarItemState *s=objc_getAssociatedObject(item,&CSItemStateKey);
     if (!s) {
@@ -233,13 +338,28 @@ static void CSApplyItem(MMTabBarItemView *item, MMTabBar *bar) {
         objc_setAssociatedObject(item,&CSItemStateKey,s,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
     if (s.depth) return;
+    CSTabBarPreferences *p=CSTabBarPreferences.current;
+    if (host.stylePreferences!=p) { host.stylePreferences=p; host.styleGeneration++; }
+    BOOL same=s.overlay && s.bar==bar && s.renderedItem==item &&
+        s.itemGeneration==host.itemGeneration && s.styleGeneration==host.styleGeneration &&
+        s.renderedIndex==index && s.renderedSelected==item.isSelected &&
+        s.renderedImageView==item.imageView && s.renderedLabel==item.textLabel && s.renderedBadge==item.badgeView &&
+        CGRectEqualToRect(s.renderedBounds,item.bounds) && s.renderedLineHeight==item.textLabel.font.lineHeight;
+    if (same && CSItemAppearanceMatches(item,s,s.applied)) {
+        // End always restores the overlay after %orig. Only unchanged inputs reuse it.
+        if (!s.applied) CSWriteItemOverlay(item,s);
+        CSReconcileClickEffect(host);
+        return;
+    }
     CSRestoreItem(item);
     s.bar=bar; s.image=item.imageView.image; s.imageMode=item.imageView.contentMode;
     s.imageFrame=item.imageView.frame; s.textFrame=item.textLabel.frame; s.badgeFrame=item.badgeView.frame;
     s.textHidden=item.textLabel.hidden; s.imageHidden=item.imageView.hidden; s.text=item.textLabel.text;
     s.customIcon=CSCustomIcon(item); s.customHidden=s.customIcon.hidden; s.customFrame=s.customIcon.frame;
     s.applied=YES;
-    CSTabBarPreferences *p=CSTabBarPreferences.current;
+    s.renderedItem=item; s.renderedImageView=item.imageView; s.renderedLabel=item.textLabel; s.renderedBadge=item.badgeView;
+    s.itemGeneration=host.itemGeneration; s.styleGeneration=host.styleGeneration; s.renderedIndex=index;
+    s.renderedSelected=item.isSelected; s.renderedBounds=item.bounds; s.renderedLineHeight=item.textLabel.font.lineHeight;
     UIImage *custom=[p iconAtIndex:index selected:item.isSelected];
     if (custom) {
         item.imageView.image=custom; item.imageView.contentMode=UIViewContentModeScaleAspectFit;
@@ -267,7 +387,17 @@ static void CSApplyItem(MMTabBarItemView *item, MMTabBar *bar) {
     badge.origin.y+=CGRectGetMinY(imageFrame)-CGRectGetMinY(s.imageFrame);
     s.badgeOffset=CGPointMake(badge.origin.x-s.badgeFrame.origin.x,badge.origin.y-s.badgeFrame.origin.y);
     CSSetFrame(item.badgeView,badge);
+    CSTabBarItemOverlay *overlay=[CSTabBarItemOverlay new];
+    overlay.image=item.imageView.image; overlay.imageMode=item.imageView.contentMode;
+    overlay.imageHidden=item.imageView.hidden; overlay.textHidden=item.textLabel.hidden; overlay.text=item.textLabel.text;
+    overlay.imageFrame=item.imageView.frame; overlay.textFrame=item.textLabel.frame; overlay.badgeFrame=item.badgeView.frame;
+    overlay.customHidden=s.customIcon.hidden; overlay.customFrame=s.customIcon.frame; s.overlay=overlay;
     CSReconcileClickEffect(host);
+}
+static void CSApplyItem(MMTabBarItemView *item, MMTabBar *bar) {
+    CSTabBarState *host=CSState(bar,NO);
+    if (!host.applied || host.depth || !CSTabBarPreferences.current.enabled) return;
+    CSApplyItemAtIndex(item,bar,CSItemIndex(bar,item));
 }
 
 static void CSRestoreInset(CSTabBarState *s) {
@@ -339,17 +469,17 @@ static void CSRestoreVisuals(CSTabBarState *s) {
 }
 static void CSStop(CSTabBarState *s) {
     if (!s) return;
+    CSResetSwipe(s); s.swipeCount=0;
     CSInvalidateFeedback(s);
+    CSRemoveCapsule(s);
+    CSReconcileHaptic(s);
     CSRestoreVisuals(s); CSRestoreInset(s);
     [s.halo removeAnimationForKey:CSOutwardAnimationKey];
     [s.surface.layer removeAnimationForKey:CSClassicAnimationKey];
     s.surface.layer.shadowOpacity=0;
     s.renderedPreferences=nil;
-    for (UIControl *button in s.observedButtons) {
-        [button removeTarget:s action:@selector(touchBegan:) forControlEvents:UIControlEventTouchDown];
-        [button removeTarget:s action:@selector(touchEnded:) forControlEvents:UIControlEventTouchUpInside];
-    }
-    [s.observedButtons removeAllObjects];
+    for (UIControl *control in s.trackingControls) [control removeFromSuperview];
+    s.trackingControls=nil;
     [s.surface removeFromSuperview];
 }
 static NSInteger CSDesiredAnimation(CSTabBarState *s) {
@@ -473,11 +603,76 @@ static void CSRenderSurface(CSTabBarState *s, UIView *container) {
     CSRenderBorderAnimation(s,radius,line);
 }
 
+static BOOL CSNativeControlAvailable(CSTabBarState *s, NSUInteger index) {
+    if (index>=s.buttons.count) return NO;
+    UIControl *button=(UIControl *)s.buttons[index].button;
+    if (!button.enabled) return NO;
+    for (UIView *view=button;view && view!=s.bar;view=view.superview) {
+        if (view.hidden || view.alpha<.01 || !view.userInteractionEnabled) return NO;
+    }
+    return button && [button isDescendantOfView:s.bar];
+}
+// Match Neo's non-native-glass resting frame. The input slots stay native-sized.
+static CGRect CSLiquidRestingFrame(CGRect slot, CGRect content, BOOL underline) {
+    CGRect frame;
+    if (underline) {
+        CGFloat width=MIN(28,MAX(0,CGRectGetWidth(slot)-8));
+        frame=CGRectMake(CGRectGetMidX(slot)-width/2,CGRectGetMaxY(content)-4,width,3);
+    } else {
+        frame=CGRectInset(slot,MAX(3,slot.size.width*.06),MAX(3,slot.size.height*.08));
+        frame=CGRectInset(frame,-frame.size.width*.05,-frame.size.height*.05);
+        frame=CGRectIntersection(frame,CGRectInset(content,2,2));
+    }
+    return CGRectIntegral(frame);
+}
+static void CSCacheSwipeGeometry(CSTabBarState *s, NSArray *items, NSArray *buttons) {
+    if (items.count!=4 || buttons.count!=4) {
+        CSResetSwipe(s); s.swipeCount=0; return;
+    }
+    CSTabBarPreferences *p=CSTabBarPreferences.current;
+    BOOL geometryChanged=s.swipeCount!=4 || s.swipeItemGeneration!=s.itemGeneration ||
+        s.swipeStyleGeneration!=s.styleGeneration || !CGRectEqualToRect(s.swipeBarBounds,s.bar.bounds) ||
+        !CGRectEqualToRect(s.swipeFloatingRect,s.floatingRect);
+    if (geometryChanged) CSResetSwipe(s);
+    s.swipeCount=4; s.swipeItemGeneration=s.itemGeneration; s.swipeStyleGeneration=s.styleGeneration;
+    s.swipeBarBounds=s.bar.bounds; s.swipeFloatingRect=s.floatingRect;
+    BOOL tracks=!s.snapshotSource && CSFeedbackRequested();
+    if (!tracks && s.trackingControls.count) {
+        for (UIControl *control in s.trackingControls) [control removeFromSuperview];
+        s.trackingControls=nil;
+    }
+    if (tracks && s.trackingControls.count!=4) {
+        NSMutableArray *controls=[NSMutableArray arrayWithCapacity:4];
+        for (NSUInteger i=0;i<4;i++) {
+            UIControl *control=CSTabBarCreateTouchControl(s.bar);
+            [s.bar addSubview:control]; [controls addObject:control];
+        }
+        s.trackingControls=controls;
+    }
+    BOOL underline=p.clickEffect==CSTabBarClickEffectUnderline;
+    for (NSUInteger i=0;i<4;i++) {
+        UIControl *button=buttons[i];
+        CGRect slot=[button convertRect:button.bounds toView:s.surface];
+        CGRect barSlot=[button convertRect:button.bounds toView:s.bar];
+        s->swipeCenters[i]=CGPointMake(CGRectGetMidX(barSlot),CGRectGetMidY(barSlot));
+        s->swipeFrames[i]=CSLiquidRestingFrame(slot,s.surface.bounds,underline);
+        if (tracks) {
+            UIControl *control=s.trackingControls[i];
+            CSSetFrame(control,barSlot);
+            control.hidden=!CSNativeControlAvailable(s,i);
+            control.userInteractionEnabled=!control.hidden;
+        }
+    }
+}
+
 void CSTabBarUpdate(MMTabBar *bar) {
     CSTabBarState *s=CSState(bar,CSTabBarPreferences.current.enabled);
-    if (!s || s.depth || s.applying) return;
+    if (!s || s.depth || s.applying) {
+        return;
+    }
     s.applying=YES;
     s.controller=CSOwner(bar);
+    NSUInteger itemGeneration=s.itemGeneration;
     NSArray *items=CSItems(bar);
     if (!CSTabBarPreferences.current.enabled || !CSOwner(bar) || items.count!=4 || bar.items.count!=4) {
         CSStop(s); s.applying=NO; return;
@@ -515,6 +710,7 @@ void CSTabBarUpdate(MMTabBar *bar) {
     s.floatingRect=CSRect(rect); s.applied=YES; s.geometryApplied=YES;
     NSMutableArray *buttonStates=[NSMutableArray array];
     BOOL rtl=bar.effectiveUserInterfaceLayoutDirection==UIUserInterfaceLayoutDirectionRightToLeft;
+    CSReconcileHaptic(s);
     for (NSUInteger i=0;i<items.count;i++) {
         MMTabBarItemView *item=items[i]; UIControl *button=buttons[i];
         CSTabBarButtonState *b=[CSTabBarButtonState new]; b.button=button; b.frame=button.frame; b.item=item; b.itemFrame=item.frame; [buttonStates addObject:b];
@@ -525,19 +721,10 @@ void CSTabBarUpdate(MMTabBar *bar) {
         // this nested hierarchy would shift the renderer twice.
         if ([item isDescendantOfView:button]) CSSetFrame(item,[button convertRect:button.bounds toView:item.superview]);
         else CSSetFrame(item,[bar convertRect:frame toView:item.superview]);
-        if (![s.observedButtons containsObject:button]) {
-            [button addTarget:s action:@selector(touchBegan:) forControlEvents:UIControlEventTouchDown];
-            [button addTarget:s action:@selector(touchEnded:) forControlEvents:UIControlEventTouchUpInside];
-            [s.observedButtons addObject:button];
-        }
-        CSApplyItem(item,bar);
-    }
-    for (UIControl *old in s.observedButtons.allObjects) {
-        if (![buttons containsObject:old]) {
-            [old removeTarget:s action:@selector(touchBegan:) forControlEvents:UIControlEventTouchDown];
-            [old removeTarget:s action:@selector(touchEnded:) forControlEvents:UIControlEventTouchUpInside];
-            [s.observedButtons removeObject:old];
-        }
+        // This array belongs only to this synchronous update. A reentrant native
+        // reload invalidates the generation and falls back to a fresh lookup.
+        NSUInteger index=CSModernBar(bar) && s.itemGeneration==itemGeneration ? i : CSItemIndex(bar,item);
+        CSApplyItemAtIndex(item,bar,index);
     }
     s.buttons=buttonStates;
     [CATransaction begin]; [CATransaction setDisableActions:YES]; CSRenderSurface(s,bar); [CATransaction commit];
@@ -547,6 +734,8 @@ void CSTabBarUpdate(MMTabBar *bar) {
     if (scope.bar==bar && bar.window && !bar.hidden && bar.alpha>=.01) s.insetDeferred=YES;
     else { s.insetDeferred=NO; CSUpdateVisibleInset(s); }
     CSReconcileClickEffect(s);
+    CSCacheSwipeGeometry(s,items,buttons);
+    CSReconcileCapsule(s,YES);
     s.applying=NO;
 }
 UIView *CSTabBarStyleSnapshot(MMTabBar *bar, UIView *nativeSnapshot) {
@@ -561,7 +750,6 @@ UIView *CSTabBarStyleSnapshot(MMTabBar *bar, UIView *nativeSnapshot) {
         CSTabBarState *copy=[CSTabBarState new];
         copy.bar=(id)nativeSnapshot; copy.controller=s.controller; copy.snapshotSource=bar;
         copy.backgroundHidden=[NSMapTable weakToStrongObjectsMapTable];
-        copy.observedButtons=[NSHashTable weakObjectsHashTable];
         objc_setAssociatedObject(nativeSnapshot,&CSBarStateKey,copy,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         CSTabBarUpdate((id)nativeSnapshot);
         return nativeSnapshot;
@@ -590,6 +778,15 @@ UIView *CSTabBarStyleSnapshot(MMTabBar *bar, UIView *nativeSnapshot) {
     CSTabBarState *copy=[CSTabBarState new];
     copy.bar=bar; copy.floatingRect=s.floatingRect; copy.nativeBackground=s.nativeBackground;
     [CATransaction begin]; [CATransaction setDisableActions:YES]; CSRenderSurface(copy,snapshot); [CATransaction commit];
+    if (s.capsule && CSTabBarPreferences.current.clickEffect!=CSTabBarClickEffectNone) {
+        UIView *host=[[UIView alloc] initWithFrame:copy.surface.bounds];
+        host.userInteractionEnabled=NO; host.clipsToBounds=YES; host.layer.cornerRadius=copy.surface.layer.cornerRadius;
+        UIView *capsule=[UIView new]; capsule.userInteractionEnabled=NO;
+        capsule.bounds=s.capsule.bounds; capsule.backgroundColor=s.capsule.backgroundColor;
+        capsule.layer.position=s.capsule.layer.presentationLayer ? s.capsule.layer.presentationLayer.position : s.capsule.layer.position;
+        capsule.layer.cornerRadius=s.capsule.layer.cornerRadius;
+        [host addSubview:capsule]; [copy.surface addSubview:host];
+    }
     for (UIView *image in images) [snapshot addSubview:image];
     return snapshot;
 }
@@ -601,6 +798,11 @@ void CSTabBarEndLayout(MMTabBar *bar) {
     CSTabBarState *s=CSState(bar,NO);
     if (s.depth) s.depth--;
     if (!s.depth) CSTabBarUpdate(bar);
+}
+void CSTabBarInvalidateItemGeneration(MMTabBar *bar) {
+    CSTabBarState *s=CSState(bar,NO);
+    CSResetSwipe(s); s.swipeCount=0;
+    CSRemoveCapsule(s); s.itemGeneration++;
 }
 void CSTabBarEndControllerLayout(MMTabBarController *controller) {
     CSTabBarControllerLayout *scope=objc_getAssociatedObject(controller,&CSControllerLayoutKey);
@@ -623,7 +825,9 @@ void CSTabBarBeginControllerLayout(MMTabBarController *controller) {
     // (including a detached controller) to this turn rather than leaving work deferred.
     dispatch_async(dispatch_get_main_queue(), ^{
         MMTabBarController *live=weakController;
-        if (live && objc_getAssociatedObject(live,&CSControllerLayoutKey)==scope) CSTabBarEndControllerLayout(live);
+        if (live && objc_getAssociatedObject(live,&CSControllerLayoutKey)==scope) {
+            CSTabBarEndControllerLayout(live);
+        }
     });
 }
 void CSTabBarBeginItemUpdate(MMTabBarItemView *item) {
@@ -634,7 +838,149 @@ void CSTabBarBeginItemUpdate(MMTabBarItemView *item) {
 void CSTabBarEndItemUpdate(MMTabBarItemView *item) {
     CSTabBarItemState *s=objc_getAssociatedObject(item,&CSItemStateKey);
     if (s.depth) s.depth--;
-    if (!s.depth && s.bar) CSApplyItem(item,s.bar);
+    if (!s.depth && s.bar) {
+        CSApplyItem(item,s.bar);
+        CSTabBarState *host=CSState(s.bar,NO);
+        if (!host.depth && !host.applying) CSReconcileCapsule(host,YES);
+    }
+}
+static BOOL CSLiquidCanTrack(CSTabBarState *s) {
+    return s && s.swipeCount==4 && !s.snapshotSource && s.applied && s.geometryApplied &&
+        s.bar.userInteractionEnabled && CSFeedbackRequested() && CSFeedbackVisible(s);
+}
+static NSInteger CSLiquidIndex(CSTabBarState *s, CGPoint point, BOOL strict) {
+    if (!isfinite(point.x) || !isfinite(point.y) || s.swipeCount!=4) return NSNotFound;
+    if (strict) {
+        for (NSInteger i=0;i<4;i++) {
+            if (!CSNativeControlAvailable(s,(NSUInteger)i)) continue;
+            CGRect slot=s.trackingControls[i].frame;
+            if (CGRectContainsPoint(CGRectInset(slot,-4,-4),point)) return i;
+        }
+        return NSNotFound;
+    }
+    // Frames can be RTL; hit-testing physical slots also preserves native indices.
+    CGFloat x=MAX(CGRectGetMinX(s.floatingRect),MIN(CGRectGetMaxX(s.floatingRect)-.1,point.x));
+    for (NSInteger i=0;i<4;i++) {
+        CGRect slot=s.trackingControls[i].frame;
+        if (x>=CGRectGetMinX(slot) && x<CGRectGetMaxX(slot)) return i;
+    }
+    return NSNotFound;
+}
+static void CSLiquidSelect(CSTabBarState *s, NSInteger index) {
+    if (index==NSNotFound || index<0 || index>=s.swipeCount || s.selecting ||
+        s.gestureSelectedIndex==index || !CSNativeControlAvailable(s,(NSUInteger)index)) return;
+    NSUInteger before=s.controller.selectedIndex;
+    s.gestureSelectedIndex=index;
+    if (before==(NSUInteger)index) return;
+    s.selecting=YES;
+    @try {
+        SEL select=NSSelectorFromString(@"handleUserSelectionAtIndex:");
+        if ([s.controller respondsToSelector:select]) {
+            ((void (*)(id,SEL,NSUInteger))[s.controller methodForSelector:select])(s.controller,select,(NSUInteger)index);
+        } else {
+            UIControl *button=CSNativeButton(s.bar,s.controller,(NSUInteger)index);
+            [button sendActionsForControlEvents:UIControlEventTouchUpInside];
+        }
+        if (s.controller.selectedIndex!=before && s.controller.selectedIndex==(NSUInteger)index) {
+            [s.hapticGenerator impactOccurred]; CSPrepareHaptic(s.hapticGenerator);
+        }
+    } @finally { s.selecting=NO; }
+}
+static void CSLiquidUpdate(CSTabBarState *s, CGPoint point, BOOL animated) {
+    NSInteger index=CSLiquidIndex(s,point,NO);
+    if (index==NSNotFound) return;
+    s.touchPoint=point; s.liquidHoverIndex=index;
+    if (s.capsule) {
+        CGRect content=s.capsuleHost.bounds, rest=s->swipeFrames[index];
+        CGFloat touchX=point.x-CGRectGetMinX(s.floatingRect);
+        CGFloat slotWidth=CGRectGetWidth(s.floatingRect)/4;
+        CGFloat q=1-MIN(1,fabs(touchX-CGRectGetMidX(rest))/MAX(1,slotWidth*.48));
+        BOOL underline=CSTabBarPreferences.current.clickEffect==CSTabBarClickEffectUnderline;
+        CGFloat width=MIN(CGRectGetWidth(content)-4,rest.size.width*(underline?1.12:1.02+.06*q));
+        CGFloat height=underline ? rest.size.height : MIN(CGRectGetHeight(content)-4,rest.size.height*(1.01+.03*q));
+        CGFloat x=MAX(CGRectGetMinX(content)+2+width/2,MIN(CGRectGetMaxX(content)-2-width/2,touchX));
+        CGRect frame=CGRectIntegral(CGRectMake(x-width/2,CGRectGetMidY(rest)-height/2,width,height));
+        void (^changes)(void)=^{ CSLiquidWrite(s,frame,1); };
+        if (!animated) {
+            changes();
+        } else if (CSLiquidCanAnimate(s)) {
+            [UIView animateWithDuration:.12 delay:0 options:UIViewAnimationOptionCurveEaseOut|UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState animations:changes completion:nil];
+        } else {
+            [s.capsule.layer removeAllAnimations];
+            [UIView performWithoutAnimation:changes];
+        }
+    }
+    // Preview only while tracking. Commit the final hit once on TouchUp so a
+    // drag across several slots never activates the intermediate pages.
+}
+void CSTabBarTouchBegin(MMTabBar *bar, CGPoint pointInBar) {
+    CSTabBarState *s=CSState(bar,NO);
+    if (!CSLiquidCanTrack(s) || !isfinite(pointInBar.x) || !isfinite(pointInBar.y)) return;
+    NSInteger origin=CSLiquidIndex(s,pointInBar,YES);
+    if (origin==NSNotFound) return;
+    s.touchActive=YES; s.touchDragged=NO; s.swipeGeneration++;
+    s.touchStartIndex=(NSInteger)s.controller.selectedIndex; s.touchOriginIndex=origin;
+    s.gestureSelectedIndex=s.touchStartIndex;
+    CSReconcileHaptic(s); CSPrepareHaptic(s.hapticGenerator);
+    CSLiquidUpdate(s,pointInBar,YES);
+}
+void CSTabBarTouchMove(MMTabBar *bar, CGPoint pointInBar) {
+    CSTabBarState *s=CSState(bar,NO);
+    if (!s.touchActive) return;
+    if (!CSLiquidCanTrack(s)) { CSResetSwipe(s); CSLiquidSettle(s,NO); return; }
+    s.touchDragged=YES;
+    CSLiquidUpdate(s,pointInBar,NO);
+}
+static BOOL CSLiquidHandleFirstTabTap(CSTabBarState *s) {
+    id target=s.controller;
+    SEL action=NSSelectorFromString(@"OnMainFrameDoubleClicked:");
+    BOOL takesArgument=YES;
+    if (![target respondsToSelector:action]) {
+        SEL frameSelector=NSSelectorFromString(@"getNewMainFrameViewController");
+        target=[s.controller respondsToSelector:frameSelector] ?
+            ((id (*)(id,SEL))[s.controller methodForSelector:frameSelector])(s.controller,frameSelector) : nil;
+        action=NSSelectorFromString(@"onNextUnreadChat"); takesArgument=NO;
+        if (![target respondsToSelector:action]) return NO;
+    }
+    CFTimeInterval now=CACurrentMediaTime(), previous=s.lastFirstTabTapTime;
+    s.lastFirstTabTapTime=now;
+    if (previous>0 && now>=previous && now-previous<=.36) {
+        s.lastFirstTabTapTime=0;
+        if (takesArgument) ((void (*)(id,SEL,id))[target methodForSelector:action])(target,action,nil);
+        else ((void (*)(id,SEL))[target methodForSelector:action])(target,action);
+    }
+    return YES;
+}
+void CSTabBarTouchEnd(MMTabBar *bar, CGPoint pointInBar) {
+    CSTabBarState *s=CSState(bar,NO);
+    if (!s.touchActive) return;
+    NSInteger index=CSLiquidCanTrack(s) ? CSLiquidIndex(s,pointInBar,YES) : NSNotFound;
+    BOOL repeat=index!=NSNotFound && !s.touchDragged && index==s.touchOriginIndex &&
+        index==s.touchStartIndex && s.controller.selectedIndex==(NSUInteger)index;
+    if (!CSTabBarPreferences.current.swipeSwitch && index!=NSNotFound) {
+        // Neo's ordinary tap path cancels the press tween before selecting.
+        [s.capsule.layer removeAllAnimations];
+        s.touchActive=NO;
+    }
+    CSLiquidSelect(s,index);
+    BOOL firstTabHandled=index==0 && CSLiquidHandleFirstTabTap(s);
+    if (repeat && !firstTabHandled && CSNativeControlAvailable(s,(NSUInteger)index)) {
+        // Preserve WeChat's current-tab repeat/double-tap entry exactly once on
+        // a real tap. Drag previews and taps that select a new tab do not replay it.
+        s.selecting=YES;
+        @try {
+            UIControl *native=(UIControl *)s.buttons[index].button;
+            [native sendActionsForControlEvents:UIControlEventTouchUpInside];
+        } @finally { s.selecting=NO; }
+    }
+    CSLiquidSettle(s,YES);
+    s.touchActive=NO; s.swipeGeneration++;
+}
+void CSTabBarTouchCancel(MMTabBar *bar) {
+    CSTabBarState *s=CSState(bar,NO);
+    if (!s.touchActive) return;
+    s.touchActive=NO; s.swipeGeneration++;
+    CSLiquidSettle(s,YES);
 }
 BOOL CSTabBarContainsPoint(MMTabBar *bar, CGPoint point, BOOL *handled) {
     CSTabBarState *s=CSState(bar,NO);
@@ -644,51 +990,33 @@ BOOL CSTabBarContainsPoint(MMTabBar *bar, CGPoint point, BOOL *handled) {
     return [[UIBezierPath bezierPathWithRoundedRect:s.floatingRect cornerRadius:radius] containsPoint:point];
 }
 UIView *CSTabBarHitTest(MMTabBar *bar, CGPoint point, UIEvent *event, BOOL *handled) {
-    if (!CSTabBarContainsPoint(bar,point,handled)) return nil;
     CSTabBarState *s=CSState(bar,NO);
+    if (!CSTabBarContainsPoint(bar,point,handled)) return nil;
+    for (UIControl *control in s.trackingControls.reverseObjectEnumerator) {
+        NSUInteger index=[s.trackingControls indexOfObjectIdenticalTo:control];
+        BOOL available=CSNativeControlAvailable(s,index);
+        control.hidden=!available; control.userInteractionEnabled=available;
+        if (!available) continue;
+        UIView *hit=[control hitTest:[bar convertPoint:point toView:control] withEvent:event];
+        if (hit) return hit;
+    }
     for (CSTabBarButtonState *b in s.buttons.reverseObjectEnumerator) {
         UIView *hit=[b.button hitTest:[bar convertPoint:point toView:b.button] withEvent:event];
         if (hit) return hit;
     }
     return bar;
 }
-@implementation CSTabBarState
-- (void)touchBegan:(UIControl *)sender {
-    CSInvalidateFeedback(self);
-    self.touchButton=sender;
-    self.selectionBeforeTouch=self.controller.selectedIndex;
-}
-- (void)touchEnded:(UIControl *)sender {
-    if (self.touchButton!=sender) return;
-    self.touchButton=nil;
-    NSUInteger previous=self.selectionBeforeTouch;
-    NSUInteger generation=self.feedbackGeneration;
-    __weak typeof(self) weakSelf=self;
-    __weak UIControl *weakButton=sender;
-    // Native targets complete first, regardless of UIControl target ordering.
-    dispatch_async(dispatch_get_main_queue(), ^{
-        CSTabBarState *s=weakSelf;
-        if (!s || s.feedbackGeneration!=generation || !CSFeedbackVisible(s) || s.controller.selectedIndex==previous) return;
-        NSUInteger index=s.controller.selectedIndex;
-        if (index>=s.bar.items.count || CSNativeButton(s.bar,s.controller,index)!=weakButton) return;
-        MMTabBarItemView *selected=nil;
-        for (MMTabBarItemView *item in CSItems(s.bar)) if (CSItemIndex(s.bar,item)==index) {selected=item; break;}
-        if (selected) CSPlayClickEffect(s,selected);
-        NSInteger haptic=CSTabBarPreferences.current.haptic;
-        if (!haptic) return;
-        UIImpactFeedbackStyle styles[]={UIImpactFeedbackStyleSoft,UIImpactFeedbackStyleLight,UIImpactFeedbackStyleMedium,UIImpactFeedbackStyleHeavy};
-        UIImpactFeedbackGenerator *generator=[[UIImpactFeedbackGenerator alloc] initWithStyle:styles[MIN(4,haptic)-1]];
-        [generator impactOccurred];
-    });
-}
-@end
+@implementation CSTabBarState @end
+
 static atomic_bool CSPreferencesPending;
 static void CSRefreshPreferences(void) {
     CSRequestMainRefresh(&CSPreferencesPending, ^{
         [CSTabBarPreferences reload];
         for (MMTabBar *bar in CSBars.allObjects) {
             CSTabBarState *s=CSState(bar,NO); CSStop(s);
-            [bar setNeedsLayout]; [bar layoutIfNeeded]; CSTabBarUpdate(bar);
+            [bar setNeedsLayout];
+            [bar layoutIfNeeded];
+            CSTabBarUpdate(bar);
         }
     });
 }
@@ -700,6 +1028,7 @@ static void CSResumeVisibleAnimations(void) {
     for (MMTabBar *bar in CSBars.allObjects) {
         CSTabBarState *s=CSState(bar,NO);
         CSReconcileClickEffect(s);
+        CSReconcileCapsule(s,NO);
         if (s.applied && s.geometryApplied) CSEnsureBorderAnimation(s);
     }
     [CATransaction commit];

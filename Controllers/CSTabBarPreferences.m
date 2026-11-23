@@ -1,6 +1,15 @@
 #import "CSTabBarPreferences.h"
 #import "CSTabBarGeometry.h"
+#include <sys/stat.h>
 static CSTabBarPreferences *CSCurrentTabBarPreferences;
+static NSMutableDictionary<NSString *, NSDictionary *> *CSIconCache;
+static NSMutableDictionary<NSString *, NSNumber *> *CSIconResourceGenerations;
+static NSArray *CSIconSignature(NSString *path, NSString *identifier, NSNumber *generation) {
+    struct stat info;
+    if (!path.length || stat(path.fileSystemRepresentation,&info)!=0 || !S_ISREG(info.st_mode)) return nil;
+    return @[path,identifier,generation ?: @0,@(info.st_dev),@(info.st_ino),@(info.st_size),
+        @(info.st_mtimespec.tv_sec),@(info.st_mtimespec.tv_nsec),@(info.st_ctimespec.tv_sec),@(info.st_ctimespec.tv_nsec)];
+}
 static CGFloat CSNumber(NSUserDefaults *d, NSString *key, CGFloat fallback, CGFloat min, CGFloat max) {
     id value=[d objectForKey:key];
     return value && [value respondsToSelector:@selector(doubleValue)] ? CSTabBarClamp([value doubleValue],min,max,fallback) : fallback;
@@ -21,6 +30,7 @@ static CGFloat CSNumber(NSUserDefaults *d, NSString *key, CGFloat fallback, CGFl
     NSUserDefaults *d=NSUserDefaults.standardUserDefaults;
     CSTabBarPreferences *p=[self new];
     p.enabled=[d boolForKey:kTabBarStyleEnabledKey]; p.hideText=[d boolForKey:kTabBarHideTextKey];
+    p.swipeSwitch=[d objectForKey:kTabBarSwipeSwitchKey] ? [d boolForKey:kTabBarSwipeSwitchKey] : YES;
     p.scale=CSNumber(d,kTabBarScaleKey,kDefaultScale,.6,1);
     p.contentHeight=CSNumber(d,kTabBarContentHeightKey,52,44,80);
     p.lift=CSNumber(d,kTabBarPositionOffsetKey,0,0,100);
@@ -28,12 +38,17 @@ static CGFloat CSNumber(NSUserDefaults *d, NSString *key, CGFloat fallback, CGFl
     p.borderWidth=CSNumber(d,kTabBarBorderWidthKey,1,0,6);
     p.borderStyle=(NSInteger)CSNumber(d,kTabBarBorderStyleKey,kDefaultBorderStyle,0,1);
     p.haptic=(NSInteger)CSNumber(d,kTabBarHapticFeedbackKey,0,0,4);
-    // Unknown values must not opt existing users into motion.
+    // Only persisted 1/3 enable effects; reserved 2 and unknown values stay off.
     id clickEffect=[d objectForKey:kTabBarClickEffectKey];
-    p.clickEffect=[clickEffect isKindOfClass:NSNumber.class] && [clickEffect doubleValue]==CSTabBarClickEffectBounce ? CSTabBarClickEffectBounce : CSTabBarClickEffectNone;
+    p.clickEffect=CSTabBarClickEffectNone;
+    if ([clickEffect isKindOfClass:NSNumber.class]) {
+        double value=[clickEffect doubleValue];
+        if (value==CSTabBarClickEffectBounce || value==CSTabBarClickEffectCapsule) p.clickEffect=(CSTabBarClickEffect)value;
+    }
     p.animation=(NSInteger)CSNumber(d,kTabBarBorderAnimationKey,0,0,CSTabBarBorderAnimationClassicHeartbeat);
     p.backgroundColor=[self colorInDefaults:d prefix:@"com.wechat.enhance.tabbar_style.bg_color"];
     p.borderColor=[self colorInDefaults:d prefix:@"com.wechat.enhance.tabbar_style.border_color"];
+    p.indicatorColor=[self colorInDefaults:d prefix:kTabBarIndicatorColorKey];
     NSMutableArray *titles=[NSMutableArray array], *icons=[NSMutableArray array], *selected=[NSMutableArray array];
     for (NSString *name in @[@"chat",@"contacts",@"discover",@"me"]) {
         NSString *title=[d stringForKey:[@"com.wechat.enhance.tabbar_style.text." stringByAppendingString:name]];
@@ -41,13 +56,47 @@ static CGFloat CSNumber(NSUserDefaults *d, NSString *key, CGFloat fallback, CGFl
         for (NSNumber *state in @[@NO,@YES]) {
             NSString *key=[(state.boolValue ? @"com.wechat.enhance.tabbar_style.icon.selected." : @"com.wechat.enhance.tabbar_style.icon.") stringByAppendingString:name];
             NSString *path=[d stringForKey:key];
-            UIImage *image=path.length ? [UIImage imageWithContentsOfFile:path] : nil;
-            // Decode once per preference change, never on layout or selection.
+            UIImage *image=[self cachedIconAtPath:path resourceIdentifier:key];
+            // Reuse the loaded image until this resource or its file identity changes.
             [(state.boolValue ? selected : icons) addObject:image ?: (id)NSNull.null];
         }
     }
     p.titles=titles; p.icons=icons; p.selectedIcons=selected;
     CSCurrentTabBarPreferences=p;
+}
++ (UIImage *)cachedIconAtPath:(NSString *)path resourceIdentifier:(NSString *)identifier {
+    if (!identifier.length) return nil;
+    @synchronized (self) {
+        if (!CSIconCache) CSIconCache=[NSMutableDictionary dictionary];
+        if (!CSIconResourceGenerations) CSIconResourceGenerations=[NSMutableDictionary dictionary];
+        NSArray *signature=CSIconSignature(path,identifier,CSIconResourceGenerations[identifier]);
+        if (!signature) {
+            [CSIconCache removeObjectForKey:identifier];
+            return nil;
+        }
+        NSDictionary *entry=CSIconCache[identifier];
+        if ([entry[@"signature"] isEqual:signature]) {
+            return entry[@"image"];
+        }
+        UIImage *image=[UIImage imageWithContentsOfFile:path];
+        // Never retain stale pixels or a failed load. A later notification can
+        // retry transient failures; selected-image fallback remains in iconAtIndex.
+        if (image && [signature isEqual:CSIconSignature(path,identifier,CSIconResourceGenerations[identifier])]) {
+            CSIconCache[identifier]=@{@"signature":signature,@"image":image};
+            return image;
+        }
+        [CSIconCache removeObjectForKey:identifier];
+        return nil;
+    }
+}
++ (void)invalidateIconAtPath:(NSString *)path resourceIdentifier:(NSString *)identifier {
+    (void)path; // The identifier invalidates either the old or replacement path.
+    if (!identifier.length) return;
+    @synchronized (self) {
+        if (!CSIconResourceGenerations) CSIconResourceGenerations=[NSMutableDictionary dictionary];
+        CSIconResourceGenerations[identifier]=@([CSIconResourceGenerations[identifier] unsignedLongLongValue]+1);
+        [CSIconCache removeObjectForKey:identifier];
+    }
 }
 - (UIImage *)iconAtIndex:(NSUInteger)i selected:(BOOL)selected {
     if (i>=self.icons.count) return nil;

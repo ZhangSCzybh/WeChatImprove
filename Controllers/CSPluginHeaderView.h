@@ -6,6 +6,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CSPluginHeaderView : UIView
 @property(nonatomic, strong, readonly) UIImageView *avatarImageView;
 @property(nonatomic) CGFloat horizontalInset;
+/// The first metric caption's leading edge in this view's coordinates.
+@property(nonatomic, readonly) CGFloat metricCaptionLeadingInset;
 - (void)updateNickname:(NSString *)nickname
              wechatID:(NSString *)wechatID
          enabledCount:(NSUInteger)enabledCount
