@@ -1,0 +1,149 @@
+{
+  "verification": "release metadata, executing the extracted production release-notes function",
+  "script_path": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2.9-4-release-metadata-vk9ls29a/verify-release-metadata.py",
+  "script_sha256": "4fa37c00095591e31f51547b190cbbd34ef1e02b6d5e54763e21068664debb8f",
+  "commands": [
+    [
+      "xcrun",
+      "--sdk",
+      "macosx",
+      "clang",
+      "-fobjc-arc",
+      "-fblocks",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-framework",
+      "Foundation",
+      "-I/Users/zhangshichao/Documents/Workspace/WeChatImprove/Headers",
+      "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2.9-4-release-metadata-vk9ls29a/ReleaseMetadataHost.m",
+      "-o",
+      "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2.9-4-release-metadata-vk9ls29a/release-metadata-host"
+    ],
+    [
+      "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2.9-4-release-metadata-vk9ls29a/release-metadata-host"
+    ]
+  ],
+  "checks": [
+    {
+      "name": "extracted production function retains runtime version-key selection",
+      "passed": true
+    },
+    {
+      "name": "real runtime release version is 2.9-4",
+      "passed": true
+    },
+    {
+      "name": "version header and package control agree",
+      "passed": true
+    },
+    {
+      "name": "README source version is current",
+      "passed": true
+    },
+    {
+      "name": "README current release is the full 2.9-4 build",
+      "passed": true
+    },
+    {
+      "name": "README current artifacts use 2.9-4 package paths",
+      "passed": true
+    },
+    {
+      "name": "runtime current release returns six items",
+      "passed": true
+    },
+    {
+      "name": "all runtime release items have nonempty title and detail",
+      "passed": true
+    },
+    {
+      "name": "runtime release is not a fallback or historical version",
+      "passed": true
+    },
+    {
+      "name": "runtime release lists all four added entries",
+      "passed": true
+    },
+    {
+      "name": "runtime release declares nineteen entries and original eight defaults",
+      "passed": true
+    },
+    {
+      "name": "switch fix covers native settings readiness",
+      "passed": true
+    },
+    {
+      "name": "switch observation covers account page and native first-use prompt",
+      "passed": true
+    },
+    {
+      "name": "runtime release retains request and account cancellation boundaries",
+      "passed": true
+    },
+    {
+      "name": "runtime release includes preferences backups and full modules",
+      "passed": true
+    },
+    {
+      "name": "runtime release retains actual-device validation boundary",
+      "passed": true
+    },
+    {
+      "name": "README added entries and nineteen-item total agree with runtime",
+      "passed": true
+    },
+    {
+      "name": "metadata source snapshots remained unchanged during verification",
+      "passed": true
+    }
+  ],
+  "scope": "No target application execution; macOS Foundation host harness only. No source, build, package contents or historic artifacts modified.",
+  "runtime": {
+    "version": "2.9-4",
+    "count": 6,
+    "notes": [
+      {
+        "detail": "快捷面板新增收款码、我的朋友圈、新建笔记和切换账号，可选入口由十五项扩展为十九项。收款码与付款码分别提供入口；默认八项、已有选择和排序及空面板配置继续兼容，新入口可在面板设置中手动添加。",
+        "title": "新增四项快捷入口"
+      },
+      {
+        "detail": "等待微信原生设置页完成展示后再执行切换账号入口，并检查原生账号页或首次使用提示是否出现，避免仅停留在设置页就认定成功。跳转期间保留请求防重、当前账号与窗口校验，用户离开页面或进入后台后停止处理。",
+        "title": "修复切换账号快捷跳转"
+      },
+      {
+        "detail": "收款码和我的朋友圈接入当前账号的微信原生入口；新建笔记沿用收藏的生物识别保护，由微信建立编辑上下文。切换账号沿用微信原生页面及后续流程，账号选择与确认交由用户完成。",
+        "title": "沿用原生页面与认证"
+      },
+      {
+        "detail": "继续保留总开关、上滑位置、入口顺序，以及背景颜色、背景图片、透明度、字体和图标颜色。十九项入口纳入配置备份与恢复白名单，兼容原有入口及空配置；圆润顶部字体、图标跟随界面调色及其他面板能力继续包含。",
+        "title": "保留面板偏好与备份兼容"
+      },
+      {
+        "detail": "本版包含 2.9-3 的完整功能与本次快捷面板更新。聊天分组、底栏与界面定制、朋友圈布局、消息增强、自动功能、群聊功能、人工智能及备份恢复等既有模块继续包含。",
+        "title": "2.9-4 正式完整版"
+      },
+      {
+        "detail": "原生账号页的实际展示与返回、单账号及多账号状态、新建笔记编辑保存，以及手势与其他既有功能仍需在原设备、原账号和原注入环境验收。静态路径核验与主机检查不代表新增真机验证结论。",
+        "title": "设备验证范围"
+      }
+    ]
+  },
+  "extracted_function_sha256": "4f06ae7be5e1ff0f8df4eacddbf45da46697d2d92048e30dbecaf1795730e9c1",
+  "harness_path": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2.9-4-release-metadata-vk9ls29a/ReleaseMetadataHost.m",
+  "harness_sha256": "ebd523b1fedd31def249406d90fd23dbd50197af0ff25bdb30ac2e0d846fd7c8",
+  "status": "PASS",
+  "verified_at_utc": "2026-11-23T09:11:44.660614+00:00",
+  "source_sha256": {
+    "Headers/CSUserInfoHelper.h": "06292dd287ad56ed59d091fa8622be7e5ddd68938f1f26c7af9b724e4d5505f7",
+    "control": "dd13739d8d4f34400047501994b8633042458ca89473fda5079f6ac4d1ea4383",
+    "README.md": "8aa0842f1b000992a49bc1c6ff34a9496a11bb81ca3f36a8e8f15466ba407d92",
+    "Controllers/CSReleaseNotesViewController.m": "9c9122a08fb879a6093f3aa9015bafe123e0f609494b4f30a42bbf3dc3d7026c"
+  },
+  "check_count": 18,
+  "passed_checks": 18,
+  "reproduction_command": [
+    "/usr/bin/python3",
+    "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2.9-4-release-metadata-vk9ls29a/verify-release-metadata.py"
+  ]
+}

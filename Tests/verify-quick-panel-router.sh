@@ -11,12 +11,14 @@ import sys
 project, output = map(Path, sys.argv[1:])
 source = (project / 'Controllers/CSQuickPanelActionRouter.m').read_text()
 spans = [
+    ('static NSString * const CSQuickFavoriteSuite', '@protocol CSQuickQRCodeConstructor'),
     ('@protocol CSQuickQRCodeConstructor', 'static BOOL CSQuickMatches('),
     ('static BOOL CSQuickMatches(', 'static BOOL CSQuickCanNavigate('),
     ('static UIViewController *CSQuickCreatePage(', '// Inspect only'),
     ('static NSArray<id> *CSQuickOwners(', '@interface CSQuickRouteRequest'),
     ('@interface CSQuickRouteRequest', 'static BOOL CSQuickOpenClass('),
     ('static BOOL CSQuickOpenClass(', 'static void CSQuickAfterPrivacyAuthentication('),
+    ('static BOOL CSQuickOpenCreateNote(', 'static BOOL CSQuickOpenPlugin('),
     ('static id CSQuickCurrentService(', '@implementation CSQuickPanelActionRouter'),
 ]
 (output / 'QuickPanelRouterProduction.h').write_text('\n'.join(source[source.index(start):source.index(end)] for start, end in spans))

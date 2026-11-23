@@ -502,7 +502,7 @@ static BOOL CSContacts(id value) {
                 if (valid) for (id item in value) if (!CSNumber(item) || floor([item doubleValue])!=[item doubleValue]) { valid=NO; break; }
             } else if ([key isEqual:@"com.wechat.enhance.quick_panel.selected_actions"]) {
                 // This backup schema stays independent of the UIKit quick-panel implementation.
-                NSSet *known=[NSSet setWithArray:@[@"scan",@"wallet",@"moments",@"my_qrcode",@"favorites",@"plugin_home",@"profile",@"create_group",@"add_friend",@"emoji_store",@"panel_settings",@"payment_code",@"channels",@"file_transfer",@"chat_background"]];
+                NSSet *known=[NSSet setWithArray:@[@"scan",@"wallet",@"moments",@"my_qrcode",@"favorites",@"plugin_home",@"profile",@"create_group",@"add_friend",@"emoji_store",@"panel_settings",@"payment_code",@"channels",@"file_transfer",@"chat_background",@"receive_code",@"my_moments",@"create_note",@"switch_account"]];
                 valid=[value isKindOfClass:NSArray.class] && [value count]<=known.count;
                 NSMutableSet *seen=[NSMutableSet new];
                 if (valid) for (id identifier in value) {

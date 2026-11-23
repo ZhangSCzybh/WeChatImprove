@@ -1,6 +1,6 @@
 Package: com.wechat.improve
 Name: WeChatImprove
-Version: 2.9-3
+Version: 2.9-4
 Architecture: iphoneos-arm
 Description: 微信增强插件，支持聊天分组、界面定制、消息增强、朋友圈卡片布局与配置备份。
 Maintainer: 再也不会

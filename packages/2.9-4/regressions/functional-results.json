@@ -1,0 +1,72 @@
+[
+  {
+    "name": "quick-panel-gesture",
+    "command": [
+      "bash",
+      "Tests/verify-quick-panel-gesture.sh"
+    ],
+    "exit_code": 0,
+    "log": "regressions/quick-panel-gesture.log",
+    "execution": "fresh 2.9-4 host regression"
+  },
+  {
+    "name": "quick-panel-color-settings",
+    "command": [
+      "bash",
+      "Tests/verify-quick-panel-color-settings.sh"
+    ],
+    "exit_code": 0,
+    "log": "regressions/quick-panel-color-settings.log",
+    "execution": "fresh 2.9-4 host regression"
+  },
+  {
+    "name": "quick-panel-preferences",
+    "command": [
+      "bash",
+      "Tests/verify-quick-panel-preferences.sh"
+    ],
+    "exit_code": 0,
+    "log": "regressions/quick-panel-preferences.log",
+    "execution": "fresh 2.9-4 host regression"
+  },
+  {
+    "name": "quick-panel-appearance",
+    "command": [
+      "bash",
+      "Tests/verify-quick-panel-appearance.sh"
+    ],
+    "exit_code": 0,
+    "log": "regressions/quick-panel-appearance.log",
+    "execution": "fresh 2.9-4 host regression"
+  },
+  {
+    "name": "quick-panel-background",
+    "command": [
+      "bash",
+      "Tests/verify-quick-panel-background.sh"
+    ],
+    "exit_code": 0,
+    "log": "regressions/quick-panel-background.log",
+    "execution": "fresh 2.9-4 host regression"
+  },
+  {
+    "name": "backup-registry",
+    "command": [
+      "bash",
+      "Tests/verify-backup-registry.sh"
+    ],
+    "exit_code": 0,
+    "log": "regressions/backup-registry.log",
+    "execution": "fresh 2.9-4 host regression"
+  },
+  {
+    "name": "backup-assets",
+    "command": [
+      "bash",
+      "Tests/verify-backup-assets.sh"
+    ],
+    "exit_code": 0,
+    "log": "regressions/backup-assets.log",
+    "execution": "fresh 2.9-4 host regression"
+  }
+]

@@ -8,6 +8,8 @@
 // verifies ownership and native ABI boundaries without launching WeChat/UIKit.
 @class UINavigationController;
 @class UIViewController;
+static char CSQuickRouteRequestKey;
+static void (^navigationPushMutation)(UINavigationController *, UIViewController *);
 typedef NS_ENUM(NSInteger, UISceneActivationState) {
     UISceneActivationStateUnattached=-1,
     UISceneActivationStateForegroundActive,
@@ -55,32 +57,41 @@ typedef NS_ENUM(NSInteger, UIApplicationState) { UIApplicationStateActive, UIApp
 @interface UIViewController : NSObject
 @property(nonatomic,weak) UINavigationController *navigationController;
 @property(nonatomic,weak) UIViewController *parentViewController;
+@property(nonatomic,weak) UIViewController *presentingViewController;
 @property(nonatomic,strong) UIViewController *presentedViewController;
 @property(nonatomic,strong) UIView *view;
+@property(nonatomic,readonly) UIView *viewIfLoaded;
 @property(nonatomic,copy) NSArray *childViewControllers;
 @property(nonatomic) BOOL isViewLoaded;
 @property(nonatomic) BOOL isBeingDismissed;
 @property(nonatomic) BOOL isMovingFromParentViewController;
 @property(nonatomic) BOOL hidesBottomBarWhenPushed;
 @property(nonatomic,strong) id<UIViewControllerTransitionCoordinator> transitionCoordinator;
+- (void)loadViewIfNeeded;
 @end
 @implementation UIViewController
 - (instancetype)init {
     if ((self=[super init])) { _view=[UIView new]; _isViewLoaded=YES; _childViewControllers=@[]; }
     return self;
 }
+- (UIView *)viewIfLoaded { return self.isViewLoaded ? self.view : nil; }
+- (void)loadViewIfNeeded { self.isViewLoaded=YES; }
 @end
 @interface UINavigationController : UIViewController
 @property(nonatomic,strong) UIViewController *topViewController;
 @property(nonatomic,copy) NSArray *viewControllers;
+@property(nonatomic) NSUInteger pushCalls;
+@property(nonatomic) BOOL lastPushAnimated;
 - (void)pushViewController:(UIViewController *)controller animated:(BOOL)animated;
 @end
 @implementation UINavigationController
 - (void)pushViewController:(UIViewController *)controller animated:(BOOL)animated {
+    self.pushCalls++; self.lastPushAnimated=animated;
     controller.navigationController=self; controller.parentViewController=self;
     controller.view.window=self.topViewController.view.window;
     self.topViewController=controller;
     self.viewControllers=[(self.viewControllers ?: @[]) arrayByAddingObject:controller];
+    if (navigationPushMutation) navigationPushMutation(self,controller);
 }
 @end
 static void (^tabSelectionMutation)(void);
@@ -129,6 +140,8 @@ static void (^tabSelectionMutation)(void);
 @interface NewMainFrameViewController : NSObject
 @property(nonatomic,weak) UIViewController *curViewController;
 @property(nonatomic) NSUInteger createCalls;
+@property(nonatomic) NSUInteger receiveCalls;
+@property(nonatomic) NSUInteger myMomentsCalls;
 @property(nonatomic) NSUInteger messageCalls;
 @property(nonatomic,strong) id lastContact;
 @property(nonatomic,strong) id lastMessageWrap;
@@ -141,10 +154,14 @@ static void (^tabSelectionMutation)(void);
 @property(nonatomic,copy) void (^messageMutation)(void);
 - (void)newMessageByContact:(id)contact msgWrapToAdd:(id)wrap;
 - (void)onCreateNewMessage;
+- (void)openFace2FaceReceiveMoney;
+- (void)showMyWCView;
 - (id)wrongABI;
 @end
 @implementation NewMainFrameViewController
 - (void)onCreateNewMessage { self.createCalls++; }
+- (void)openFace2FaceReceiveMoney { self.receiveCalls++; }
+- (void)showMyWCView { self.myMomentsCalls++; }
 - (void)newMessageByContact:(id)contact msgWrapToAdd:(id)wrap {
     self.messageCalls++; self.lastContact=contact; self.lastMessageWrap=wrap;
     if (self.messageMutation) self.messageMutation();
@@ -161,23 +178,200 @@ static void (^tabSelectionMutation)(void);
 }
 - (id)wrongABI { return nil; }
 @end
+// Older WeChat exposes the Me page as a UIKit owner; modern builds use the
+// existing NSObject main owner above for the checked fallback.
+@interface MoreViewController : UIViewController
+@property(nonatomic) NSUInteger myMomentsCalls;
+- (void)showMyWCView;
+@end
+@implementation MoreViewController
+- (void)showMyWCView { self.myMomentsCalls++; }
+@end
+static NSUInteger publicTimelineConstructions;
+@interface WCTimeLineViewController : UIViewController @end
+@implementation WCTimeLineViewController
+- (instancetype)init {
+    if ((self=[super init])) publicTimelineConstructions++;
+    return self;
+}
+@end
 @interface NativeWallet : UIViewController @end
 @implementation NativeWallet @end
 @interface InvalidControllerFactory : UIViewController @end
 @implementation InvalidControllerFactory
 - (instancetype)init { self=[super init]; return self ? (id)[NSObject new] : nil; }
 @end
+typedef NS_ENUM(NSInteger, LAPolicy) { LAPolicyDeviceOwnerAuthenticationWithBiometrics=1 };
+typedef NS_ENUM(NSInteger, LAError) {
+    LAErrorAuthenticationFailed=-1, LAErrorUserCancel=-2, LAErrorSystemCancel=-4, LAErrorAppCancel=-9
+};
+static BOOL quickBiometricsAvailable=YES;
+static NSUInteger quickBiometricEvaluations;
+static NSUInteger quickBiometricConstructions;
+static void (^quickBiometricPreflightMutation)(void);
+@class LAContext;
+static LAContext *quickLastAuthentication;
 @interface LAContext : NSObject
 @property(nonatomic) NSUInteger invalidations;
 @property(nonatomic,copy) void (^invalidation)(void);
+@property(nonatomic) LAPolicy preflightPolicy;
+@property(nonatomic) LAPolicy evaluationPolicy;
+@property(nonatomic,copy) NSString *reason;
+@property(nonatomic,copy) void (^reply)(BOOL,NSError *);
+- (BOOL)canEvaluatePolicy:(LAPolicy)policy error:(NSError **)error;
+- (void)evaluatePolicy:(LAPolicy)policy localizedReason:(NSString *)reason reply:(void (^)(BOOL,NSError *))reply;
+- (void)completeWithSuccess:(BOOL)success error:(NSError *)error;
 - (void)invalidate;
 @end
 @implementation LAContext
+- (instancetype)init {
+    if ((self=[super init])) { quickBiometricConstructions++; quickLastAuthentication=self; }
+    return self;
+}
+- (BOOL)canEvaluatePolicy:(LAPolicy)policy error:(NSError **)error {
+    self.preflightPolicy=policy;
+    if (quickBiometricPreflightMutation) quickBiometricPreflightMutation();
+    if (error) *error=quickBiometricsAvailable ? nil : [NSError errorWithDomain:@"fixture.biometric" code:-6 userInfo:nil];
+    return quickBiometricsAvailable;
+}
+- (void)evaluatePolicy:(LAPolicy)policy localizedReason:(NSString *)reason reply:(void (^)(BOOL,NSError *))reply {
+    quickBiometricEvaluations++; self.evaluationPolicy=policy; self.reason=reason; self.reply=reply;
+}
+- (void)completeWithSuccess:(BOOL)success error:(NSError *)error {
+    void (^reply)(BOOL,NSError *)=self.reply; self.reply=nil;
+    if (reply) reply(success,error);
+}
 - (void)invalidate {
     self.invalidations++;
     if (self.invalidation) self.invalidation();
 }
 @end
+
+// The extracted production guard reads this in-memory defaults fixture. No
+// real suite, preference file or device authentication API is touched.
+static BOOL quickFavoritesProtected;
+static NSMutableArray<NSString *> *quickFavoriteSuites;
+static NSMutableArray<NSString *> *quickFavoriteKeys;
+@interface QuickFavoriteDefaults : NSObject
+@property(nonatomic,copy) NSString *suite;
+- (instancetype)initWithSuiteName:(NSString *)suite;
+- (BOOL)boolForKey:(NSString *)key;
+@end
+@implementation QuickFavoriteDefaults
+- (instancetype)initWithSuiteName:(NSString *)suite {
+    if ((self=[super init])) { _suite=suite.copy; [quickFavoriteSuites addObject:suite]; }
+    return self;
+}
+- (BOOL)boolForKey:(NSString *)key { [quickFavoriteKeys addObject:key]; return quickFavoritesProtected; }
+@end
+
+static NSUInteger quickFavoritesConstructions;
+@interface MyFavoritesViewController : UIViewController @end
+@implementation MyFavoritesViewController
+- (instancetype)init {
+    if ((self=[super init])) quickFavoritesConstructions++;
+    return self;
+}
+@end
+
+static BOOL quickSettingInitUnavailable;
+static id quickSettingInitReplacement;
+static void (^quickSettingInitMutation)(void);
+static void (^quickSettingShowMutation)(void);
+static void (^quickSettingGotoMutation)(void);
+static NSUInteger quickSettingInitCalls;
+static NSUInteger quickSettingShowCalls;
+static NSUInteger quickSettingGotoCalls;
+static NSUInteger quickSettingForbiddenCalls;
+static UIViewController *quickSettingLastReceiver;
+static UIViewController *quickSettingRequestSource;
+static id quickSettingLastLogic;
+static BOOL quickSettingNativeNoOp;
+static BOOL quickSettingTargetDeferred;
+static BOOL quickSettingNeedsTip;
+static BOOL quickSettingTipDeferred;
+static UIWindow *quickSettingTipWindow;
+@class NewSettingViewController;
+@class MMTipsViewController;
+static Class quickSettingTipClass;
+static void (^quickSettingTipMutation)(MMTipsViewController *);
+static BOOL quickSettingHoldDestination;
+static dispatch_block_t quickSettingPendingDestination;
+@interface WCAccountLoginUsersViewController : UIViewController @end
+@implementation WCAccountLoginUsersViewController @end
+@interface MMTipsViewController : UIViewController
+@property(nonatomic,weak) NewSettingViewController *m_delegate;
+@property(nonatomic) BOOL objShowing;
+- (BOOL)isObjShowing;
+- (void)confirm;
+- (void)cancel;
+@end
+@interface NewSettingViewController : UIViewController {
+@public
+    MMTipsViewController *m_introView;
+}
+@property(nonatomic,strong) id nativeSwitchLogic;
+@property(nonatomic) NSUInteger showCalls;
+@property(nonatomic) NSUInteger gotoCalls;
+- (void)showLoginInfo;
+- (void)gotoSwitchAccount;
+- (void)logout;
+- (void)login;
+- (void)selectAccount:(id)account;
+@end
+@implementation NewSettingViewController
+- (instancetype)init {
+    quickSettingInitCalls++;
+    self=[super init];
+    if (quickSettingInitMutation) quickSettingInitMutation();
+    return quickSettingInitReplacement ?: (quickSettingInitUnavailable ? nil : self);
+}
+- (void)showLoginInfo {
+    self.showCalls++; quickSettingShowCalls++; quickSettingLastReceiver=self;
+    id request=objc_getAssociatedObject(self.view.window,&CSQuickRouteRequestKey);
+    quickSettingRequestSource=[request valueForKey:@"source"];
+    if (quickSettingShowMutation) quickSettingShowMutation();
+    if (quickSettingNativeNoOp || !self.isViewLoaded || !self.view.window || self.transitionCoordinator || self.navigationController.transitionCoordinator) return;
+    if (quickSettingNeedsTip) {
+        void (^showTip)(void)=^{
+            self->m_introView=[(quickSettingTipClass ?: MMTipsViewController.class) new];
+            self->m_introView.m_delegate=self; self->m_introView.objShowing=YES;
+            self->m_introView.view.window=quickSettingTipWindow ?: self.view.window;
+            if (quickSettingTipWindow) quickSettingTipWindow.rootViewController=self->m_introView;
+            if (quickSettingTipMutation) quickSettingTipMutation(self->m_introView);
+        };
+        if (quickSettingTipDeferred) dispatch_async(dispatch_get_main_queue(),showTip); else showTip();
+    } else [self gotoSwitchAccount];
+}
+- (void)gotoSwitchAccount {
+    self.gotoCalls++; quickSettingGotoCalls++; quickSettingLastReceiver=self;
+    self.nativeSwitchLogic=[NSObject new];
+    quickSettingLastLogic=self.nativeSwitchLogic;
+    id request=objc_getAssociatedObject(self.view.window,&CSQuickRouteRequestKey);
+    quickSettingRequestSource=[request valueForKey:@"source"];
+    if (quickSettingGotoMutation) quickSettingGotoMutation();
+    if (quickSettingNativeNoOp) return;
+    void (^openAccounts)(void)=^{ [self.navigationController pushViewController:[WCAccountLoginUsersViewController new] animated:YES]; };
+    if (quickSettingHoldDestination) quickSettingPendingDestination=openAccounts;
+    else if (quickSettingTargetDeferred) dispatch_async(dispatch_get_main_queue(),openAccounts);
+    else openAccounts();
+}
+- (void)logout { quickSettingForbiddenCalls++; }
+- (void)login { quickSettingForbiddenCalls++; }
+- (void)selectAccount:(id)account { quickSettingForbiddenCalls++; }
+@end
+@implementation MMTipsViewController
+- (BOOL)isObjShowing { return self.objShowing; }
+- (void)confirm { self.objShowing=NO; [self.m_delegate gotoSwitchAccount]; }
+- (void)cancel { self.objShowing=NO; }
+@end
+
+static BOOL quickSettingClassOverridden;
+static Class quickSettingClassOverride;
+static Class QuickNativeClass(NSString *name) {
+    if (quickSettingClassOverridden && [name isEqual:@"NewSettingViewController"]) return quickSettingClassOverride;
+    return NSClassFromString(name);
+}
 
 static BOOL cameraQRCodeUnavailable;
 static void (^cameraInitMutation)(void);
@@ -273,17 +467,28 @@ static id quickAppManager;
 @property(nonatomic,weak) UIWindow *mainWindow;
 @property(nonatomic,weak) UIViewController *entrySource;
 @property(nonatomic) NSUInteger paymentCalls;
+@property(nonatomic) NSUInteger noteCalls;
+@property(nonatomic,strong) id topOverride;
+@property(nonatomic,copy) void (^topReadMutation)(void);
+@property(nonatomic,copy) void (^noteMutation)(void);
 @property(nonatomic,strong) id mainFrame;
 + (id)getAppViewControllerManager;
 - (id)getNewMainFrameViewController;
 - (id)getMainWindow;
+- (id)getTopViewController;
 - (void)jumpToOfflinePayWithEntryVC:(id)source;
+- (void)jumpToWriteNote;
 @end
 @implementation CAppViewControllerManager
 + (id)getAppViewControllerManager { return quickAppManager; }
 - (id)getMainWindow { return self.mainWindow; }
 - (id)getNewMainFrameViewController { return self.mainFrame; }
+- (id)getTopViewController {
+    if (self.topReadMutation) self.topReadMutation();
+    return self.topOverride ?: self.mainWindow.rootViewController;
+}
 - (void)jumpToOfflinePayWithEntryVC:(id)source { self.paymentCalls++; self.entrySource=source; }
+- (void)jumpToWriteNote { self.noteCalls++; if (self.noteMutation) self.noteMutation(); }
 @end
 static BOOL finderInvalidInitializer;
 static id finderConstructorReplacement;
@@ -357,7 +562,6 @@ static void (^backgroundInitMutation)(void);
 - (void)showChatBackgroundConfig { self.backgroundCalls++; }
 @end
 
-static char CSQuickRouteRequestKey;
 static NSString *quickAccount=@"first-account";
 static NSUInteger quickEpoch=1;
 static BOOL quickSuspended;
@@ -373,21 +577,37 @@ static BOOL CSQuickCanNavigate(UIViewController *source) {
 }
 
 static BOOL CSQuickFailure(UIViewController *source, NSString *message);
+// Production main-queue turns stay real. Only delayed observation is held in
+// memory so lifecycle and timeout boundaries can advance without wall-clock waits.
+static NSMutableArray<dispatch_block_t> *quickDelayedBlocks;
+static NSUInteger quickDelayedSchedules;
+static BOOL quickDelayedUsesMainQueue=YES;
+static void QuickDispatchAfter(dispatch_time_t when, dispatch_queue_t queue, dispatch_block_t block) {
+    quickDelayedSchedules++;
+    quickDelayedUsesMainQueue=quickDelayedUsesMainQueue && queue==dispatch_get_main_queue();
+    [quickDelayedBlocks addObject:[block copy]];
+}
+#define NSUserDefaults QuickFavoriteDefaults
+#define NSClassFromString QuickNativeClass
+#define dispatch_after QuickDispatchAfter
 #import "QuickPanelRouterProduction.h"
+#undef dispatch_after
+#undef NSClassFromString
+#undef NSUserDefaults
 
 static NSString *quickPublicStub;
 static NSString *quickFailureMessage;
-static BOOL CSQuickFailure(UIViewController *source, NSString *message) { quickFailureMessage=message; return NO; }
+static __weak UIViewController *quickFailureSource;
+static BOOL CSQuickFailure(UIViewController *source, NSString *message) { quickFailureSource=source; quickFailureMessage=message; return NO; }
 static BOOL CSQuickOpenPlugin(CSQuickRouteRequest *request, BOOL settings) {
     quickPublicStub=settings ? @"panel_settings" : @"plugin_home"; [request finish]; return YES;
-}
-static BOOL CSQuickOpenFavorites(CSQuickRouteRequest *request) {
-    quickPublicStub=@"favorites"; [request finish]; return YES;
 }
 @interface CSQuickPanelActionRouter : NSObject
 + (BOOL)performActionWithIdentifier:(NSString *)identifier fromViewController:(UIViewController *)source;
 @end
+#define NSClassFromString QuickNativeClass
 #import "QuickPanelRouterPublicProduction.h"
+#undef NSClassFromString
 #import "QuickPanelPreferenceIDs.h"
 
 static NSUInteger checks;
@@ -412,6 +632,17 @@ static void DrainMainQueue(void) {
     dispatch_async(dispatch_get_main_queue(), ^{ completed=YES; });
     while (!completed) [NSRunLoop.currentRunLoop runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.01]];
 }
+static void RunDelayedTurn(void) {
+    NSArray<dispatch_block_t> *ready=quickDelayedBlocks.copy;
+    [quickDelayedBlocks removeAllObjects];
+    for (dispatch_block_t block in ready) block();
+    DrainMainQueue();
+}
+static void SettleDelayedNavigation(void) {
+    DrainMainQueue();
+    for (NSUInteger turn=0; quickDelayedBlocks.count && turn<250; turn++) RunDelayedTurn();
+    Check(!quickDelayedBlocks.count,"bounded native navigation observation stops scheduling after its completion or cancellation");
+}
 static UIViewController *FileSource(UIWindow *window, NewMainFrameViewController *main) {
     UIViewController *source=RouteSource(window); main.curViewController=source; return source;
 }
@@ -429,6 +660,196 @@ static UIViewController *CrossTabSource(UIWindow *window, NewMainFrameViewContro
     return source;
 }
 static id WrongMainAction(id receiver, SEL selector, id contact, id wrap) { return nil; }
+static id WrongReceiveAction(id receiver, SEL selector) { return nil; }
+static void VerifyMyMomentsRoutes(void) {
+    UIWindow *window=[UIWindow new]; window.windowScene=[UIWindowScene new];
+    NewMainFrameViewController *main=[NewMainFrameViewController new];
+    CAppViewControllerManager *manager=[CAppViewControllerManager new];
+    manager.mainWindow=window; manager.mainFrame=main; quickAppManager=manager;
+    NSUInteger timelineBefore=publicTimelineConstructions;
+    UIViewController *source=FileSource(window,main);
+    CSQuickRouteRequest *request=CSQuickBeginRequest(source);
+    Check(CSQuickOpenMyMoments(request) && main.myMomentsCalls==1 && !main.receiveCalls &&
+        !manager.paymentCalls && publicTimelineConstructions==timelineBefore,
+        "my moments submits the native self-album action without constructing the public friends timeline");
+    [request finish];
+    UIViewController *home=source;
+    UIViewController *chat=[UIViewController new];
+    [home.navigationController pushViewController:chat animated:NO]; request=CSQuickBeginRequest(chat);
+    Check(CSQuickOpenMyMoments(request) && main.myMomentsCalls==2,
+        "my moments can use the existing main owner earlier in the current chat stack");
+    [request finish];
+
+    source=FileSource(window,main);
+    MoreViewController *more=[MoreViewController new];
+    [source.navigationController pushViewController:more animated:NO];
+    quickFailureMessage=nil;
+    Check([CSQuickPanelActionRouter performActionWithIdentifier:@"my_moments" fromViewController:more] &&
+        more.myMomentsCalls==1 && main.myMomentsCalls==2 && !quickFailureMessage && !objc_getAssociatedObject(window,&CSQuickRouteRequestKey),
+        "the public my-moments action prefers the current Me-page owner and releases its request lock");
+    chat=[UIViewController new];
+    [more.navigationController pushViewController:chat animated:NO]; more.navigationController.childViewControllers=@[more];
+    Check([CSQuickPanelActionRouter performActionWithIdentifier:@"my_moments" fromViewController:chat] &&
+        more.myMomentsCalls==2 && main.myMomentsCalls==2,
+        "an existing Me-page owner earlier in the same navigation stack remains the preferred album entry");
+
+    UITabBarController *tab=nil; source=CrossTabSource(window,main,&tab);
+    UINavigationController *homeNavigation=main.curViewController.navigationController;
+    quickFailureMessage=nil;
+    Check([CSQuickPanelActionRouter performActionWithIdentifier:@"my_moments" fromViewController:source] &&
+        main.myMomentsCalls==3 && tab.selectedViewController==homeNavigation && !quickFailureMessage &&
+        !objc_getAssociatedObject(window,&CSQuickRouteRequestKey) && publicTimelineConstructions==timelineBefore,
+        "my moments uses the existing first home tab for a checked public handoff without falling back to friends' moments");
+
+    source=CrossTabSource(window,main,&tab); request=CSQuickBeginRequest(source);
+    tabSelectionMutation=^{ quickEpoch++; };
+    Check(!CSQuickOpenMyMoments(request) && main.myMomentsCalls==3,
+        "an account change during tab handoff prevents the old my-moments request from invoking native");
+    tabSelectionMutation=nil; [request finish];
+    source=FileSource(window,main); UIWindow *otherWindow=[UIWindow new]; manager.mainWindow=otherWindow;
+    request=CSQuickBeginRequest(source);
+    Check(!CSQuickOpenMyMoments(request) && main.myMomentsCalls==3,
+        "my moments cannot use a main owner returned by another window's app manager");
+    [request finish]; manager.mainWindow=window;
+
+    Class wrongClass=objc_allocateClassPair(NewMainFrameViewController.class,"WrongMyMomentsOwnerABI",0);
+    class_addMethod(wrongClass,NSSelectorFromString(@"showMyWCView"),(IMP)WrongReceiveAction,"@@:");
+    objc_registerClassPair(wrongClass);
+    NewMainFrameViewController *wrong=[wrongClass new]; wrong.curViewController=source; manager.mainFrame=wrong;
+    quickFailureMessage=nil;
+    Check(![CSQuickPanelActionRouter performActionWithIdentifier:@"my_moments" fromViewController:source] &&
+        !wrong.myMomentsCalls && quickFailureMessage.length && !objc_getAssociatedObject(window,&CSQuickRouteRequestKey) &&
+        publicTimelineConstructions==timelineBefore,
+        "an incompatible my-album native ABI fails visibly without opening the public timeline or leaking the request");
+    manager.mainFrame=nil; quickFailureMessage=nil;
+    Check(![CSQuickPanelActionRouter performActionWithIdentifier:@"my_moments" fromViewController:source] &&
+        quickFailureMessage.length && publicTimelineConstructions==timelineBefore && !objc_getAssociatedObject(window,&CSQuickRouteRequestKey),
+        "an unavailable personal-album capability never substitutes the friends timeline");
+
+    manager.mainFrame=main; source=FileSource(window,main);
+    Check([CSQuickPanelActionRouter performActionWithIdentifier:@"moments" fromViewController:source] &&
+        [source.navigationController.topViewController isKindOfClass:WCTimeLineViewController.class] &&
+        publicTimelineConstructions==timelineBefore+1 && main.myMomentsCalls==3,
+        "the original moments identifier continues to open the public friends timeline independently");
+    quickAppManager=nil;
+}
+static void VerifyReceiveCodeRoutes(void) {
+    UIWindow *window=[UIWindow new]; window.windowScene=[UIWindowScene new];
+    NewMainFrameViewController *main=[NewMainFrameViewController new];
+    CAppViewControllerManager *manager=[CAppViewControllerManager new];
+    manager.mainWindow=window; manager.mainFrame=main; quickAppManager=manager;
+    UIViewController *source=FileSource(window,main);
+    CSQuickRouteRequest *request=CSQuickBeginRequest(source);
+    Check(CSQuickOpenReceiveCode(request) && main.receiveCalls==1 && !manager.paymentCalls,
+        "receive code submits the native facing-receive action without opening the offline payment-code route");
+    [request finish];
+
+    UIViewController *home=source;
+    UIViewController *chat=[UIViewController new];
+    [home.navigationController pushViewController:chat animated:NO];
+    request=CSQuickBeginRequest(chat);
+    Check(CSQuickOpenReceiveCode(request) && main.receiveCalls==2 && home.navigationController.topViewController==chat,
+        "receive code accepts the existing main owner earlier in the current chat navigation stack");
+    [request finish]; source=FileSource(window,main);
+    NSUInteger calls=main.receiveCalls;
+    UIWindow *otherWindow=[UIWindow new];
+    manager.mainWindow=otherWindow; request=CSQuickBeginRequest(source);
+    Check(!CSQuickOpenReceiveCode(request) && main.receiveCalls==calls,
+        "receive code rejects a main owner supplied by another window's native manager");
+    [request finish]; manager.mainWindow=window;
+    UIViewController *stale=[UIViewController new]; stale.navigationController=source.navigationController;
+    main.curViewController=stale; request=CSQuickBeginRequest(source);
+    Check(!CSQuickOpenReceiveCode(request) && main.receiveCalls==calls,
+        "receive code rejects a stale main page outside the navigation stack");
+    [request finish]; main.curViewController=source;
+
+    Class wrongClass=objc_allocateClassPair(NewMainFrameViewController.class,"WrongReceiveCodeOwnerABI",0);
+    class_addMethod(wrongClass,NSSelectorFromString(@"openFace2FaceReceiveMoney"),(IMP)WrongReceiveAction,"@@:");
+    objc_registerClassPair(wrongClass);
+    NewMainFrameViewController *wrong=[wrongClass new]; wrong.curViewController=source; manager.mainFrame=wrong;
+    request=CSQuickBeginRequest(source);
+    Check(!CSQuickOpenReceiveCode(request) && wrong.receiveCalls==0,
+        "receive code rejects an incompatible object-returning native action");
+    [request finish]; manager.mainFrame=nil; quickFailureMessage=nil;
+    Check(![CSQuickPanelActionRouter performActionWithIdentifier:@"receive_code" fromViewController:source] &&
+        quickFailureMessage.length && !objc_getAssociatedObject(window,&CSQuickRouteRequestKey),
+        "an unavailable receive-code capability fails visibly and releases the public request lock");
+    manager.mainFrame=main;
+
+    UITabBarController *tab=nil; source=CrossTabSource(window,main,&tab);
+    UINavigationController *homeNavigation=main.curViewController.navigationController;
+    request=CSQuickBeginRequest(source);
+    Check(CSQuickOpenReceiveCode(request) && main.receiveCalls==calls+1 && tab.selectedViewController==homeNavigation && !manager.paymentCalls,
+        "a different main tab hands off once to its own first WeChat tab before invoking receive money");
+    [request finish]; calls=main.receiveCalls;
+
+    source=CrossTabSource(window,main,&tab); homeNavigation=main.curViewController.navigationController;
+    tab.viewControllers=@[source.navigationController,homeNavigation]; request=CSQuickBeginRequest(source);
+    Check(!CSQuickOpenReceiveCode(request) && main.receiveCalls==calls && tab.selectedViewController==source.navigationController,
+        "receive code cannot switch to a non-first navigation tab posing as home");
+    [request finish];
+    source=CrossTabSource(window,main,&tab); tab.view.window=otherWindow; request=CSQuickBeginRequest(source);
+    Check(!CSQuickOpenReceiveCode(request) && main.receiveCalls==calls && tab.selectedViewController==source.navigationController,
+        "receive code cannot switch a tab container attached to another window");
+    [request finish];
+
+    source=CrossTabSource(window,main,&tab); homeNavigation=main.curViewController.navigationController;
+    request=CSQuickBeginRequest(source); tabSelectionMutation=^{ quickEpoch++; };
+    Check(!CSQuickOpenReceiveCode(request) && main.receiveCalls==calls && tab.selectedViewController==homeNavigation,
+        "an account change during tab handoff cancels receive navigation without restoring a tab in the new account");
+    tabSelectionMutation=nil; [request finish];
+
+    source=CrossTabSource(window,main,&tab);
+    UIViewController *nativeHome=main.curViewController;
+    request=CSQuickBeginRequest(source); tabSelectionMutation=^{ nativeHome.presentedViewController=[UIViewController new]; };
+    Check(!CSQuickOpenReceiveCode(request) && main.receiveCalls==calls && tab.selectedViewController==nativeHome.navigationController,
+        "a modal opened by native tab selection blocks receive navigation and retains its native tab");
+    tabSelectionMutation=nil; nativeHome.presentedViewController=nil; [request finish];
+
+    source=CrossTabSource(window,main,&tab); nativeHome=main.curViewController;
+    request=CSQuickBeginRequest(source);
+    tabSelectionMutation=^{ [nativeHome.navigationController pushViewController:[UIViewController new] animated:YES]; };
+    Check(!CSQuickOpenReceiveCode(request) && main.receiveCalls==calls && tab.selectedViewController==nativeHome.navigationController &&
+        nativeHome.navigationController.topViewController!=nativeHome,
+        "a new native top opened during tab selection blocks receive submission and is never hidden by rollback");
+    tabSelectionMutation=nil; [request finish];
+
+    source=CrossTabSource(window,main,&tab); nativeHome=main.curViewController;
+    request=CSQuickBeginRequest(source);
+    tabSelectionMutation=^{ nativeHome.navigationController.transitionCoordinator=[QuickTransition new]; };
+    Check(!CSQuickOpenReceiveCode(request) && main.receiveCalls==calls && tab.selectedViewController==nativeHome.navigationController,
+        "a native transition started by tab selection cannot be interrupted by receive navigation or rollback");
+    tabSelectionMutation=nil; nativeHome.navigationController.transitionCoordinator=nil; [request finish];
+
+    source=CrossTabSource(window,main,&tab); nativeHome=main.curViewController;
+    UINavigationController *originalNavigation=source.navigationController;
+    request=CSQuickBeginRequest(source);
+    tabSelectionMutation=^{ [originalNavigation pushViewController:[UIViewController new] animated:NO]; };
+    Check(!CSQuickOpenReceiveCode(request) && main.receiveCalls==calls && originalNavigation.topViewController!=source &&
+        tab.selectedViewController==nativeHome.navigationController,
+        "a replaced source navigation top invalidates the old receive request without rolling back newer navigation");
+    tabSelectionMutation=nil; [request finish];
+
+    source=CrossTabSource(window,main,&tab); nativeHome=main.curViewController;
+    nativeHome.presentedViewController=[UIViewController new]; request=CSQuickBeginRequest(source);
+    Check(!CSQuickOpenReceiveCode(request) && main.receiveCalls==calls && tab.selectedViewController==source.navigationController,
+        "a home tab already presenting a modal is rejected before selecting it");
+    nativeHome.presentedViewController=nil; [request finish];
+
+    source=CrossTabSource(window,main,&tab); request=CSQuickBeginRequest(source);
+    UIViewController *replacement=[UIViewController new];
+    tabSelectionMutation=^{ main.curViewController=replacement; };
+    Check(!CSQuickOpenReceiveCode(request) && main.receiveCalls==calls && tab.selectedViewController==source.navigationController,
+        "a native owner rebound during handoff cannot submit receive navigation");
+    tabSelectionMutation=nil; [request finish];
+
+    source=FileSource(window,main); request=CSQuickBeginRequest(source); [request finish];
+    Check(!CSQuickOpenReceiveCode(request) && main.receiveCalls==calls,"a finished receive-code request cannot invoke native");
+    request=CSQuickBeginRequest(source); UIApplication.sharedApplication.applicationState=UIApplicationStateBackground;
+    Check(!CSQuickOpenReceiveCode(request) && main.receiveCalls==calls,"receive code cannot invoke native while the app is backgrounded");
+    UIApplication.sharedApplication.applicationState=UIApplicationStateActive; [request finish];
+    quickAppManager=nil;
+}
 static void VerifyFileTransferRoutes(void) {
     UIWindow *window=[UIWindow new]; window.windowScene=[UIWindowScene new];
     NewMainFrameViewController *main=[NewMainFrameViewController new];
@@ -652,41 +1073,442 @@ static void VerifyNewNativeRoutes(void) {
     [request finish]; finderInitMutation=nil;
 
     request=CSQuickBeginRequest(source); [request finish];
-    BOOL (*routes[])(CSQuickRouteRequest *)={CSQuickOpenQRCode,CSQuickOpenPaymentCode,CSQuickOpenChannels,CSQuickOpenFileTransfer,CSQuickOpenChatBackground};
+    BOOL (*routes[])(CSQuickRouteRequest *)={CSQuickOpenQRCode,CSQuickOpenPaymentCode,CSQuickOpenReceiveCode,CSQuickOpenMyMoments,CSQuickOpenChannels,CSQuickOpenFileTransfer,CSQuickOpenChatBackground,CSQuickOpenCreateNote,CSQuickOpenSwitchAccount};
     for (NSUInteger index=0; index<sizeof(routes)/sizeof(routes[0]); index++)
-        Check(!routes[index](request),"a finished request cannot invoke a QR, payment, channels file-transfer or chat-background native route");
+        Check(!routes[index](request),"a finished request cannot invoke any contextual native shortcut route");
     request=CSQuickBeginRequest(source); window.windowScene=[UIWindowScene new];
     for (NSUInteger index=0; index<sizeof(routes)/sizeof(routes[0]); index++)
-        Check(!routes[index](request),"a request from a replaced scene cannot invoke any of the five routes");
+        Check(!routes[index](request),"a request from a replaced scene cannot invoke any contextual native shortcut route");
     [request finish];
     legacyQRCodeContact=nil; finderParams=nil; quickAppManager=nil; quickContext=nil;
 }
+static NSError *QuickBiometricError(NSInteger code) {
+    return [NSError errorWithDomain:@"fixture.biometric" code:code userInfo:nil];
+}
+static BOOL OpenFavoriteContent(BOOL createNote, UIViewController *source) {
+    return [CSQuickPanelActionRouter performActionWithIdentifier:createNote ? @"create_note" : @"favorites" fromViewController:source];
+}
+static void VerifyCreateNoteAndFavorites(void) {
+    UIWindow *window=[UIWindow new]; window.windowScene=[UIWindowScene new];
+    CAppViewControllerManager *manager=[CAppViewControllerManager new]; manager.mainWindow=window; quickAppManager=manager;
+    UIViewController *source=RouteSource(window);
+    CSQuickRouteRequest *request=CSQuickBeginRequest(source);
+    Check(CSQuickOpenCreateNote(request) && manager.noteCalls==1 && !manager.paymentCalls,
+        "raw note navigation invokes only the exact native write-note entry after resolving its window's real top");
+    [request finish];
+    UIWindow *otherWindow=[UIWindow new]; manager.mainWindow=otherWindow; request=CSQuickBeginRequest(source);
+    Check(!CSQuickOpenCreateNote(request) && manager.noteCalls==1,"note navigation rejects a manager attached to another window");
+    [request finish]; manager.mainWindow=window;
+    manager.topOverride=[UIViewController new]; request=CSQuickBeginRequest(source);
+    Check(!CSQuickOpenCreateNote(request) && manager.noteCalls==1,"note navigation rejects another native top even in the same manager");
+    [request finish]; manager.topOverride=[NSObject new]; request=CSQuickBeginRequest(source);
+    Check(!CSQuickOpenCreateNote(request) && manager.noteCalls==1,"note navigation rejects a non-controller native top");
+    [request finish]; manager.topOverride=source.navigationController; request=CSQuickBeginRequest(source);
+    Check(CSQuickOpenCreateNote(request) && manager.noteCalls==2,"note navigation normalizes a native navigation-container top to this exact source");
+    [request finish]; manager.topOverride=nil;
+    request=CSQuickBeginRequest(source); manager.topReadMutation=^{ quickEpoch++; };
+    Check(!CSQuickOpenCreateNote(request) && manager.noteCalls==2,"note navigation rechecks account identity after the native top getter");
+    [request finish]; manager.topReadMutation=nil;
+    request=CSQuickBeginRequest(source); manager.topReadMutation=^{ window.windowScene.activationState=UISceneActivationStateForegroundInactive; };
+    Check(!CSQuickOpenCreateNote(request) && manager.noteCalls==2,"note navigation rechecks scene activity immediately before its parameterless native action");
+    [request finish]; manager.topReadMutation=nil; window.windowScene.activationState=UISceneActivationStateForegroundActive;
+    Class wrongNoteClass=objc_allocateClassPair(CAppViewControllerManager.class,"WrongWriteNoteManagerABI",0);
+    class_addMethod(wrongNoteClass,NSSelectorFromString(@"jumpToWriteNote"),(IMP)WrongReceiveAction,"@@:"); objc_registerClassPair(wrongNoteClass);
+    CAppViewControllerManager *wrongManager=[wrongNoteClass new]; wrongManager.mainWindow=window; quickAppManager=wrongManager;
+    request=CSQuickBeginRequest(source);
+    Check(!CSQuickOpenCreateNote(request) && !wrongManager.noteCalls,"note navigation rejects the native action with an incompatible object return ABI");
+    [request finish]; quickAppManager=nil; request=CSQuickBeginRequest(source);
+    Check(!CSQuickOpenCreateNote(request),"note navigation rejects an unavailable native manager without opening a different page");
+    [request finish]; quickAppManager=manager;
+
+    quickFavoritesProtected=NO; quickBiometricsAvailable=YES;
+    for (NSUInteger destination=0; destination<2; destination++) {
+        BOOL createNote=destination==1;
+        source=RouteSource(window); quickFailureMessage=nil;
+        NSUInteger noteBefore=manager.noteCalls, favoritesBefore=quickFavoritesConstructions, contextsBefore=quickBiometricConstructions;
+        Check(OpenFavoriteContent(createNote,source),"an unprotected favorite-content shortcut accepts its native destination");
+        Check(manager.noteCalls==noteBefore+(createNote ? 1 : 0) && quickFavoritesConstructions==favoritesBefore+(createNote ? 0 : 1) &&
+            quickBiometricConstructions==contextsBefore && !objc_getAssociatedObject(window,&CSQuickRouteRequestKey),
+            "disabled favorites protection routes directly without constructing authentication or retaining a request lock");
+        if (!createNote) Check([source.navigationController.topViewController isKindOfClass:MyFavoritesViewController.class],
+            "the actual unprotected favorites helper opens the native favorites page instead of a route stub");
+
+        quickFavoritesProtected=YES; source=RouteSource(window); quickFailureMessage=nil;
+        noteBefore=manager.noteCalls; favoritesBefore=quickFavoritesConstructions;
+        Check(OpenFavoriteContent(createNote,source),"a protected favorite-content shortcut starts asynchronous authentication");
+        LAContext *context=quickLastAuthentication;
+        request=objc_getAssociatedObject(window,&CSQuickRouteRequestKey);
+        Check(context && request && request.authentication==context && context.preflightPolicy==LAPolicyDeviceOwnerAuthenticationWithBiometrics &&
+            context.evaluationPolicy==LAPolicyDeviceOwnerAuthenticationWithBiometrics && [context.reason isEqual:@"请验证您的身份以查看收藏内容"] &&
+            manager.noteCalls==noteBefore && quickFavoritesConstructions==favoritesBefore,
+            "both protected destinations use the real favorites biometric policy and defer native navigation until its callback");
+        Check([quickFavoriteSuites.lastObject isEqual:CSQuickFavoriteSuite] && [quickFavoriteKeys.lastObject isEqual:CSQuickFavoriteAuthKey],
+            "the real guard reads its production favorites suite and key through the isolated in-memory defaults boundary");
+        Check(!OpenFavoriteContent(createNote,source) && objc_getAssociatedObject(window,&CSQuickRouteRequestKey)==request,
+            "a repeated protected shortcut preserves the pending biometric request and cannot open a second destination");
+        quickFailureMessage=nil; [context completeWithSuccess:YES error:nil];
+        Check(manager.noteCalls==noteBefore && quickFavoritesConstructions==favoritesBefore,
+            "a biometric completion enqueues its destination on the main queue");
+        DrainMainQueue();
+        Check(manager.noteCalls==noteBefore+(createNote ? 1 : 0) && quickFavoritesConstructions==favoritesBefore+(createNote ? 0 : 1) &&
+            request.cancelled && context.invalidations==1 && !objc_getAssociatedObject(window,&CSQuickRouteRequestKey) && !quickFailureMessage,
+            "successful authentication opens exactly the requested native destination and releases the live context and window lock");
+
+        source=RouteSource(window); quickBiometricsAvailable=NO; quickFailureMessage=nil;
+        NSUInteger evaluationsBefore=quickBiometricEvaluations;
+        Check(!OpenFavoriteContent(createNote,source) && quickLastAuthentication.invalidations==1 &&
+            quickBiometricEvaluations==evaluationsBefore && quickFailureMessage.length && !objc_getAssociatedObject(window,&CSQuickRouteRequestKey),
+            "unavailable biometrics refuse protected note and favorites entry without evaluating or retaining a request");
+        quickBiometricsAvailable=YES;
+        source=RouteSource(window); quickFailureMessage=nil; noteBefore=manager.noteCalls; favoritesBefore=quickFavoritesConstructions;
+        Check(OpenFavoriteContent(createNote,source),"a failed-authentication fixture begins with a real pending request");
+        context=quickLastAuthentication; [context completeWithSuccess:NO error:QuickBiometricError(LAErrorAuthenticationFailed)]; DrainMainQueue();
+        Check(manager.noteCalls==noteBefore && quickFavoritesConstructions==favoritesBefore && quickFailureMessage.length &&
+            context.invalidations==1 && !objc_getAssociatedObject(window,&CSQuickRouteRequestKey),
+            "an actual biometric failure opens no content, reports failure and releases its request");
+        for (NSNumber *code in @[@(LAErrorUserCancel),@(LAErrorSystemCancel),@(LAErrorAppCancel)]) {
+            source=RouteSource(window); quickFailureMessage=nil;
+            Check(OpenFavoriteContent(createNote,source),"a canceled-authentication fixture starts a protected request");
+            context=quickLastAuthentication; [context completeWithSuccess:NO error:QuickBiometricError(code.integerValue)]; DrainMainQueue();
+            Check(manager.noteCalls==noteBefore && quickFavoritesConstructions==favoritesBefore && !quickFailureMessage &&
+                context.invalidations==1 && !objc_getAssociatedObject(window,&CSQuickRouteRequestKey),
+                "user, system and app biometric cancellations open no content and cleanly release without an error alert");
+        }
+
+        source=RouteSource(window); quickFailureMessage=nil;
+        Check(OpenFavoriteContent(createNote,source),"an account-boundary fixture starts pending authentication");
+        context=quickLastAuthentication; request=objc_getAssociatedObject(window,&CSQuickRouteRequestKey);
+        quickAccount=[quickAccount stringByAppendingString:@"-changed"]; quickEpoch++;
+        [NSNotificationCenter.defaultCenter postNotificationName:@"CSBackupAccountChanged" object:nil];
+        CSQuickRouteRequest *replacement=CSQuickBeginRequest(source);
+        [context completeWithSuccess:YES error:nil]; DrainMainQueue();
+        Check(request.cancelled && context.invalidations==1 && replacement && objc_getAssociatedObject(window,&CSQuickRouteRequestKey)==replacement &&
+            manager.noteCalls==noteBefore && quickFavoritesConstructions==favoritesBefore && !quickFailureMessage,
+            "a late successful biometric callback from an old account neither opens content nor clears the new account's request");
+        [replacement finish];
+        source=RouteSource(window); quickFailureMessage=nil;
+        Check(OpenFavoriteContent(createNote,source),"a replaced-scene fixture starts pending authentication");
+        context=quickLastAuthentication; window.windowScene=[UIWindowScene new];
+        [context completeWithSuccess:YES error:nil]; DrainMainQueue();
+        Check(manager.noteCalls==noteBefore && quickFavoritesConstructions==favoritesBefore && context.invalidations==1 &&
+            !objc_getAssociatedObject(window,&CSQuickRouteRequestKey) && !quickFailureMessage,
+            "a biometric success from the window's previous scene cannot open favorite content");
+        source=RouteSource(window); quickFailureMessage=nil;
+        Check(OpenFavoriteContent(createNote,source),"a scene-background fixture starts pending authentication");
+        context=quickLastAuthentication;
+        [NSNotificationCenter.defaultCenter postNotificationName:UISceneDidEnterBackgroundNotification object:window.windowScene];
+        [context completeWithSuccess:YES error:nil]; DrainMainQueue();
+        Check(manager.noteCalls==noteBefore && quickFavoritesConstructions==favoritesBefore && context.invalidations==1 &&
+            !objc_getAssociatedObject(window,&CSQuickRouteRequestKey) && !quickFailureMessage,
+            "an owning scene background event cancels protected content even if authentication later succeeds");
+        source=RouteSource(window); quickFailureMessage=nil;
+        Check(OpenFavoriteContent(createNote,source),"a protection-change fixture starts under enabled favorites protection");
+        context=quickLastAuthentication; quickFavoritesProtected=NO;
+        [context completeWithSuccess:YES error:nil]; DrainMainQueue();
+        Check(manager.noteCalls==noteBefore && quickFavoritesConstructions==favoritesBefore && context.invalidations==1 &&
+            !objc_getAssociatedObject(window,&CSQuickRouteRequestKey),
+            "turning favorites protection off invalidates the old protected continuation instead of opening stale content");
+        quickFavoritesProtected=YES;
+        source=RouteSource(window); quickFailureMessage=nil;
+        Check(OpenFavoriteContent(createNote,source),"a covered-source fixture starts protected authentication");
+        context=quickLastAuthentication; source.presentedViewController=[UIViewController new];
+        [context completeWithSuccess:YES error:nil]; DrainMainQueue();
+        Check(manager.noteCalls==noteBefore && quickFavoritesConstructions==favoritesBefore && context.invalidations==1 &&
+            !objc_getAssociatedObject(window,&CSQuickRouteRequestKey),
+            "a modal covering the original source prevents a successful biometric reply from pushing content behind it");
+        source.presentedViewController=nil;
+        quickFavoritesProtected=NO;
+    }
+    quickFavoritesProtected=YES; source=RouteSource(window); quickFailureMessage=nil;
+    NSUInteger before=manager.noteCalls;
+    Check(OpenFavoriteContent(YES,source),"a native-top-change fixture starts protected note creation");
+    LAContext *context=quickLastAuthentication; manager.topOverride=[UIViewController new];
+    [context completeWithSuccess:YES error:nil]; DrainMainQueue();
+    Check(manager.noteCalls==before && quickFailureMessage.length && !objc_getAssociatedObject(window,&CSQuickRouteRequestKey),
+        "successful note authentication revalidates the manager's real top before calling its parameterless editor entry");
+    manager.topOverride=nil; source=RouteSource(window); quickFailureMessage=nil;
+    Check(OpenFavoriteContent(YES,source),"a native-exception fixture starts protected note creation");
+    context=quickLastAuthentication; manager.noteMutation=^{ [NSException raise:NSInternalInconsistencyException format:@"fixture note native failure"]; };
+    [context completeWithSuccess:YES error:nil]; DrainMainQueue();
+    Check(manager.noteCalls==before+1 && quickFailureMessage.length && context.invalidations==1 && !objc_getAssociatedObject(window,&CSQuickRouteRequestKey),
+        "an exception from the authenticated native note action is caught and releases authentication and its window lock");
+    manager.noteMutation=nil; quickFavoritesProtected=NO; quickLastAuthentication=nil; quickAppManager=nil;
+}
+static void WrongSettingInitializer(id receiver, SEL selector) {}
+static void ResetSwitchFixture(void) {
+    quickSettingInitUnavailable=NO; quickSettingInitReplacement=nil; quickSettingInitMutation=nil;
+    quickSettingShowMutation=nil; quickSettingGotoMutation=nil; navigationPushMutation=nil;
+    quickSettingNativeNoOp=NO; quickSettingTargetDeferred=NO; quickSettingNeedsTip=NO; quickSettingTipDeferred=NO;
+    quickSettingTipWindow=nil; quickSettingTipClass=Nil; quickSettingTipMutation=nil;
+    quickSettingHoldDestination=NO; quickSettingPendingDestination=nil;
+    quickSettingClassOverridden=NO; quickSettingClassOverride=Nil;
+    quickFailureMessage=nil; quickFailureSource=nil; quickSuspended=NO;
+}
+static BOOL OpenSwitchAccount(UIViewController *source) {
+    return [CSQuickPanelActionRouter performActionWithIdentifier:@"switch_account" fromViewController:source];
+}
+static void VerifySwitchAccountRoutes(void) {
+    ResetSwitchFixture();
+    UIWindow *window=[UIWindow new]; window.windowScene=[UIWindowScene new];
+    UIWindow *otherWindow=[UIWindow new]; otherWindow.windowScene=[UIWindowScene new];
+    UIViewController *source=RouteSource(window);
+    NSUInteger constructionsBefore=quickSettingInitCalls, showBefore=quickSettingShowCalls, actionsBefore=quickSettingGotoCalls;
+    Check(OpenSwitchAccount(source),"switch-account accepts a checked native settings owner as a pending route");
+    NewSettingViewController *page=(id)source.navigationController.topViewController;
+    CSQuickRouteRequest *request=objc_getAssociatedObject(window,&CSQuickRouteRequestKey);
+    Check([page isKindOfClass:NewSettingViewController.class] && quickSettingInitCalls==constructionsBefore+1 &&
+        quickSettingShowCalls==showBefore && quickSettingGotoCalls==actionsBefore && request.awaitingNavigation && request.source==page &&
+        source.navigationController.pushCalls==1 && !source.navigationController.lastPushAnimated && page.hidesBottomBarWhenPushed,
+        "fallback pushes and rebinds settings while deferring its native action until a later main turn");
+    SettleDelayedNavigation();
+    Check([source.navigationController.topViewController isKindOfClass:WCAccountLoginUsersViewController.class] &&
+        quickSettingShowCalls==showBefore+1 && quickSettingGotoCalls==actionsBefore+1 && page.showCalls==1 && page.gotoCalls==1 &&
+        quickSettingLastReceiver==page && quickSettingRequestSource==page && quickSettingLastLogic==page.nativeSwitchLogic &&
+        quickSettingLastLogic && request.cancelled && !quickFailureMessage && !objc_getAssociatedObject(window,&CSQuickRouteRequestKey),
+        "success requires an actual visible native account-selection page after showLoginInfo owns its native continuation");
+
+    ResetSwitchFixture(); source=RouteSource(window); page=[NewSettingViewController new];
+    [source.navigationController pushViewController:page animated:NO];
+    constructionsBefore=quickSettingInitCalls; showBefore=quickSettingShowCalls;
+    NSUInteger pushes=page.navigationController.pushCalls;
+    Check(OpenSwitchAccount(page),"an already visible native settings page accepts the same deferred entry");
+    SettleDelayedNavigation();
+    Check(quickSettingInitCalls==constructionsBefore && page.showCalls==1 && quickSettingShowCalls==showBefore+1 &&
+        page.navigationController.pushCalls==pushes+1 && [page.navigationController.topViewController isKindOfClass:WCAccountLoginUsersViewController.class],
+        "only the visible settings owner is reused without constructing or pushing a second settings page");
+
+    ResetSwitchFixture(); source=RouteSource(window); NewSettingViewController *older=[NewSettingViewController new];
+    [source.navigationController pushViewController:older animated:NO];
+    UIViewController *detail=[UIViewController new]; [source.navigationController pushViewController:detail animated:NO];
+    source.navigationController.childViewControllers=@[older]; constructionsBefore=quickSettingInitCalls;
+    Check(OpenSwitchAccount(detail),"a detail above an older settings page starts a fresh visible owner");
+    page=(id)detail.navigationController.topViewController;
+    SettleDelayedNavigation();
+    Check(page!=older && quickSettingInitCalls==constructionsBefore+1 && !older.showCalls && !older.gotoCalls && page.showCalls==1 &&
+        [detail.navigationController.topViewController isKindOfClass:WCAccountLoginUsersViewController.class],
+        "hidden settings owners earlier in the same stack cannot supply a competing native presentation");
+
+    Class wrongAction=objc_allocateClassPair(NewSettingViewController.class,"WrongSwitchLoginInfoABI",0);
+    class_addMethod(wrongAction,NSSelectorFromString(@"showLoginInfo"),(IMP)WrongReceiveAction,"@@:"); objc_registerClassPair(wrongAction);
+    Class wrongInit=objc_allocateClassPair(NewSettingViewController.class,"WrongSwitchAccountInitializerABI",0);
+    class_addMethod(wrongInit,@selector(init),(IMP)WrongSettingInitializer,"v@:"); objc_registerClassPair(wrongInit);
+    quickSettingClassOverridden=YES;
+    for (id value in @[NSNull.null,NSObject.class,wrongAction,wrongInit]) {
+        quickSettingClassOverride=value==NSNull.null ? Nil : value;
+        source=RouteSource(window); quickFailureMessage=nil;
+        constructionsBefore=quickSettingInitCalls; showBefore=quickSettingShowCalls;
+        Check(!OpenSwitchAccount(source) && quickSettingInitCalls==constructionsBefore && quickSettingShowCalls==showBefore &&
+            !source.navigationController.pushCalls && quickFailureMessage.length && !objc_getAssociatedObject(window,&CSQuickRouteRequestKey),
+            "missing settings, non-UIKit classes and incompatible initializer or showLoginInfo ABIs fail before constructing a native owner");
+    }
+    ResetSwitchFixture(); source=RouteSource(window); quickSettingInitUnavailable=YES; showBefore=quickSettingShowCalls;
+    Check(!OpenSwitchAccount(source) && quickSettingShowCalls==showBefore && !source.navigationController.pushCalls &&
+        !objc_getAssociatedObject(window,&CSQuickRouteRequestKey),"a nil settings initializer cannot begin a deferred native account route");
+    ResetSwitchFixture(); source=RouteSource(window); quickSettingInitReplacement=[NSObject new];
+    Check(!OpenSwitchAccount(source) && quickSettingShowCalls==showBefore && !source.navigationController.pushCalls &&
+        !objc_getAssociatedObject(window,&CSQuickRouteRequestKey),"an unrelated initializer result cannot become an account route owner");
+    ResetSwitchFixture(); quickSettingInitReplacement=[wrongAction new]; source=RouteSource(window);
+    Check(!OpenSwitchAccount(source) && quickSettingShowCalls==showBefore && !source.navigationController.pushCalls &&
+        !objc_getAssociatedObject(window,&CSQuickRouteRequestKey),"the initialized instance must still expose the native entry with its exact ABI");
+    ResetSwitchFixture(); source=RouteSource(window); quickSettingInitMutation=^{ quickEpoch++; };
+    Check(!OpenSwitchAccount(source) && quickSettingShowCalls==showBefore && !source.navigationController.pushCalls &&
+        !objc_getAssociatedObject(window,&CSQuickRouteRequestKey),"an account change during initialization prevents the settings push");
+    ResetSwitchFixture(); source=RouteSource(window); UIViewController *originalSource=source;
+    quickSettingInitMutation=^{ [originalSource.navigationController pushViewController:[UIViewController new] animated:NO]; };
+    Check(!OpenSwitchAccount(source) && quickSettingShowCalls==showBefore && source.navigationController.pushCalls==1 &&
+        ![source.navigationController.topViewController isKindOfClass:NewSettingViewController.class] &&
+        !objc_getAssociatedObject(window,&CSQuickRouteRequestKey),"user navigation during native initialization is preserved without a stale account route");
+
+    ResetSwitchFixture(); source=RouteSource(window); showBefore=quickSettingShowCalls;
+    navigationPushMutation=^(UINavigationController *navigation, UIViewController *pushed) {
+        if ([pushed isKindOfClass:NewSettingViewController.class]) pushed.view.window=nil;
+    };
+    Check(OpenSwitchAccount(source),"settings can enter pending observation before its native view attaches to the window");
+    page=(id)source.navigationController.topViewController; request=objc_getAssociatedObject(window,&CSQuickRouteRequestKey);
+    DrainMainQueue();
+    Check(request && !request.cancelled && request.source==page && request.awaitingNavigation && quickSettingShowCalls==showBefore &&
+        !quickFailureMessage && quickDelayedBlocks.count,"a detached newly pushed settings view waits without calling its native entry");
+    UIViewController *contender=[UIViewController new]; contender.view.window=window;
+    CSQuickRouteRequest *duplicate=CSQuickBeginRequest(contender);
+    Check(!duplicate && objc_getAssociatedObject(window,&CSQuickRouteRequestKey)==request && !request.cancelled,
+        "pending navigation keeps the window lock even while its newly rebound settings source is temporarily detached");
+    navigationPushMutation=nil; page.view.window=window;
+    SettleDelayedNavigation();
+    Check(page.showCalls==1 && [page.navigationController.topViewController isKindOfClass:WCAccountLoginUsersViewController.class] &&
+        request.cancelled && !quickFailureMessage,"window attachment resumes the native action once and verifies its actual account page");
+
+    ResetSwitchFixture(); source=RouteSource(window); QuickTransition *appearance=[QuickTransition new];
+    navigationPushMutation=^(UINavigationController *navigation, UIViewController *pushed) {
+        if ([pushed isKindOfClass:NewSettingViewController.class]) pushed.transitionCoordinator=appearance;
+    };
+    Check(OpenSwitchAccount(source),"a settings appearance transition starts a pending native route");
+    page=(id)source.navigationController.topViewController; request=objc_getAssociatedObject(window,&CSQuickRouteRequestKey);
+    DrainMainQueue();
+    Check(!page.showCalls && !request.cancelled && quickDelayedBlocks.count,"the native switch entry waits for the pushed settings appearance to settle");
+    navigationPushMutation=nil; page.transitionCoordinator=nil; [appearance complete]; SettleDelayedNavigation();
+    Check(page.showCalls==1 && [page.navigationController.topViewController isKindOfClass:WCAccountLoginUsersViewController.class] &&
+        !quickFailureMessage,"completing native appearance submits the entry once without overlapping settings pushes");
+
+    ResetSwitchFixture(); source=RouteSource(window); quickSettingHoldDestination=YES;
+    Check(OpenSwitchAccount(source),"a native action can accept its route before enqueuing the account-selection destination");
+    page=(id)source.navigationController.topViewController; request=objc_getAssociatedObject(window,&CSQuickRouteRequestKey);
+    DrainMainQueue();
+    Check(page.showCalls==1 && page.gotoCalls==1 && quickSettingPendingDestination && !request.cancelled &&
+        request.awaitingNavigation && page.navigationController.topViewController==page && !quickFailureMessage,
+        "invocation counts and a settings top cannot falsely complete a native account shortcut");
+    Check(!OpenSwitchAccount(page) && !quickFailureMessage && page.showCalls==1 &&
+        objc_getAssociatedObject(window,&CSQuickRouteRequestKey)==request,
+        "a repeated tap while observing native account checks neither reenters nor presents a competing alert");
+    RunDelayedTurn(); RunDelayedTurn();
+    Check(page.showCalls==1 && page.gotoCalls==1 && !request.cancelled,
+        "repeated observation never resubmits showLoginInfo or the native goto continuation");
+    dispatch_block_t destination=quickSettingPendingDestination; quickSettingPendingDestination=nil;
+    dispatch_async(dispatch_get_main_queue(),destination); SettleDelayedNavigation();
+    Check([page.navigationController.topViewController isKindOfClass:WCAccountLoginUsersViewController.class] &&
+        request.cancelled && !quickFailureMessage && !objc_getAssociatedObject(window,&CSQuickRouteRequestKey),
+        "the pending request completes only after the asynchronously opened account-selection page becomes visible");
+
+    ResetSwitchFixture(); source=RouteSource(window); quickSettingTargetDeferred=YES;
+    Check(OpenSwitchAccount(source),"a native main-queue account push starts pending observation");
+    SettleDelayedNavigation();
+    Check([source.navigationController.topViewController isKindOfClass:WCAccountLoginUsersViewController.class] &&
+        !quickFailureMessage && !objc_getAssociatedObject(window,&CSQuickRouteRequestKey),
+        "a real next-main-turn native account push is observed before releasing the window lock");
+
+    ResetSwitchFixture(); source=RouteSource(window); quickSettingNativeNoOp=YES;
+    NSUInteger scheduledBefore=quickDelayedSchedules;
+    Check(OpenSwitchAccount(source),"a native void no-op is accepted only as an unverified pending handoff");
+    page=(id)source.navigationController.topViewController; request=objc_getAssociatedObject(window,&CSQuickRouteRequestKey);
+    DrainMainQueue();
+    Check(page.showCalls==1 && !page.gotoCalls && !request.cancelled && !quickFailureMessage,
+        "returning from the native entry without a tip or account page keeps verification pending");
+    SettleDelayedNavigation();
+    Check(request.cancelled && page.navigationController.topViewController==page && page.showCalls==1 && !page.gotoCalls &&
+        quickFailureMessage.length && quickFailureSource==page && !objc_getAssociatedObject(window,&CSQuickRouteRequestKey) &&
+        quickDelayedSchedules>scheduledBefore && quickDelayedSchedules-scheduledBefore<=240,
+        "a settled native no-op has a bounded timeout, reports failure on visible settings and never repeats its native action");
+
+    for (NSUInteger boundary=0; boundary<8; boundary++) {
+        ResetSwitchFixture(); source=RouteSource(window); quickSettingNativeNoOp=YES;
+        Check(OpenSwitchAccount(source),"a cancellation fixture starts with native work still pending");
+        page=(id)source.navigationController.topViewController; request=objc_getAssociatedObject(window,&CSQuickRouteRequestKey);
+        DrainMainQueue();
+        UIViewController *userPage=nil;
+        switch (boundary) {
+            case 0: quickEpoch++; break;
+            case 1: quickAccount=[quickAccount stringByAppendingString:@"-switch-boundary"]; quickEpoch++; break;
+            case 2: window.windowScene=[UIWindowScene new]; break;
+            case 3: [NSNotificationCenter.defaultCenter postNotificationName:UISceneDidEnterBackgroundNotification object:window.windowScene]; break;
+            case 4: userPage=[UIViewController new]; [page.navigationController pushViewController:userPage animated:YES]; break;
+            case 5: page.presentedViewController=[UIViewController new]; break;
+            case 6: quickSuspended=YES; break;
+            case 7: window.rootViewController=[UIViewController new]; break;
+        }
+        SettleDelayedNavigation();
+        Check(request.cancelled && page.showCalls==1 && !page.gotoCalls && !quickFailureMessage &&
+            !objc_getAssociatedObject(window,&CSQuickRouteRequestKey) && (!userPage || page.navigationController.topViewController==userPage),
+            "account, scene, background, suspension and user-navigation boundaries cancel pending work without repeating or replacing native UI");
+        page.presentedViewController=nil;
+    }
+
+    ResetSwitchFixture(); source=RouteSource(window); quickSettingNativeNoOp=YES;
+    Check(OpenSwitchAccount(source),"a replacement-lock fixture begins pending account observation");
+    page=(id)source.navigationController.topViewController; request=objc_getAssociatedObject(window,&CSQuickRouteRequestKey); DrainMainQueue();
+    quickEpoch++; [NSNotificationCenter.defaultCenter postNotificationName:@"CSBackupAccountChanged" object:nil];
+    CSQuickRouteRequest *replacementRequest=CSQuickBeginRequest(page);
+    SettleDelayedNavigation();
+    Check(request.cancelled && replacementRequest && [replacementRequest isCurrent] &&
+        objc_getAssociatedObject(window,&CSQuickRouteRequestKey)==replacementRequest && page.showCalls==1 && !quickFailureMessage,
+        "late observation from an old account cannot invoke native work or release the new account's request");
+    [replacementRequest finish];
+
+    for (NSUInteger choice=0; choice<2; choice++) {
+        ResetSwitchFixture(); source=RouteSource(window); quickSettingNeedsTip=YES; quickSettingTipDeferred=choice==1;
+        UIWindow *tipWindow=[UIWindow new]; tipWindow.windowScene=window.windowScene; quickSettingTipWindow=tipWindow;
+        Check(OpenSwitchAccount(source),"first-use native guidance starts through the real showLoginInfo gate");
+        page=(id)source.navigationController.topViewController; request=objc_getAssociatedObject(window,&CSQuickRouteRequestKey);
+        SettleDelayedNavigation();
+        MMTipsViewController *tip=page->m_introView;
+        Check(tip && tip.m_delegate==page && tip.isObjShowing && tip.view.window==tipWindow && page.showCalls==1 && !page.gotoCalls &&
+            !page.nativeSwitchLogic && page.navigationController.topViewController==page && request.cancelled && !quickFailureMessage &&
+            !objc_getAssociatedObject(window,&CSQuickRouteRequestKey),
+            "the exact showing native tip in this scene is a valid handoff without bypassing first-use confirmation");
+        if (!choice) {
+            [tip confirm]; SettleDelayedNavigation();
+            Check(page.showCalls==1 && page.gotoCalls==1 && [page.navigationController.topViewController isKindOfClass:WCAccountLoginUsersViewController.class],
+                "native tip confirmation alone continues goto exactly once after the router has handed off ownership");
+        } else {
+            [tip cancel]; SettleDelayedNavigation();
+            Check(page.showCalls==1 && !page.gotoCalls && page.navigationController.topViewController==page && !tip.isObjShowing,
+                "canceling first-use guidance never invokes a router fallback or forces the account-selection page");
+        }
+    }
+
+    Class wrongTip=objc_allocateClassPair(MMTipsViewController.class,"WrongSwitchTipShowingABI",0);
+    class_addMethod(wrongTip,NSSelectorFromString(@"isObjShowing"),(IMP)WrongReceiveAction,"@@:"); objc_registerClassPair(wrongTip);
+    for (NSUInteger invalidTip=0; invalidTip<6; invalidTip++) {
+        ResetSwitchFixture(); source=RouteSource(window); quickSettingNeedsTip=YES;
+        if (invalidTip==5) quickSettingTipClass=wrongTip;
+        quickSettingTipMutation=^(MMTipsViewController *tip) {
+            switch (invalidTip) {
+                case 0: tip.m_delegate=nil; break;
+                case 1: tip.objShowing=NO; break;
+                case 2: tip.isViewLoaded=NO; break;
+                case 3: tip.view.window=nil; break;
+                case 4: tip.view.window=otherWindow; break;
+            }
+        };
+        Check(OpenSwitchAccount(source),"an invalid native-tip fixture begins as an unverified handoff");
+        page=(id)source.navigationController.topViewController; request=objc_getAssociatedObject(window,&CSQuickRouteRequestKey);
+        SettleDelayedNavigation();
+        Check(request.cancelled && page.showCalls==1 && !page.gotoCalls && page.navigationController.topViewController==page &&
+            quickFailureMessage.length && !objc_getAssociatedObject(window,&CSQuickRouteRequestKey),
+            "a tip with wrong delegate, hidden or unloaded UI, missing window, wrong scene or incompatible showing ABI cannot prove success");
+    }
+
+    ResetSwitchFixture(); source=RouteSource(window);
+    quickSettingShowMutation=^{ [NSException raise:NSInternalInconsistencyException format:@"fixture native showLoginInfo failure"]; };
+    Check(OpenSwitchAccount(source),"a native exception fixture starts through deferred public dispatch");
+    page=(id)source.navigationController.topViewController; request=objc_getAssociatedObject(window,&CSQuickRouteRequestKey);
+    SettleDelayedNavigation();
+    Check(request.cancelled && page.showCalls==1 && !page.gotoCalls && quickFailureMessage.length && quickFailureSource==page &&
+        !objc_getAssociatedObject(window,&CSQuickRouteRequestKey),"an asynchronous native-entry exception reports against the visible settings owner and releases its lock");
+    Check(!quickSettingForbiddenCalls && quickDelayedUsesMainQueue,"account observation uses the main queue without logout, login or automatic account-selection APIs");
+    ResetSwitchFixture(); quickSettingLastReceiver=nil; quickSettingRequestSource=nil; quickSettingLastLogic=nil;
+}
 static void VerifyPublicDispatch(void) {
     NSDictionary *pages=@{@"scan":@"CameraScanViewController",@"wallet":@"WCPayMainViewControllerV2",@"moments":@"WCTimeLineViewController",
-        @"my_qrcode":@"CameraQRCodeListViewController",@"profile":@"SettingMyProfileViewController",@"add_friend":@"AddFriendEntryViewController",@"emoji_store":@"MMEmotionStoreViewController",@"chat_background":@"ChatBackgroundEntranceViewController"};
+        @"my_qrcode":@"CameraQRCodeListViewController",@"favorites":@"MyFavoritesViewController",@"profile":@"SettingMyProfileViewController",@"add_friend":@"AddFriendEntryViewController",@"emoji_store":@"MMEmotionStoreViewController",@"chat_background":@"ChatBackgroundEntranceViewController"};
     for (NSString *name in pages.allValues) if (!NSClassFromString(name)) {
         Class cls=objc_allocateClassPair(UIViewController.class,name.UTF8String,0); objc_registerClassPair(cls);
     }
-    NSSet *expected=[NSSet setWithArray:@[@"scan",@"wallet",@"moments",@"my_qrcode",@"favorites",@"plugin_home",@"profile",@"create_group",@"add_friend",@"emoji_store",@"panel_settings",@"payment_code",@"channels",@"file_transfer",@"chat_background"]];
-    Check(QuickPreferenceIDs().count==15 && [[NSSet setWithArray:QuickPreferenceIDs()] isEqual:expected],"all 15 production preference identifiers agree with the router dispatch contract");
+    NSSet *expected=[NSSet setWithArray:@[@"scan",@"wallet",@"moments",@"my_qrcode",@"favorites",@"plugin_home",@"profile",@"create_group",@"add_friend",@"emoji_store",@"panel_settings",@"payment_code",@"channels",@"file_transfer",@"chat_background",@"receive_code",@"my_moments",@"create_note",@"switch_account"]];
+    Check(QuickPreferenceIDs().count==19 && [[NSSet setWithArray:QuickPreferenceIDs()] isEqual:expected],"all 19 production preference identifiers agree with the router dispatch contract");
     UIWindow *window=[UIWindow new]; window.windowScene=[UIWindowScene new];
     CContactMgr *contacts=[CContactMgr new]; contacts.fileContact=Contact(@"filehelper");
     MMMsgLogicManager *messages=[MMMsgLogicManager new]; QuickServiceCenter *center=[QuickServiceCenter new];
     center.services=@{@"CContactMgr":contacts,@"MMMsgLogicManager":messages}; quickContext=center;
     CAppViewControllerManager *manager=[CAppViewControllerManager new]; manager.mainWindow=window; quickAppManager=manager;
+    quickFavoritesProtected=NO;
     for (NSString *identifier in QuickPreferenceIDs()) {
         UIViewController *source=RouteSource(window); quickPublicStub=nil; quickFailureMessage=nil;
         NewMainFrameViewController *home=[NewMainFrameViewController new]; home.curViewController=source;
         manager.mainFrame=home;
         if ([identifier isEqual:@"create_group"]) source.navigationController.childViewControllers=@[home];
-        NSUInteger oldFinderPushes=finderPushes, oldPaymentCalls=manager.paymentCalls, oldMessages=home.messageCalls;
+        NSUInteger oldFinderPushes=finderPushes, oldPaymentCalls=manager.paymentCalls, oldMessages=home.messageCalls, oldReceiveCalls=home.receiveCalls, oldMyMomentsCalls=home.myMomentsCalls;
+        NSUInteger oldNoteCalls=manager.noteCalls, oldSettingGotoCalls=quickSettingGotoCalls, oldSettingShowCalls=quickSettingShowCalls;
         Check([CSQuickPanelActionRouter performActionWithIdentifier:identifier fromViewController:source],[[NSString stringWithFormat:@"the actual public performAction accepts configured identifier %@",identifier] UTF8String]);
+        if ([identifier isEqual:@"switch_account"]) SettleDelayedNavigation();
         BOOL routed=NO;
         if (pages[identifier]) routed=[source.navigationController.topViewController isKindOfClass:NSClassFromString(pages[identifier])];
         else if ([identifier isEqual:@"create_group"]) routed=home.createCalls==1;
         else if ([identifier isEqual:@"payment_code"]) routed=manager.paymentCalls==oldPaymentCalls+1 && manager.entrySource==source;
+        else if ([identifier isEqual:@"receive_code"]) routed=home.receiveCalls==oldReceiveCalls+1 && manager.paymentCalls==oldPaymentCalls;
+        else if ([identifier isEqual:@"my_moments"]) routed=home.myMomentsCalls==oldMyMomentsCalls+1;
         else if ([identifier isEqual:@"channels"]) routed=finderPushes==oldFinderPushes+1 && finderParams.fromVC==source && finderParams.byPush;
         else if ([identifier isEqual:@"file_transfer"]) routed=home.messageCalls==oldMessages+1 && home.lastContact==contacts.fileContact && home.lastMessageWrap==nil && CSQuickChatIsFileHelper(source.navigationController.topViewController) && messages.pushes==0;
+        else if ([identifier isEqual:@"create_note"]) routed=manager.noteCalls==oldNoteCalls+1;
+        else if ([identifier isEqual:@"switch_account"]) routed=quickSettingShowCalls==oldSettingShowCalls+1 && quickSettingGotoCalls==oldSettingGotoCalls+1 && [source.navigationController.topViewController isKindOfClass:WCAccountLoginUsersViewController.class];
         else routed=[quickPublicStub isEqual:identifier];
         Check(routed && !quickFailureMessage && !objc_getAssociatedObject(window,&CSQuickRouteRequestKey),[[NSString stringWithFormat:@"public identifier %@ reaches its intended route and releases the request lock",identifier] UTF8String]);
     }
@@ -805,6 +1627,8 @@ static void VerifyRequestLifecycle(void) {
     [request finish];
 }
 int main(void) { @autoreleasepool {
+    quickFavoriteSuites=[NSMutableArray new]; quickFavoriteKeys=[NSMutableArray new];
+    quickDelayedBlocks=[NSMutableArray new];
     UIViewController *source=[UIViewController new], *home=[UIViewController new];
     UINavigationController *navigation=[UINavigationController new];
     navigation.topViewController=source; navigation.viewControllers=@[home,source];
@@ -838,7 +1662,11 @@ int main(void) { @autoreleasepool {
     VerifyRequestLifecycle();
     VerifyNewNativeRoutes();
     VerifyFileTransferRoutes();
+    VerifyReceiveCodeRoutes();
+    VerifyMyMomentsRoutes();
     VerifyChatBackgroundRoutes();
+    VerifyCreateNoteAndFavorites();
+    VerifySwitchAccountRoutes();
     VerifyPublicDispatch();
     printf("Quick panel router: %lu checks passed.\n",(unsigned long)checks);
 } return 0; }

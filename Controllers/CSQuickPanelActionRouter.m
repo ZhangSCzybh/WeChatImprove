@@ -208,7 +208,7 @@ static CSQuickRouteRequest *CSQuickBeginRequest(UIViewController *source) {
     UIWindow *window=source.view.window;
     CSQuickRouteRequest *previous=objc_getAssociatedObject(window,&CSQuickRouteRequestKey);
     if (previous) {
-        if ([previous identityIsCurrent]) return nil;
+        if ([previous identityIsCurrent] || (previous.awaitingNavigation && [previous windowIdentityIsCurrent])) return nil;
         [previous finish];
     }
     CSQuickRouteRequest *request=[CSQuickRouteRequest new];
@@ -243,16 +243,30 @@ static void CSQuickAfterPrivacyAuthentication(CSQuickRouteRequest *request, void
     } else if ([request isCurrent]) completion();
     else [request finish];
 }
-static BOOL CSQuickOpenFavorites(CSQuickRouteRequest *request) {
+static BOOL CSQuickOpenCreateNote(CSQuickRouteRequest *request) {
+    if (![request isCurrent]) return NO;
+    id manager=CSQuickRead(NSClassFromString(@"CAppViewControllerManager"),@"getAppViewControllerManager");
+    // This native entry has no fromVC parameter. Bind both the manager's window
+    // and its current top to this request before letting WeChat build the editor.
+    if (CSQuickRead(manager,@"getMainWindow")!=request.window ||
+        !CSQuickMatches(manager,@"jumpToWriteNote","v@:")) return NO;
+    id top=CSQuickRead(manager,@"getTopViewController");
+    if (![top isKindOfClass:UIViewController.class] || CSQuickSourcePage(top)!=request.source) return NO;
+    return [request isCurrent] && CSQuickInvokeAction(manager,@"jumpToWriteNote");
+}
+static BOOL CSQuickOpenFavoriteContent(CSQuickRouteRequest *request, BOOL createNote) {
     UIViewController *source=request.source;
+    if (![request isCurrent]) { [request finish]; return NO; }
+    NSString *destination=createNote ? @"新建笔记" : @"收藏";
+    NSString *nativePath=createNote ? @"我 → 收藏 → ＋" : @"我 → 收藏";
     BOOL protected=[[[NSUserDefaults alloc] initWithSuiteName:CSQuickFavoriteSuite] boolForKey:CSQuickFavoriteAuthKey];
     if (!protected) {
-        BOOL opened=CSQuickOpenClass(@"MyFavoritesViewController",source);
+        BOOL opened=createNote ? CSQuickOpenCreateNote(request) : CSQuickOpenClass(@"MyFavoritesViewController",source);
         [request finish];
-        return opened || CSQuickFailure(source,@"当前微信的收藏页面未通过兼容检查，请从“我 → 收藏”打开。");
+        return opened || CSQuickFailure(source,[NSString stringWithFormat:@"当前微信的%@页面未通过兼容检查，请从“%@”打开。",destination,nativePath]);
     }
     // Match FavoriteHooks.xm's suite, key and exact authentication policy. A
-    // shortcut outside MoreViewController must not bypass its existing guard.
+    // new-note shortcut also stays behind the user's existing favorites guard.
     LAContext *context=[LAContext new]; request.authentication=context;
     NSError *error=nil;
     if (![context canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&error]) {
@@ -265,10 +279,11 @@ static BOOL CSQuickOpenFavorites(CSQuickRouteRequest *request) {
             BOOL stillProtected=[[[NSUserDefaults alloc] initWithSuiteName:CSQuickFavoriteSuite] boolForKey:CSQuickFavoriteAuthKey];
             if (success && current && stillProtected) {
                 @try {
-                    if (!CSQuickOpenClass(@"MyFavoritesViewController",source))
-                        CSQuickFailure(source,@"验证已完成，但当前微信未能打开收藏。请从“我 → 收藏”重试。");
+                    BOOL opened=createNote ? CSQuickOpenCreateNote(request) : CSQuickOpenClass(@"MyFavoritesViewController",source);
+                    if (!opened)
+                        CSQuickFailure(source,[NSString stringWithFormat:@"验证已完成，但当前微信未能打开%@。请从“%@”重试。",destination,nativePath]);
                 } @catch (__unused NSException *exception) {
-                    CSQuickFailure(source,@"微信收藏页面未完成打开，请返回后从原生收藏入口重试。");
+                    CSQuickFailure(source,[NSString stringWithFormat:@"微信%@页面未完成打开，请返回后从原生入口重试。",destination]);
                 }
             } else if (!success && current && failure.code!=LAErrorUserCancel && failure.code!=LAErrorSystemCancel && failure.code!=LAErrorAppCancel) {
                 CSQuickFailure(source,@"未通过收藏的生物识别验证，请重试或使用原生收藏入口。");
@@ -375,6 +390,63 @@ static BOOL CSQuickOpenChannels(CSQuickRouteRequest *request) {
 static BOOL CSQuickRouteWindowIsActive(CSQuickRouteRequest *request) {
     return [request windowIdentityIsCurrent] && UIApplication.sharedApplication.applicationState==UIApplicationStateActive &&
         (!request.scene || request.scene.activationState==UISceneActivationStateForegroundActive);
+}
+static BOOL CSQuickOpenMainFrameAction(CSQuickRouteRequest *request, NSString *selector) {
+    if (![request isCurrent] || !request.source.navigationController) return NO;
+    NSArray *owners=CSQuickOwners(request.source);
+    id main=CSQuickOwnerForAction(owners,@"NewMainFrameViewController",selector,request.source);
+    // Keep native destination initialization and delegates on the existing
+    // account-bound main owner. Callers supply fixed, checked native actions.
+    if (main) return [request isCurrent] && CSQuickInvokeAction(main,selector);
+
+    // As with filehelper, another main tab may own the gesture. Only hand off
+    // to the first WeChat tab inside this exact window's existing tab container.
+    for (id candidate in owners) {
+        if (!CSQuickIsClass(candidate,@"NewMainFrameViewController") || !CSQuickMatches(candidate,selector,"v@:")) continue;
+        UIViewController *page=CSQuickNativePage(candidate);
+        UINavigationController *navigation=page.navigationController;
+        if (!navigation || navigation==request.source.navigationController || ![navigation.viewControllers containsObject:page]) continue;
+        UITabBarController *tab=nil;
+        for (id owner in owners) {
+            if (![owner isKindOfClass:UITabBarController.class]) continue;
+            UITabBarController *container=owner;
+            if (container.isViewLoaded && container.view.window==request.window &&
+                container.selectedViewController==request.source.navigationController &&
+                container.viewControllers.firstObject==navigation &&
+                [container.viewControllers containsObject:request.source.navigationController]) { tab=container; break; }
+        }
+        if (!tab || ![request isCurrent]) continue;
+        UIViewController *before=navigation.topViewController;
+        if (!before || before.presentedViewController || before.transitionCoordinator || navigation.transitionCoordinator ||
+            before.isBeingDismissed || before.isMovingFromParentViewController) continue;
+        UIViewController *previousTab=tab.selectedViewController;
+        tab.selectedIndex=0;
+        UIViewController *visible=navigation.topViewController;
+        BOOL ready=CSQuickRouteWindowIsActive(request) && tab.selectedViewController==navigation &&
+            request.source.navigationController.topViewController==request.source &&
+            CSQuickNativePage(candidate)==page && page.navigationController==navigation &&
+            [navigation.viewControllers containsObject:page] && visible==before &&
+            visible.view.window==request.window && CSQuickCanNavigate(visible);
+        if (ready) return CSQuickInvokeAction(candidate,selector);
+        // Restore only a rejected preflight. Once native navigation is called,
+        // its asynchronous work or verification page owns the handoff.
+        if (CSQuickRouteWindowIsActive(request) && tab.selectedViewController==navigation &&
+            navigation.topViewController==before && !before.presentedViewController &&
+            !before.transitionCoordinator && !navigation.transitionCoordinator &&
+            !before.isBeingDismissed && !before.isMovingFromParentViewController &&
+            previousTab==request.source.navigationController && request.source.navigationController.topViewController==request.source)
+            tab.selectedViewController=previousTab;
+        return NO;
+    }
+    return NO;
+}
+static BOOL CSQuickOpenReceiveCode(CSQuickRouteRequest *request) {
+    return CSQuickOpenMainFrameAction(request,@"openFace2FaceReceiveMoney");
+}
+static BOOL CSQuickOpenMyMoments(CSQuickRouteRequest *request) {
+    // Native "My WC" owns the current-account album setup. A fresh public
+    // WCTimeLineViewController would instead open the friends' timeline.
+    return CSQuickOpenMainFrameAction(request,@"showMyWCView");
 }
 static BOOL CSQuickChatIsFileHelper(UIViewController *page) {
     if (!CSQuickIsClass(page,@"BaseMsgContentViewController")) return NO;
@@ -491,15 +563,124 @@ static BOOL CSQuickOpenChatBackground(CSQuickRouteRequest *request) {
     if (username && (![username isKindOfClass:NSString.class] || [username length])) return NO;
     return [request isCurrent] && CSQuickPush(page,request.source);
 }
+// Follow only the visible UIKit path, including modals on a navigation/tab
+// container. Hidden children and cached native login controllers are not proof.
+static UIViewController *CSQuickSwitchVisiblePage(UIWindow *window) {
+    UIViewController *page=window.rootViewController;
+    for (NSUInteger depth=0; page && depth<32; depth++) {
+        if (page.isBeingDismissed || page.isMovingFromParentViewController) return nil;
+        UIViewController *next=page.presentedViewController;
+        if (!next && [page isKindOfClass:UINavigationController.class]) next=[(UINavigationController *)page topViewController];
+        else if (!next && [page isKindOfClass:UITabBarController.class]) next=[(UITabBarController *)page selectedViewController];
+        else if (!next && CSQuickIsClass(page,@"WCTabBarController")) {
+            id selected=CSQuickRead(page,@"selectedViewController");
+            if ([selected isKindOfClass:UIViewController.class]) next=selected;
+        }
+        if (!next || next==page) return page;
+        page=next;
+    }
+    return nil;
+}
+static BOOL CSQuickSwitchAccountUIOpened(CSQuickRouteRequest *request, UIViewController *settings) {
+    UIViewController *visible=CSQuickSwitchVisiblePage(request.window);
+    if (CSQuickIsClass(visible,@"WCAccountLoginUsersViewController") && visible.isViewLoaded &&
+        visible.view.window==request.window && !visible.transitionCoordinator &&
+        !visible.navigationController.transitionCoordinator) return YES;
+    // 8.0.80 showLoginInfo owns a first-use MMTipsViewController in m_introView.
+    // MMWindowViewController can use a separate window, so bind that exact tip
+    // to its native delegate and scene rather than accepting any visible alert.
+    if (visible!=settings) return NO;
+    Ivar ivar=class_getInstanceVariable(object_getClass(settings),"m_introView");
+    const char *type=ivar ? ivar_getTypeEncoding(ivar) : NULL;
+    id tip=type && type[0]=='@' ? object_getIvar(settings,ivar) : nil;
+    if (![tip isKindOfClass:UIViewController.class] || !CSQuickIsClass(tip,@"MMTipsViewController") ||
+        CSQuickRead(tip,@"m_delegate")!=settings || !CSQuickMatches(tip,@"isObjShowing","B@:")) return NO;
+    UIViewController *page=tip;
+    return page.isViewLoaded && page.view.window && page.view.window.windowScene==request.scene &&
+        (request.scene || page.view.window==request.window) &&
+        !page.isBeingDismissed && !page.isMovingFromParentViewController &&
+        ((BOOL (*)(id,SEL))objc_msgSend)(tip,NSSelectorFromString(@"isObjShowing"));
+}
+static void CSQuickContinueSwitchAccount(CSQuickRouteRequest *request, UINavigationController *navigation,
+    UIViewController *settings, BOOL submitted, NSUInteger remaining) {
+    @try {
+        if (!CSQuickRouteWindowIsActive(request)) { [request finish]; return; }
+        if (submitted && CSQuickSwitchAccountUIOpened(request,settings)) { [request finish]; return; }
+        UIViewController *visible=CSQuickSwitchVisiblePage(request.window);
+        BOOL arriving=submitted && CSQuickIsClass(visible,@"WCAccountLoginUsersViewController") &&
+            (!visible.isViewLoaded || !visible.view.window || visible.view.window==request.window);
+        // User navigation, a different tab/root, or competing UI cancels this
+        // shortcut. Never chase it with another push or another native action.
+        if (!arriving && (settings.navigationController!=navigation || navigation.topViewController!=settings ||
+            ![navigation.viewControllers containsObject:settings] ||
+            visible!=settings ||
+            (settings.isViewLoaded && settings.view.window && settings.view.window!=request.window))) {
+            [request finish]; return;
+        }
+        if (!submitted && [request isCurrent]) {
+            // The real 8.0.80 settings row binds showLoginInfo, not the internal
+            // gotoSwitchAccount continuation. Let native tips/checks/delegates
+            // continue the flow, including cancellation and account selection.
+            if (!CSQuickInvokeAction(settings,@"showLoginInfo")) { [request finish]; return; }
+            CSQuickContinueSwitchAccount(request,navigation,settings,YES,200);
+            return;
+        }
+        if (!remaining) {
+            BOOL canReport=[request isCurrent];
+            [request finish];
+            if (canReport) CSQuickFailure(settings,@"微信尚未打开切换账号页面，请从微信“设置 → 切换账号”进入。");
+            return;
+        }
+        // Nonanimated push can return before the view enters its window. Native
+        // work can also enqueue a later push; both stages have a bounded wait.
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW,(int64_t)(0.05*NSEC_PER_SEC)),dispatch_get_main_queue(), ^{
+            CSQuickContinueSwitchAccount(request,navigation,settings,submitted,remaining-1);
+        });
+    } @catch (__unused NSException *exception) {
+        BOOL canReport=[request isCurrent];
+        [request finish];
+        if (canReport) CSQuickFailure(settings,@"微信未完成切换账号页面打开，请使用原生设置入口重试。");
+    }
+}
+static BOOL CSQuickOpenSwitchAccount(CSQuickRouteRequest *request) {
+    if (![request isCurrent] || !request.source.navigationController) return NO;
+    UIViewController *source=request.source;
+    UINavigationController *navigation=source.navigationController;
+    // Keep the visible settings owner alive for all native delegates. An older
+    // settings page behind the source is not a valid presentation owner.
+    Class settingsClass=NSClassFromString(@"NewSettingViewController");
+    if (![settingsClass isSubclassOfClass:UIViewController.class] ||
+        !CSCloseFriendMethodMatches(class_getInstanceMethod(settingsClass,NSSelectorFromString(@"showLoginInfo")),"v@:")) return NO;
+    UIViewController *page=CSQuickIsClass(source,@"NewSettingViewController") ? source : CSQuickCreatePage(@"NewSettingViewController");
+    if (!page || !CSQuickMatches(page,@"showLoginInfo","v@:") || ![request isCurrent]) return NO;
+    if (page!=source) {
+        page.hidesBottomBarWhenPushed=YES;
+        [navigation pushViewController:page animated:NO];
+    }
+    if (![request windowIdentityIsCurrent] || source.navigationController!=navigation ||
+        ![navigation.viewControllers containsObject:source] || navigation.topViewController!=page ||
+        page.navigationController!=navigation) return NO;
+    request.source=page;
+    request.awaitingNavigation=YES;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        CSQuickContinueSwitchAccount(request,navigation,page,NO,40);
+    });
+    return YES; // Pending, not evidence that the account page has already opened.
+}
 @implementation CSQuickPanelActionRouter
 + (BOOL)performActionWithIdentifier:(NSString *)identifier fromViewController:(UIViewController *)source {
     if (!NSThread.isMainThread || ![source isKindOfClass:UIViewController.class]) return NO;
     source=CSQuickSourcePage(source);
+    CSQuickRouteRequest *pending=objc_getAssociatedObject(source.view.window,&CSQuickRouteRequestKey);
+    // A second tap must not place a competing failure alert over the native
+    // page that an accepted shortcut is still preparing or observing.
+    if (pending.awaitingNavigation && [pending windowIdentityIsCurrent]) return NO;
     CSQuickRouteRequest *request=CSQuickBeginRequest(source);
     if (!request) return CSQuickFailure(source,@"当前页面正在切换、验证或恢复数据，请稍后再打开快捷入口。");
     @try {
         if ([identifier isEqual:@"plugin_home"]) return CSQuickOpenPlugin(request,NO);
         if ([identifier isEqual:@"panel_settings"]) return CSQuickOpenPlugin(request,YES);
+        if ([identifier isEqual:@"create_note"]) return CSQuickOpenFavoriteContent(request,YES);
         if (![identifier isKindOfClass:NSString.class] || !identifier.length) {
             [request finish];
             return CSQuickFailure(source,@"这个快捷入口暂不可用，请重新打开快捷面板。");
@@ -509,6 +690,7 @@ static BOOL CSQuickOpenChatBackground(CSQuickRouteRequest *request) {
             @"scan":@[@"NewMainFrameViewController",@"onCreateScanCamera"],
             @"wallet":@[@"MoreViewController",@"showWCPayView"],
             @"my_qrcode":@[@"MoreViewController",@"showMyQRCodeInProfileView"],
+            @"my_moments":@[@"MoreViewController",@"showMyWCView"],
             @"favorites":@[@"MoreViewController",@"showFavoriteView"],
             @"profile":@[@"MoreViewController",@"showProfileView"],
             @"channels":@[@"FindFriendEntryViewController",@"onClickFindPageFinderCell"],
@@ -525,13 +707,16 @@ static BOOL CSQuickOpenChatBackground(CSQuickRouteRequest *request) {
             [request finish];
             return accepted;
         }
-        if ([identifier isEqual:@"favorites"]) return CSQuickOpenFavorites(request);
+        if ([identifier isEqual:@"favorites"]) return CSQuickOpenFavoriteContent(request,NO);
         BOOL opened=NO;
         if ([identifier isEqual:@"my_qrcode"]) opened=CSQuickOpenQRCode(request);
         else if ([identifier isEqual:@"payment_code"]) opened=CSQuickOpenPaymentCode(request);
+        else if ([identifier isEqual:@"receive_code"]) opened=CSQuickOpenReceiveCode(request);
+        else if ([identifier isEqual:@"my_moments"]) opened=CSQuickOpenMyMoments(request);
         else if ([identifier isEqual:@"channels"]) opened=CSQuickOpenChannels(request);
         else if ([identifier isEqual:@"file_transfer"]) opened=CSQuickOpenFileTransfer(request);
         else if ([identifier isEqual:@"chat_background"]) opened=CSQuickOpenChatBackground(request);
+        else if ([identifier isEqual:@"switch_account"]) opened=CSQuickOpenSwitchAccount(request);
         else if ([identifier isEqual:@"create_group"]) {
             // Retain the native CreateChatLogic owner and delegate. Constructing
             // a bare picker would lose its Done/cancel and chat-return contract.
@@ -546,11 +731,13 @@ static BOOL CSQuickOpenChatBackground(CSQuickRouteRequest *request) {
             if (name && [request isCurrent]) opened=CSQuickOpenClass(name,source);
         }
         if (opened && request.awaitingNavigation) return YES;
+        UIViewController *failureSource=request.source ?: source;
         [request finish];
-        return opened || CSQuickFailure(source,@"当前微信未能打开这个快捷页面，请使用微信原生入口。原页面和账号数据已保留。");
+        return opened || CSQuickFailure(failureSource,@"当前微信未能打开这个快捷页面，请使用微信原生入口。");
     } @catch (__unused NSException *exception) {
+        UIViewController *failureSource=request.source ?: source;
         [request finish];
-        return CSQuickFailure(source,@"微信未完成页面打开，请返回后使用原生入口重试。");
+        return CSQuickFailure(failureSource,@"微信未完成页面打开，请返回后使用原生入口重试。");
     }
 }
 @end

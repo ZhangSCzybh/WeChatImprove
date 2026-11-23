@@ -1,0 +1,47 @@
+{
+  "recorded_at_utc": "2026-11-23T09:07:42.697910+00:00",
+  "project": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "baseline_checks": 286,
+  "validation": {
+    "command": "bash Tests/verify-quick-panel-router.sh",
+    "exit_code": 0,
+    "checks_passed": 361,
+    "output": "Quick panel router: 361 checks passed.\n",
+    "log_file": "/tmp/wechat-quick-panel-switch-native-gate-20261123/router-tests.log",
+    "rerun_for_report": false
+  },
+  "whitespace": {
+    "command": "git diff --check -- Tests/QuickPanelRouterTests.m Tests/verify-quick-panel-router.sh",
+    "exit_code": 0,
+    "output": ""
+  },
+  "sha256": {
+    "Controllers/CSQuickPanelActionRouter.m": "7ac42be30a2610f14b7e2428904628876e44248a23a6f1ff2fb751304313c7f0",
+    "Tests/QuickPanelRouterTests.m": "4508dc59e4882bbf0f071a0df730360b132b45d49d4f5487d15494eba72d4361",
+    "Tests/verify-quick-panel-router.sh": "86d18258a12138519819f9af765ad25ffa700f3803d35ddbd311729456937225"
+  },
+  "coverage": [
+    "19 production catalog identifiers through real public dispatch",
+    "Real extracted production switch-account state machine and exact showLoginInfo native entry",
+    "Native account-selection page visibility required instead of invocation-count success",
+    "Only currently visible settings owner reused; hidden earlier settings rejected as presentation owner",
+    "Deferred settings window attachment and appearance transition without premature native action",
+    "Held native destination, actual asynchronous account page, once-only submission, duplicate tap without alert or reentry",
+    "Bounded native no-op timeout after 200 submitted polls",
+    "Account, epoch, scene replacement, scene background, suspension and user-navigation cancellation",
+    "Late old-account observation preserves replacement request lock",
+    "Exact native m_introView/delegate/isObjShowing ABI and independent same-scene tip window",
+    "Native tip confirmation continues goto once; native tip cancellation cannot force account page",
+    "Wrong-delegate/hidden/unloaded/no-window/wrong-scene/wrong-ABI tips rejected",
+    "Missing/nonUIKit/wrong native entry or initializer ABI and initializer substitutions rejected",
+    "Asynchronous native exception releases lock and reports on visible settings",
+    "Prior note/favorites biometric, filehelper, payment, QR, receive-code, moments, channels and chat-background regression retained"
+  ],
+  "isolation": {
+    "real_user_defaults_access": false,
+    "real_device_authentication": false,
+    "real_dispatch_after_wait": false,
+    "service_start_restart_install_package_build": false
+  },
+  "state": "frozen_after_success"
+}
