@@ -1,4 +1,6 @@
 #import "CSListCornerContactsAdapter.h"
+#import <objc/runtime.h>
+static char ContactsSectionViewsKey;
 void CSListCornerContactsDecorateCountFooter(id owner) {
     if (![[CSListCornerConfiguration sharedConfiguration] snapshot].enabled) return;
     UITableView *table=CSListCornerOwnedTable(owner,CSListCornerPageContacts);
@@ -9,12 +11,12 @@ void CSListCornerContactsDecorateCountFooter(id owner) {
     // A different footer or a stale label must not become a guessed paint target.
     if (![label isKindOfClass:UILabel.class] || !CSListCornerBeginOperation(footer)) return;
     @try {
-        UIColor *canvas=CSListCornerCanvasColor();
+        UIColor *canvas=CSListCornerCanvasColorForStyle(table.traitCollection.userInterfaceStyle);
         if (![footer.backgroundColor isEqual:canvas]) footer.backgroundColor=canvas;
         if (![label.backgroundColor isEqual:UIColor.clearColor]) label.backgroundColor=UIColor.clearColor;
     } @finally { CSListCornerEndOperation(footer); }
 }
-static void CSListCornerContactsSectionSurface(UIView *surface, UIView *selection, NSUInteger depth) {
+static void CSListCornerContactsSectionSurface(UIView *surface, UIView *selection, NSUInteger depth, UIColor *canvas) {
     for (UIView *child in surface.subviews) {
         if (child==selection) continue;
         if ([child isKindOfClass:UILabel.class]) {
@@ -28,8 +30,8 @@ static void CSListCornerContactsSectionSurface(UIView *surface, UIView *selectio
         BOOL edge=CGRectGetMinY(frame)<=CGRectGetMinY(surface.bounds)+1 || CGRectGetMaxY(frame)>=CGRectGetMaxY(surface.bounds)-1;
         if (frame.size.height<=1 && child.subviews.count==0 && edge) { child.hidden=YES; child.alpha=0; }
         else {
-            child.backgroundColor=CSListCornerCanvasColor();
-            if (depth<1) CSListCornerContactsSectionSurface(child,selection,depth+1);
+            child.backgroundColor=canvas;
+            if (depth<1) CSListCornerContactsSectionSurface(child,selection,depth+1,canvas);
         }
     }
 }
@@ -38,7 +40,13 @@ void CSListCornerContactsDecorateSection(UIView *view, UITableView *table, id ow
     if (!(owner ? CSListCornerOwnsTable(owner,table,CSListCornerPageContacts) : CSListCornerOwnerForTable(table,CSListCornerPageContacts)!=nil)) return;
     if (!CSListCornerBeginOperation(view)) return;
     @try {
-        UIColor *canvas=CSListCornerCanvasColor();
+        NSHashTable *sections=objc_getAssociatedObject(table,&ContactsSectionViewsKey);
+        if (!sections) {
+            sections=[NSHashTable weakObjectsHashTable];
+            objc_setAssociatedObject(table,&ContactsSectionViewsKey,sections,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        }
+        [sections addObject:view];
+        UIColor *canvas=CSListCornerCanvasColorForStyle(table.traitCollection.userInterfaceStyle);
         view.backgroundColor=canvas;
         UIView *selection=CSListCornerViewIvar(view,"_selectedBackgroundView",view);
         UIView *content=view;
@@ -49,7 +57,7 @@ void CSListCornerContactsDecorateSection(UIView *view, UITableView *table, id ow
             header.backgroundView.backgroundColor=canvas;
             if ([header.backgroundView isKindOfClass:UIImageView.class]) ((UIImageView *)header.backgroundView).image=nil;
         }
-        CSListCornerContactsSectionSurface(content,selection,0);
+        CSListCornerContactsSectionSurface(content,selection,0,canvas);
         // MMTableSectionHeaderView paints behind its title/star with an image view.
         // Keep title, star, selection state and hit targets; replace only the backing paint.
         UIView *paint=CSListCornerViewIvar(view,"_backgroundImageView",view);
@@ -62,6 +70,13 @@ void CSListCornerContactsDecorateSection(UIView *view, UITableView *table, id ow
             line.hidden=YES; line.alpha=0;
         }
     } @finally { CSListCornerEndOperation(view); }
+}
+void CSListCornerContactsRefreshSections(UITableView *table) {
+    if (!CSListCornerOwnerForTable(table,CSListCornerPageContacts)) return;
+    NSHashTable *sections=objc_getAssociatedObject(table,&ContactsSectionViewsKey);
+    for (UIView *view in sections.allObjects) {
+        if ([view isDescendantOfView:table]) CSListCornerContactsDecorateSection(view,table,nil);
+    }
 }
 void CSListCornerContactsDecorate(UITableViewCell *cell, UITableView *table, NSIndexPath *path, id owner) {
     if (![[CSListCornerConfiguration sharedConfiguration] snapshot].enabled || !(owner ? CSListCornerOwnsTable(owner,table,CSListCornerPageContacts) : CSListCornerOwnerForTable(table,CSListCornerPageContacts)!=nil)) return;

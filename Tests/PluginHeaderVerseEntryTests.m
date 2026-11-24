@@ -21,12 +21,16 @@ enum { UIApplicationStateActive=0, UIApplicationStateBackground=2,
 - (UIView *)viewWithTag:(NSInteger)tag;
 - (void)addSubview:(UIView *)child;
 - (void)removeFromSuperview;
+- (void)layoutIfNeeded;
++ (void)performWithoutAnimation:(void (^)(void))actions;
 @end
 @implementation UIView
 - (instancetype)initWithFrame:(NSRect)frame { if ((self=[super init])) _bounds=frame; return self; }
 - (UIView *)viewWithTag:(NSInteger)tag { for (UIView *child in self.children) if (child.tag==tag) return child; return nil; }
 - (void)addSubview:(UIView *)child { if (!self.children) self.children=[NSMutableArray array]; [self.children addObject:child]; }
 - (void)removeFromSuperview {}
+- (void)layoutIfNeeded {}
++ (void)performWithoutAnimation:(void (^)(void))actions { actions(); }
 @end
 @interface UITableView : NSObject
 @property(nonatomic) NSUInteger reloads;
@@ -94,6 +98,8 @@ static BOOL CSCloseFriendPluginEntryHidden(void) { return NO; }
 @property(nonatomic, strong) UITableView *tableView;
 @property(nonatomic, strong) CSPluginHeaderView *headerView;
 @property(nonatomic) NSUInteger setups, contentRefreshes, layouts;
+@property(nonatomic,strong) NSNumber *pendingHomeDistance,*homeAppearanceDistance;
+@property(nonatomic,copy) NSArray *homePreparedScope;
 - (void)setupData;
 - (void)reloadSettingsKeepingPosition;
 - (void)refreshHeaderContent;
@@ -102,12 +108,20 @@ static BOOL CSCloseFriendPluginEntryHidden(void) { return NO; }
 - (void)finishHeaderVerseVisitIfLeaving;
 - (void)settingsDidChange:(NSNotification *)notification;
 - (void)refreshHeaderFromNotification:(NSNotification *)notification;
+- (CGFloat)currentHomeDistance;
+- (BOOL)returningFromOtherSettingsInCurrentScope;
+- (void)refreshVisibleHomeAppearance;
+- (NSArray *)currentHomePreparationScope;
 @end
 @implementation CSCustomViewController
 - (void)setupData { self.setups++; }
 - (void)reloadSettingsKeepingPosition { [self.tableView reloadData]; }
 - (void)refreshHeaderContent { self.contentRefreshes++; }
 - (void)updateHeaderLayout { self.layouts++; }
+- (CGFloat)currentHomeDistance { return 0; }
+- (BOOL)returningFromOtherSettingsInCurrentScope { return NO; }
+- (void)refreshVisibleHomeAppearance {}
+- (NSArray *)currentHomePreparationScope { return @[@"verse-fixture"]; }
 #include "HeaderVerseEntryUnderTest.h"
 @end
 

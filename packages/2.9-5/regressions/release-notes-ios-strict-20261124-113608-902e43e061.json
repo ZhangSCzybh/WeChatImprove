@@ -1,0 +1,68 @@
+{
+  "status": "PASS",
+  "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+  "sourceSHA256": "3acec3ef5dbf29a1ef1717ae915002af3e0d505eeb45fecf07a5fdf993ec9e81",
+  "strictFlags": [
+    "-Wall",
+    "-Wextra",
+    "-Werror"
+  ],
+  "commands": [
+    {
+      "arch": "arm64",
+      "target": "arm64-apple-ios15.0",
+      "file": "Controllers/CSReleaseNotesViewController.m",
+      "command": [
+        "xcrun",
+        "--sdk",
+        "iphoneos",
+        "clang",
+        "-target",
+        "arm64-apple-ios15.0",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+        "-fobjc-arc",
+        "-fblocks",
+        "-fsyntax-only",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-IHeaders",
+        "-IHooks",
+        "-IControllers",
+        "Controllers/CSReleaseNotesViewController.m"
+      ],
+      "exitCode": 0,
+      "output": "",
+      "log": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/packages/2.9-5/regressions/release-notes-ios-strict-arm64-20261124-113608-902e43e061.log"
+    },
+    {
+      "arch": "arm64e",
+      "target": "arm64e-apple-ios15.0",
+      "file": "Controllers/CSReleaseNotesViewController.m",
+      "command": [
+        "xcrun",
+        "--sdk",
+        "iphoneos",
+        "clang",
+        "-target",
+        "arm64e-apple-ios15.0",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk",
+        "-fobjc-arc",
+        "-fblocks",
+        "-fsyntax-only",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-IHeaders",
+        "-IHooks",
+        "-IControllers",
+        "Controllers/CSReleaseNotesViewController.m"
+      ],
+      "exitCode": 0,
+      "output": "",
+      "log": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/packages/2.9-5/regressions/release-notes-ios-strict-arm64e-20261124-113608-902e43e061.log"
+    }
+  ]
+}

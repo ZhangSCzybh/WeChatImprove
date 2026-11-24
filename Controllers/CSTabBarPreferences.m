@@ -49,6 +49,7 @@ static CGFloat CSNumber(NSUserDefaults *d, NSString *key, CGFloat fallback, CGFl
     p.backgroundColor=[self colorInDefaults:d prefix:@"com.wechat.enhance.tabbar_style.bg_color"];
     p.borderColor=[self colorInDefaults:d prefix:@"com.wechat.enhance.tabbar_style.border_color"];
     p.indicatorColor=[self colorInDefaults:d prefix:kTabBarIndicatorColorKey];
+    p.selectedIconColor=[self colorInDefaults:d prefix:kTabBarSelectedIconColorKey];
     NSMutableArray *titles=[NSMutableArray array], *icons=[NSMutableArray array], *selected=[NSMutableArray array];
     for (NSString *name in @[@"chat",@"contacts",@"discover",@"me"]) {
         NSString *title=[d stringForKey:[@"com.wechat.enhance.tabbar_style.text." stringByAppendingString:name]];

@@ -11,6 +11,7 @@
 #define CGRectGetHeight NSHeight
 #define CGRectGetWidth NSWidth
 #define CGRectEqualToRect NSEqualRects
+typedef double UIScrollViewDecelerationRate;
 static BOOL enabled=YES,appActive=YES,privacyEnabled;
 static NSString *account=@"A";
 static NSSet *hiddenNames;
@@ -18,11 +19,20 @@ static BOOL Option(NSString *key) { return [key isEqual:@"enabled"] && enabled; 
 static BOOL CSGroupApplicationActive(void) { return appActive; }
 static NSString *CSGroupCurrentAccountID(void) { return account; }
 static BOOL CSGroupPrivacyActive(void) { return privacyEnabled; }
+static NSUInteger CSCloseFriendAccountEpoch(void) { return 1; }
 static BOOL CSGroupIsFoldedController(id owner) { (void)owner; return NO; }
 static id CSGroupReadObject(id owner,NSString *key) { return [owner valueForKey:key]; }
 static long long CSGroupReadInteger(id owner,NSString *key,long long fallback) { return owner ? [[owner valueForKey:key] longLongValue] : fallback; }
-static void CSGroupWithDisplayIndices(id table,void (^body)(void)) { (void)table; body(); }
-static void CSGroupWithNativeIndices(id table,void (^body)(void)) { (void)table; body(); }
+static NSUInteger nativeIndicesDepth,displayIndicesDepth;
+static BOOL fixtureNativeIndexScope=YES;
+static BOOL CSGroupUsesNativeIndices(id table) { (void)table; return nativeIndicesDepth && !displayIndicesDepth; }
+static BOOL CSGroupUsesNativeHeader(id table) { (void)table; return NO; }
+static void CSGroupWithDisplayIndices(id table,void (^body)(void)) {
+    (void)table; displayIndicesDepth++; @try { body(); } @finally { displayIndicesDepth--; }
+}
+static void CSGroupWithNativeIndices(id table,void (^body)(void)) {
+    (void)table; nativeIndicesDepth++; @try { body(); } @finally { nativeIndicesDepth--; }
+}
 @interface SearchPolicy : NSObject
 @property(nonatomic) BOOL blocked;
 @end
@@ -77,12 +87,19 @@ static SearchPolicy *CSCloseFriendCurrentSnapshot(void) { return nil; }
 @implementation Pan @end
 @interface UITableView : UIView
 @property(nonatomic,strong) UIView *tableHeaderView;
+@property(nonatomic,strong) NSMutableArray *installedHeaders;
+@property(nonatomic,weak) id testAdapter;
 @property(nonatomic) double decelerationRate;
 @property(nonatomic) BOOL tracking,dragging,decelerating,editing;
 - (void)reloadData;
 - (void)layoutIfNeeded;
 @end
 @implementation UITableView
+@synthesize tableHeaderView=_tableHeaderView;
+- (void)setTableHeaderView:(UIView *)header {
+    _tableHeaderView=header;
+    [self.installedHeaders addObject:header ?: NSNull.null];
+}
 - (void)reloadData {}
 - (void)layoutIfNeeded {}
 @end
@@ -126,6 +143,8 @@ static SearchPolicy *CSCloseFriendCurrentSnapshot(void) { return nil; }
 @property(nonatomic,strong) NSMutableDictionary *anchors;
 @property(nonatomic,strong) NSArray *sourceSections,*cachedNativeSections,*displayedTabs;
 @property(nonatomic,strong) NSDictionary *identityDisplayPaths;
+@property(nonatomic,strong) NSDictionary *presentationViewport,*switchViewport;
+@property(nonatomic,strong) NSMutableSet *pendingChangedUserNames;
 @property(nonatomic,strong) NSMutableArray *completions,*nativeActions;
 @property(nonatomic,strong) NSMutableSet *prefetchedPaths;
 @property(nonatomic,strong) NSDictionary<NSNumber *,Proxy *> *proxies;
@@ -133,8 +152,10 @@ static SearchPolicy *CSCloseFriendCurrentSnapshot(void) { return nil; }
 @property(nonatomic) BOOL chromeVisible,searching,searchChromeVisible,pendingScrollToTop,presentationSuspended,updatingHeader;
 @property(nonatomic) BOOL publishing,privacyRefreshPending,dirty,swipeActive,recoveryPending,nativePresentation,projecting,publishedEnabled;
 @property(nonatomic) BOOL appearanceDirty,snapshotRetryAttempted,sessionLayoutHeld;
+@property(nonatomic) BOOL usesNativeSessionModel,pendingChangeNamesUnknown;
 @property(nonatomic,strong) SearchPrivacyShield *privacyShield;
 @property(nonatomic) NSUInteger changeDepth,interactionAttempts,publications;
+@property(nonatomic) NSUInteger modelRevision,snapshotEpoch;
 @property(nonatomic) CSGroupChangeKind pendingChanges;
 @property(nonatomic) NSTimeInterval interactionDeadline;
 @property(nonatomic) double baselineDeceleration;
@@ -142,11 +163,34 @@ static SearchPolicy *CSCloseFriendCurrentSnapshot(void) { return nil; }
 - (void)layout;
 - (void)publishHeader:(UIView *)header;
 - (void)shieldVisiblePrivateRows;
++ (instancetype)adapterForTable:(UITableView *)table;
++ (void)setPresentationSuspended:(BOOL)suspended forController:(id)controller;
++ (void)attachToController:(id)controller;
++ (void)layoutForController:(id)controller;
++ (void)finishPresentationReturnForController:(id)controller;
 @end
 @implementation CSGroupListAdapter
++ (instancetype)adapterForTable:(UITableView *)table { return table.testAdapter; }
+// The fixture models owner attachment; the production appearance hook itself
+// is replayed below. Viewport restoration belongs to GroupInitialViewportTests.
++ (void)setPresentationSuspended:(BOOL)suspended forController:(id)controller {
+    CSGroupListAdapter *adapter=[controller valueForKey:@"adapter"];
+    adapter.presentationSuspended=suspended;
+}
++ (void)attachToController:(id)controller { CSGroupListAdapter *adapter=[controller valueForKey:@"adapter"]; [adapter refresh]; [adapter layout]; }
++ (void)layoutForController:(id)controller { [[controller valueForKey:@"adapter"] layout]; }
++ (void)finishPresentationReturnForController:(id)controller { (void)controller; }
 // Badge source lifecycle is exercised in GroupLifecycleTests.
 - (void)requestTabBadgeSourceRefresh {}
 - (void)shieldVisiblePrivateRows {}
+- (BOOL)adoptCompatibilityModelIfNeeded { return NO; }
+- (void)refreshNativeSessionModel { [NSException raise:@"UnexpectedNativeModel" format:@"Search projection fixture uses the compatibility model"]; }
+- (void)prepareInitialViewport {}
+- (void)clearPendingViewport {}
+- (void)restorePendingViewport {}
+- (NSDictionary *)captureViewportForTabID:(NSString *)tabID { (void)tabID; return nil; }
+- (void)restoreViewportFromSource:(NSDictionary *)viewport { (void)viewport; }
+- (void)consumeRefreshRequest {}
 - (void)invalidateNativeSnapshot { self.invalidations++; }
 - (void)saveAnchor { self.anchorSaves++; }
 - (void)restoreAnchor {}
@@ -164,37 +208,63 @@ static SearchPolicy *CSCloseFriendCurrentSnapshot(void) { return nil; }
 - (void)reconcileDeletedSwipeRow {}
 - (void)installProxies {}
 - (BOOL)isActive { return self.projecting; }
-- (NSArray *)nativeSectionsForAccount:(NSString *)accountID { (void)accountID; return self.sourceSections; }
+- (NSArray *)nativeSectionsForAccount:(NSString *)accountID changes:(CSGroupChangeKind)changes changedUserNames:(NSSet *)names { (void)accountID; (void)changes; (void)names; return self.sourceSections; }
 - (CSGroupProjection *)projectionForSections:(NSArray *)sections tabs:(NSArray *)tabs selectedTabID:(NSString *)selected accountID:(NSString *)accountID {
     return [[CSGroupProjection alloc] initWithSections:sections tabs:tabs selectedTabID:selected filterDuplicates:NO
         accountID:accountID hiddenUserNames:privacyEnabled ? hiddenNames : [NSSet set] privacyRevision:self.publications+1 previousProjection:nil];
 }
-- (void)publishProjection:(CSGroupProjection *)projection previous:(CSGroupProjection *)previous changes:(CSGroupChangeKind)changes previouslyProjecting:(BOOL)previouslyProjecting {
-    (void)projection; (void)previous; (void)changes; (void)previouslyProjecting; self.publications++;
+- (void)publishProjection:(CSGroupProjection *)projection previous:(CSGroupProjection *)previous changes:(CSGroupChangeKind)changes changedUserNames:(NSSet *)names previouslyProjecting:(BOOL)previouslyProjecting {
+    (void)projection; (void)previous; (void)changes; (void)names; (void)previouslyProjecting; self.publications++;
 }
 #include "SearchBodies.h"
 @end
+@interface SearchTable : UITableView @end
+@implementation SearchTable
+#include "SearchTableHooks.h"
+@end
 @interface Host : NSObject
 @property(nonatomic,strong) CSGroupListAdapter *adapter;
+@property(nonatomic,strong) UIView *searchBar,*presentedSearchBar;
 @property(nonatomic) NSUInteger calls;
 @property(nonatomic) BOOL sawNativeBeforePrepare,isSearching;
-- (void)originalSearchCall;
+@property(nonatomic,copy) void (^nativeCall)(Host *,NSString *);
+- (void)originalSearchCall:(NSString *)selector;
+- (void)originalSearchCall:(NSString *)selector searchBar:(UIView *)searchBar;
+- (void)onSearchButtonTapped;
+- (void)showSearchBar:(id)sender;
+- (void)showSearchBar:(id)sender searchBar:(id)searchBar autoStartGreenMic:(BOOL)autoStartGreenMic;
 - (id)m_mainFrameLogicController;
 @end
 static CSGroupListAdapter *Adapter(Host *host) { return host.adapter; }
-static void Native(id owner,BOOL change,void (^body)(void)) { (void)owner; (void)change; body(); }
+static void Native(Host *owner,BOOL change,void (^body)(void)) {
+    (void)change;
+    if (fixtureNativeIndexScope) CSGroupWithNativeIndices(owner.adapter.table,body);
+    else body();
+}
 @implementation Host
+@synthesize adapter=_adapter;
+- (void)setAdapter:(CSGroupListAdapter *)adapter { _adapter=adapter; self.searchBar=adapter.nativeHeader; }
 - (id)m_mainFrameLogicController { return nil; }
-- (void)originalSearchCall {
+- (void)onSearchButtonTapped { [self showSearchBar:self]; }
+- (void)showSearchBar:(id)sender { [self showSearchBar:sender searchBar:self.searchBar autoStartGreenMic:NO]; }
+- (void)originalSearchCall:(NSString *)selector searchBar:(UIView *)searchBar {
+    self.presentedSearchBar=searchBar;
+    [self originalSearchCall:selector];
+}
+- (void)originalSearchCall:(NSString *)selector {
     self.calls++;
-    if (self.adapter.table.tableHeaderView==self.adapter.nativeHeader) self.sawNativeBeforePrepare=YES;
+    __block UIView *installed=nil;
+    CSGroupWithDisplayIndices(self.adapter.table,^{ installed=self.adapter.table.tableHeaderView; });
+    if (installed==self.adapter.nativeHeader) self.sawNativeBeforePrepare=YES;
+    if (self.nativeCall) self.nativeCall(self,selector);
 }
 #include "SearchHooks.h"
 @end
 static NSUInteger checks,failures;
 static void Check(BOOL ok,NSString *message) { checks++; if (!ok) { failures++; fprintf(stderr,"FAIL: %s\n",message.UTF8String); } }
 static CSGroupListAdapter *List(void) {
-    CSGroupListAdapter *a=[CSGroupListAdapter new]; a.table=[UITableView new]; a.table.bounds=NSMakeRect(0,0,430,900);
+    CSGroupListAdapter *a=[CSGroupListAdapter new]; a.table=[SearchTable new]; a.table.testAdapter=a;
+    a.table.installedHeaders=[NSMutableArray array]; a.table.bounds=NSMakeRect(0,0,430,900);
     a.nativeHeader=[UIView new]; a.nativeHeader.frame=NSMakeRect(0,0,430,47);
     a.chrome=[Chrome new]; a.chrome.intrinsicContentSize=NSMakeSize(430,52);
     a.pan=[Pan new]; a.listPan=[Pan new]; a.preferences=[[CSGroupPreferences alloc] initWithDefaults:nil accountID:account];
@@ -210,6 +280,70 @@ static NSArray *DisplayedNames(CSGroupListAdapter *adapter) {
 static CSGroupRow *Row(NSUInteger index,NSString *name,CSGroupRowCategory category) {
     return [[CSGroupRow alloc] initWithNativePath:[NSIndexPath indexPathForRow:(NSInteger)index inSection:0]
         userName:name kind:CSGroupRowKindSession category:category top:NO unreadCount:0 redDot:NO];
+}
+static UIView *DisplayedHeader(CSGroupListAdapter *adapter) {
+    __block UIView *header=nil;
+    CSGroupWithDisplayIndices(adapter.table,^{ header=adapter.table.tableHeaderView; });
+    return header;
+}
+static void ReplayQuickSearchReturn(BOOL resetsBeforeAppearance,BOOL usesNativeIndexScope) {
+    // Scope mode follows both production Native() branches. Projection refresh
+    // remains the compatibility fixture; this is not a native-model data replay.
+    BOOL previousScope=fixtureNativeIndexScope; fixtureNativeIndexScope=usesNativeIndexScope;
+    Host *host=[Host new]; CSGroupListAdapter *a=List(); host.adapter=a; a.controller=host;
+    a.sourceSections=@[@[Row(0,@"ordinary",CSGroupRowCategoryPrivate),Row(1,@"group",CSGroupRowCategoryGroup)]];
+    [a refresh]; UIView *wrapper=DisplayedHeader(a);
+    host.nativeCall=^(Host *owner,NSString *selector) {
+        CSGroupListAdapter *adapter=owner.adapter;
+        if ([selector isEqual:@"showSearchBar:"]) {
+            Check(adapter.searching && adapter.searchChromeVisible && DisplayedHeader(adapter)==wrapper,
+                @"quick button reaches the real presenter after backing-header preparation");
+            Check(owner.presentedSearchBar==owner.searchBar && owner.searchBar==adapter.nativeHeader,
+                @"three-argument presenter receives the native searchBar object independently of table scope");
+            Check(CSGroupUsesNativeIndices(adapter.table)==usesNativeIndexScope &&
+                adapter.table.tableHeaderView==(usesNativeIndexScope ? adapter.nativeHeader : wrapper),
+                @"native body uses the selected scope while the displayed group header stays installed");
+            UIView *searchPage=[UIView new]; [searchPage addSubview:owner.presentedSearchBar];
+            NSUInteger removals=adapter.nativeHeader.removals;
+            owner.isSearching=YES; [adapter refresh]; [adapter layout];
+            Check(adapter.nativeHeader.superview==searchPage && adapter.nativeHeader.removals==removals,
+                @"presenter keeps ownership of its moved search view");
+            [owner viewWillDisappear:YES]; [owner viewDidDisappear:YES];
+        } else if ([selector isEqual:@"setSearchBarToTableHeaderView"]) {
+            // Replay the 8.0.80 host method: table.tableHeaderView=searchBar.
+            // This passes through the extracted production UITableView setter.
+            adapter.table.tableHeaderView=owner.searchBar;
+            Check(DisplayedHeader(adapter)==wrapper,@"host header restoration cannot install a visible native search bar");
+        } else if ([selector isEqual:@"viewWillAppear:"]) {
+            [owner setSearchBarToTableHeaderView];
+            Check(DisplayedHeader(adapter)==wrapper,@"first native appearance body keeps the group before attachment refresh");
+        } else if ([selector isEqual:@"cancelSearch"]) owner.isSearching=NO;
+    };
+    // The quick router invokes the native button. The fixture follows the
+    // verified button -> showSearchBar: -> three-argument presenter chain.
+    [host onSearchButtonTapped];
+    Check(a.presentationSuspended && DisplayedHeader(a)==wrapper && a.searchChromeVisible,
+        @"covered main page retains the prepared group backing header");
+    if (resetsBeforeAppearance) host.isSearching=NO;
+    [host setSearchBarToTableHeaderView]; [a refresh];
+    Check(DisplayedHeader(a)==wrapper,@"suspended native restoration leaves the installed group header intact");
+    [host viewWillAppear:YES];
+    Check(DisplayedHeader(a)==wrapper && a.chromeVisible && [a.publishedTabID isEqual:@"preset_2"],
+        @"first returned frame keeps the selected group for either native search-state timing");
+    for (NSUInteger frame=0;frame<6;frame++) {
+        [host setSearchBarToTableHeaderView]; [host viewDidLayoutSubviews]; [a refresh];
+        Check(DisplayedHeader(a)==wrapper && !a.chrome.hidden && [a.publishedTabID isEqual:@"preset_2"],
+            @"every cancellation-transition slice retains the displayed group header");
+    }
+    [host cancelSearch]; [host onFTSSearchEnd]; [host setSearchBarActive:NO]; [host viewDidAppear:YES];
+    Check(!a.searching && !a.searchChromeVisible && a.chrome.userInteractionEnabled && DisplayedHeader(a)==wrapper,
+        @"completed quick search restores group interaction without a header swap");
+    Check([DisplayedNames(a) isEqual:@[@"ordinary"]],@"quick search return retains the selected group's rows");
+    BOOL onlyGroup=YES;
+    for (id installed in a.table.installedHeaders) onlyGroup &= installed==wrapper;
+    Check(onlyGroup && !host.sawNativeBeforePrepare,
+        @"recorded actual header installations contain no native search flash at any phase");
+    fixtureNativeIndexScope=previousScope;
 }
 int main(void) { @autoreleasepool {
     // Use a private defaults suite: never modify the developer's real settings.
@@ -254,6 +388,36 @@ int main(void) { @autoreleasepool {
     NSUInteger refreshes=host.adapter.refreshes, requests=host.adapter.requests;
     [host cancelSearch]; [host onFTSSearchEnd]; [host setSearchBarActive:NO];
     Check(host.calls==5 && host.adapter.refreshes==refreshes+3 && host.adapter.requests==requests,@"search end hooks reconcile synchronously without the scheduled delay");
+
+    ReplayQuickSearchReturn(NO,YES); ReplayQuickSearchReturn(YES,YES);
+    ReplayQuickSearchReturn(NO,NO); ReplayQuickSearchReturn(YES,NO);
+    host=[Host new]; host.adapter=List(); a=host.adapter; a.controller=host;
+    enabled=NO; [a refresh]; [host onSearchButtonTapped];
+    Check(!a.searchChromeVisible && DisplayedHeader(a)==a.nativeHeader,
+        @"quick search leaves the native header in charge when grouping is disabled");
+    enabled=YES;
+    [defaults setVolatileDomain:@{CSGroupSearchButtonVisibleKey:@NO} forName:NSArgumentDomain];
+    host=[Host new]; host.adapter=List(); [host onSearchButtonTapped];
+    Check(!host.adapter.searchChromeVisible && DisplayedHeader(host.adapter)==host.adapter.nativeHeader,
+        @"quick search retains ordinary native search when the group search shortcut is disabled");
+    [defaults setVolatileDomain:@{CSGroupSearchButtonVisibleKey:@YES} forName:NSArgumentDomain];
+    host=[Host new]; host.adapter=List(); a=host.adapter; a.controller=host;
+    a.sourceSections=@[@[Row(0,@"account-A",CSGroupRowCategoryPrivate)]]; [a refresh];
+    host.nativeCall=^(Host *owner,NSString *selector) {
+        if ([selector isEqual:@"showSearchBar:"]) { owner.isSearching=YES; [owner viewWillDisappear:YES]; }
+        else if ([selector isEqual:@"viewWillAppear:"]) [owner setSearchBarToTableHeaderView];
+        else if ([selector isEqual:@"setSearchBarToTableHeaderView"]) owner.adapter.table.tableHeaderView=owner.adapter.nativeHeader;
+    };
+    [host onSearchButtonTapped]; account=@"B";
+    Check(![a keepsGroupHeaderDuringSearch],@"quick-search backing-header ownership cannot cross accounts while suspended");
+    a.sourceSections=@[@[Row(0,@"account-B",CSGroupRowCategoryPrivate)]];
+    [host viewWillAppear:YES];
+    Check(!a.searchChromeVisible && DisplayedHeader(a)==a.nativeHeader && !a.projecting,
+        @"account change releases the old quick-search group before native return is displayed");
+    host.isSearching=NO; [host cancelSearch];
+    Check([a.preferences.accountID isEqual:@"B"] && [DisplayedNames(a) isEqual:@[@"account-B"]],
+        @"completed quick search republishes only the current account's group");
+    account=@"A";
 
     // Replay the production refresh, including its real projection decisions.
     // The native source deliberately contains a protected private chat and a
@@ -302,8 +466,10 @@ int main(void) { @autoreleasepool {
     Check(a.table.tableHeaderView==switcherHeader && a.chromeVisible && [a.publishedTabID isEqual:@"preset_2"],@"switcher privacy publication preserves group header and selection");
     publications=a.publications; [a refresh];
     Check(a.publications==publications,@"ordinary inactive publications remain deferred after privacy settles");
+    UIView *inactiveHeader=DisplayedHeader(host.adapter);
     host.adapter.table.tableHeaderView=nil; [host.adapter layout];
-    Check(!host.adapter.table.tableHeaderView,@"inactive application still blocks header publication");
+    Check(DisplayedHeader(host.adapter)==inactiveHeader && !host.adapter.nativeHeader,
+        @"inactive application records the native header change without publishing it");
     fprintf(stdout,"Group search: %lu checks, %lu failures\n",(unsigned long)checks,(unsigned long)failures);
     return failures ? 1 : 0;
 } }

@@ -1,0 +1,86 @@
+{
+  "results": [
+    {
+      "command": "bash Tests/verify-backup-compatibility.sh",
+      "exit_code": 0,
+      "reported_checks": 66,
+      "note": "",
+      "log": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/packages/2.9-5/regressions/core-review-20261124-113120-353dcae894-verify-backup-compatibility.log",
+      "output": "STARTUP rejected: 恢复条件未满足：当前账号未就绪或已变化，恢复保持待处理；可在备份页取消\nSTARTUP rejected: 恢复条件未满足：当前账号未就绪或已变化，恢复保持待处理；可在备份页取消\nBackup compatibility: 66 checks passed\n"
+    },
+    {
+      "command": "bash Tests/verify-backup-registry.sh",
+      "exit_code": 0,
+      "reported_checks": 2212,
+      "note": "",
+      "log": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/packages/2.9-5/regressions/core-review-20261124-113120-37dd295a6c-verify-backup-registry.log",
+      "output": "2026-11-24 11:31:23.504 registry-tests[58976:28414344] Backup registry passed 2212 assertions\n"
+    },
+    {
+      "command": "bash Tests/verify-quick-panel-router.sh",
+      "exit_code": 0,
+      "reported_checks": 396,
+      "note": "",
+      "log": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/packages/2.9-5/regressions/core-review-20261124-113120-54f9045156-verify-quick-panel-router.log",
+      "output": "Quick panel router: 396 checks passed.\n"
+    },
+    {
+      "command": "bash Tests/verify-settings-home.sh",
+      "exit_code": 0,
+      "reported_checks": 1030,
+      "note": "",
+      "log": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/packages/2.9-5/regressions/core-review-20261124-113120-68b5bf0852-verify-settings-home.log",
+      "output": "SettingsHomeModelTests: 803 checks, 0 failures (real production model and layout helpers; four Tabs/shared About, global visible-only search, identity/routes, rebuild/account reset, sticky rail/safe areas, legal scrolling and asynchronous reflow)\nSettingsHomeControllerTests: 227 checks, 0 failures (real setupData, selection and lifecycle methods; quick-panel routes, no duplicate completion reload, preserved user scroll, privacy/account/authorization boundaries, width-dependent verse reflow, existing search/Tab restoration and rail geometry; UIKit/navigation/layout/animation are fixtures)\n"
+    },
+    {
+      "command": "bash Tests/verify-moments-card.sh",
+      "exit_code": 0,
+      "reported_checks": 73580,
+      "note": "",
+      "log": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/packages/2.9-5/regressions/core-review-20261124-113120-76eaa24f61-verify-moments-card.log",
+      "output": "Moments card geometry: 73467 checks passed (natural covers, two-line titles, optional location, stacked author/date, dynamic fonts, large counts, no overlaps).\nMoments card configuration: 113 checks passed (production configure/cleanup, first cover, video reuse/fallback, native emoji text/ABI, larger fonts, counts, timestamp/timezone/DST, optional location).\n"
+    },
+    {
+      "command": "bash Tests/verify-list-corners.sh",
+      "exit_code": 0,
+      "reported_checks": 1711,
+      "note": "",
+      "log": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/packages/2.9-5/regressions/core-review-20261124-113120-78a8c63a55-verify-list-corners.log",
+      "output": "List corners: 1711 checks, 0 failures (production modules, extracted Hooks + group role function, real index scopes; host doubles, no device rendering claim)\n"
+    },
+    {
+      "command": "bash Tests/verify-quick-panel-preferences.sh",
+      "exit_code": 0,
+      "reported_checks": null,
+      "note": "PASS; no check counter emitted",
+      "log": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/packages/2.9-5/regressions/core-review-20261124-113120-8425d6988b-verify-quick-panel-preferences.log",
+      "output": "2026-11-24 11:31:23.298 preferences[58958:28414289] PASS: quick panel preferences (isolated defaults suite)\n"
+    },
+    {
+      "command": "bash Tests/verify-backup-reset.sh",
+      "exit_code": 0,
+      "reported_checks": 45,
+      "note": "",
+      "log": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/packages/2.9-5/regressions/core-review-20261124-113120-8aee3eaebd-verify-backup-reset.log",
+      "output": "Backup reset: 45 checks passed\n"
+    },
+    {
+      "command": "bash Tests/verify-bubble-style.sh",
+      "exit_code": 0,
+      "reported_checks": 39660,
+      "note": "",
+      "log": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/packages/2.9-5/regressions/core-review-20261124-113120-91403fc546-verify-bubble-style.log",
+      "output": "Bubble policy/renderer/ownership: 36979 checks passed\nBubble real-adapter lifecycle: 2681 checks passed\n"
+    },
+    {
+      "command": "bash Tests/verify-tabbar.sh",
+      "exit_code": 0,
+      "reported_checks": null,
+      "note": "121 touch checks plus geometry, selected icon/native restore, and lifecycle PASS; no overall counter",
+      "log": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/packages/2.9-5/regressions/core-review-20261124-113120-9680a01e16-verify-tabbar.log",
+      "output": "tabbar geometry: PASS\n2026-11-24 11:31:24.105 native[58987:28414403] tabbar selected icon color/native restore: PASS\n2026-11-24 11:31:24.117 native[58987:28414403] tabbar Neo touch/animation: 97 checks passed\n2026-11-24 11:31:24.120 native[58987:28414403] tabbar modern native hierarchy: PASS (121 total touch checks)\n2026-11-24 11:31:24.134 native[58987:28414403] tabbar preferences/native lifecycle: PASS\n"
+    }
+  ],
+  "all_passed": true,
+  "production_or_test_source_modified": false
+}

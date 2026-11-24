@@ -247,10 +247,10 @@ int main(void) {
 
             NSArray *all = CSQuickPanelTestPreferences.allActionIdentifiers;
             NSArray *legacyIdentifiers = @[@"scan", @"wallet", @"moments", @"my_qrcode", @"favorites", @"plugin_home", @"profile", @"create_group", @"add_friend", @"emoji_store", @"panel_settings"];
-            NSArray *newIdentifiers = @[@"payment_code", @"channels", @"file_transfer", @"chat_background", @"receive_code", @"my_moments", @"create_note", @"switch_account"];
-            CSRequire(all.count == 19 && [NSSet setWithArray:all].count == 19, @"catalog has 19 stable unique identifiers");
+            NSArray *newIdentifiers = @[@"payment_code", @"channels", @"file_transfer", @"chat_background", @"receive_code", @"my_moments", @"create_note", @"switch_account", @"dark_mode", @"global_search"];
+            CSRequire(all.count == 21 && [NSSet setWithArray:all].count == 21, @"catalog has 21 stable unique identifiers");
             CSRequire([all isEqual:[legacyIdentifiers arrayByAddingObjectsFromArray:newIdentifiers]], @"catalog preserves all existing identifiers and appends new actions");
-            NSArray *titles = @[@"扫一扫", @"钱包", @"朋友圈", @"我的二维码", @"收藏", @"插件主页", @"个人资料", @"发起群聊", @"添加朋友", @"表情商店", @"面板设置", @"付款码", @"视频号", @"文件传输助手", @"聊天背景", @"收款码", @"我的朋友圈", @"新建笔记", @"切换账号"];
+            NSArray *titles = @[@"扫一扫", @"钱包", @"朋友圈", @"我的二维码", @"收藏", @"插件主页", @"个人资料", @"发起群聊", @"添加朋友", @"表情商店", @"面板设置", @"付款码", @"视频号", @"文件传输助手", @"聊天背景", @"收款码", @"我的朋友圈", @"新建笔记", @"切换账号", @"深色模式切换", @"全局搜索"];
             [all enumerateObjectsUsingBlock:^(NSString *identifier, NSUInteger index, BOOL *stop) {
                 (void)stop;
                 CSRequire([[CSQuickPanelTestPreferences titleForActionIdentifier:identifier] isEqual:titles[index]], @"catalog Chinese title");
@@ -260,6 +260,8 @@ int main(void) {
             CSRequire([[CSQuickPanelTestPreferences symbolNameForActionIdentifier:@"my_moments"] isEqual:@"photo.on.rectangle"], @"my moments uses the photo stack symbol");
             CSRequire([[CSQuickPanelTestPreferences symbolNameForActionIdentifier:@"create_note"] isEqual:@"square.and.pencil"], @"create note uses the compose symbol");
             CSRequire([[CSQuickPanelTestPreferences symbolNameForActionIdentifier:@"switch_account"] isEqual:@"arrow.triangle.2.circlepath"], @"switch account uses the shared circular arrows symbol");
+            CSRequire([[CSQuickPanelTestPreferences symbolNameForActionIdentifier:@"dark_mode"] isEqual:@"moon.circle"] &&
+                      [[CSQuickPanelTestPreferences symbolNameForActionIdentifier:@"global_search"] isEqual:@"magnifyingglass"], @"appearance and global search have distinct symbols");
             CSRequire([CSQuickPanelTestPreferences titleForActionIdentifier:@"unknown"] == nil, @"unknown action has no title");
 
             [CSQuickPanelTestDefaults setObject:legacyIdentifiers forKey:CSQuickPanelSelectedActionIdentifiersKey];
@@ -293,6 +295,11 @@ int main(void) {
                       @"saved 17-action selection never automatically adds note or account actions");
             CSRequire([[CSQuickPanelTestDefaults objectForKey:CSQuickPanelSelectedActionIdentifiersKey] isEqual:savedSeventeen],
                       @"reading an existing 17-action selection leaves storage unchanged");
+            NSArray *savedNineteen = [all subarrayWithRange:NSMakeRange(0, 19)];
+            [CSQuickPanelTestDefaults setObject:savedNineteen forKey:CSQuickPanelSelectedActionIdentifiersKey];
+            CSRequire([CSQuickPanelTestPreferences.selectedActionIdentifiers isEqual:savedNineteen] &&
+                      [[CSQuickPanelTestDefaults objectForKey:CSQuickPanelSelectedActionIdentifiersKey] isEqual:savedNineteen],
+                      @"existing 19-action selections remain unchanged without automatically adding appearance or search");
             [CSQuickPanelTestDefaults setObject:@[@"file_transfer", @"scan", @"payment_code", @"channels"] forKey:CSQuickPanelSelectedActionIdentifiersKey];
             CSRequire([CSQuickPanelTestPreferences.selectedActionIdentifiers isEqual:@[@"file_transfer", @"scan", @"payment_code", @"channels"]], @"restored new actions keep their selected order");
 
@@ -327,8 +334,12 @@ int main(void) {
             [CSQuickPanelTestDefaults setObject:@[@"create_note", @"switch_account", @"create_note", @"switch_account.extra"] forKey:CSQuickPanelSelectedActionIdentifiersKey];
             CSRequire([CSQuickPanelTestPreferences.selectedActionIdentifiers isEqual:@[@"create_note", @"switch_account"]],
                       @"stored note and account choices retain the opposite saved order without duplicates");
+            NSArray *mixedAppearanceSearchSelection = @[@"global_search", @"dark_mode", @"global_search", @"dark_mode.extra", @21];
+            [CSQuickPanelTestPreferences setSelectedActionIdentifiers:mixedAppearanceSearchSelection];
+            CSRequire([CSQuickPanelTestPreferences.selectedActionIdentifiers isEqual:@[@"global_search", @"dark_mode"]],
+                      @"appearance and search are independent ordered choices with duplicates and malformed identifiers removed");
             [CSQuickPanelTestPreferences setSelectedActionIdentifiers:all];
-            CSRequire([CSQuickPanelTestPreferences.selectedActionIdentifiers isEqual:all], @"all 19 actions can be selected without truncation");
+            CSRequire([CSQuickPanelTestPreferences.selectedActionIdentifiers isEqual:all], @"all 21 actions can be selected without truncation");
             [CSQuickPanelTestPreferences setTriggerLocations:0];
             CSRequire(CSQuickPanelTestPreferences.triggerLocations == CSQuickPanelTriggerHome, @"at least one location survives zero input");
             [CSQuickPanelTestPreferences setTriggerLocations:1 << 7];

@@ -3,19 +3,22 @@ from pathlib import Path
 import re
 import sys
 source = (Path(__file__).resolve().parent.parent / 'Controllers/WESessionTabContainerView.m').read_text()
-def extract(marker):
-    start = source.index(marker)
-    brace = source.index('{', start)
+def extract(marker, text=None):
+    text = source if text is None else text
+    start = text.index(marker)
+    brace = text.index('{', start)
     depth = 0
-    for end in range(brace, len(source)):
-        if source[end] == '{': depth += 1
-        if source[end] == '}':
+    for end in range(brace, len(text)):
+        if text[end] == '{': depth += 1
+        if text[end] == '}':
             depth -= 1
             if depth == 0:
-                return source[start:end+1]
+                return text[start:end+1]
     raise ValueError(marker)
 
 methods = [extract(marker) for marker in ['- (NSInteger)indexForTabID:', '- (void)setSelectedTabID:',
+               '- (void)updateTabs:', '- (CGFloat)widthForTabButton:', '- (void)layoutTabButtons',
+               '- (void)scrollViewWillBeginDragging:',
                '- (void)selectTabAtIndex:', '- (void)updateIndicatorPosition {',
                '- (void)updateIndicatorPositionAnimated:', '- (void)moveIndicatorToFrame:',
                '- (void)scrollToSelectedTab', '- (CGRect)indicatorFrameForIndex:', '- (void)updateInteractiveTransitionToIndex:',
@@ -26,6 +29,9 @@ methods = [extract(marker) for marker in ['- (NSInteger)indexForTabID:', '- (voi
                '- (void)tabButtonTapped:']]
 output = Path(sys.argv[1])
 output.write_text('\n'.join(methods)+'\n')
+# Select the container implementation, after WETabButton's layoutSubviews.
+container_source = source[source.index('@implementation WESessionTabContainerView'):]
+output.with_name('GroupContainerLayoutBody.h').write_text(extract('- (void)layoutSubviews',container_source)+'\n')
 output.with_name('GroupCapsuleHelpers.h').write_text(source[source.index('static NSTimeInterval const kCapsulePressDuration'):source.index('// Match the native')])
 # Replay the real UIControl event bindings, so handler tests also cover wiring.
 bindings = re.findall(r'\[button addTarget:self action:@selector\([^)]*\) forControlEvents:[^;]+;', extract('- (void)updateTabs:'))

@@ -1,0 +1,50 @@
+{
+  "version": "2.9-5",
+  "verified_at": "2026-11-24T11:39:22.646430+08:00",
+  "source_checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "all_checks_passed": true,
+  "functional_suite_count": 16,
+  "chat_group_checks": 406,
+  "release_metadata_checks": 18,
+  "strict_ios_architectures": [
+    "arm64",
+    "arm64e"
+  ],
+  "compilation_records": 1168,
+  "source_input_count": 533,
+  "test_file_count": 450,
+  "source_changes": [],
+  "test_changes": [],
+  "preserved_file_count": 1347,
+  "historical_changes": [],
+  "git_diff_check_exit_code": 0,
+  "artifacts": {
+    "com.wechat.improve_2.9-5_iphoneos-arm.deb": {
+      "bytes": 2363460,
+      "sha256": "c898e4e043b5a84585542438bd422864366f2da9340350a4d27c7dd92b431554"
+    },
+    "com.wechat.improve_2.9-5_iphoneos-arm64.deb": {
+      "bytes": 2367166,
+      "sha256": "4434248d7a3f039799df110f94c62f5ac74e389409065adacfa2a3489b433fb7"
+    },
+    "WeChatImprove.dylib": {
+      "bytes": 10284848,
+      "sha256": "5d04498615d06eef180009dfecc12b8c20ebe330a4fc82f2871c579c250b45fc"
+    },
+    "symbols.zip": {
+      "bytes": 16474273,
+      "sha256": "7148733e4c0e651216dc04dd4c5b809e618c07d2e470b2f2c1abd1e2519ba3ad"
+    }
+  },
+  "artifact_validation": "build-validation.json",
+  "functional_results": [
+    "regressions/results.json",
+    "regressions/core-review-summary-20261124-113204-83f193f8fe.json"
+  ],
+  "metadata_results": "regressions/release-metadata-results-20261124-113608-902e43e061.json",
+  "strict_ios_results": "regressions/release-notes-ios-strict-20261124-113608-902e43e061.json",
+  "checksum_file": "SHA256SUMS",
+  "on_device_validation": "not_performed",
+  "make_clean_executed": false,
+  "device_install_or_service_switch": false
+}

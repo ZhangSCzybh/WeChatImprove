@@ -34,6 +34,12 @@ chunk=source[source.index('%hook ContactsViewController\n'):];chunk=chunk[:chunk
 for method,signature in [('- (void)initCountLabel:', 'HookContactsInitCount(id self,id arg1,void (^original)(void))'), ('- (void)viewDidLayoutSubviews', 'HookContactsCountLayout(id self,void (^original)(void))')]:
     code=body(chunk,chunk.index(method));assert code.count('%orig')==1
     output.append('static void '+signature+' {'+code.replace('%orig;', 'original();')+'}')
+for page,cls in [('Contacts','ContactsViewController'),('Discover','FindFriendEntryViewController'),('More','MoreViewController')]:
+    chunk=source[source.index('%hook '+cls+'\n'):];chunk=chunk[:chunk.index('%end')]
+    for method,event in [('- (void)viewDidLayoutSubviews','ViewportLayout'),('- (void)traitCollectionDidChange:','AppearanceChange')]:
+        code=body(chunk,chunk.index(method)) if method in chunk else '%orig;'
+        assert code.count('%orig')==1
+        output.append('static void Hook'+page+event+'(id self,void (^original)(void)) {'+code.replace('%orig;', 'original();')+'}')
 chunk=source[source.index('%hook NewMainFrameViewController\n'):];chunk=chunk[:chunk.index('%end')]
 # Before the regression fix there is no layout hook: execute native layout alone.
 method='- (void)viewDidLayoutSubviews'

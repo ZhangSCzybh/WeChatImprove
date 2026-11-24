@@ -11,8 +11,45 @@
 #include "GroupLifecycleTabBadgeDependencies.h"
 #include "GroupLifecycleTabBadgeImplementation.inc"
 @class CSGroupListAdapter;
+@interface LifecycleNativeModel : NSObject
+@property(nonatomic,readonly) BOOL isValid;
+@property(nonatomic,readonly) NSArray *sourceRows;
+@end
+// The native coordinator is an external model boundary in this suite. Keep its
+// compatibility selection explicit; publication geometry has separate tests.
+@interface CSGroupNativeSessionCoordinator : NSObject
+@property(nonatomic) BOOL compatibilityFallback;
+@property(nonatomic) BOOL boundary;
+@property(nonatomic) NSUInteger epoch;
+@property(nonatomic,copy) NSString *accountID;
+@property(nonatomic,strong) LifecycleNativeModel *model;
++ (instancetype)sharedCoordinator;
+- (void)setMainController:(id)controller;
+@end
+@implementation CSGroupNativeSessionCoordinator
++ (instancetype)sharedCoordinator {
+    static CSGroupNativeSessionCoordinator *coordinator;
+    if (!coordinator) { coordinator=[self new]; coordinator.compatibilityFallback=YES; }
+    return coordinator;
+}
+- (void)setMainController:(id)controller { (void)controller; }
+@end
+static NSNotificationName const CSGroupNativeSessionModelDidChangeNotification=@"native-session-model";
+@interface LifecyclePan : NSObject
+- (void)addTarget:(id)target action:(SEL)action;
+@end
+@implementation LifecyclePan
+- (void)addTarget:(id)target action:(SEL)action { (void)target; (void)action; }
+@end
 @interface UITableView (LifecycleDataSource)
 @property(nonatomic,readonly) id dataSource;
+@property(nonatomic,readonly) LifecyclePan *panGestureRecognizer;
+@end
+@implementation UITableView (LifecycleDataSource)
+- (id)dataSource { return nil; }
+- (LifecyclePan *)panGestureRecognizer {
+    static LifecyclePan *pan; if (!pan) pan=[LifecyclePan new]; return pan;
+}
 @end
 @interface LifecycleTable : UITableView @end
 @interface Host : NSObject
@@ -25,6 +62,11 @@
 - (void)viewDidAppear:(BOOL)animated;
 - (void)viewWillDisappear:(BOOL)animated;
 - (void)viewDidDisappear:(BOOL)animated;
+- (void)showSearchBar:(id)sender searchBar:(id)searchBar autoStartGreenMic:(BOOL)autoStartGreenMic;
+- (void)cancelSearch;
+- (void)onFTSSearchEnd;
+- (void)nativeSearchBegan;
+- (void)nativeSearchFinished;
 @end
 @interface CSGroupPreferences : NSObject
 @property(nonatomic,copy) NSString *accountID;
@@ -72,10 +114,12 @@ static BOOL mutateDuringSnapshot,failPublication,rawPublicationFailure;
 static void (^publicationMutation)(id);
 static NSArray *CSGroupBuildNativeSections(id controller,id table,id source);
 static NSArray *CSGroupBuildNativeSectionsReusing(id controller,id table,id source,NSArray *previous);
+static NSArray *CSGroupBuildNativeSectionsForChanges(id controller,id table,id source,NSArray *previous,CSGroupChangeKind changes,NSSet *changedUserNames);
 static NSHashTable *Adapters(void) {
     static NSHashTable *adapters; if (!adapters) adapters=[NSHashTable weakObjectsHashTable]; return adapters;
 }
 static BOOL Option(NSString *key) { (void)key; return enabled; }
+static BOOL CSGroupSearchButtonVisible(NSUserDefaults *defaults) { (void)defaults; return enabled; }
 static NSString *CSGroupCurrentAccountID(void) { return account; }
 static id CSGroupReadObject(id owner,NSString *key) { return [owner valueForKey:key]; }
 static long long CSGroupReadInteger(id owner,NSString *key,long long fallback) { return owner ? [[owner valueForKey:key] longLongValue] : fallback; }
@@ -119,7 +163,9 @@ CS_GROUP_REFRESH_TEST_PROPERTIES
 @property(nonatomic,strong) NSMutableDictionary *proxies,*anchors;
 @property(nonatomic,strong) NSMutableArray *completions,*nativeActions;
 @property(nonatomic,strong) NSMutableSet *prefetchedPaths;
-@property(nonatomic,strong) id nativeHeader,projection,identityDisplayPaths;
+@property(nonatomic,strong) id nativeHeader,identityDisplayPaths;
+@property(nonatomic,strong) CSGroupProjection *projection;
+@property(nonatomic,strong) UIView *headerContainer;
 @property(nonatomic) BOOL chromeVisible,searchChromeVisible,privacyRefreshPending,privacyShielded,privacyTableWasHidden;
 @property(nonatomic,strong) CSCloseFriendListShield *privacyShield;
 @property(nonatomic) CSGroupChangeKind lastPublishedChanges;
@@ -127,6 +173,13 @@ CS_GROUP_REFRESH_TEST_PROPERTIES
 @property(nonatomic,strong) CSGroupPreferences *preferences;
 @property(nonatomic) double baselineDeceleration;
 @property(nonatomic) BOOL active,presentationSuspended,publishedEnabled,searching,dirty,scheduled,publishing,groupPanMoving,swipeActive,nativePresentation,updatingHeader,snapshotRetryAttempted;
+@property(nonatomic) BOOL usesNativeSessionModel,initialViewportPending,restoringViewport,presentationReturnFinished,immediateRefreshPending;
+@property(nonatomic,copy) NSDictionary *presentationViewport,*switchViewport;
+@property(nonatomic,copy) NSArray *initialViewportKey;
+@property(nonatomic) NSUInteger viewportGeneration,initialViewportGeneration;
+@property(nonatomic,strong) NSMutableSet *pendingChangedUserNames;
+@property(nonatomic) BOOL pendingChangeNamesUnknown;
+@property(nonatomic) NSTimeInterval refreshBurstStart,refreshCoalescedDue,scheduledRefreshDue;
 @property(nonatomic) NSUInteger changeDepth,snapshotRetryGeneration,refreshCount,layoutCount,anchorOrTitleCount,menuReads,menuState;
 @property(nonatomic) BOOL pendingScrollToTop;
 + (instancetype)adapterForController:(id)controller;
@@ -139,6 +192,11 @@ CS_GROUP_REFRESH_TEST_PROPERTIES
 - (void)refreshNavigationTitle;
 - (void)useNativePresentation;
 - (void)shieldVisiblePrivateRows;
+- (void)prepareForVisibility;
+- (void)restorePendingViewport;
+- (void)nativeSessionModelChanged:(NSNotification *)notification;
+- (void)refreshNativeSessionModel;
+- (void)performSessionListLayout:(void (^)(void))layout;
 @end
 @implementation CSGroupListAdapter
 #include "GroupLifecycleBodies.h"
@@ -149,6 +207,21 @@ CS_GROUP_REFRESH_TEST_PROPERTIES
 - (void)reconcileDeletedSwipeRow {}
 - (id)nativeSource { return self; }
 - (void)applyPendingScrollToTop {}
+- (BOOL)adoptCompatibilityModelIfNeeded { return NO; }
+- (void)prepareForVisibility {}
+- (void)nativeSessionModelChanged:(NSNotification *)notification {
+    (void)notification; [NSException raise:@"FixtureBoundary" format:@"Native-model events require their model suite"];
+}
+- (void)refreshNativeSessionModel {
+    [NSException raise:@"FixtureBoundary" format:@"This suite selects the compatibility publication boundary"];
+}
+- (void)performSessionListLayout:(void (^)(void))layout { if (layout) layout(); }
+- (void)prepareInitialViewport {}
+- (void)restoreInitialViewport { self.initialViewportPending=NO; }
+- (NSDictionary *)captureViewportForTabID:(NSString *)tabID { (void)tabID; return nil; }
+- (NSArray *)nativeSectionsForAccount:(NSString *)currentAccount {
+    return [self nativeSectionsForAccount:currentAccount changes:CSGroupChangeUnknown changedUserNames:nil];
+}
 - (void)detach {
 #if CS_GROUP_LIFECYCLE_TAB_BADGE
     [self cancelTabBadgeSourceRefresh];
@@ -157,17 +230,22 @@ CS_GROUP_REFRESH_TEST_PROPERTIES
     [self.nativeActions removeAllObjects];
     objc_setAssociatedObject(self.table,&AdapterKey,nil,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
-- (void)publishFixture {
+- (void)publishFixtureWithChanges:(CSGroupChangeKind)changes changedUserNames:(NSSet *)changedUserNames requestedRevision:(NSUInteger)requestedRevision {
     [self.privacyShield prepareForPublication];
     if (publicationMutation) publicationMutation(self);
     self.refreshCount++;
-    if (!self.nativePresentation) [self nativeSectionsForAccount:account];
+    self.lastPublishedChanges=changes;
+    if (!self.nativePresentation) [self nativeSectionsForAccount:account
+        changes:self.modelRevision==requestedRevision ? changes : changes|CSGroupChangeUnknown
+        changedUserNames:self.modelRevision==requestedRevision ? changedUserNames : nil];
     self.preferences=[CSGroupPreferences new]; self.preferences.accountID=account;
     WESessionTabItem *all=[WESessionTabItem tabWithType:WETabTypeAll],*a=[WESessionTabItem customTabWithName:@"A" sessionUserNames:@[@"a"]],*b=[WESessionTabItem customTabWithName:@"B" sessionUserNames:@[@"b"]];
     a.tabId=@"custom-a";b.tabId=@"custom-b";self.preferences.tabs=@[all,a,b];self.displayedTabs=self.preferences.tabs;
     self.publishedTabID=self.preferences.selectedTabID;
     self.publishedEnabled=enabled; self.searching=self.controller.isSearching;
     self.active=privacyEnabled || (enabled && !self.searching && !self.nativePresentation);
+    self.chromeVisible=enabled && !self.controller.folded && !self.searching && account.length>0;
+    if (self.chromeVisible && !self.headerContainer) self.headerContainer=[UIView new];
     [self layout];
     if (failPublication) { if (rawPublicationFailure) [self requestRefresh]; else [self requestRecovery]; }
 }
@@ -182,6 +260,10 @@ static NSArray *CSGroupBuildNativeSections(id controller,id table,id source) {
 static NSArray *CSGroupBuildNativeSectionsReusing(id controller,id table,id source,NSArray *previous) {
     (void)previous;return CSGroupBuildNativeSections(controller,table,source);
 }
+static NSArray *CSGroupBuildNativeSectionsForChanges(id controller,id table,id source,NSArray *previous,CSGroupChangeKind changes,NSSet *changedUserNames) {
+    (void)changes; (void)changedUserNames;
+    return CSGroupBuildNativeSectionsReusing(controller,table,source,previous);
+}
 static CSGroupListAdapter *Adapter(id owner) { return [CSGroupListAdapter adapterForController:owner]; }
 static void Native(id owner,BOOL change,void (^body)(void)) { (void)owner; (void)change; body(); }
 static BOOL Projected(CSGroupListAdapter *a) { return a.isActive && !a.publishing; }
@@ -192,6 +274,8 @@ static BOOL Projected(CSGroupListAdapter *a) { return a.isActive && !a.publishin
     // Native lifecycle may itself produce a session/UI invalidation.
     [Adapter(self) requestRefresh];
 }
+- (void)nativeSearchBegan { self.originalCalls++; self.isSearching=YES; }
+- (void)nativeSearchFinished { self.originalCalls++; self.isSearching=NO; }
 #include "GroupLifecycleHooks.h"
 @end
 static void FoldedAppearOriginal(id owner,SEL selector,BOOL animated) { (void)selector;[owner nativeAppearance:animated]; }
@@ -242,7 +326,7 @@ int main(void) { @autoreleasepool {
         [CSGroupListAdapter attachToController:host];
         [a refresh];
     }
-    [a saveAnchor]; [a restoreAnchor]; [a returnToGroupTop]; [a refreshNavigationTitle];
+    [a saveAnchor]; [a restoreAnchor]; [a restorePendingViewport]; [a refreshNavigationTitle];
     RunFor(.08);
     Check(models==200 && !a.changeDepth,@"all native changes still execute and transactions balance");
     Check(a.refreshCount==before && a.layoutCount==layouts,@"200 hidden updates do zero publication or header layout");
@@ -333,6 +417,42 @@ int main(void) { @autoreleasepool {
     host.isSearching=NO; [a refresh];
     Check(a.lastPublishedChanges&CSGroupChangeUnknown,@"return reconciles accumulated search-time changes with a full publication");
     Check(!a.searching && !a.searchChromeVisible && a.active,@"completed search clears transition ownership during normal publication");
+
+    // Replay the actual native presenter hook and real owner lifecycle, with
+    // isSearching ending both before and after appearance. UI/header frames
+    // remain the boundary owned by GroupSearchTests; no source-text assertion
+    // substitutes for executing search admission, suspension or publication.
+    NSString *selectionBeforeSearchReplay=selectedGroups[account];
+    for (NSUInteger delayedEnd=0;delayedEnd<2;delayedEnd++) {
+        a=List(&host); [a selectIndex:1];
+        NSString *selected=[a.publishedTabID copy]; UIView *retainedHeader=a.headerContainer;
+        NSUInteger searchPublications=a.refreshCount, nativeCalls=host.originalCalls;
+        [host showSearchBar:nil searchBar:nil autoStartGreenMic:NO]; RunFor(.02);
+        Check(host.originalCalls==nativeCalls+1 && host.isSearching && a.searching && a.searchChromeVisible,
+            @"native presenter executes once and production preparation retains group ownership");
+        Check(a.refreshCount==searchPublications && a.headerContainer==retainedHeader &&
+            [a.publishedTabID isEqual:selected],@"native search admission does not republish or replace the selected group");
+        [host viewWillDisappear:YES]; [host viewDidDisappear:YES];
+        NSUInteger hiddenLayouts=a.layoutCount;
+        [a beginNativeChange]; [a endNativeChange]; RunFor(.02);
+        Check(a.presentationSuspended && a.refreshCount==searchPublications && a.layoutCount==hiddenLayouts,
+            @"native messages while search covers the list defer publication and header layout");
+        if (!delayedEnd) host.isSearching=NO;
+        [host viewWillAppear:YES]; [host viewDidAppear:YES];
+        if (delayedEnd) {
+            Check(a.searching && a.searchChromeVisible && a.refreshCount==searchPublications &&
+                [a.publishedTabID isEqual:selected],@"late native search state retains the selected group through both appearance callbacks");
+            [host cancelSearch];
+        } else [host onFTSSearchEnd];
+        RunFor(.02);
+        Check(!a.presentationSuspended && !a.searching && !a.searchChromeVisible && !a.dirty && a.active &&
+            a.headerContainer==retainedHeader && [a.publishedTabID isEqual:selected],
+            @"early and late native search completion restore the same group after real lifecycle callbacks");
+        Check(a.refreshCount==searchPublications+(delayedEnd ? 1 : 3) && !a.scheduled,
+            @"search return drains lifecycle requests without leaving a repeated publication timer");
+    }
+    if (selectionBeforeSearchReplay) selectedGroups[account]=selectionBeforeSearchReplay;
+    else [selectedGroups removeObjectForKey:account];
 
     a=List(&host); a.searchChromeVisible=YES; host.isSearching=YES; [a refresh];
     NSUInteger beforeSearchAction=actions;

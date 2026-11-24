@@ -42,6 +42,11 @@ static NSString * const kTabBarIndicatorColorRedKey = @"com.wechat.enhance.tabba
 static NSString * const kTabBarIndicatorColorGreenKey = @"com.wechat.enhance.tabbar_style.indicator_color.green";
 static NSString * const kTabBarIndicatorColorBlueKey = @"com.wechat.enhance.tabbar_style.indicator_color.blue";
 static NSString * const kTabBarIndicatorColorAlphaKey = @"com.wechat.enhance.tabbar_style.indicator_color.alpha";
+static NSString * const kTabBarSelectedIconColorKey = @"com.wechat.enhance.tabbar_style.selected_icon_color";
+static NSString * const kTabBarSelectedIconColorRedKey = @"com.wechat.enhance.tabbar_style.selected_icon_color.red";
+static NSString * const kTabBarSelectedIconColorGreenKey = @"com.wechat.enhance.tabbar_style.selected_icon_color.green";
+static NSString * const kTabBarSelectedIconColorBlueKey = @"com.wechat.enhance.tabbar_style.selected_icon_color.blue";
+static NSString * const kTabBarSelectedIconColorAlphaKey = @"com.wechat.enhance.tabbar_style.selected_icon_color.alpha";
 static NSString * const kTabBarBorderAnimationKey = @"com.wechat.enhance.tabbar_style.border_animation";
 static NSString * const kTabBarBorderColorRedKey = @"com.wechat.enhance.tabbar_style.border_color.red";
 static NSString * const kTabBarBorderColorGreenKey = @"com.wechat.enhance.tabbar_style.border_color.green";
@@ -78,6 +83,8 @@ static NSString * const CSTabBarPreferencesDidChange = @"com.wechat.enhance.tabb
 @property(nonatomic, strong) UIColor *backgroundColor, *borderColor;
 // nil keeps the indicator's trait-dependent default; loading never persists it.
 @property(nonatomic, strong) UIColor *indicatorColor;
+// nil preserves WeChat's native selected artwork. Uploaded icons keep their colors.
+@property(nonatomic, strong) UIColor *selectedIconColor;
 @property(nonatomic, copy) NSArray *titles, *icons, *selectedIcons;
 + (instancetype)current;
 + (void)reload;

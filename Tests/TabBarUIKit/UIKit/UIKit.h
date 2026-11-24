@@ -108,7 +108,19 @@ BOOL UIAccessibilityIsReduceMotionEnabled(void);
 @end
 @interface UIImage : NSObject
 @property(nonatomic,copy) NSString *path;
+@property(nonatomic,strong) UIImage *sourceImage;
+@property(nonatomic,strong) UIColor *appliedTint;
+@property(nonatomic) CGSize renderedSize;
 + (instancetype)imageWithContentsOfFile:(NSString *)path;
+- (UIImage *)imageWithTintColor:(UIColor *)color renderingMode:(NSInteger)mode;
+@end
+typedef NS_ENUM(NSInteger, UIImageRenderingMode) { UIImageRenderingModeAutomatic,UIImageRenderingModeAlwaysOriginal,UIImageRenderingModeAlwaysTemplate };
+@interface UIGraphicsImageRendererContext : NSObject
+@property(nonatomic,readonly) CGContextRef CGContext;
+@end
+@interface UIGraphicsImageRenderer : NSObject
+- (instancetype)initWithSize:(CGSize)size;
+- (UIImage *)imageWithActions:(void (^)(UIGraphicsImageRendererContext *context))actions;
 @end
 @interface UIImageView : UIView
 @property(nonatomic,strong) UIImage *image;

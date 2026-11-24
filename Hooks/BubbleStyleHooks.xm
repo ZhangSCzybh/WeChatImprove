@@ -53,6 +53,19 @@
 - (void)updateStatus { %orig; CSBubbleStyleApply((UIView *)self); }
 %end
 
+// 8.0.80's recording preview has its own UIView background. layoutUI also runs
+// inside the native send-color animation; keep that animation and completion.
+%hook VoiceTransView_ContentV2
+- (void)layoutUI { %orig; CSBubbleStyleVoiceTransPreviewApply((UIView *)self); }
+- (void)finishEntranceExpand { %orig; CSBubbleStyleVoiceTransPreviewApply((UIView *)self); }
+- (void)traitCollectionDidChange:(UITraitCollection *)previous {
+    %orig; CSBubbleStyleVoiceTransPreviewApply((UIView *)self);
+}
+- (id)bubbleTextColorForCurrentState {
+    return CSBubbleStyleVoiceTransPreviewTextColor((UIView *)self,%orig);
+}
+%end
+
 %hook VoiceMessageCellView
 - (void)layoutContentView { %orig; CSBubbleStyleApply((UIView *)self); }
 - (void)updateSecLabelColor { %orig; CSBubbleStyleApply((UIView *)self); }

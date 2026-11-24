@@ -77,6 +77,9 @@ static BOOL Option(NSString *suffix) {
 @property (nonatomic, copy) NSDictionary *presentationViewport, *switchViewport;
 @property (nonatomic) BOOL presentationReturnFinished, restoringViewport;
 @property (nonatomic) NSUInteger viewportGeneration;
+@property (nonatomic, copy) NSArray *initialViewportKey;
+@property (nonatomic) NSUInteger initialViewportGeneration;
+@property (nonatomic) BOOL initialViewportPending;
 @property (nonatomic) BOOL publishedEnabled;
 @property (nonatomic, strong) NSMutableSet<NSIndexPath *> *prefetchedPaths;
 @property (nonatomic, strong) NSMutableArray *nativeActions;
@@ -143,6 +146,9 @@ static BOOL Option(NSString *suffix) {
 - (void)restorePendingViewport;
 - (void)restoreViewportFromSource:(NSDictionary *)viewport;
 - (void)clearPendingViewport;
+- (void)prepareInitialViewport;
+- (void)cancelInitialViewport;
+- (void)restoreInitialViewport;
 - (void)tablePan:(UIPanGestureRecognizer *)pan;
 - (void)requestRecovery;
 - (void)cancelScheduledRefresh;
@@ -246,6 +252,7 @@ static BOOL Option(NSString *suffix) {
     objc_setAssociatedObject(controller,&PresentationSuspendedKey,@(suspended),OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     CSGroupListAdapter *adapter=[self adapterForController:controller];
     if (suspended && !adapter.presentationSuspended) {
+        [adapter cancelInitialViewport];
         // willDisappear and didDisappear share one departure. The second call
         // must not replace its height with a covered/host-adjusted viewport.
         if (![adapter validViewport:adapter.presentationViewport]) {
@@ -269,8 +276,8 @@ static BOOL Option(NSString *suffix) {
 + (void)finishPresentationReturnForController:(id)controller {
     if (!NSThread.isMainThread || !controller) return;
     CSGroupListAdapter *adapter=[self adapterForController:controller];
-    if (!adapter.presentationViewport) return;
-    adapter.presentationReturnFinished=YES;
+    if (!adapter.presentationViewport && !adapter.initialViewportPending) return;
+    if (adapter.presentationViewport) adapter.presentationReturnFinished=YES;
     // The host has completed viewDidAppear. Dirty/privacy-held geometry waits
     // for the existing publication/layout callbacks instead of polling.
     if (!adapter.dirty && !adapter.publishing && !adapter.changeDepth && !adapter.presentationSuspended &&
@@ -1081,6 +1088,7 @@ static BOOL Option(NSString *suffix) {
     if (!NSThread.isMainThread) { [self requestRefresh]; return; }
     if ([self adoptCompatibilityModelIfNeeded]) { [self refresh];return; }
     if (self.publishing) return;
+    [self prepareInitialViewport];
     NSDictionary *sourceViewport=(self.presentationViewport || self.switchViewport) ? nil : [self captureViewportForTabID:self.publishedTabID];
     [self pruneNativeActions];
     if ((!CSGroupApplicationActive() && !self.privacyRefreshPending) ||
@@ -1258,6 +1266,7 @@ static BOOL Option(NSString *suffix) {
     if (self.usesNativeSessionModel) { [self refreshNativeSessionModel]; return; }
     if (!NSThread.isMainThread) { [self requestRefresh]; return; }
     if (self.publishing) return;
+    [self prepareInitialViewport];
     NSDictionary *sourceViewport=(self.presentationViewport || self.switchViewport) ? nil : [self captureViewportForTabID:self.publishedTabID];
     [self pruneNativeActions];
     // Explicit native navigation is the only offscreen publication exception.
@@ -2048,6 +2057,7 @@ static BOOL Option(NSString *suffix) {
         table.contentOffset.y>=-table.adjustedContentInset.top-0.5;
 }
 - (NSDictionary *)captureViewportForTabID:(NSString *)tabID {
+    if (self.initialViewportPending) return nil;
     NSUInteger generation=self.viewportGeneration;
     UITableView *table=self.table;
     CGFloat height=table.contentOffset.y+table.adjustedContentInset.top;
@@ -2084,7 +2094,57 @@ static BOOL Option(NSString *suffix) {
         [viewport[@"epoch"] unsignedIntegerValue]==CSCloseFriendAccountEpoch();
 }
 - (void)clearPendingViewport {
+    [self cancelInitialViewport];
     self.presentationViewport=nil; self.switchViewport=nil; self.presentationReturnFinished=NO;
+}
+- (void)prepareInitialViewport {
+    NSString *account=CSGroupCurrentAccountID();
+    if (!account.length) { self.initialViewportKey=nil; self.initialViewportPending=NO; return; }
+    NSArray *key=@[account,@(CSCloseFriendAccountEpoch())];
+    if ([self.initialViewportKey isEqual:key]) return;
+    self.initialViewportKey=key;
+    self.initialViewportGeneration=self.viewportGeneration;
+    BOOL previousPublication=self.preferences.accountID.length &&
+        (![self.preferences.accountID isEqual:account] || self.snapshotEpoch!=CSCloseFriendAccountEpoch());
+    self.initialViewportPending=Option(@"enabled") && !CSGroupIsFoldedController(self.controller) &&
+        !self.presentationSuspended && !CSGroupReadInteger(self.controller,@"isSearching",0) &&
+        (previousPublication || (!self.nativePresentation && !self.nativeActions.count &&
+            !self.presentationViewport && !self.switchViewport && !self.searching));
+}
+- (void)cancelInitialViewport {
+    self.initialViewportPending=NO;
+    // A user command before the first valid publication also consumes this
+    // account's startup request; a later refresh must not arm it again.
+    NSString *account=CSGroupCurrentAccountID();
+    if (account.length) self.initialViewportKey=@[account,@(CSCloseFriendAccountEpoch())];
+}
+- (void)restoreInitialViewport {
+    if (!self.initialViewportPending) return;
+    NSArray *key=@[CSGroupCurrentAccountID() ?: @"",@(CSCloseFriendAccountEpoch())];
+    // Expire the old account without consuming the next account's startup.
+    // Its layout can arrive before the first publication for that account.
+    if (![self.initialViewportKey isEqual:key]) { self.initialViewportPending=NO; return; }
+    if (self.initialViewportGeneration!=self.viewportGeneration || !Option(@"enabled") || self.presentationSuspended) {
+        [self cancelInitialViewport]; return;
+    }
+    // Until the new account publishes, its predecessor's search/native state
+    // must neither move the list nor consume the new startup request.
+    if (![self.preferences.accountID isEqual:key.firstObject] || self.snapshotEpoch!=CSCloseFriendAccountEpoch()) return;
+    if (self.searching || self.nativePresentation || self.nativeActions.count) { [self cancelInitialViewport]; return; }
+    UITableView *table=self.table;
+    if (!table.window || !self.chromeVisible || self.chrome.hidden || !self.headerContainer ||
+        self.chrome.superview!=self.headerContainer || ![self.headerContainer isDescendantOfView:table]) return;
+    CGRect chromeRect=[self.chrome convertRect:self.chrome.bounds toView:table];
+    CGFloat height=CGRectGetMinY(chromeRect);
+    CGFloat visibleTop=table.contentOffset.y+table.adjustedContentInset.top;
+    if (!isfinite(height) || height<0 || !isfinite(visibleTop) ||
+        !isfinite(CGRectGetWidth(chromeRect)) || !isfinite(CGRectGetHeight(chromeRect)) ||
+        CGRectGetWidth(chromeRect)<=0 || CGRectGetHeight(chromeRect)<=0 || visibleTop<=height+0.5) return;
+    // Keep this request for the first presentation, until the user takes over.
+    // WeChat can reset its top area after didAppear; a temporarily visible
+    // first frame is not proof that the native startup positioning has ended.
+    // The shared restore validates policy/model/interaction and reentrant reads.
+    [self restoreScrollHeight:height];
 }
 - (void)beginUserScrolling {
     // A real drag is a newer positioning command. Waiting for that drag to end
@@ -2173,6 +2233,10 @@ static BOOL Option(NSString *suffix) {
 }
 - (void)restorePendingViewport {
     if (self.restoringViewport) return;
+    if (self.initialViewportPending) {
+        [self restoreInitialViewport];
+        if (self.initialViewportPending) return;
+    }
     if (self.presentationViewport && ![self validViewport:self.presentationViewport]) {
         self.presentationViewport=nil; self.presentationReturnFinished=NO;
     }
@@ -2220,6 +2284,7 @@ static BOOL Option(NSString *suffix) {
 }
 - (void)saveAnchor {
     NSUInteger generation=self.viewportGeneration;
+    if (self.initialViewportPending) return;
     if (self.presentationSuspended || !CSGroupApplicationActive()) return;
     if ([self validViewport:self.presentationViewport] || [self validViewport:self.switchViewport]) return;
     if (!self.isActive || !self.publishedTabID) return;
@@ -2233,6 +2298,7 @@ static BOOL Option(NSString *suffix) {
 }
 - (void)restoreAnchor {
     NSUInteger generation=self.viewportGeneration;
+    if (self.initialViewportPending) { [self restorePendingViewport]; return; }
     if (self.presentationSuspended || !CSGroupApplicationActive()) return;
     if (self.presentationViewport || self.switchViewport) { [self restorePendingViewport]; return; }
     NSDictionary *anchor=self.anchors[self.publishedTabID];
@@ -2262,6 +2328,7 @@ static BOOL Option(NSString *suffix) {
     NSArray *tabs=self.displayedTabs; if (index<0 || index>=(NSInteger)tabs.count) return;
     if (![self.preferences.accountID isEqualToString:CSGroupCurrentAccountID()]) { [self requestRefresh]; return; }
     NSString *tabID=[tabs[(NSUInteger)index] tabId];
+    [self cancelInitialViewport];
     BOOL belongs=[self.preferences.tabs filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(WESessionTabItem *tab, NSDictionary *bindings) { (void)bindings; return [tab.tabId isEqual:tabID]; }]].count>0;
     if (belongs && !self.nativePresentation && !self.nativeActions.count &&
         [tabID isEqual:self.publishedTabID] && [tabID isEqual:self.preferences.selectedTabID] &&

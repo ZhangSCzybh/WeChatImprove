@@ -318,7 +318,20 @@ static BOOL CSQuickOpenPlugin(CSQuickRouteRequest *request, BOOL settings) {
         return YES;
     }
     UIViewController *page=settings ? [[CSQuickPanelSettingsViewController alloc] initWithStyle:UITableViewStyleInsetGrouped] : [[CSNativeSettingsControllerClass() alloc] init];
-    BOOL opened=CSQuickPush(page,source);
+    if (![request isCurrent]) { [request finish]; return NO; }
+    BOOL opened=NO;
+    if (settings) {
+        opened=CSQuickPush(page,source);
+    } else if (page) {
+        // Match the established plugin entries: a native settings host owns
+        // its own navigation container, rather than inheriting WeChat's push
+        // transition and its changing navigation/safe-area geometry.
+        UINavigationController *navigation=[[UINavigationController alloc] initWithRootViewController:page];
+        navigation.modalPresentationStyle=UIModalPresentationFormSheet;
+        if (![request isCurrent]) { [request finish]; return NO; }
+        [source presentViewController:navigation animated:YES completion:nil];
+        opened=source.presentedViewController==navigation || navigation.presentingViewController!=nil;
+    }
     [request finish];
     return opened || CSQuickFailure(source,@"当前页面无法打开插件设置，请返回微信首页后重试。");
 }
@@ -342,6 +355,21 @@ static id CSQuickCurrentService(CSQuickRouteRequest *request, NSString *name) {
         return service;
     }
     return CSQuickClassDescendsFrom(object_getClass(service),serviceClass) ? service : nil;
+}
+static BOOL CSQuickToggleDarkMode(CSQuickRouteRequest *request) {
+    if (![request isCurrent]) return NO;
+    Class config=NSClassFromString(@"MMDarkModeConfigUtil");
+    if (!CSQuickMatches(config,@"isDarkMode","B@:")) return NO;
+    id manager=CSQuickCurrentService(request,@"DarkModeManager");
+    if (!CSQuickMatches(manager,@"changeDarkModeConfigType:","v@:q") || ![request isCurrent]) return NO;
+    BOOL dark=((_Bool (*)(id,SEL))objc_msgSend)(config,NSSelectorFromString(@"isDarkMode"));
+    if (![request isCurrent]) return NO;
+    // WeChat 8.0.80's native selections use 1=dark and 2=light. Read the
+    // effective appearance so a follow-system configuration toggles correctly.
+    // The account service persists this explicit choice and updates its
+    // windows just like the native settings page.
+    ((void (*)(id,SEL,long long))objc_msgSend)(manager,NSSelectorFromString(@"changeDarkModeConfigType:"),dark ? 2 : 1);
+    return YES;
 }
 static BOOL CSQuickOpenQRCode(CSQuickRouteRequest *request) {
     if (![request isCurrent]) return NO;
@@ -442,6 +470,11 @@ static BOOL CSQuickOpenMainFrameAction(CSQuickRouteRequest *request, NSString *s
 }
 static BOOL CSQuickOpenReceiveCode(CSQuickRouteRequest *request) {
     return CSQuickOpenMainFrameAction(request,@"openFace2FaceReceiveMoney");
+}
+static BOOL CSQuickOpenGlobalSearch(CSQuickRouteRequest *request) {
+    // The native button prepares the full FTS context and search presenter.
+    // A bare search controller would miss that lifecycle and its cancel route.
+    return CSQuickOpenMainFrameAction(request,@"onSearchButtonTapped");
 }
 static BOOL CSQuickOpenMyMoments(CSQuickRouteRequest *request) {
     // Native "My WC" owns the current-account album setup. A fresh public
@@ -709,7 +742,9 @@ static BOOL CSQuickOpenSwitchAccount(CSQuickRouteRequest *request) {
         }
         if ([identifier isEqual:@"favorites"]) return CSQuickOpenFavoriteContent(request,NO);
         BOOL opened=NO;
-        if ([identifier isEqual:@"my_qrcode"]) opened=CSQuickOpenQRCode(request);
+        if ([identifier isEqual:@"dark_mode"]) opened=CSQuickToggleDarkMode(request);
+        else if ([identifier isEqual:@"global_search"]) opened=CSQuickOpenGlobalSearch(request);
+        else if ([identifier isEqual:@"my_qrcode"]) opened=CSQuickOpenQRCode(request);
         else if ([identifier isEqual:@"payment_code"]) opened=CSQuickOpenPaymentCode(request);
         else if ([identifier isEqual:@"receive_code"]) opened=CSQuickOpenReceiveCode(request);
         else if ([identifier isEqual:@"my_moments"]) opened=CSQuickOpenMyMoments(request);

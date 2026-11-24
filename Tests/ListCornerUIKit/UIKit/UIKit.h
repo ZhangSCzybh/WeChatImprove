@@ -93,7 +93,7 @@ static NSString *const UISceneDidActivateNotification=@"UISceneDidActivateNotifi
 @property(nonatomic) CGFloat sectionHeaderHeight,sectionFooterHeight;
 @property(nonatomic,copy) NSArray<NSNumber *> *rows;
 @property(nonatomic) BOOL throwsOnQuery;
-@property(nonatomic) NSUInteger queries,reloads,originalCalls;
+@property(nonatomic) NSUInteger queries,reloads,originalCalls,visibleCellReads;
 @property(nonatomic,strong) id groupAdapter;
 @property(nonatomic,copy) void (^onQuery)(void);
 @property(nonatomic,readonly) NSInteger numberOfSections;

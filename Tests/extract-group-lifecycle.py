@@ -13,6 +13,11 @@ header = (root/'Controllers/CSGroupListAdapter.h').read_text()
 def method(text, marker):
     start = text.index(marker)
     brace = text.index('{', start)
+    # Adapter private interfaces now declare several methods before their
+    # implementations. A declaration must never absorb the following body.
+    while ';' in text[start:brace]:
+        start = text.index(marker, start + len(marker))
+        brace = text.index('{', start)
     depth = 0
     for end in range(brace, len(text)):
         if text[end] == '{': depth += 1
@@ -39,7 +44,7 @@ else:
     out.with_name('GroupLifecycleTabBadgeImplementation.inc').write_text('')
 for marker in ['+ (instancetype)adapterForTable:', '+ (instancetype)adapterForController:',
                '+ (void)attachToController:', '+ (void)layoutForController:', '+ (void)settingsChanged',
-               '- (void)requestRefresh {', '- (void)requestRecovery {', '- (void)scheduleRefresh {', '- (void)cancelScheduledRefresh {', '+ (void)applicationActivityChanged:', '+ (void)closeFriendPolicyChanged:', '- (void)beginNativeChangeOfKind:', '- (void)requestCoalescedRefresh', '- (void)invalidateNativeSnapshot', '- (NSArray *)nativeSectionsForAccount:', '- (void)beginNativeChange', '- (void)endNativeChange {', '- (void)endNativeChangeCoalesced:',
+               '- (void)requestRefresh {', '- (void)requestRecovery {', '- (void)scheduleRefresh {', '- (BOOL)refreshInteractionIsBlocking {', '- (void)consumeRefreshRequest {', '- (void)cancelScheduledRefresh {', '+ (void)applicationActivityChanged:', '+ (void)closeFriendPolicyChanged:', '- (void)beginNativeChangeOfKind:(CSGroupChangeKind)kind {', '- (void)beginNativeChangeOfKind:(CSGroupChangeKind)kind changedUserNames:', '- (void)mergePendingChangeOfKind:', '- (void)requestCoalescedRefresh', '- (void)invalidateNativeSnapshot', '- (NSArray *)nativeSectionsForAccount:', '- (void)beginNativeChange {', '- (void)endNativeChange {', '- (void)endNativeChangeCoalesced:',
                '- (void)pruneNativeActions', '- (void)performNativeBatch:', '- (void)performInNativePresentation:', '- (void)useNativePresentation {']:
     methods.append(method(source, marker))
 methods.append(method(source,'- (void)selectIndex:'))
@@ -49,6 +54,10 @@ for marker, fallback in [('+ (void)setPresentationSuspended:', '+ (void)setPrese
                          ('- (void)shieldVisiblePrivateRows', '- (void)shieldVisiblePrivateRows {}'),
                          ('- (void)finishSuspendedBatches', '- (void)finishSuspendedBatches {}')]:
     methods.append(method(source, marker) if marker in source else fallback)
+for marker in ['+ (void)finishPresentationReturnForController:', '- (void)cancelInitialViewport {',
+               '- (void)clearPendingViewport {', '- (BOOL)validViewport:', '- (void)restorePendingViewport {',
+               '- (void)prepareForNativeSearch {']:
+    methods.append(method(source, marker))
 refresh = method(source, '- (void)refresh {')
 prefix = refresh[:refresh.index('    self.publishing=YES; self.dirty=NO;')]
 tail = refresh[refresh.index('    } @finally {'):]
@@ -60,20 +69,28 @@ account_reset+=refresh[account_end:mode_end]
 publication_start=refresh.index('    self.publishing=YES; self.dirty=NO;')
 publication_end=refresh.index('    @try {',publication_start)
 publication_state=refresh[publication_start:publication_end]
-methods.append(prefix + publication_state + '    @try {\n' + account_reset + ' self.lastPublishedChanges=changes; [self publishFixture]; finished=YES;\n' + tail)
+methods.append(prefix + publication_state + '    @try {\n' + account_reset + ' [self publishFixtureWithChanges:changes changedUserNames:changedUserNames requestedRevision:requestedRevision]; finished=YES;\n' + tail)
 layout = method(source, '- (void)layout {')
 methods.append(layout[:layout.index('    __block UIView *installed')] + '    self.layoutCount++;\n}')
-# Actual save/restore/top method entry guards; the expensive UI work is counted.
-for name, cut in [('saveAnchor', '    if (self.pendingScrollToTop)'), ('restoreAnchor', '    if (self.pendingScrollToTop)'),
-                  ('returnToGroupTop', '    if (!Option'), ('refreshNavigationTitle', '    id titleView=')]:
+# Actual viewport/title entry guards; geometry is tested separately by the
+# group viewport suites. Preserve the lifecycle admission checks verbatim.
+for name, cut in [('saveAnchor', '    if (![self hasScrollableContent])'), ('restoreAnchor', '    NSDictionary *anchor='),
+                  ('refreshNavigationTitle', '    id titleView=')]:
     body = method(source, '- (void)' + name + ' {')
     methods.append(body[:body.index(cut)] + '    self.anchorOrTitleCount++;\n}')
+restore_height=method(source, '- (BOOL)restoreScrollHeight:')
+methods.append(restore_height[:restore_height.index('    NSString *account=')] +
+               '    self.anchorOrTitleCount++; return YES;\n}')
 out.write_text('\n\n'.join(methods)+'\n')
 life = []
 for name in ['viewWillAppear', 'viewDidAppear', 'viewWillDisappear', 'viewDidDisappear']:
     marker = '- (void)' + name + ':'
     body = method(hooks, marker) if marker in hooks else marker + '(BOOL)animated { %orig; }'
     life.append(body.replace('%orig', '[self nativeAppearance:animated]'))
+for marker, native in [('- (void)showSearchBar:', '[self nativeSearchBegan]'),
+                       ('- (void)cancelSearch {', '[self nativeSearchFinished]'),
+                       ('- (void)onFTSSearchEnd {', '[self nativeSearchFinished]')]:
+    life.append(method(hooks, marker).replace('%orig', native))
 out.with_name('GroupLifecycleHooks.h').write_text('\n'.join(life)+'\n')
 folded=[]
 for name in ['FoldedAppear','FoldedDisappear']:

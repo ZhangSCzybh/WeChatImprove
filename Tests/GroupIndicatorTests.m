@@ -3,6 +3,7 @@
 #import <CoreGraphics/CoreGraphics.h>
 #import <math.h>
 #import "../Controllers/CSGroupAppearance.h"
+#import "../Controllers/WESessionTabItem.h"
 // Redirect only this host replay to an isolated preference suite.
 static NSUserDefaults *testDefaults;
 @interface IndicatorTestDefaults : NSUserDefaults
@@ -26,11 +27,14 @@ static NSUInteger viewportAnimations;
 static BOOL reducedMotion;
 static BOOL UIAccessibilityIsReduceMotionEnabled(void) { return reducedMotion; }
 static CGFloat const kIndicatorHeight=2;
+static CGFloat const kTabMinWidth=60,kTabPadding=16,kTabMinGap=8,kTabBadgeGap=3,kActionButtonWidth=44;
 static NSTimeInterval const kIndicatorDuration=0.20;
 static NSString *const kIndicatorAnimationKey=@"CSGroupIndicator.selection";
 #include "GroupCapsuleHelpers.h"
 enum { UIViewAnimationOptionCurveEaseInOut=1, UIViewAnimationOptionBeginFromCurrentState=2, UIViewAnimationOptionAllowUserInteraction=4, UIViewAnimationOptionCurveEaseOut=8 };
 typedef NSUInteger UIViewAnimationOptions;
+typedef struct { CGFloat top,left,bottom,right; } UIEdgeInsets;
+enum { UIControlStateNormal=0 };
 @class UIView;
 @interface ViewAnimation : NSObject
 @property(nonatomic) NSTimeInterval duration,delay;
@@ -71,6 +75,8 @@ static __weak UIView *observedIndicator;
 @property(nonatomic) BOOL hidden;
 @property(nonatomic,strong) id window;
 @property(nonatomic) CGRect frame,bounds;
+@property(nonatomic) UIEdgeInsets safeAreaInsets;
+@property(nonatomic) BOOL needsLayout;
 @property(nonatomic) CGAffineTransform transform;
 @property(nonatomic) CGFloat alpha;
 @property(nonatomic) CGPoint contentOffset;
@@ -81,6 +87,8 @@ static __weak UIView *observedIndicator;
 - (void)removeFromSuperview;
 - (void)insertSubview:(UIView *)view belowSubview:(UIView *)sibling;
 - (void)layoutIfNeeded;
+- (void)layoutSubviews;
+- (void)addSubview:(UIView *)view;
 - (void)setContentOffset:(CGPoint)offset animated:(BOOL)animated;
 - (BOOL)beginTrackingWithTouch:(UITouch *)touch withEvent:(UIEvent *)event;
 - (BOOL)continueTrackingWithTouch:(UITouch *)touch withEvent:(UIEvent *)event;
@@ -91,13 +99,15 @@ static __weak UIView *observedIndicator;
 @implementation UIView
 - (instancetype)init { if ((self=[super init])) _layer=[TestLayer layer]; return self; }
 - (CGRect)frame { return self.layer.frame; }
-- (void)setFrame:(CGRect)frame { self.layer.frame=frame; }
+- (void)setFrame:(CGRect)frame { self.layer.frame=frame; CGRect bounds=self.bounds; bounds.size=frame.size; self.bounds=bounds; }
 - (CGAffineTransform)transform { return self.layer.affineTransform; }
 - (void)setTransform:(CGAffineTransform)transform { self.layer.affineTransform=transform; }
 - (CGFloat)alpha { return self.layer.opacity; }
 - (void)setAlpha:(CGFloat)alpha { self.layer.opacity=alpha; }
 - (void)layoutIfNeeded {}
-- (void)setNeedsLayout {}
+- (void)layoutSubviews {}
+- (void)setNeedsLayout { self.needsLayout=YES; }
+- (void)addSubview:(UIView *)view { (void)view; }
 - (void)removeFromSuperview {}
 - (void)insertSubview:(UIView *)view belowSubview:(UIView *)sibling { (void)view; (void)sibling; }
 - (void)setContentOffset:(CGPoint)offset animated:(BOOL)animated { (void)animated; self.contentOffset=offset; self.scrollWrites++; }
@@ -145,7 +155,9 @@ typedef NS_OPTIONS(NSUInteger, UIControlEvents) {
 @implementation TouchAction @end
 @interface WETabButton : UIView
 @property(nonatomic) NSInteger tabIndex;
+@property(nonatomic) CGFloat baseFontSize;
 @property(nonatomic,copy) NSString *tabID;
+@property(nonatomic,copy) NSString *currentTitle,*accessibilityLabel;
 @property(nonatomic,strong) UILabel *capsuleTitleLabel;
 @property(nonatomic,strong) UIView *titleLabel;
 @property(nonatomic,strong) UIView *unreadBadge;
@@ -160,8 +172,17 @@ typedef NS_OPTIONS(NSUInteger, UIControlEvents) {
 - (CGRect)tabTitleFrame;
 - (void)addTarget:(id)target action:(SEL)action forControlEvents:(UIControlEvents)events;
 - (void)sendActionsForControlEvents:(UIControlEvents)events;
+- (void)updateFonts;
+- (void)setTitle:(NSString *)title forState:(NSUInteger)state;
+- (CGSize)tabTitleSize;
+- (CGFloat)badgeWidth;
 @end
 @implementation WETabButton
+- (instancetype)init { if ((self=[super init])) { _titleLabel=[UIView new]; _unreadBadge=[UIView new]; _unreadBadge.hidden=YES; } return self; }
+- (void)updateFonts {}
+- (void)setTitle:(NSString *)title forState:(NSUInteger)state { (void)state; self.currentTitle=title; }
+- (CGSize)tabTitleSize { return CGSizeMake(self.currentTitle.length * 9,20); }
+- (CGFloat)badgeWidth { return self.unreadBadge.hidden ? 0 : CGRectGetWidth(self.unreadBadge.frame); }
 - (CGRect)tabTitleFrame { return CGRectIsEmpty(self.measuredTitleFrame) ? CGRectMake(20,12,40,20) : self.measuredTitleFrame; }
 - (void)addTarget:(id)target action:(SEL)action forControlEvents:(UIControlEvents)events {
     if (!self.touchActions) self.touchActions=[NSMutableArray array];
@@ -183,6 +204,7 @@ typedef NS_OPTIONS(NSUInteger, UIControlEvents) {
 @end
 @interface UIScrollView : UIView
 @property(nonatomic) BOOL delaysContentTouches,canCancelContentTouches;
+@property(nonatomic) BOOL tracking,dragging,decelerating;
 - (BOOL)touchesShouldCancelInContentView:(UIView *)view;
 @end
 @implementation UIScrollView
@@ -196,8 +218,13 @@ typedef NS_OPTIONS(NSUInteger, UIControlEvents) {
 @property(nonatomic) NSInteger selectedIndex;
 @property(nonatomic,copy) NSString *selectedTabID;
 @property(nonatomic,strong) NSArray<WETabButton *> *tabButtons;
+@property(nonatomic,copy) NSArray *renderedTabRecords;
 @property(nonatomic,strong) UIView *indicatorView;
+@property(nonatomic,strong) UIView *searchButton;
 @property(nonatomic,strong) UIScrollView *scrollView;
+@property(nonatomic) CGFloat baseFontSize;
+@property(nonatomic) BOOL revealSelectionAfterLayout,tabLayoutValid,replaysLayout;
+@property(nonatomic) CGSize tabLayoutSize,indicatorLayoutSize;
 @property(nonatomic) NSUInteger haptics;
 @property(nonatomic) BOOL interactiveTransition,settlingInteractiveTransition;
 @property(nonatomic) NSInteger interactiveTarget;
@@ -222,12 +249,19 @@ typedef NS_OPTIONS(NSUInteger, UIControlEvents) {
 - (void)refreshTouchAppearance;
 - (void)setupTouchPolicy;
 - (void)initializeSelection;
+- (void)refreshAppearance;
+- (void)updateTabs:(NSArray<WESessionTabItem *> *)tabs;
+- (void)layoutTabButtons;
+- (CGFloat)widthForTabButton:(WETabButton *)button;
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView;
 - (CGRect)capsuleFrameForButton:(WETabButton *)button pressed:(BOOL)pressed;
 - (void)moveCapsuleToFrame:(CGRect)target pressed:(BOOL)pressed animated:(BOOL)animated;
 @end
 @implementation WESessionTabContainerView
+- (instancetype)init { if ((self=[super init])) _selectedIndex=NSNotFound; return self; }
 #define NSUserDefaults IndicatorTestDefaults
 #include "GroupIndicatorBodies.h"
+#include "GroupContainerLayoutBody.h"
 - (void)refreshTouchAppearance {
 #include "GroupCapsuleTouchAppearance.h"
 }
@@ -239,7 +273,8 @@ typedef NS_OPTIONS(NSUInteger, UIControlEvents) {
 #include "GroupCapsuleTouchBindings.h"
 }
 - (void)initializeSelection { _selectedIndex=0; _selectedTabID=@"tab0"; }
-- (void)layoutIfNeeded { self.layoutCalls++; }
+- (void)layoutIfNeeded { self.layoutCalls++; if (self.replaysLayout && self.needsLayout) { self.needsLayout=NO; [self layoutSubviews]; } }
+- (void)refreshAppearance { [self refreshTouchAppearance]; }
 - (void)triggerHapticFeedback { self.haptics++; }
 - (void)updateSelectedButtons {}
 @end
@@ -262,6 +297,7 @@ static WESessionTabContainerView *Fixture(void) {
     __weak WESessionTabContainerView *weakView=view;
     view.onTabSelected=^(NSInteger index) { weakView.selectionCallbacks++; weakView.callbackIndex=index; };
     view.scrollView.bounds=CGRectMake(0,0,160,52); view.scrollView.contentSize=CGSizeMake(300,52);
+    view.tabLayoutValid=YES; view.tabLayoutSize=view.scrollView.bounds.size;
     NSMutableArray *buttons=[NSMutableArray array];
     for (NSInteger i=0;i<3;i++) {
         WETabButton *button=[WETabButton new]; button.frame=CGRectMake(i*100,0,80,52);
@@ -278,10 +314,70 @@ static WESessionTabContainerView *Fixture(void) {
     view.tabButtons=buttons; [view initializeSelection];
     [view updateIndicatorPositionAnimated:NO]; return view;
 }
+
+static WESessionTabContainerView *StartupFixture(void) {
+    WESessionTabContainerView *view=[WESessionTabContainerView new];
+    view.scrollView=[WEGroupTabScrollView new]; view.indicatorView=[UIView new];
+    view.searchButton=[UIView new]; view.replaysLayout=YES; view.baseFontSize=14;
+    return view;
+}
+static NSArray<WESessionTabItem *> *StartupTabs(NSUInteger count) {
+    NSMutableArray *tabs=[NSMutableArray array];
+    for (NSUInteger index=0;index<count;index++) {
+        WESessionTabItem *item=[WESessionTabItem new];
+        item.tabId=[NSString stringWithFormat:@"startup-%lu",(unsigned long)index];
+        item.tabName=index ? [NSString stringWithFormat:@"Group%lu",(unsigned long)index] : @"Whole";
+        item.type=index ? WETabTypeCustom : WETabTypeAll;
+        [tabs addObject:item];
+    }
+    return tabs;
+}
+static void FinishStartupLayout(WESessionTabContainerView *view) {
+    view.frame=CGRectMake(0,0,320,52); [view setNeedsLayout]; [view layoutIfNeeded];
+}
+static void CheckStartupViewport(void) {
+    for (NSNumber *count in @[@5,@8]) {
+        NSArray *tabs=StartupTabs(count.unsignedIntegerValue);
+        WESessionTabContainerView *view=StartupFixture();
+        [view updateTabs:tabs];
+        Check(!view.scrollView.scrollWrites && !view.tabLayoutValid,@"zero-width cold-start publication never writes a horizontal offset or caches invalid geometry");
+        Check(view.revealSelectionAfterLayout,@"cold-start selection reveal survives the zero-width layout");
+        FinishStartupLayout(view);
+        Check(view.scrollView.contentSize.width>CGRectGetWidth(view.scrollView.bounds),@"cold-start fixture has real horizontal overflow with five or more groups");
+        Check(view.selectedIndex==0 && fabs(view.scrollView.contentOffset.x)<.001 && CGRectGetMinX(view.tabButtons[0].frame)>=0,@"first group remains fully visible after the real viewport arrives");
+        Check(!view.revealSelectionAfterLayout && view.tabLayoutValid,@"real layout consumes the pending initial reveal once");
+        view.scrollView.contentOffset=CGPointMake(25,0);
+        NSUInteger writes=view.scrollView.scrollWrites;
+        [view updateTabs:tabs]; [view setNeedsLayout]; [view layoutIfNeeded];
+        Check(fabs(view.scrollView.contentOffset.x-25)<.001 && view.scrollView.scrollWrites==writes,@"identical publication and repeated layout preserve the user's horizontal position");
+        view.tabButtons[1].unreadBadge.hidden=NO; view.tabButtons[1].unreadBadge.frame=CGRectMake(0,0,16,14);
+        view.tabLayoutValid=NO; [view setNeedsLayout]; [view layoutIfNeeded];
+        Check(fabs(view.scrollView.contentOffset.x-25)<.001 && view.scrollView.scrollWrites==writes,@"badge geometry reflow does not recenter an already revealed selection");
+
+        view=StartupFixture(); view.selectedTabID=[tabs.lastObject tabId]; [view updateTabs:tabs];
+        Check(!view.scrollView.scrollWrites && view.revealSelectionAfterLayout,@"restored last-group selection waits for real geometry");
+        FinishStartupLayout(view);
+        CGFloat maxOffset=view.scrollView.contentSize.width-CGRectGetWidth(view.scrollView.bounds);
+        Check(view.selectedIndex==(NSInteger)tabs.count-1 && fabs(view.scrollView.contentOffset.x-maxOffset)<.001,@"restored last-group selection is revealed at the final viewport width");
+        Check(CGRectGetMaxX(view.tabButtons.lastObject.frame)<=view.scrollView.contentOffset.x+CGRectGetWidth(view.scrollView.bounds)+.001,@"restored last group fits inside the visible strip");
+    }
+    WESessionTabContainerView *view=StartupFixture(); [view updateTabs:StartupTabs(5)];
+    view.scrollView.dragging=YES; [view scrollViewWillBeginDragging:view.scrollView];
+    Check(!view.revealSelectionAfterLayout,@"horizontal user drag cancels the pending startup reveal");
+    FinishStartupLayout(view); view.scrollView.contentOffset=CGPointMake(25,0);
+    [view scrollToSelectedTab];
+    Check(fabs(view.scrollView.contentOffset.x-25)<.001 && !view.revealSelectionAfterLayout,@"selection reconciliation during dragging preserves user ownership");
+    view.scrollView.dragging=NO; [view setNeedsLayout]; [view layoutIfNeeded];
+    Check(fabs(view.scrollView.contentOffset.x-25)<.001,@"ending the drag does not replay the cancelled startup reveal");
+
+    view=StartupFixture(); [view updateTabs:StartupTabs(2)]; FinishStartupLayout(view);
+    Check(fabs(view.scrollView.contentOffset.x)<.001 && CGRectGetMinX(view.tabButtons[0].frame)>kTabMinGap,@"nonoverflowing groups keep their existing evenly distributed spacing");
+}
 int main(void) { @autoreleasepool {
     viewAnimations=[NSMutableArray array];
     NSString *suite=[@"com.wechat.improve.tests.indicator." stringByAppendingString:NSUUID.UUID.UUIDString];
     testDefaults=[[NSUserDefaults alloc] initWithSuiteName:suite];
+    CheckStartupViewport();
     Check(CSGroupCurrentIndicatorStyle(testDefaults)==CSGroupIndicatorStyleUnderline,@"fresh install preserves the original underline style");
     Check(![testDefaults objectForKey:CSGroupIndicatorStyleKey],@"reading preferences does not migrate or write user data");
     [testDefaults setInteger:2 forKey:@"com.wechat.enhance.chat_group.indicator_animation_style"];

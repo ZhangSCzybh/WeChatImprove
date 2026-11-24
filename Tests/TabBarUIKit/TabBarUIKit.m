@@ -66,6 +66,31 @@ static NSUInteger CSTestAnimationKind;
 @end
 @implementation UIImage
 + (instancetype)imageWithContentsOfFile:(NSString *)path { if (![NSFileManager.defaultManager fileExistsAtPath:path]) return nil;UIImage *image=[self new];image.path=path;return image; }
+- (UIImage *)imageWithTintColor:(UIColor *)color renderingMode:(NSInteger)mode {
+    UIImage *image=[UIImage new];image.sourceImage=self;image.appliedTint=color;image.renderedSize=self.renderedSize;return image;
+}
+@end
+@implementation UIGraphicsImageRendererContext {
+    CGContextRef _CGContext;
+}
+- (instancetype)init {
+    if ((self=[super init])) {
+        CGColorSpaceRef space=CGColorSpaceCreateDeviceRGB();
+        _CGContext=CGBitmapContextCreate(NULL,32,32,8,0,space,(CGBitmapInfo)kCGImageAlphaPremultipliedLast);
+        CGColorSpaceRelease(space);
+    }
+    return self;
+}
+- (CGContextRef)CGContext { return _CGContext; }
+- (void)dealloc { CGContextRelease(_CGContext); }
+@end
+@implementation UIGraphicsImageRenderer {
+    CGSize _size;
+}
+- (instancetype)initWithSize:(CGSize)size { if ((self=[super init])) _size=size; return self; }
+- (UIImage *)imageWithActions:(void (^)(UIGraphicsImageRendererContext *context))actions {
+    actions([UIGraphicsImageRendererContext new]);UIImage *image=[UIImage new];image.renderedSize=_size;return image;
+}
 @end
 @implementation UIImageView @end
 @implementation UIFont

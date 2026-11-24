@@ -20,7 +20,10 @@ controller = (root / 'Controllers/CSCustomViewController.m').read_text()
 methods = []
 for name in ['setupData', 'currentHomeDistance', 'setHomeDistance:', 'positionSettingsTabBar',
              'updateHomeFooter', 'reloadSettingsKeepingPosition', 'reloadHomeAtDistance:',
-             'selectHomeTab:', 'revealHomeAccountSection', 'openHomeSearch', 'updateHomeSearch:', 'closeHomeSearch', 'updateHeaderLayout']:
+             'selectHomeTab:', 'revealHomeAccountSection', 'openHomeSearch', 'updateHomeSearch:', 'closeHomeSearch',
+             'updateHeaderLayout', 'viewWillAppear:', 'viewDidAppear:', 'viewWillDisappear:', 'viewDidLayoutSubviews',
+             'currentOtherSettingsScope', 'currentHomePreparationScope',
+             'returningFromOtherSettingsInCurrentScope']:
     match = re.search(r'^- \([^)]+\)' + re.escape(name) + r'(?=[ (:{])', controller, re.M)
     if not match:
         raise SystemExit('Missing real controller method: ' + name)

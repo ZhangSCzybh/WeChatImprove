@@ -58,6 +58,12 @@ static unsigned int ReplacementMessageType(id object, SEL selector) { replacemen
 @property(nonatomic, strong) BubbleInfo *bgBubbleInfo;
 @end
 @implementation TextMessageViewModel @end
+@interface VoiceTransTextMessageViewModel : TextMessageViewModel @end
+@implementation VoiceTransTextMessageViewModel @end
+@interface VoiceTransTextMessageViewModelV2 : TextMessageViewModel @end
+@implementation VoiceTransTextMessageViewModelV2 @end
+@interface UnknownVoiceTransTextMessageViewModel : VoiceTransTextMessageViewModel @end
+@implementation UnknownVoiceTransTextMessageViewModel @end
 @interface TextMessageSubViewModel : NSObject
 @property(nonatomic,weak) TextMessageViewModel *parentModel;
 @property(nonatomic,strong) BubbleInfo *bgBubbleInfo;
@@ -113,6 +119,35 @@ static unsigned int ReplacementMessageType(id object, SEL selector) { replacemen
 - (id)getMsgReplyView { return self.reply; }
 - (id)getContentView { return self.content; }
 @end
+@interface TextMessageCellView : BubbleCell @end
+@implementation TextMessageCellView @end
+@interface VoiceTransTextMessageCellView : TextMessageCellView @end
+@implementation VoiceTransTextMessageCellView @end
+@interface VoiceTransTextMessageCellViewV2 : TextMessageCellView @end
+@implementation VoiceTransTextMessageCellViewV2 @end
+@interface PreviewLayer : NSObject
+@property(nonatomic) CGFloat cornerRadius;
+@property(nonatomic) NSUInteger radiusAssignments;
+@end
+@implementation PreviewLayer
+- (void)setCornerRadius:(CGFloat)value { _cornerRadius=value;self.radiusAssignments++; }
+@end
+@interface PreviewBackground : UIView
+@property(nonatomic, strong) UIColor *backgroundColor;
+@property(nonatomic, strong) PreviewLayer *layer;
+@property(nonatomic) NSUInteger colorAssignments;
+@end
+@implementation PreviewBackground
+- (void)setBackgroundColor:(UIColor *)color { _backgroundColor=color;self.colorAssignments++; }
+@end
+@interface VoiceTransView_ContentV2 : UIView
+@property(nonatomic) unsigned long long recordState;
+@property(nonatomic) BOOL isStillEntranceCircle, entranceExpanding, entranceAnimating;
+@property(nonatomic, strong) PreviewBackground *contentView;
+@end
+@implementation VoiceTransView_ContentV2 @end
+@interface UnknownVoiceTransPreview : VoiceTransView_ContentV2 @end
+@implementation UnknownVoiceTransPreview @end
 // These getters model the native lazy decoder. Layout must only inspect already
 // published backing storage, including when a wrapper is not ready or is reused.
 @interface LazyYYImage : YYImage @end
@@ -341,6 +376,115 @@ static int VerifyUnownedNativeCache(void) {
     CHECK(!ready);
     return 0;
 }
+static int VerifyVoiceTransTextCells(YYImage *baseline, YYImage *pressed) {
+    // The 8.0.80 speech-to-text cells inherit TextMessageCellView. Exercise the
+    // shared hook entry points with their exact model classes, including reuse;
+    // the separate VoiceTransView recording overlay has no message-cell contract.
+    NSDictionary *settings=[NSUserDefaults.standardUserDefaults volatileDomainForName:NSArgumentDomain];
+    for (NSUInteger version=0;version<2;version++) for (NSUInteger dark=0;dark<2;dark++) {
+        BubbleCell *cell=version ? [VoiceTransTextMessageCellViewV2 new] : [VoiceTransTextMessageCellView new];
+        cell.background=[YYAsyncImageView new];cell.background.frame=CGRectMake(0,0,180,38);
+        cell.traitCollection.userInterfaceStyle=dark ? UIUserInterfaceStyleDark : UIUserInterfaceStyleLight;
+        for (NSUInteger reuse=0;reuse<2;reuse++) {
+            TextMessageViewModel *model=version ? [VoiceTransTextMessageViewModelV2 new] : [VoiceTransTextMessageViewModel new];
+            model.isSender=reuse==0;model.bgBubbleInfo=[BubbleInfo new];
+            cell.viewModel=model;cell.background.image=baseline;cell.background.highlightedImage=pressed;
+            CSBubbleStyleApply(cell);CHECK(cell.background->m_image==baseline); // Wrap not ready yet.
+            model.messageWrap=[BubbleWrap new];model.messageWrap.m_uiMessageType=1;
+            CSBubbleStyleApply(cell);
+            CHECK(HasColor(cell.background->m_image,SchemeColor(model.isSender,dark),NO));
+            CHECK(HasColor(cell.background->m_highlightedImage,SchemeColor(model.isSender,dark),YES));
+            cell.background.image=baseline;CSBubbleStyleNativeChanged(cell);
+            CHECK(HasColor(cell.background->m_image,SchemeColor(model.isSender,dark),NO));
+            for (NSNumber *type in @[@34,@49]) {
+                model.messageWrap.m_uiMessageType=type.unsignedIntValue;model.messageWrap.m_uiAppMsgInnerType=57;
+                CSBubbleStyleApply(cell);CHECK(cell.background->m_image==baseline);
+            }
+            model.messageWrap.m_uiMessageType=1;CSBubbleStyleApply(cell);
+            CHECK(HasColor(cell.background->m_image,SchemeColor(model.isSender,dark),NO));
+            NSMutableDictionary *disabled=[settings mutableCopy];disabled[@"com.wechat.enhance.bubble_style.enabled"]=@NO;
+            [NSUserDefaults.standardUserDefaults setVolatileDomain:disabled forName:NSArgumentDomain];
+            [NSNotificationCenter.defaultCenter postNotificationName:NSUserDefaultsDidChangeNotification object:nil];Drain();
+            CHECK(cell.background->m_image==baseline && cell.background->m_highlightedImage==pressed);
+            [NSUserDefaults.standardUserDefaults setVolatileDomain:settings forName:NSArgumentDomain];
+            [NSNotificationCenter.defaultCenter postNotificationName:NSUserDefaultsDidChangeNotification object:nil];Drain();
+            CHECK(HasColor(cell.background->m_image,SchemeColor(model.isSender,dark),NO));
+            CSBubbleStyleDetach(cell); // Common prepareForReuse/setViewModel boundary.
+            CHECK(cell.background->m_image==baseline && cell.background->m_highlightedImage==pressed);
+        }
+        UnknownVoiceTransTextMessageViewModel *unknown=[UnknownVoiceTransTextMessageViewModel new];
+        unknown.messageWrap=[BubbleWrap new];unknown.messageWrap.m_uiMessageType=1;unknown.bgBubbleInfo=[BubbleInfo new];
+        cell.viewModel=unknown;CSBubbleStyleApply(cell);
+        CHECK(cell.background->m_image==baseline && cell.background->m_highlightedImage==pressed);
+        CSBubbleStyleDetach(cell);
+    }
+    return 0;
+}
+static int VerifyVoiceTransPreview(void) {
+    NSDictionary *settings=[NSUserDefaults.standardUserDefaults volatileDomainForName:NSArgumentDomain];
+    UIColor *native=[UIColor colorWithRed:.4 green:.9 blue:.3 alpha:1];
+    UIColor *special=[UIColor colorWithRed:.8 green:.2 blue:.4 alpha:1];
+    for (NSUInteger dark=0;dark<2;dark++) {
+        VoiceTransView_ContentV2 *preview=[VoiceTransView_ContentV2 new];preview.recordState=2;
+        preview.contentView=[PreviewBackground new];preview.contentView.frame=CGRectMake(0,0,180,80);
+        preview.contentView.layer=[PreviewLayer new];preview.contentView.layer.cornerRadius=24;
+        preview.contentView.backgroundColor=native;
+        preview.traitCollection.userInterfaceStyle=dark ? UIUserInterfaceStyleDark : UIUserInterfaceStyleLight;
+        preview.isStillEntranceCircle=YES;preview.entranceAnimating=YES;
+        NSUInteger colors=preview.contentView.colorAssignments,radii=preview.contentView.layer.radiusAssignments;
+        CSBubbleStyleVoiceTransPreviewApply(preview);
+        CHECK(preview.contentView.colorAssignments==colors && preview.contentView.layer.radiusAssignments==radii);
+        CHECK(CSBubbleStyleVoiceTransPreviewTextColor(preview,native)==native);
+        preview.isStillEntranceCircle=NO;preview.entranceExpanding=YES;
+        CSBubbleStyleVoiceTransPreviewApply(preview);
+        CSBubbleRGBA rgba=SchemeColor(YES,dark);
+        UIColor *custom=[UIColor colorWithRed:rgba.red green:rgba.green blue:rgba.blue alpha:rgba.alpha];
+        CHECK([preview.contentView.backgroundColor isEqual:custom]);
+        CHECK(preview.contentView.layer.radiusAssignments==radii);
+        preview.entranceAnimating=NO;preview.entranceExpanding=NO;CSBubbleStyleVoiceTransPreviewApply(preview);
+        CHECK(preview.contentView.layer.cornerRadius==16);
+        colors=preview.contentView.colorAssignments;radii=preview.contentView.layer.radiusAssignments;
+        for (NSUInteger i=0;i<10;i++) CSBubbleStyleVoiceTransPreviewApply(preview);
+        CHECK(preview.contentView.colorAssignments==colors && preview.contentView.layer.radiusAssignments==radii);
+        preview.recordState=0;CSBubbleStyleVoiceTransPreviewApply(preview); // Native prepareForSendCollapse.
+        CHECK([preview.contentView.backgroundColor isEqual:custom] && preview.contentView.layer.cornerRadius==16);
+        for (NSNumber *state in @[@8,@3,@10]) {
+            preview.recordState=state.unsignedLongLongValue;
+            preview.contentView.backgroundColor=special;preview.contentView.layer.cornerRadius=20;
+            colors=preview.contentView.colorAssignments;radii=preview.contentView.layer.radiusAssignments;
+            CSBubbleStyleVoiceTransPreviewApply(preview);
+            CHECK(preview.contentView.colorAssignments==colors && preview.contentView.layer.radiusAssignments==radii);
+            CHECK(CSBubbleStyleVoiceTransPreviewTextColor(preview,native)==native);
+        }
+        preview.recordState=1;preview.contentView.backgroundColor=native;preview.contentView.layer.cornerRadius=24;
+        CSBubbleStyleVoiceTransPreviewApply(preview);CHECK([preview.contentView.backgroundColor isEqual:custom]);
+        preview.traitCollection.userInterfaceStyle=dark ? UIUserInterfaceStyleLight : UIUserInterfaceStyleDark;
+        CSBubbleStyleVoiceTransPreviewApply(preview);rgba=SchemeColor(YES,!dark);
+        CHECK(preview.contentView.backgroundColor.red==rgba.red && preview.contentView.backgroundColor.blue==rgba.blue);
+        NSMutableDictionary *withText=[settings mutableCopy];
+        for (NSUInteger palette=0;palette<4;palette++) {
+            withText[CSBubbleTextColorPreferenceKey(palette,@"red")]=@.9;
+            withText[CSBubbleTextColorPreferenceKey(palette,@"green")]=@.8;
+            withText[CSBubbleTextColorPreferenceKey(palette,@"blue")]=@.7;
+        }
+        [NSUserDefaults.standardUserDefaults setVolatileDomain:withText forName:NSArgumentDomain];
+        [NSNotificationCenter.defaultCenter postNotificationName:NSUserDefaultsDidChangeNotification object:nil];Drain();
+        CHECK(CSBubbleStyleVoiceTransPreviewTextColor(preview,native).red==.9);
+        withText[@"com.wechat.enhance.bubble_style.enabled"]=@NO;
+        [NSUserDefaults.standardUserDefaults setVolatileDomain:withText forName:NSArgumentDomain];
+        [NSNotificationCenter.defaultCenter postNotificationName:NSUserDefaultsDidChangeNotification object:nil];Drain();
+        CHECK(preview.contentView.backgroundColor==native && preview.contentView.layer.cornerRadius==24);
+        CHECK(CSBubbleStyleVoiceTransPreviewTextColor(preview,native)==native);
+        [NSUserDefaults.standardUserDefaults setVolatileDomain:settings forName:NSArgumentDomain];
+        [NSNotificationCenter.defaultCenter postNotificationName:NSUserDefaultsDidChangeNotification object:nil];Drain();
+        CHECK(preview.contentView.backgroundColor!=native && preview.contentView.layer.cornerRadius==16);
+    }
+    UnknownVoiceTransPreview *unknown=[UnknownVoiceTransPreview new];unknown.recordState=2;
+    unknown.contentView=[PreviewBackground new];unknown.contentView.backgroundColor=native;
+    CSBubbleStyleVoiceTransPreviewApply(unknown);CHECK(unknown.contentView.backgroundColor==native);
+    CHECK(CSBubbleStyleVoiceTransPreviewTextColor(unknown,native)==native);
+    return 0;
+}
 int main(void) { @autoreleasepool {
     if (VerifyUnownedNativeCache()) return 1;
     NSDictionary *saved=[NSUserDefaults.standardUserDefaults volatileDomainForName:NSArgumentDomain];
@@ -492,6 +636,8 @@ int main(void) { @autoreleasepool {
     }
     [NSUserDefaults.standardUserDefaults setVolatileDomain:palettes forName:NSArgumentDomain];
     [NSNotificationCenter.defaultCenter postNotificationName:NSUserDefaultsDidChangeNotification object:nil];Drain();
+    CHECK(VerifyVoiceTransTextCells(baseline,nativeHighlight)==0);
+    CHECK(VerifyVoiceTransPreview()==0);
     UIView *window=[UIView new];cell.window=window;
     for (NSUInteger kind=0;kind<5;kind++) for (NSUInteger outgoing=0;outgoing<2;outgoing++) for (NSUInteger dark=0;dark<2;dark++) {
         TextMessageViewModel *themed=kind==4 ? [VoIPSignalMessageViewModel new] : (kind==3 ? [VoIPBubbleMessageViewModel new] : (kind==2 ? [VoiceMessageViewModel new] : [TextMessageViewModel new]));

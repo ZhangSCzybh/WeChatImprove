@@ -237,7 +237,7 @@ static UIImage *CSGroupSearchIcon(void) {
 }
 @end
 
-@interface WESessionTabContainerView ()
+@interface WESessionTabContainerView () <UIScrollViewDelegate>
 @property (nonatomic, copy) NSArray *renderedTabRecords;
 @property (nonatomic, strong, readwrite) UIScrollView *scrollView;
 @property (nonatomic, strong) NSMutableArray<WETabButton *> *tabButtons;
@@ -278,6 +278,7 @@ static UIImage *CSGroupSearchIcon(void) {
     _scrollView.showsVerticalScrollIndicator = NO;
     _scrollView.alwaysBounceHorizontal = YES;
     _scrollView.canCancelContentTouches = YES;
+    _scrollView.delegate = self;
     _scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
     [self addSubview:_scrollView];
     _tabButtons = [NSMutableArray array];
@@ -413,9 +414,12 @@ static UIImage *CSGroupSearchIcon(void) {
     }
     [self layoutTabButtons];
     if (self.revealSelectionAfterLayout) {
-        self.revealSelectionAfterLayout = NO;
         [self scrollToSelectedTab];
     }
+}
+
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
+    if (scrollView == self.scrollView) self.revealSelectionAfterLayout = NO;
 }
 
 - (CGFloat)widthForTabButton:(WETabButton *)button {
@@ -427,6 +431,11 @@ static UIImage *CSGroupSearchIcon(void) {
 
 - (void)layoutTabButtons {
     CGSize viewportSize = self.scrollView.bounds.size;
+    if (!isfinite(viewportSize.width) || !isfinite(viewportSize.height) ||
+        viewportSize.width <= 0 || viewportSize.height <= 0) {
+        self.tabLayoutValid = NO;
+        return;
+    }
     if (self.tabLayoutValid && CGSizeEqualToSize(self.tabLayoutSize,viewportSize)) {
         [self updateIndicatorPosition];
         return;
@@ -518,9 +527,9 @@ static UIImage *CSGroupSearchIcon(void) {
     _selectedTabID = nextIndex == NSNotFound ? nil : [buttons[nextIndex].tabID copy];
     [self updateSelectedButtons];
     if (self.indicatorStyle == CSGroupIndicatorStyleCapsule) [self updateIndicatorPositionAnimated:NO];
+    self.revealSelectionAfterLayout = YES;
     [self setNeedsLayout];
     [self layoutIfNeeded];
-    [self scrollToSelectedTab];
 }
 
 - (NSInteger)indexForTabID:(NSString *)tabID {
@@ -820,12 +829,26 @@ static UIImage *CSGroupSearchIcon(void) {
 
 - (void)scrollToSelectedTab {
     if (self.selectedIndex < 0 || self.selectedIndex >= (NSInteger)self.tabButtons.count) return;
+    if (self.scrollView.tracking || self.scrollView.dragging || self.scrollView.decelerating) {
+        self.revealSelectionAfterLayout = NO;
+        return;
+    }
     CGRect frame = self.tabButtons[self.selectedIndex].frame;
     CGFloat viewport = CGRectGetWidth(self.scrollView.bounds);
+    // Cold-start publication precedes the header's first real frame. Keep the
+    // reveal pending instead of centering a tab in a zero-width viewport.
+    if (!self.tabLayoutValid || !CGSizeEqualToSize(self.tabLayoutSize,self.scrollView.bounds.size) ||
+        !isfinite(viewport) || viewport <= 0 || CGRectIsEmpty(frame) ||
+        !isfinite(frame.origin.x) || !isfinite(frame.size.width) ||
+        !isfinite(self.scrollView.contentSize.width)) {
+        self.revealSelectionAfterLayout = YES;
+        return;
+    }
     CGFloat maxOffset = MAX(0, self.scrollView.contentSize.width - viewport);
     CGFloat offset = MAX(0, MIN(CGRectGetMidX(frame) - viewport / 2, maxOffset));
     if (fabs(self.scrollView.contentOffset.x-offset)>0.5)
         [self.scrollView setContentOffset:CGPointMake(offset, 0) animated:NO];
+    self.revealSelectionAfterLayout = NO;
 }
 
 - (void)tabButtonPressed:(WETabButton *)sender {

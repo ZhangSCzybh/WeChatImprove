@@ -60,6 +60,8 @@ MMTabBar *CSTabBarForController(MMTabBarController *controller);
 UIView *CSTabBarStyleSnapshot(MMTabBar *bar, UIView *nativeSnapshot);
 void CSTabBarBeginItemUpdate(MMTabBarItemView *item);
 void CSTabBarEndItemUpdate(MMTabBarItemView *item);
+// A native image reload can change a drawn custom icon without replacing its view.
+void CSTabBarInvalidateItemAppearance(MMTabBarItemView *item);
 BOOL CSTabBarContainsPoint(MMTabBar *bar, CGPoint point, BOOL *handled);
 UIView *CSTabBarHitTest(MMTabBar *bar, CGPoint point, UIEvent *event, BOOL *handled);
 void CSTabBarInstallObservers(void);

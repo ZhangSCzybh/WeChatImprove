@@ -22,3 +22,7 @@ FOUNDATION_EXPORT BOOL CSBubbleStyleVisibleInsets(UIView *background, UIEdgeInse
 // footprint. Native opaque short bodies need no cap-size minimum. No lazy YY getter.
 FOUNDATION_EXPORT BOOL CSBubbleStyleModelInsets(id model, UIView *appearance, CGSize size, UIEdgeInsets *insets);
 FOUNDATION_EXPORT BOOL CSBubbleStyleIsDark(UIView *view);
+// 8.0.80's separate speech-to-text recording preview; only the exact V2 owner
+// and its contentView are supported. Native circle/command/error states stay native.
+FOUNDATION_EXPORT void CSBubbleStyleVoiceTransPreviewApply(UIView *preview);
+FOUNDATION_EXPORT UIColor *CSBubbleStyleVoiceTransPreviewTextColor(UIView *preview, UIColor *nativeColor);

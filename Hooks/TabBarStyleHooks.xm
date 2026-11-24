@@ -98,7 +98,7 @@
     CSTabBarBeginItemUpdate(self); %orig; CSTabBarEndItemUpdate(self);
 }
 - (void)reloadIconImage {
-    CSTabBarBeginItemUpdate(self); %orig; CSTabBarEndItemUpdate(self);
+    CSTabBarBeginItemUpdate(self); %orig; CSTabBarInvalidateItemAppearance(self); CSTabBarEndItemUpdate(self);
 }
 - (void)setSelected:(BOOL)selected {
     CSTabBarBeginItemUpdate(self); %orig(selected); CSTabBarEndItemUpdate(self);

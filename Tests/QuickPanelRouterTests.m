@@ -10,6 +10,7 @@
 @class UIViewController;
 static char CSQuickRouteRequestKey;
 static void (^navigationPushMutation)(UINavigationController *, UIViewController *);
+enum { UIModalPresentationFormSheet=2, UITableViewStyleInsetGrouped=2 };
 typedef NS_ENUM(NSInteger, UISceneActivationState) {
     UISceneActivationStateUnattached=-1,
     UISceneActivationStateForegroundActive,
@@ -66,8 +67,12 @@ typedef NS_ENUM(NSInteger, UIApplicationState) { UIApplicationStateActive, UIApp
 @property(nonatomic) BOOL isBeingDismissed;
 @property(nonatomic) BOOL isMovingFromParentViewController;
 @property(nonatomic) BOOL hidesBottomBarWhenPushed;
+@property(nonatomic) NSInteger modalPresentationStyle;
+@property(nonatomic) NSUInteger presentationCalls;
+@property(nonatomic) BOOL lastPresentationAnimated;
 @property(nonatomic,strong) id<UIViewControllerTransitionCoordinator> transitionCoordinator;
 - (void)loadViewIfNeeded;
+- (void)presentViewController:(UIViewController *)controller animated:(BOOL)animated completion:(void (^)(void))completion;
 @end
 @implementation UIViewController
 - (instancetype)init {
@@ -76,6 +81,13 @@ typedef NS_ENUM(NSInteger, UIApplicationState) { UIApplicationStateActive, UIApp
 }
 - (UIView *)viewIfLoaded { return self.isViewLoaded ? self.view : nil; }
 - (void)loadViewIfNeeded { self.isViewLoaded=YES; }
+- (void)presentViewController:(UIViewController *)controller animated:(BOOL)animated completion:(void (^)(void))completion {
+    self.presentationCalls++; self.lastPresentationAnimated=animated;
+    self.presentedViewController=controller; controller.presentingViewController=self;
+    controller.view.window=self.view.window;
+    for (UIViewController *child in controller.childViewControllers) child.view.window=self.view.window;
+    if (completion) completion();
+}
 @end
 @interface UINavigationController : UIViewController
 @property(nonatomic,strong) UIViewController *topViewController;
@@ -83,8 +95,16 @@ typedef NS_ENUM(NSInteger, UIApplicationState) { UIApplicationStateActive, UIApp
 @property(nonatomic) NSUInteger pushCalls;
 @property(nonatomic) BOOL lastPushAnimated;
 - (void)pushViewController:(UIViewController *)controller animated:(BOOL)animated;
+- (instancetype)initWithRootViewController:(UIViewController *)controller;
 @end
 @implementation UINavigationController
+- (instancetype)initWithRootViewController:(UIViewController *)controller {
+    if ((self=[super init])) {
+        controller.navigationController=self; controller.parentViewController=self;
+        self.topViewController=controller; self.viewControllers=@[controller]; self.childViewControllers=@[controller];
+    }
+    return self;
+}
 - (void)pushViewController:(UIViewController *)controller animated:(BOOL)animated {
     self.pushCalls++; self.lastPushAnimated=animated;
     controller.navigationController=self; controller.parentViewController=self;
@@ -142,6 +162,7 @@ static void (^tabSelectionMutation)(void);
 @property(nonatomic) NSUInteger createCalls;
 @property(nonatomic) NSUInteger receiveCalls;
 @property(nonatomic) NSUInteger myMomentsCalls;
+@property(nonatomic) NSUInteger searchCalls;
 @property(nonatomic) NSUInteger messageCalls;
 @property(nonatomic,strong) id lastContact;
 @property(nonatomic,strong) id lastMessageWrap;
@@ -156,12 +177,14 @@ static void (^tabSelectionMutation)(void);
 - (void)onCreateNewMessage;
 - (void)openFace2FaceReceiveMoney;
 - (void)showMyWCView;
+- (void)onSearchButtonTapped;
 - (id)wrongABI;
 @end
 @implementation NewMainFrameViewController
 - (void)onCreateNewMessage { self.createCalls++; }
 - (void)openFace2FaceReceiveMoney { self.receiveCalls++; }
 - (void)showMyWCView { self.myMomentsCalls++; }
+- (void)onSearchButtonTapped { self.searchCalls++; }
 - (void)newMessageByContact:(id)contact msgWrapToAdd:(id)wrap {
     self.messageCalls++; self.lastContact=contact; self.lastMessageWrap=wrap;
     if (self.messageMutation) self.messageMutation();
@@ -368,8 +391,11 @@ static dispatch_block_t quickSettingPendingDestination;
 
 static BOOL quickSettingClassOverridden;
 static Class quickSettingClassOverride;
+static BOOL quickDarkConfigClassOverridden;
+static Class quickDarkConfigClassOverride;
 static Class QuickNativeClass(NSString *name) {
     if (quickSettingClassOverridden && [name isEqual:@"NewSettingViewController"]) return quickSettingClassOverride;
+    if (quickDarkConfigClassOverridden && [name isEqual:@"MMDarkModeConfigUtil"]) return quickDarkConfigClassOverride;
     return NSClassFromString(name);
 }
 
@@ -461,6 +487,35 @@ static id quickContext;
 @end
 @implementation MMContext
 + (id)currentContext { return quickContext; }
+@end
+static BOOL quickEffectiveDarkMode;
+static long long quickDarkConfiguration;
+static NSUInteger quickDarkDirectChanges;
+static void (^quickDarkReadMutation)(void);
+@interface MMDarkModeConfigUtil : NSObject
++ (_Bool)isDarkMode;
++ (_Bool)changeDarkModeConfigType:(long long)type;
+@end
+@implementation MMDarkModeConfigUtil
++ (_Bool)isDarkMode { if (quickDarkReadMutation) quickDarkReadMutation(); return quickEffectiveDarkMode; }
++ (_Bool)changeDarkModeConfigType:(long long)type { quickDarkDirectChanges++; return YES; }
+@end
+@interface WrongDarkModeConfigUtil : NSObject
++ (id)isDarkMode;
+@end
+@implementation WrongDarkModeConfigUtil
++ (id)isDarkMode { return @YES; }
+@end
+@interface DarkModeManager : NSObject
+@property(nonatomic) NSUInteger changes;
+@property(nonatomic) long long selectedType;
+- (void)changeDarkModeConfigType:(long long)type;
+@end
+@implementation DarkModeManager
+- (void)changeDarkModeConfigType:(long long)type {
+    self.changes++; self.selectedType=type;
+    quickDarkConfiguration=type; quickEffectiveDarkMode=type==1;
+}
 @end
 static id quickAppManager;
 @interface CAppViewControllerManager : NSObject
@@ -576,6 +631,52 @@ static BOOL CSQuickCanNavigate(UIViewController *source) {
         (!source.view.window.windowScene || source.view.window.windowScene.activationState==UISceneActivationStateForegroundActive);
 }
 
+// Keep the plugin destination and its asynchronous gates narrow while executing
+// the production route itself, including its choice of navigation container.
+static void (^quickPluginInitMutation)(void);
+@interface QuickNativeSettingsHost : UIViewController @end
+@implementation QuickNativeSettingsHost
+- (instancetype)init { if ((self=[super init]) && quickPluginInitMutation) quickPluginInitMutation(); return self; }
+@end
+static Class CSNativeSettingsControllerClass(void) { return QuickNativeSettingsHost.class; }
+@interface CSQuickPanelSettingsViewController : UIViewController
+@property(nonatomic) NSUInteger style;
+- (instancetype)initWithStyle:(NSUInteger)style;
+@end
+@implementation CSQuickPanelSettingsViewController
+- (instancetype)initWithStyle:(NSUInteger)style { if ((self=[super init])) self.style=style; return self; }
+@end
+@interface UIAlertController : UIViewController
+@property(nonatomic,copy) NSString *title;
+@end
+@implementation UIAlertController @end
+static BOOL quickPluginHidden;
+static void (^quickPrivacyReply)(BOOL);
+static void (^quickPrivacyDismissCompletion)(void);
+static NSUInteger quickPrivacyDismissals;
+static BOOL CSCloseFriendPluginEntryHidden(void) { return quickPluginHidden; }
+static void CSCloseFriendAuthenticate(UIViewController *source,void (^completion)(BOOL)) { quickPrivacyReply=completion; }
+static void CSSettingsAfterDismissingSheet(UIAlertController *sheet,void (^completion)(void)) {
+    quickPrivacyDismissals++; quickPrivacyDismissCompletion=completion;
+}
+@interface CSAuthorizationManager : NSObject
+@property(nonatomic) BOOL isAuthorized;
+@property(nonatomic) NSUInteger requests;
+@property(nonatomic,copy) void (^completion)(BOOL,NSString *);
++ (instancetype)sharedManager;
+- (void)requestAuthorizationWithPresentingViewController:(UIViewController *)source completion:(void (^)(BOOL,NSString *))completion;
+@end
+@implementation CSAuthorizationManager
++ (instancetype)sharedManager {
+    static CSAuthorizationManager *manager;
+    if (!manager) { manager=[self new]; manager.isAuthorized=YES; }
+    return manager;
+}
+- (void)requestAuthorizationWithPresentingViewController:(UIViewController *)source completion:(void (^)(BOOL,NSString *))completion {
+    self.requests++; self.completion=completion;
+}
+@end
+
 static BOOL CSQuickFailure(UIViewController *source, NSString *message);
 // Production main-queue turns stay real. Only delayed observation is held in
 // memory so lifecycle and timeout boundaries can advance without wall-clock waits.
@@ -595,13 +696,9 @@ static void QuickDispatchAfter(dispatch_time_t when, dispatch_queue_t queue, dis
 #undef NSClassFromString
 #undef NSUserDefaults
 
-static NSString *quickPublicStub;
 static NSString *quickFailureMessage;
 static __weak UIViewController *quickFailureSource;
 static BOOL CSQuickFailure(UIViewController *source, NSString *message) { quickFailureSource=source; quickFailureMessage=message; return NO; }
-static BOOL CSQuickOpenPlugin(CSQuickRouteRequest *request, BOOL settings) {
-    quickPublicStub=settings ? @"panel_settings" : @"plugin_home"; [request finish]; return YES;
-}
 @interface CSQuickPanelActionRouter : NSObject
 + (BOOL)performActionWithIdentifier:(NSString *)identifier fromViewController:(UIViewController *)source;
 @end
@@ -661,6 +758,86 @@ static UIViewController *CrossTabSource(UIWindow *window, NewMainFrameViewContro
 }
 static id WrongMainAction(id receiver, SEL selector, id contact, id wrap) { return nil; }
 static id WrongReceiveAction(id receiver, SEL selector) { return nil; }
+static id WrongDarkModeAction(id receiver, SEL selector, long long type) { return nil; }
+static void VerifyAppearanceAndSearchRoutes(void) {
+    UIWindow *window=[UIWindow new]; window.windowScene=[UIWindowScene new];
+    UIViewController *source=RouteSource(window);
+    DarkModeManager *dark=[DarkModeManager new];
+    QuickServiceCenter *center=[QuickServiceCenter new]; center.services=@{@"DarkModeManager":dark}; quickContext=center;
+    quickDarkConfiguration=0; quickEffectiveDarkMode=NO;
+    CSQuickRouteRequest *request=CSQuickBeginRequest(source);
+    Check(CSQuickToggleDarkMode(request) && dark.changes==1 && dark.selectedType==1 && quickDarkConfiguration==1 &&
+        source.navigationController.topViewController==source && !source.navigationController.pushCalls,
+        "follow-system light appearance toggles through the current-account manager to native dark without navigation");
+    [request finish]; quickDarkConfiguration=0; quickEffectiveDarkMode=YES; request=CSQuickBeginRequest(source);
+    Check(CSQuickToggleDarkMode(request) && dark.changes==2 && dark.selectedType==2 && quickDarkConfiguration==2 && !quickDarkDirectChanges,
+        "follow-system dark appearance toggles to native light without calling the configuration-only setter");
+    [request finish];
+    MMServiceWrapper *wrapper=[[MMServiceWrapper alloc] initWithTarget:dark]; center.services=@{@"DarkModeManager":wrapper};
+    request=CSQuickBeginRequest(source);
+    Check(CSQuickToggleDarkMode(request) && dark.changes==3 && wrapper.forwards==1,
+        "the checked account-service wrapper remains the receiver for its dark-mode change");
+    [request finish]; center.services=@{@"DarkModeManager":dark};
+    NSUInteger changes=dark.changes;
+    quickDarkConfigClassOverridden=YES; quickDarkConfigClassOverride=WrongDarkModeConfigUtil.class; request=CSQuickBeginRequest(source);
+    Check(!CSQuickToggleDarkMode(request) && dark.changes==changes,"an object-returning dark-state getter cannot be treated as the native boolean ABI");
+    [request finish]; quickDarkConfigClassOverride=Nil; request=CSQuickBeginRequest(source);
+    Check(!CSQuickToggleDarkMode(request) && dark.changes==changes,"missing native dark-mode support does not change the account service");
+    [request finish]; quickDarkConfigClassOverridden=NO;
+    Class wrongClass=objc_allocateClassPair(DarkModeManager.class,"WrongDarkModeManagerABI",0);
+    class_addMethod(wrongClass,NSSelectorFromString(@"changeDarkModeConfigType:"),(IMP)WrongDarkModeAction,"@@:q");
+    objc_registerClassPair(wrongClass); DarkModeManager *wrong=[wrongClass new];
+    center.services=@{@"DarkModeManager":wrong}; request=CSQuickBeginRequest(source);
+    Check(!CSQuickToggleDarkMode(request) && !wrong.changes,"an incompatible native manager change signature is rejected");
+    [request finish]; center.services=@{}; request=CSQuickBeginRequest(source);
+    Check(!CSQuickToggleDarkMode(request) && dark.changes==changes,"an unavailable account dark-mode service has no global fallback");
+    [request finish]; center.services=@{@"DarkModeManager":dark};
+    center.serviceRead=^{ quickEpoch++; }; request=CSQuickBeginRequest(source);
+    Check(!CSQuickToggleDarkMode(request) && dark.changes==changes,"an account epoch change while resolving the dark-mode service cancels the change");
+    [request finish]; center.serviceRead=nil;
+    quickDarkReadMutation=^{ quickEpoch++; }; request=CSQuickBeginRequest(source);
+    Check(!CSQuickToggleDarkMode(request) && dark.changes==changes,"an account epoch change while reading appearance cancels before native mutation");
+    [request finish]; quickDarkReadMutation=nil; quickContext=nil; request=CSQuickBeginRequest(source);
+    Check(!CSQuickToggleDarkMode(request) && dark.changes==changes,"a logged-out context cannot switch an unrelated account's appearance");
+    [request finish]; quickFailureMessage=nil;
+    Check(![CSQuickPanelActionRouter performActionWithIdentifier:@"dark_mode" fromViewController:source] &&
+        quickFailureMessage.length && !objc_getAssociatedObject(window,&CSQuickRouteRequestKey),
+        "an unsupported public dark-mode shortcut fails visibly and releases its request lock");
+
+    NewMainFrameViewController *main=[NewMainFrameViewController new];
+    CAppViewControllerManager *manager=[CAppViewControllerManager new];
+    manager.mainWindow=window; manager.mainFrame=main; quickAppManager=manager;
+    source=FileSource(window,main); request=CSQuickBeginRequest(source);
+    Check(CSQuickOpenGlobalSearch(request) && main.searchCalls==1 && source.navigationController.topViewController==source,
+        "global search invokes the native home search button to retain its FTS presenter and cancellation lifecycle");
+    [request finish]; UIViewController *home=source; UIViewController *chat=[UIViewController new];
+    [home.navigationController pushViewController:chat animated:NO]; request=CSQuickBeginRequest(chat);
+    Check(CSQuickOpenGlobalSearch(request) && main.searchCalls==2 && home.navigationController.topViewController==chat,
+        "a chat page can use the existing native home owner on its current navigation stack");
+    [request finish]; UITabBarController *tab=nil; source=CrossTabSource(window,main,&tab);
+    UINavigationController *homeNavigation=main.curViewController.navigationController; request=CSQuickBeginRequest(source);
+    Check(CSQuickOpenGlobalSearch(request) && main.searchCalls==3 && tab.selectedViewController==homeNavigation,
+        "global search from another main tab hands off once to the same window's existing home stack");
+    [request finish]; NSUInteger searches=main.searchCalls;
+    source=CrossTabSource(window,main,&tab); tabSelectionMutation=^{ quickEpoch++; }; request=CSQuickBeginRequest(source);
+    Check(!CSQuickOpenGlobalSearch(request) && main.searchCalls==searches,
+        "an account change during the search tab handoff cancels native search submission");
+    [request finish]; tabSelectionMutation=nil;
+    UIWindow *otherWindow=[UIWindow new];
+    source=FileSource(window,main); manager.mainWindow=otherWindow; request=CSQuickBeginRequest(source);
+    Check(!CSQuickOpenGlobalSearch(request) && main.searchCalls==searches,"global search rejects an app manager belonging to another window");
+    [request finish]; manager.mainWindow=window;
+    wrongClass=objc_allocateClassPair(NewMainFrameViewController.class,"WrongGlobalSearchOwnerABI",0);
+    class_addMethod(wrongClass,NSSelectorFromString(@"onSearchButtonTapped"),(IMP)WrongReceiveAction,"@@:");
+    objc_registerClassPair(wrongClass); NewMainFrameViewController *wrongHome=[wrongClass new];
+    wrongHome.curViewController=source; manager.mainFrame=wrongHome; request=CSQuickBeginRequest(source);
+    Check(!CSQuickOpenGlobalSearch(request) && !wrongHome.searchCalls,"global search rejects an incompatible native action ABI");
+    [request finish]; manager.mainFrame=nil; quickFailureMessage=nil;
+    Check(![CSQuickPanelActionRouter performActionWithIdentifier:@"global_search" fromViewController:source] &&
+        quickFailureMessage.length && !objc_getAssociatedObject(window,&CSQuickRouteRequestKey),
+        "an unavailable global search owner fails visibly without constructing a context-free search page");
+    quickAppManager=nil; quickContext=nil; quickFailureMessage=nil;
+}
 static void VerifyMyMomentsRoutes(void) {
     UIWindow *window=[UIWindow new]; window.windowScene=[UIWindowScene new];
     NewMainFrameViewController *main=[NewMainFrameViewController new];
@@ -1476,27 +1653,92 @@ static void VerifySwitchAccountRoutes(void) {
     Check(!quickSettingForbiddenCalls && quickDelayedUsesMainQueue,"account observation uses the main queue without logout, login or automatic account-selection APIs");
     ResetSwitchFixture(); quickSettingLastReceiver=nil; quickSettingRequestSource=nil; quickSettingLastLogic=nil;
 }
+static BOOL PluginHomePresented(UIViewController *source) {
+    UINavigationController *navigation=(id)source.presentedViewController;
+    return [navigation isKindOfClass:UINavigationController.class] && navigation!=source.navigationController &&
+        navigation.modalPresentationStyle==UIModalPresentationFormSheet && navigation.viewControllers.count==1 &&
+        [navigation.topViewController isKindOfClass:QuickNativeSettingsHost.class] && navigation.topViewController.navigationController==navigation;
+}
+static void VerifyPluginRoutes(void) {
+    UIWindow *window=[UIWindow new]; window.windowScene=[UIWindowScene new];
+    UIViewController *source=RouteSource(window);
+    UINavigationController *original=source.navigationController;
+    NSArray *stack=original.viewControllers;
+    Check([CSQuickPanelActionRouter performActionWithIdentifier:@"plugin_home" fromViewController:source] && PluginHomePresented(source),
+        "the real public plugin-home route presents its native host in a distinct form-sheet navigation controller");
+    Check(original.topViewController==source && [original.viewControllers isEqual:stack] && !original.pushCalls &&
+        source.presentationCalls==1 && source.lastPresentationAnimated && !objc_getAssociatedObject(window,&CSQuickRouteRequestKey),
+        "plugin home leaves the source navigation stack intact and releases its request after one animated presentation");
+    Check(![CSQuickPanelActionRouter performActionWithIdentifier:@"plugin_home" fromViewController:source] && source.presentationCalls==1,
+        "a second plugin-home tap cannot stack another sheet over the existing presentation");
+
+    source=RouteSource(window); original=source.navigationController;
+    Check([CSQuickPanelActionRouter performActionWithIdentifier:@"panel_settings" fromViewController:source] &&
+        [original.topViewController isKindOfClass:CSQuickPanelSettingsViewController.class] && original.pushCalls==1 && !source.presentationCalls,
+        "the real panel-settings branch retains its push route rather than inheriting the plugin-home modal container");
+    Check([(CSQuickPanelSettingsViewController *)original.topViewController style]==UITableViewStyleInsetGrouped &&
+        original.topViewController.hidesBottomBarWhenPushed && !objc_getAssociatedObject(window,&CSQuickRouteRequestKey),
+        "panel settings retains its grouped initialization, hidden bottom bar and completed request");
+
+    source=RouteSource(window);
+    quickPluginInitMutation=^{ quickEpoch++; };
+    Check(![CSQuickPanelActionRouter performActionWithIdentifier:@"plugin_home" fromViewController:source] &&
+        !source.presentationCalls && !source.navigationController.pushCalls && !objc_getAssociatedObject(window,&CSQuickRouteRequestKey),
+        "an account epoch change inside the native-host initializer rejects the stale modal before presenting it");
+    quickPluginInitMutation=nil;
+
+    CSAuthorizationManager *authorization=CSAuthorizationManager.sharedManager;
+    authorization.isAuthorized=NO; source=RouteSource(window);
+    Check([CSQuickPanelActionRouter performActionWithIdentifier:@"plugin_home" fromViewController:source] &&
+        !source.presentationCalls && authorization.completion && objc_getAssociatedObject(window,&CSQuickRouteRequestKey),
+        "the real plugin route defers modal presentation and retains its request until authorization completes");
+    authorization.completion(NO,@"cancel"); authorization.completion=nil;
+    Check(!source.presentationCalls && !objc_getAssociatedObject(window,&CSQuickRouteRequestKey),
+        "denied authorization leaves navigation untouched and releases the plugin request");
+    source=RouteSource(window);
+    Check([CSQuickPanelActionRouter performActionWithIdentifier:@"plugin_home" fromViewController:source],"a fresh plugin request can retry after denied authorization");
+    authorization.isAuthorized=YES; authorization.completion(YES,@"ok"); authorization.completion=nil;
+    Check(PluginHomePresented(source) && source.presentationCalls==1 && !objc_getAssociatedObject(window,&CSQuickRouteRequestKey),
+        "successful authorization resumes the real route with exactly one form-sheet presentation");
+
+    quickPluginHidden=YES; source=RouteSource(window);
+    Check([CSQuickPanelActionRouter performActionWithIdentifier:@"plugin_home" fromViewController:source] && quickPrivacyReply && !source.presentationCalls,
+        "a hidden plugin entry invokes privacy authentication before constructing its visible destination");
+    UIAlertController *password=[UIAlertController new]; password.title=@"验证密友密码"; source.presentedViewController=password;
+    quickPluginHidden=NO; NSUInteger dismissals=quickPrivacyDismissals;
+    quickPrivacyReply(YES); quickPrivacyReply=nil;
+    Check(source.presentedViewController==password && !source.presentationCalls && quickPrivacyDismissals==dismissals+1 &&
+        quickPrivacyDismissCompletion && objc_getAssociatedObject(window,&CSQuickRouteRequestKey),
+        "the production privacy continuation waits for that exact password alert to dismiss before showing the home sheet");
+    source.presentedViewController=nil;
+    quickPrivacyDismissCompletion(); quickPrivacyDismissCompletion=nil;
+    Check(PluginHomePresented(source) && source.presentationCalls==1 && !objc_getAssociatedObject(window,&CSQuickRouteRequestKey),
+        "finishing privacy-sheet dismissal resumes a single real home presentation and releases its request");
+    quickFailureMessage=nil;
+}
 static void VerifyPublicDispatch(void) {
     NSDictionary *pages=@{@"scan":@"CameraScanViewController",@"wallet":@"WCPayMainViewControllerV2",@"moments":@"WCTimeLineViewController",
         @"my_qrcode":@"CameraQRCodeListViewController",@"favorites":@"MyFavoritesViewController",@"profile":@"SettingMyProfileViewController",@"add_friend":@"AddFriendEntryViewController",@"emoji_store":@"MMEmotionStoreViewController",@"chat_background":@"ChatBackgroundEntranceViewController"};
     for (NSString *name in pages.allValues) if (!NSClassFromString(name)) {
         Class cls=objc_allocateClassPair(UIViewController.class,name.UTF8String,0); objc_registerClassPair(cls);
     }
-    NSSet *expected=[NSSet setWithArray:@[@"scan",@"wallet",@"moments",@"my_qrcode",@"favorites",@"plugin_home",@"profile",@"create_group",@"add_friend",@"emoji_store",@"panel_settings",@"payment_code",@"channels",@"file_transfer",@"chat_background",@"receive_code",@"my_moments",@"create_note",@"switch_account"]];
-    Check(QuickPreferenceIDs().count==19 && [[NSSet setWithArray:QuickPreferenceIDs()] isEqual:expected],"all 19 production preference identifiers agree with the router dispatch contract");
+    NSSet *expected=[NSSet setWithArray:@[@"scan",@"wallet",@"moments",@"my_qrcode",@"favorites",@"plugin_home",@"profile",@"create_group",@"add_friend",@"emoji_store",@"panel_settings",@"payment_code",@"channels",@"file_transfer",@"chat_background",@"receive_code",@"my_moments",@"create_note",@"switch_account",@"dark_mode",@"global_search"]];
+    Check(QuickPreferenceIDs().count==21 && [[NSSet setWithArray:QuickPreferenceIDs()] isEqual:expected],"all 21 production preference identifiers agree with the router dispatch contract");
     UIWindow *window=[UIWindow new]; window.windowScene=[UIWindowScene new];
     CContactMgr *contacts=[CContactMgr new]; contacts.fileContact=Contact(@"filehelper");
     MMMsgLogicManager *messages=[MMMsgLogicManager new]; QuickServiceCenter *center=[QuickServiceCenter new];
-    center.services=@{@"CContactMgr":contacts,@"MMMsgLogicManager":messages}; quickContext=center;
+    DarkModeManager *dark=[DarkModeManager new];
+    center.services=@{@"CContactMgr":contacts,@"MMMsgLogicManager":messages,@"DarkModeManager":dark}; quickContext=center;
     CAppViewControllerManager *manager=[CAppViewControllerManager new]; manager.mainWindow=window; quickAppManager=manager;
     quickFavoritesProtected=NO;
     for (NSString *identifier in QuickPreferenceIDs()) {
-        UIViewController *source=RouteSource(window); quickPublicStub=nil; quickFailureMessage=nil;
+        UIViewController *source=RouteSource(window); quickFailureMessage=nil;
         NewMainFrameViewController *home=[NewMainFrameViewController new]; home.curViewController=source;
         manager.mainFrame=home;
         if ([identifier isEqual:@"create_group"]) source.navigationController.childViewControllers=@[home];
         NSUInteger oldFinderPushes=finderPushes, oldPaymentCalls=manager.paymentCalls, oldMessages=home.messageCalls, oldReceiveCalls=home.receiveCalls, oldMyMomentsCalls=home.myMomentsCalls;
         NSUInteger oldNoteCalls=manager.noteCalls, oldSettingGotoCalls=quickSettingGotoCalls, oldSettingShowCalls=quickSettingShowCalls;
+        NSUInteger oldDarkChanges=dark.changes; BOOL wasDark=quickEffectiveDarkMode;
         Check([CSQuickPanelActionRouter performActionWithIdentifier:identifier fromViewController:source],[[NSString stringWithFormat:@"the actual public performAction accepts configured identifier %@",identifier] UTF8String]);
         if ([identifier isEqual:@"switch_account"]) SettleDelayedNavigation();
         BOOL routed=NO;
@@ -1505,11 +1747,14 @@ static void VerifyPublicDispatch(void) {
         else if ([identifier isEqual:@"payment_code"]) routed=manager.paymentCalls==oldPaymentCalls+1 && manager.entrySource==source;
         else if ([identifier isEqual:@"receive_code"]) routed=home.receiveCalls==oldReceiveCalls+1 && manager.paymentCalls==oldPaymentCalls;
         else if ([identifier isEqual:@"my_moments"]) routed=home.myMomentsCalls==oldMyMomentsCalls+1;
+        else if ([identifier isEqual:@"dark_mode"]) routed=dark.changes==oldDarkChanges+1 && dark.selectedType==(wasDark ? 2 : 1) && quickEffectiveDarkMode!=wasDark;
+        else if ([identifier isEqual:@"global_search"]) routed=home.searchCalls==1;
         else if ([identifier isEqual:@"channels"]) routed=finderPushes==oldFinderPushes+1 && finderParams.fromVC==source && finderParams.byPush;
         else if ([identifier isEqual:@"file_transfer"]) routed=home.messageCalls==oldMessages+1 && home.lastContact==contacts.fileContact && home.lastMessageWrap==nil && CSQuickChatIsFileHelper(source.navigationController.topViewController) && messages.pushes==0;
         else if ([identifier isEqual:@"create_note"]) routed=manager.noteCalls==oldNoteCalls+1;
         else if ([identifier isEqual:@"switch_account"]) routed=quickSettingShowCalls==oldSettingShowCalls+1 && quickSettingGotoCalls==oldSettingGotoCalls+1 && [source.navigationController.topViewController isKindOfClass:WCAccountLoginUsersViewController.class];
-        else routed=[quickPublicStub isEqual:identifier];
+        else if ([identifier isEqual:@"plugin_home"]) routed=PluginHomePresented(source);
+        else if ([identifier isEqual:@"panel_settings"]) routed=[source.navigationController.topViewController isKindOfClass:CSQuickPanelSettingsViewController.class];
         Check(routed && !quickFailureMessage && !objc_getAssociatedObject(window,&CSQuickRouteRequestKey),[[NSString stringWithFormat:@"public identifier %@ reaches its intended route and releases the request lock",identifier] UTF8String]);
     }
     UIViewController *source=RouteSource(window);
@@ -1665,8 +1910,10 @@ int main(void) { @autoreleasepool {
     VerifyReceiveCodeRoutes();
     VerifyMyMomentsRoutes();
     VerifyChatBackgroundRoutes();
+    VerifyAppearanceAndSearchRoutes();
     VerifyCreateNoteAndFavorites();
     VerifySwitchAccountRoutes();
+    VerifyPluginRoutes();
     VerifyPublicDispatch();
     printf("Quick panel router: %lu checks passed.\n",(unsigned long)checks);
 } return 0; }

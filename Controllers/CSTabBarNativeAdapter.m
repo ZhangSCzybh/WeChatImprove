@@ -25,6 +25,7 @@ static void CSSetFrame(UIView *view, CGRect frame) {
 @property(nonatomic) UIViewContentMode imageMode;
 @property(nonatomic) BOOL imageHidden, textHidden, customHidden;
 @property(nonatomic) CGRect imageFrame, textFrame, badgeFrame, customFrame;
+@property(nonatomic) CGRect customBounds;
 @end
 @implementation CSTabBarItemOverlay @end
 
@@ -33,6 +34,7 @@ static void CSSetFrame(UIView *view, CGRect frame) {
 @property(nonatomic) NSUInteger depth;
 @property(nonatomic) BOOL applied, textHidden, imageHidden, customHidden;
 @property(nonatomic) CGRect imageFrame, textFrame, badgeFrame, customFrame;
+@property(nonatomic) CGRect customBounds, renderedCustomBounds;
 @property(nonatomic) CGPoint badgeOffset;
 @property(nonatomic) UIViewContentMode imageMode;
 @property(nonatomic, strong) UIImage *image;
@@ -44,6 +46,9 @@ static void CSSetFrame(UIView *view, CGRect frame) {
 @property(nonatomic, weak) UIView *renderedBadge;
 @property(nonatomic) NSUInteger itemGeneration, styleGeneration, renderedIndex;
 @property(nonatomic) BOOL renderedSelected;
+@property(nonatomic) UIUserInterfaceStyle renderedStyle;
+@property(nonatomic, weak) UIWindow *renderedCustomWindow;
+@property(nonatomic) CGFloat renderedCustomAlpha;
 @property(nonatomic) CGRect renderedBounds;
 @property(nonatomic) CGFloat renderedLineHeight;
 @property(nonatomic, strong) CSTabBarItemOverlay *overlay;
@@ -197,6 +202,21 @@ static UIView *CSCustomIcon(MMTabBarItemView *item) {
     id value=((id (*)(id,SEL))[item methodForSelector:selector])(item,selector);
     return [value isKindOfClass:UIView.class] ? value : nil;
 }
+static UIImage *CSTintedNativeIcon(CSTabBarItemState *state, UIColor *color, UITraitCollection *traits) {
+    UIImage *source=state.image;
+    UIView *nativeIcon=state.customIcon;
+    if (nativeIcon && !state.customHidden) {
+        CGSize size=nativeIcon.bounds.size;
+        if (!nativeIcon.window || nativeIcon.alpha<=.01 || !isfinite(size.width) || !isfinite(size.height) || size.width<=0 || size.height<=0) return nil;
+        // Some 8.0.80 icons are drawn by MMTabBarItemIconView instead of imageView.
+        // Preserve its selected shape without changing its native drawing state.
+        UIGraphicsImageRenderer *renderer=[[UIGraphicsImageRenderer alloc] initWithSize:size];
+        source=[renderer imageWithActions:^(UIGraphicsImageRendererContext *context) {
+            [nativeIcon.layer renderInContext:context.CGContext];
+        }];
+    }
+    return [source imageWithTintColor:[color resolvedColorWithTraitCollection:traits] renderingMode:UIImageRenderingModeAlwaysOriginal];
+}
 static BOOL CSFeedbackVisible(CSTabBarState *s) {
     if (s.snapshotSource || !s.applied || !CSTabBarPreferences.current.enabled || !s.bar.window ||
         CSOwner(s.bar)!=s.controller || CSAnimationInactive || UIApplication.sharedApplication.applicationState!=UIApplicationStateActive) return NO;
@@ -296,7 +316,15 @@ static void CSRestoreItem(MMTabBarItemView *item) {
     CGRect badge=item.badgeView.frame;
     badge.origin.x-=s.badgeOffset.x; badge.origin.y-=s.badgeOffset.y;
     CSSetFrame(item.badgeView,badge);
-    if (s.customIcon) { if (s.customIcon.hidden!=s.customHidden) s.customIcon.hidden=s.customHidden; CSSetFrame(s.customIcon,s.customFrame); }
+    if (s.customIcon) {
+        // A native icon can finish sizing after our overlay was installed. Keep
+        // that new source geometry instead of restoring the previous zero size.
+        if (s.overlay && !CGRectEqualToRect(s.customIcon.frame,s.overlay.customFrame)) s.customFrame=s.customIcon.frame;
+        if (s.overlay && !CGRectEqualToRect(s.customIcon.bounds,s.overlay.customBounds)) s.customBounds=s.customIcon.bounds;
+        if (s.customIcon.hidden!=s.customHidden) s.customIcon.hidden=s.customHidden;
+        CSSetFrame(s.customIcon,s.customFrame);
+        if (!CGRectEqualToRect(s.customIcon.bounds,s.customBounds)) s.customIcon.bounds=s.customBounds;
+    }
 }
 static BOOL CSItemTextEqual(NSString *a, NSString *b) { return a==b || [a isEqualToString:b]; }
 static BOOL CSItemAppearanceMatches(MMTabBarItemView *item,CSTabBarItemState *s,BOOL overlay) {
@@ -311,7 +339,8 @@ static BOOL CSItemAppearanceMatches(MMTabBarItemView *item,CSTabBarItemState *s,
         CGRectEqualToRect(item.badgeView.frame,overlay ? o.badgeFrame : s.badgeFrame) &&
         CSCustomIcon(item)==s.customIcon && (!s.customIcon ||
         (s.customIcon.hidden==(overlay ? o.customHidden : s.customHidden) &&
-        CGRectEqualToRect(s.customIcon.frame,overlay ? o.customFrame : s.customFrame)));
+        CGRectEqualToRect(s.customIcon.frame,overlay ? o.customFrame : s.customFrame) &&
+        CGRectEqualToRect(s.customIcon.bounds,overlay ? o.customBounds : s.customBounds)));
 }
 static void CSWriteItemOverlay(MMTabBarItemView *item,CSTabBarItemState *s) {
     CSTabBarItemOverlay *o=s.overlay;
@@ -325,6 +354,7 @@ static void CSWriteItemOverlay(MMTabBarItemView *item,CSTabBarItemState *s) {
     if (s.customIcon) {
         if (s.customIcon.hidden!=o.customHidden) s.customIcon.hidden=o.customHidden;
         CSSetFrame(s.customIcon,o.customFrame);
+        if (!CGRectEqualToRect(s.customIcon.bounds,o.customBounds)) s.customIcon.bounds=o.customBounds;
     }
     s.applied=YES;
 }
@@ -340,9 +370,15 @@ static void CSApplyItemAtIndex(MMTabBarItemView *item, MMTabBar *bar, NSUInteger
     if (s.depth) return;
     CSTabBarPreferences *p=CSTabBarPreferences.current;
     if (host.stylePreferences!=p) { host.stylePreferences=p; host.styleGeneration++; }
+    UIView *nativeCustomIcon=CSCustomIcon(item);
+    CGRect nativeCustomBounds=nativeCustomIcon.bounds;
+    if (s.applied && nativeCustomIcon==s.customIcon && CGRectEqualToRect(nativeCustomBounds,s.overlay.customBounds)) nativeCustomBounds=s.customBounds;
     BOOL same=s.overlay && s.bar==bar && s.renderedItem==item &&
         s.itemGeneration==host.itemGeneration && s.styleGeneration==host.styleGeneration &&
         s.renderedIndex==index && s.renderedSelected==item.isSelected &&
+        s.renderedStyle==bar.traitCollection.userInterfaceStyle &&
+        s.renderedCustomWindow==nativeCustomIcon.window && s.renderedCustomAlpha==nativeCustomIcon.alpha &&
+        CGRectEqualToRect(s.renderedCustomBounds,nativeCustomBounds) &&
         s.renderedImageView==item.imageView && s.renderedLabel==item.textLabel && s.renderedBadge==item.badgeView &&
         CGRectEqualToRect(s.renderedBounds,item.bounds) && s.renderedLineHeight==item.textLabel.font.lineHeight;
     if (same && CSItemAppearanceMatches(item,s,s.applied)) {
@@ -356,14 +392,28 @@ static void CSApplyItemAtIndex(MMTabBarItemView *item, MMTabBar *bar, NSUInteger
     s.imageFrame=item.imageView.frame; s.textFrame=item.textLabel.frame; s.badgeFrame=item.badgeView.frame;
     s.textHidden=item.textLabel.hidden; s.imageHidden=item.imageView.hidden; s.text=item.textLabel.text;
     s.customIcon=CSCustomIcon(item); s.customHidden=s.customIcon.hidden; s.customFrame=s.customIcon.frame;
+    s.customBounds=s.customIcon.bounds;
     s.applied=YES;
     s.renderedItem=item; s.renderedImageView=item.imageView; s.renderedLabel=item.textLabel; s.renderedBadge=item.badgeView;
     s.itemGeneration=host.itemGeneration; s.styleGeneration=host.styleGeneration; s.renderedIndex=index;
     s.renderedSelected=item.isSelected; s.renderedBounds=item.bounds; s.renderedLineHeight=item.textLabel.font.lineHeight;
+    s.renderedStyle=bar.traitCollection.userInterfaceStyle;
+    s.renderedCustomWindow=s.customIcon.window; s.renderedCustomAlpha=s.customIcon.alpha;
+    s.renderedCustomBounds=s.customBounds;
     UIImage *custom=[p iconAtIndex:index selected:item.isSelected];
+    BOOL drawnNativeReplacement=NO;
     if (custom) {
         item.imageView.image=custom; item.imageView.contentMode=UIViewContentModeScaleAspectFit;
         item.imageView.hidden=NO; s.customIcon.hidden=YES;
+    } else if (item.isSelected && p.selectedIconColor) {
+        UIImage *tinted=CSTintedNativeIcon(s,p.selectedIconColor,bar.traitCollection);
+        if (tinted) {
+            item.imageView.image=tinted;
+            item.imageView.hidden=NO;
+            drawnNativeReplacement=s.customIcon && !s.customHidden && s.customIcon.alpha>.01;
+            if (drawnNativeReplacement) item.imageView.contentMode=UIViewContentModeScaleAspectFit;
+            s.customIcon.hidden=YES;
+        }
     }
     NSString *title=[p titleAtIndex:index];
     if (title) item.textLabel.text=title;
@@ -371,7 +421,7 @@ static void CSApplyItemAtIndex(MMTabBarItemView *item, MMTabBar *bar, NSUInteger
     CGFloat height=CGRectGetHeight(item.bounds), width=CGRectGetWidth(item.bounds);
     CGFloat labelHeight=p.hideText ? 0 : MIN(20,MAX(12,item.textLabel.font.lineHeight));
     CGFloat iconHeight=MIN(28,MAX(20,height-labelHeight-12));
-    CGSize nativeSize=custom ? CGSizeMake(25,25) : s.imageFrame.size;
+    CGSize nativeSize=custom ? CGSizeMake(25,25) : (drawnNativeReplacement ? s.customFrame.size : s.imageFrame.size);
     if (nativeSize.width<=0 || nativeSize.height<=0) nativeSize=CGSizeMake(25,25);
     CGFloat factor=MIN(iconHeight/MAX(1,nativeSize.height),MIN(32,width-12)/MAX(1,nativeSize.width));
     CGSize size=CGSizeMake(nativeSize.width*factor,nativeSize.height*factor);
@@ -379,7 +429,7 @@ static void CSApplyItemAtIndex(MMTabBarItemView *item, MMTabBar *bar, NSUInteger
     CGFloat top=(height-size.height-labelHeight-gap)/2;
     CGRect imageFrame=CGRectMake((width-size.width)/2,top,size.width,size.height);
     CSSetFrame(item.imageView,imageFrame);
-    if (s.customIcon && !custom) CSSetFrame(s.customIcon,imageFrame);
+    if (s.customIcon && !custom && s.customBounds.size.width>0 && s.customBounds.size.height>0) CSSetFrame(s.customIcon,imageFrame);
     if (!p.hideText) CSSetFrame(item.textLabel,CGRectMake(2,CGRectGetMaxY(imageFrame)+gap,width-4,labelHeight));
     // Keep the original badge object, value, shape and visibility. Move its native anchor.
     CGRect badge=s.badgeFrame;
@@ -391,7 +441,7 @@ static void CSApplyItemAtIndex(MMTabBarItemView *item, MMTabBar *bar, NSUInteger
     overlay.image=item.imageView.image; overlay.imageMode=item.imageView.contentMode;
     overlay.imageHidden=item.imageView.hidden; overlay.textHidden=item.textLabel.hidden; overlay.text=item.textLabel.text;
     overlay.imageFrame=item.imageView.frame; overlay.textFrame=item.textLabel.frame; overlay.badgeFrame=item.badgeView.frame;
-    overlay.customHidden=s.customIcon.hidden; overlay.customFrame=s.customIcon.frame; s.overlay=overlay;
+    overlay.customHidden=s.customIcon.hidden; overlay.customFrame=s.customIcon.frame; overlay.customBounds=s.customIcon.bounds; s.overlay=overlay;
     CSReconcileClickEffect(host);
 }
 static void CSApplyItem(MMTabBarItemView *item, MMTabBar *bar) {
@@ -834,6 +884,10 @@ void CSTabBarBeginItemUpdate(MMTabBarItemView *item) {
     CSTabBarItemState *s=objc_getAssociatedObject(item,&CSItemStateKey);
     if (!s) return; // Ordinary native item updates do no work until this instance is styled.
     if (s.depth++==0) CSRestoreItem(item);
+}
+void CSTabBarInvalidateItemAppearance(MMTabBarItemView *item) {
+    CSTabBarItemState *s=objc_getAssociatedObject(item,&CSItemStateKey);
+    s.overlay=nil;
 }
 void CSTabBarEndItemUpdate(MMTabBarItemView *item) {
     CSTabBarItemState *s=objc_getAssociatedObject(item,&CSItemStateKey);

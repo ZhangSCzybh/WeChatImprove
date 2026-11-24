@@ -48,6 +48,12 @@ static NSString * const kScrollSensitivityKey = @"com.wechat.enhance.scroll_sens
 
 @end
 
+@interface CSGroupColorPicker : UIColorPickerViewController
+@property (nonatomic, copy) NSString *preferenceKey;
+@property (nonatomic) NSInteger colorType;
+@end
+@implementation CSGroupColorPicker @end
+
 @interface CSChatGroupSettingsViewController () <UITableViewDataSource, UITableViewDelegate, UIColorPickerViewControllerDelegate>
 @property (nonatomic, weak) UIAlertAction *fontSizeSaveAction;
 
@@ -59,6 +65,7 @@ static NSString * const kScrollSensitivityKey = @"com.wechat.enhance.scroll_sens
 @property (nonatomic, strong) WEColorPreviewView *indicatorColorPreview;
 @property (nonatomic, strong) WEColorPreviewView *selectedTextColorPreview;
 @property (nonatomic, assign) NSInteger currentColorType;
+@property (nonatomic, weak) CSGroupColorPicker *activeColorPicker;
 @property (nonatomic, strong) CSGroupPreferences *groupPreferences;
 @property (nonatomic, strong) NSTimer *accountCheckTimer;
 
@@ -104,6 +111,16 @@ static NSString * const kScrollSensitivityKey = @"com.wechat.enhance.scroll_sens
     [super viewWillDisappear:animated];
     [self.accountCheckTimer invalidate];
     self.accountCheckTimer = nil;
+}
+
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+    if (previousTraitCollection.userInterfaceStyle == self.traitCollection.userInterfaceStyle ||
+        !self.isViewLoaded || !self.groupPreferences) return;
+    // These rows contain decoded, mode-specific colors rather than dynamic
+    // system colors. Rebuild their icons and swatches when the mode changes.
+    [self setupData];
+    [self.tableView reloadData];
 }
 
 - (void)dealloc { [_accountCheckTimer invalidate]; [NSNotificationCenter.defaultCenter removeObserver:self]; }
@@ -540,7 +557,7 @@ static NSString * const kScrollSensitivityKey = @"com.wechat.enhance.scroll_sens
     if ([data isKindOfClass:NSData.class]) {
         @try {
             id color=[NSKeyedUnarchiver unarchivedObjectOfClass:UIColor.class fromData:data error:nil];
-            if ([color isKindOfClass:UIColor.class]) return color;
+            if ([color isKindOfClass:UIColor.class]) return [color resolvedColorWithTraitCollection:self.traitCollection];
         } @catch (__unused NSException *exception) {}
     }
     return [UIColor colorWithRed:0.102 green:0.678 blue:0.098 alpha:1.0];
@@ -558,41 +575,45 @@ static NSString * const kScrollSensitivityKey = @"com.wechat.enhance.scroll_sens
     return self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
 }
 
+- (NSString *)colorPreferenceKeyForType:(NSInteger)type {
+    if (type == 0) return [self isDarkMode] ? kIndicatorColorDarkKey : kIndicatorColorKey;
+    return [self isDarkMode] ? kSelectedTextColorDarkKey : kSelectedTextColorKey;
+}
+
 - (void)showColorPicker {
     NSString *title = self.currentColorType == 0 ? @"指示器背景色" : @"选中文本颜色";
     UIColor *currentColor = self.currentColorType == 0 ? [self currentIndicatorColor] : [self currentSelectedTextColor];
     
-    UIColorPickerViewController *colorPicker = [[UIColorPickerViewController alloc] init];
+    CSGroupColorPicker *colorPicker = [[CSGroupColorPicker alloc] init];
+    colorPicker.colorType = self.currentColorType;
+    colorPicker.preferenceKey = [self colorPreferenceKeyForType:colorPicker.colorType];
     colorPicker.delegate = self;
     colorPicker.selectedColor = currentColor;
     colorPicker.title = title;
     colorPicker.supportsAlpha = YES;
+    self.activeColorPicker = colorPicker;
     [self presentViewController:colorPicker animated:YES completion:nil];
 }
 
 #pragma mark - UIColorPickerViewControllerDelegate
 
 - (void)colorPickerViewControllerDidFinish:(UIColorPickerViewController *)viewController {
-    UIColor *selectedColor = viewController.selectedColor;
-    
-    NSString *colorKey = nil;
-    if (self.currentColorType == 0) {
-        colorKey = [self isDarkMode] ? kIndicatorColorDarkKey : kIndicatorColorKey;
-        self.indicatorColorPreview.previewColor = selectedColor;
-    } else {
-        colorKey = [self isDarkMode] ? kSelectedTextColorDarkKey : kSelectedTextColorKey;
-        self.selectedTextColorPreview.previewColor = selectedColor;
-    }
-    
-    [self saveColor:selectedColor forKey:colorKey];
+    if (viewController != self.activeColorPicker || ![viewController isKindOfClass:CSGroupColorPicker.class]) return;
+    CSGroupColorPicker *picker = (CSGroupColorPicker *)viewController;
+    // A system appearance change while the picker is open must not write the
+    // light color into the dark preference, or the reverse.
+    [self saveColor:picker.selectedColor forKey:picker.preferenceKey];
+    self.activeColorPicker = nil;
     [self setupData];
     [self.tableView reloadData];
 }
 
 - (void)colorPickerViewControllerDidSelectColor:(UIColorPickerViewController *)viewController {
-    UIColor *selectedColor = viewController.selectedColor;
-    
-    if (self.currentColorType == 0) {
+    if (viewController != self.activeColorPicker || ![viewController isKindOfClass:CSGroupColorPicker.class]) return;
+    CSGroupColorPicker *picker = (CSGroupColorPicker *)viewController;
+    if (![picker.preferenceKey isEqualToString:[self colorPreferenceKeyForType:picker.colorType]]) return;
+    UIColor *selectedColor = [picker.selectedColor resolvedColorWithTraitCollection:self.traitCollection];
+    if (picker.colorType == 0) {
         self.indicatorColorPreview.previewColor = selectedColor;
     } else {
         self.selectedTextColorPreview.previewColor = selectedColor;

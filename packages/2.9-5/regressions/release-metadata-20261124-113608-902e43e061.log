@@ -1,0 +1,83 @@
+$ xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -framework Foundation -I/Users/zhangshichao/Documents/Workspace/WeChatImprove/Headers /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2.9-5-release-metadata-_x9z_ibx/ReleaseMetadataHost.m -o /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2.9-5-release-metadata-_x9z_ibx/release-notes-current
+exit_code=0
+$ /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2.9-5-release-metadata-_x9z_ibx/release-notes-current
+{
+  "count" : 9,
+  "headerVersion" : "2.9-5",
+  "notes" : [
+    {
+      "detail" : "修正重启后仅有电脑登录提示时顶部区域与分组栏的初始位置，补齐电脑登录等顶部提示晚到时的列表刷新，避免已有提示因漏刷新而需切换前后台才显示。保留置顶笔记与微信原生在线状态的更新流程。",
+      "title" : "修复聊天列表启动布局"
+    },
+    {
+      "detail" : "修正五个及以上分组时重启后的初始滚动位置与首项左侧裁切。等待有效布局后定位所选分组，并保留手动滚动、原生未读定位与分组切换行为。",
+      "title" : "修复分组初始横向位置"
+    },
+    {
+      "detail" : "聊天分组选中文本颜色设置适配深色外观；列表圆角同步修复通讯录、发现和我页面的外围底色、分组标题及页脚，切换外观后更新当前页面。",
+      "title" : "完善深色模式适配"
+    },
+    {
+      "detail" : "底栏样式新增选中图标颜色，可自定义或恢复微信原生默认，并跟随原生深浅色更新。上传的普通及选中图标保留图片原色，选中色用于实际采用原生图标的项目。",
+      "title" : "自定义底栏选中图标颜色"
+    },
+    {
+      "detail" : "新增深色模式切换和全局搜索，可选入口增至二十一项；已有选择和顺序继续兼容，新入口可手动添加。插件主页统一使用原有独立导航容器，调整入场顶部布局，并保留详情返回时的滚动位置。",
+      "title" : "扩展快捷面板并调整主页入口"
+    },
+    {
+      "detail" : "按住输入框时的转写预览接入发送方浅深色配色与圆角，发送后的两种语音转文字专用消息接入自定义气泡、复用及恢复逻辑。保留原生录音状态与发送收拢动画。",
+      "title" : "补齐语音转文字气泡样式"
+    },
+    {
+      "detail" : "朋友圈卡片的位置图标改为地图图钉，保留位置文字、颜色与原有布局。新增底栏和面板配置继续纳入备份、恢复与重置。",
+      "title" : "调整朋友圈位置图标"
+    },
+    {
+      "detail" : "包含 2.9-4 的完整功能与本轮修复更新，保留聊天分组、底栏与界面定制、朋友圈布局、消息增强、自动功能、群聊工具、人工智能和备份恢复等全部既有模块。",
+      "title" : "2.9-5 正式完整版"
+    },
+    {
+      "detail" : "完成主机回归及双架构编译打包。冷启动顶部显示、深浅色切换、面板进入主页的转场与连续语音输入效果，仍需在原设备、原账号和原注入环境验收。",
+      "title" : "设备验证范围"
+    }
+  ],
+  "selectedVersion" : "2.9-5"
+}
+exit_code=0
+$ xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror -framework Foundation -I/Users/zhangshichao/Documents/Workspace/WeChatImprove/Headers -DWE_RELEASE_HISTORY_TEST=1 /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2.9-5-release-metadata-_x9z_ibx/ReleaseMetadataHost.m -o /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2.9-5-release-metadata-_x9z_ibx/release-notes-history
+exit_code=0
+$ /var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2.9-5-release-metadata-_x9z_ibx/release-notes-history
+{
+  "count" : 6,
+  "headerVersion" : "2.9-5",
+  "notes" : [
+    {
+      "detail" : "快捷面板新增收款码、我的朋友圈、新建笔记和切换账号，可选入口由十五项扩展为十九项。收款码与付款码分别提供入口；默认八项、已有选择和排序及空面板配置继续兼容，新入口可在面板设置中手动添加。",
+      "title" : "新增四项快捷入口"
+    },
+    {
+      "detail" : "等待微信原生设置页完成展示后再执行切换账号入口，并检查原生账号页或首次使用提示是否出现，避免仅停留在设置页就认定成功。跳转期间保留请求防重、当前账号与窗口校验，用户离开页面或进入后台后停止处理。",
+      "title" : "修复切换账号快捷跳转"
+    },
+    {
+      "detail" : "收款码和我的朋友圈接入当前账号的微信原生入口；新建笔记沿用收藏的生物识别保护，由微信建立编辑上下文。切换账号沿用微信原生页面及后续流程，账号选择与确认交由用户完成。",
+      "title" : "沿用原生页面与认证"
+    },
+    {
+      "detail" : "继续保留总开关、上滑位置、入口顺序，以及背景颜色、背景图片、透明度、字体和图标颜色。十九项入口纳入配置备份与恢复白名单，兼容原有入口及空配置；圆润顶部字体、图标跟随界面调色及其他面板能力继续包含。",
+      "title" : "保留面板偏好与备份兼容"
+    },
+    {
+      "detail" : "本版包含 2.9-3 的完整功能与本次快捷面板更新。聊天分组、底栏与界面定制、朋友圈布局、消息增强、自动功能、群聊功能、人工智能及备份恢复等既有模块继续包含。",
+      "title" : "2.9-4 正式完整版"
+    },
+    {
+      "detail" : "原生账号页的实际展示与返回、单账号及多账号状态、新建笔记编辑保存，以及手势与其他既有功能仍需在原设备、原账号和原注入环境验收。静态路径核验与主机检查不代表新增真机验证结论。",
+      "title" : "设备验证范围"
+    }
+  ],
+  "selectedVersion" : "2.9-4"
+}
+exit_code=0
+RESULT PASS: 18/18 checks passed

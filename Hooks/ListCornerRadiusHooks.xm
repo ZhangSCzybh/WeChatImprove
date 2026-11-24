@@ -22,7 +22,8 @@ static UIView *CSListCornerSectionView(id owner, UITableView *table, UIView *ori
     if (page==CSListCornerPageSession) return CSListCornerCreateSessionGap(table,section,footer,CGRectMake(0,0,table.bounds.size.width,height));
     UIView *view=[[UIView alloc] initWithFrame:CGRectMake(0,0,table.bounds.size.width,height)];
     view.userInteractionEnabled=NO;
-    view.backgroundColor=footer ? CSListCornerCanvasColor() : [UIColor clearColor];
+    if (footer) CSListCornerTrackPageCanvas(table,view);
+    else view.backgroundColor=[UIColor clearColor];
     return view;
 }
 
@@ -125,6 +126,14 @@ static UIView *CSListCornerSectionView(id owner, UITableView *table, UIView *ori
 }
 - (void)viewDidLayoutSubviews {
     %orig;
+    if (CSListCornerRefreshPageAppearance(self,CSListCornerPageContacts))
+        CSListCornerContactsRefreshSections(CSListCornerOwnedTable(self,CSListCornerPageContacts));
+    CSListCornerContactsDecorateCountFooter(self);
+}
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    %orig;
+    if (CSListCornerRefreshPageAppearance(self,CSListCornerPageContacts))
+        CSListCornerContactsRefreshSections(CSListCornerOwnedTable(self,CSListCornerPageContacts));
     CSListCornerContactsDecorateCountFooter(self);
 }
 - (void)viewDidLoad {
@@ -158,6 +167,14 @@ static UIView *CSListCornerSectionView(id owner, UITableView *table, UIView *ori
 %end
 
 %hook FindFriendEntryViewController
+- (void)viewDidLayoutSubviews {
+    %orig;
+    CSListCornerRefreshPageAppearance(self,CSListCornerPageDiscover);
+}
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    %orig;
+    CSListCornerRefreshPageAppearance(self,CSListCornerPageDiscover);
+}
 - (id)tableView:(id)arg1 cellForRowAtIndexPath:(id)arg2 {
     UITableViewCell *cell=%orig;
     CSListCornerDiscoverDecorate(cell,(UITableView *)arg1,(NSIndexPath *)arg2,self);
@@ -246,6 +263,16 @@ static UIView *CSListCornerSectionView(id owner, UITableView *table, UIView *ori
 %end
 
 %hook MoreViewController
+- (void)viewDidLayoutSubviews {
+    %orig;
+    if (CSListCornerRefreshPageAppearance(self,CSListCornerPageMore))
+        CSListCornerMoreDecorateHeader(CSListCornerOwnedTable(self,CSListCornerPageMore).tableHeaderView);
+}
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    %orig;
+    if (CSListCornerRefreshPageAppearance(self,CSListCornerPageMore))
+        CSListCornerMoreDecorateHeader(CSListCornerOwnedTable(self,CSListCornerPageMore).tableHeaderView);
+}
 - (void)viewDidLoad {
     %orig;
     CSListCornerPrepareTable(self,CSListCornerPageMore,YES);

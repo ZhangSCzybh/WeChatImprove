@@ -56,6 +56,29 @@ static void InstallMainScrollToTopHook(void) {
             (IMP)MainScrollToTop,(IMP *)&MainScrollToTopOriginal,"B@:@");
     else class_addMethod(owner,selector,(IMP)MainScrollToTop,"B@:@");
 }
+static void BeginMainTabPositioning(id owner) {
+    id controller=CSGroupReadObject(owner,@"getNewMainFrameViewController");
+    [[CSGroupListAdapter adapterForController:controller] beginUserScrolling];
+}
+static void (*MainTabDoubleClickedOriginal)(id,SEL,id);
+static void MainTabDoubleClicked(id owner,SEL selector,id sender) {
+    BeginMainTabPositioning(owner);
+    if (MainTabDoubleClickedOriginal) MainTabDoubleClickedOriginal(owner,selector,sender);
+}
+static void (*NewMainTabDoubleClickedOriginal)(id,SEL,id);
+static void NewMainTabDoubleClicked(id owner,SEL selector,id sender) {
+    BeginMainTabPositioning(owner);
+    if (NewMainTabDoubleClickedOriginal) NewMainTabDoubleClickedOriginal(owner,selector,sender);
+}
+static void InstallMainTabPositioningHooks(void) {
+    // These are the actual owners used by the legacy and modern tab adapters.
+    // Missing methods must stay missing so the native unread-action fallback
+    // can still choose its existing respondsToSelector path.
+    CSCloseFriendInstallHook(@"MainTabBarViewController",@"OnMainFrameDoubleClicked:",
+        (IMP)MainTabDoubleClicked,(IMP *)&MainTabDoubleClickedOriginal,"v@:@");
+    CSCloseFriendInstallHook(@"NewMainTabBarViewController",@"OnMainFrameDoubleClicked:",
+        (IMP)NewMainTabDoubleClicked,(IMP *)&NewMainTabDoubleClickedOriginal,"v@:@");
+}
 static void Native(id owner, BOOL change, void (^body)(void)) {
     CSGroupListAdapter *a=Adapter(owner);
     if (!a.table) { body(); return; }
@@ -73,6 +96,16 @@ static void Native(id owner, BOOL change, void (^body)(void)) {
     if (change) [a beginNativeChange];
     @try { CSGroupWithNativeIndices(a.table,body); }
     @finally { if (change) [a endNativeChange]; }
+}
+static void NativeHeaderChange(id owner, void (^body)(void)) {
+    CSGroupListAdapter *a=Adapter(owner);
+    if (!a.table) { body(); return; }
+    // Banner rows have their own source in MainFrameHeaderLogic, separate from
+    // MainSessionMgr. Record their UI revision even during the first publication
+    // or a native source boundary, without rebuilding the session arrays.
+    [a beginNativeChange];
+    @try { Native(owner,NO,body); }
+    @finally { [a endNativeChange]; }
 }
 static NSSet *ChangedSessionNames(id value) {
     if (!NSThread.isMainThread) return nil;
@@ -189,6 +222,14 @@ static void BindMainNativeCell(id table,UITableViewCell *cell,NSIndexPath *path)
 - (void)viewDidLayoutSubviews { Native(self,NO,^{ %orig; }); [CSGroupListAdapter layoutForController:self]; }
 - (void)initTableHeaderView { Native(self,NO,^{ %orig; }); [CSGroupListAdapter layoutForController:self]; }
 - (void)setSearchBarToTableHeaderView { Native(self,NO,^{ %orig; }); [CSGroupListAdapter layoutForController:self]; }
+- (void)showSearchBar:(id)sender searchBar:(id)searchBar autoStartGreenMic:(BOOL)autoStartGreenMic {
+    // The native search button (including the quick panel) reaches this
+    // presenter without onSearch/setSearchBarActive:. Capture the backing
+    // group header before WeChat moves its search view into the search page.
+    [Adapter(self) prepareForNativeSearch];
+    Native(self,NO,^{ %orig; });
+    [Adapter(self) requestRefresh];
+}
 - (void)onSearch { [Adapter(self) prepareForNativeSearch]; Native(self,NO,^{ %orig; }); [Adapter(self) requestRefresh]; }
 - (void)setSearchBarActive:(BOOL)active { if (active) [Adapter(self) prepareForNativeSearch]; Native(self,NO,^{ %orig; }); [Adapter(self) refresh]; }
 - (void)onFTSSearchEnd { Native(self,NO,^{ %orig; }); [Adapter(self) refresh]; }
@@ -201,6 +242,11 @@ static void BindMainNativeCell(id table,UITableViewCell *cell,NSIndexPath *path)
 - (void)newMessageByContact:(id)contact msgWrapToAdd:(id)wrap { NativeNamedNotification(self,CSGroupChangeContent|CSGroupChangeStructure,contact,^{ %orig; }); }
 - (void)updateSession:(id)session { NativeNamedNotification(self,CSGroupChangeContent|CSGroupChangeStructure,session,^{ %orig; }); }
 - (void)reloadSessions { Native(self,YES,^{ %orig; }); }
+// MainFrameHeaderDelegate delivers late computer-login and other banner rows
+// through these callbacks, independently of session rebuild notifications.
+- (void)insertRow:(unsigned int)row { NativeHeaderChange(self,^{ %orig(row); }); }
+- (void)removeRow:(unsigned int)row { NativeHeaderChange(self,^{ %orig(row); }); }
+- (void)reloadAll { NativeHeaderChange(self,^{ %orig; }); }
 - (void)updateItem:(id)item { Native(self,YES,^{ %orig; }); }
 - (void)insertSessionCellAtIndexes:(id)paths { Native(self,YES,^{ %orig; }); }
 - (void)deleteSessionCellAtIndexes:(id)paths { Native(self,YES,^{ %orig; }); }
@@ -613,6 +659,7 @@ static void InstallFoldedSessionHooks(void) {
     CSBackupWhenReady(^{
         InstallMenuTouchGate();
         InstallMainScrollToTopHook();
+        InstallMainTabPositioningHooks();
         InstallFoldedSessionHooks();
         [NSNotificationCenter.defaultCenter addObserver:CSGroupListAdapter.class selector:@selector(closeFriendPolicyChanged:) name:CSCloseFriendPolicyDidChangeNotification object:nil];
         for (NSString *name in @[UIApplicationWillResignActiveNotification,UIApplicationDidEnterBackgroundNotification,UIApplicationDidBecomeActiveNotification])

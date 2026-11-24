@@ -83,6 +83,15 @@ int main(void) { @autoreleasepool {
     CHECK([clickEffect[@"module"] isEqual:@"tabbar"] && [clickEffect[@"scope"] isEqual:@"global"]);
     CHECK(Valid(@0,clickEffect) && Valid(@1,clickEffect));
     CHECK(!Valid(@"1",clickEffect));
+    for (NSString *component in @[@"red",@"green",@"blue",@"alpha"]) {
+        NSString *key=[@"com.wechat.enhance.tabbar_style.selected_icon_color." stringByAppendingString:component];
+        NSDictionary *entry=Entry(key);
+        CHECK([entry[@"module"] isEqual:@"tabbar"] && [entry[@"scope"] isEqual:@"global"] && [entry[@"type"] isEqual:@"number"]);
+        CHECK(Valid(@0,entry) && Valid(@0.5,entry) && Valid(@1,entry));
+        CHECK(!Valid(@(-0.01),entry) && !Valid(@1.01,entry) && !Valid(@(NAN),entry) && !Valid(@(INFINITY),entry) && !Valid(@"0.5",entry));
+        CHECK([CSBackupRegistry entryForDomain:@"legacy" key:key]==nil);
+    }
+    CHECK(Entry(@"com.wechat.enhance.tabbar_style.selected_icon_color.purple")==nil);
     NSDictionary *panelEnabled=Entry(@"com.wechat.enhance.quick_panel.enabled");
     NSDictionary *panelLocations=Entry(@"com.wechat.enhance.quick_panel.trigger_locations");
     NSDictionary *panelActions=Entry(@"com.wechat.enhance.quick_panel.selected_actions");
@@ -137,6 +146,13 @@ int main(void) { @autoreleasepool {
     CHECK(!Valid(@[@"my_moments",NSNull.null],panelActions));
     NSArray *nineteenPanelIdentifiers=[seventeenPanelIdentifiers arrayByAddingObjectsFromArray:@[@"create_note",@"switch_account"]];
     CHECK(nineteenPanelIdentifiers.count==19 && Valid(nineteenPanelIdentifiers,panelActions));
+    NSArray *twentyOnePanelIdentifiers=[nineteenPanelIdentifiers arrayByAddingObjectsFromArray:@[@"dark_mode",@"global_search"]];
+    CHECK(twentyOnePanelIdentifiers.count==21 && Valid(twentyOnePanelIdentifiers,panelActions));
+    CHECK(Valid(@[@"dark_mode"],panelActions) && Valid(@[@"global_search"],panelActions));
+    CHECK(Valid(@[@"global_search",@"dark_mode"],panelActions));
+    CHECK(!Valid(@[@"dark_mode",@"dark_mode"],panelActions) && !Valid(@[@"global_search",@"global_search"],panelActions));
+    CHECK(!Valid(@[@"dark_mode.extra"],panelActions) && !Valid(@[@"global_search.extra"],panelActions));
+    CHECK(!Valid(@[@"dark_mode",NSNull.null],panelActions) && !Valid(@[@"global_search",@1],panelActions));
     CHECK(Valid(@[@"create_note"],panelActions) && Valid(@[@"switch_account"],panelActions));
     CHECK(Valid(@[@"create_note",@"switch_account"],panelActions) && Valid(@[@"switch_account",@"create_note"],panelActions));
     CHECK(!Valid(@[@"create_note",@"create_note"],panelActions) && !Valid(@[@"switch_account",@"switch_account"],panelActions));

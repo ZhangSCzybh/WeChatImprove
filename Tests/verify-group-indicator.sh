@@ -6,5 +6,5 @@ trap 'rm -rf "$test_dir"' EXIT
 python3 "$project_dir/Tests/extract-group-indicator.py" "$test_dir/GroupIndicatorBodies.h"
 xcrun --sdk macosx clang -fobjc-arc -fblocks -Wall -Wextra -Werror \
     -framework Foundation -framework QuartzCore -framework CoreGraphics -I"$test_dir" \
-    "$project_dir/Tests/GroupIndicatorTests.m" -o "$test_dir/indicator-tests"
+    "$project_dir/Tests/GroupIndicatorTests.m" "$project_dir/Controllers/WESessionTabItem.m" -o "$test_dir/indicator-tests"
 "$test_dir/indicator-tests"

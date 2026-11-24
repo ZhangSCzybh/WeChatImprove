@@ -33,7 +33,7 @@ FOUNDATION_EXPORT NSNotificationName const CSGroupTabBadgeSourceDidRefreshNotifi
 + (void)attachToController:(id)controller;
 /// Suspend derived UI work while the native main-frame owner is offscreen.
 + (void)setPresentationSuspended:(BOOL)suspended forController:(id)controller;
-/// Restore the departure height after the native appearance/layout finishes.
+/// Reconcile initial header visibility or restore the departure height after native appearance/layout.
 + (void)finishPresentationReturnForController:(id)controller;
 + (void)layoutForController:(id)controller;
 /// Validate existing cells before a covering miniapp starts revealing the list.

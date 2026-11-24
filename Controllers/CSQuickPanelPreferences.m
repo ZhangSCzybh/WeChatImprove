@@ -46,7 +46,7 @@ static NSString *CSQuickPanelNormalizedColorHex(id value) {
     return @[@"scan", @"wallet", @"moments", @"my_qrcode", @"favorites", @"plugin_home",
              @"profile", @"create_group", @"add_friend", @"emoji_store", @"panel_settings",
              @"payment_code", @"channels", @"file_transfer", @"chat_background", @"receive_code", @"my_moments",
-             @"create_note", @"switch_account"];
+             @"create_note", @"switch_account", @"dark_mode", @"global_search"];
 }
 
 + (NSArray<NSString *> *)cs_defaultSelectedActionIdentifiers {
@@ -113,7 +113,8 @@ static NSString *CSQuickPanelNormalizedColorHex(id value) {
              @"favorites": @"收藏", @"plugin_home": @"插件主页", @"profile": @"个人资料", @"create_group": @"发起群聊",
              @"add_friend": @"添加朋友", @"emoji_store": @"表情商店", @"panel_settings": @"面板设置",
              @"payment_code": @"付款码", @"channels": @"视频号", @"file_transfer": @"文件传输助手", @"chat_background": @"聊天背景", @"receive_code": @"收款码", @"my_moments": @"我的朋友圈",
-             @"create_note": @"新建笔记", @"switch_account": @"切换账号"}[identifier];
+             @"create_note": @"新建笔记", @"switch_account": @"切换账号",
+             @"dark_mode": @"深色模式切换", @"global_search": @"全局搜索"}[identifier];
 }
 
 + (NSString *)symbolNameForActionIdentifier:(NSString *)identifier {
@@ -123,7 +124,8 @@ static NSString *CSQuickPanelNormalizedColorHex(id value) {
              @"profile": @"person.crop.circle", @"create_group": @"person.3.fill", @"add_friend": @"person.badge.plus",
              @"emoji_store": @"face.smiling", @"panel_settings": @"slider.horizontal.3",
              @"payment_code": @"barcode.viewfinder", @"channels": @"play.rectangle.fill", @"file_transfer": @"arrow.up.doc.fill", @"chat_background": @"photo.fill", @"receive_code": @"qrcode", @"my_moments": @"photo.on.rectangle",
-             @"create_note": @"square.and.pencil", @"switch_account": @"arrow.triangle.2.circlepath"}[identifier];
+             @"create_note": @"square.and.pencil", @"switch_account": @"arrow.triangle.2.circlepath",
+             @"dark_mode": @"moon.circle", @"global_search": @"magnifyingglass"}[identifier];
 }
 
 + (CSQuickPanelBackgroundStyle)backgroundStyle {

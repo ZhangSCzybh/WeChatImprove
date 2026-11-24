@@ -26,7 +26,7 @@ static char SelectionStateKey;
 @end
 @implementation CSListCornerSessionState @end
 static UIColor *CSListCornerSessionCanvas(UIUserInterfaceStyle style) {
-    return style==UIUserInterfaceStyleDark ? UIColor.blackColor : CSListCornerCanvasColor();
+    return CSListCornerCanvasColorForStyle(style);
 }
 static void CSListCornerPaint(UITableViewCell *cell, UIView *view, UIColor *color) {
     if (!view) return;
@@ -76,6 +76,9 @@ BOOL CSListCornerValidRect(CGRect rect) {
     return isfinite(rect.origin.x) && isfinite(rect.origin.y) && isfinite(rect.size.width) && isfinite(rect.size.height) && rect.size.width>0 && rect.size.height>0;
 }
 UIColor *CSListCornerCanvasColor(void) { return [UIColor colorWithRed:0.929 green:0.929 blue:0.929 alpha:1]; }
+UIColor *CSListCornerCanvasColorForStyle(UIUserInterfaceStyle style) {
+    return style==UIUserInterfaceStyleDark ? UIColor.blackColor : CSListCornerCanvasColor();
+}
 static NSString *CSListCornerOwnerName(CSListCornerPage page) {
     switch (page) {
         case CSListCornerPageSession:return @"NewMainFrameViewController";
@@ -212,8 +215,10 @@ void CSListCornerPrepareTable(id owner, CSListCornerPage page, BOOL initial) {
     // Cell/layout decoration keeps its independent enabled gate.
     if (!configuration.enabled && page!=CSListCornerPageSession) return;
     UITableView *table=CSListCornerOwnedTable(owner,page); if (!table) return;
-    UIColor *background=page==CSListCornerPageSession ? CSListCornerSessionTableColor(table) : CSListCornerCanvasColor();
+    UIColor *background=page==CSListCornerPageSession ? CSListCornerSessionTableColor(table) : CSListCornerCanvasColorForStyle(table.traitCollection.userInterfaceStyle);
     if (![table.backgroundColor isEqual:background]) table.backgroundColor=background;
+    // Native appearance updates can replace this backing view after viewDidLoad.
+    if (![table.backgroundView.backgroundColor isEqual:background]) table.backgroundView.backgroundColor=background;
     if (page==CSListCornerPageContacts) {
         table.sectionIndexBackgroundColor=[UIColor clearColor];
         table.sectionIndexTrackingBackgroundColor=[UIColor clearColor];
@@ -224,16 +229,14 @@ void CSListCornerPrepareTable(id owner, CSListCornerPage page, BOOL initial) {
     }
     if (initial || page==CSListCornerPageSession) {
         // With cards enabled this is the canvas visible around and below them.
-        if (![table.backgroundView.backgroundColor isEqual:background]) table.backgroundView.backgroundColor=background;
         table.showsVerticalScrollIndicator=NO;
         if (page==CSListCornerPageContacts) { table.sectionHeaderHeight=0; table.sectionFooterHeight=0; }
     }
     if (page==CSListCornerPageSession) CSListCornerTrackSessionTable(table);
 }
-static void CSListCornerPrepareCellPaint(UITableViewCell *cell, UIView *content) {
-    BOOL session=objc_getAssociatedObject(cell,&SessionStateKey)!=nil;
+static void CSListCornerPrepareCellPaint(UITableViewCell *cell, UIView *content, UIUserInterfaceStyle style) {
     CSListCornerPaint(cell,cell,UIColor.clearColor);
-    CSListCornerPaint(cell,content,session ? CSListCornerSessionCanvas(content.traitCollection.userInterfaceStyle) : CSListCornerCanvasColor());
+    CSListCornerPaint(cell,content,CSListCornerCanvasColorForStyle(style));
     CSListCornerHideSeparator(cell);
     // Native MMTableViewCell's dedicated content container may have an opaque fill.
     UIView *native=CSListCornerNativeContent(cell);
@@ -242,6 +245,60 @@ static void CSListCornerPrepareCellPaint(UITableViewCell *cell, UIView *content)
         NSString *name=NSStringFromClass(view.class);
         if ([name isEqualToString:@"MainFrameItemView"] || [name isEqualToString:@"FakeMainFrameItemView"] || [name isEqualToString:@"MMUIView"]) CSListCornerPaint(cell,view,UIColor.clearColor);
     }
+}
+@interface CSListCornerPageAppearance : NSObject
+@property(nonatomic,strong) CSListCornerSnapshot *configuration;
+@property(nonatomic) UIUserInterfaceStyle style;
+@end
+@implementation CSListCornerPageAppearance @end
+static char PageAppearanceKey;
+static char PageCanvasViewsKey;
+void CSListCornerTrackPageCanvas(UITableView *table, UIView *view) {
+    if (!view || !table) return;
+    NSHashTable *views=objc_getAssociatedObject(table,&PageCanvasViewsKey);
+    if (!views) {
+        views=[NSHashTable weakObjectsHashTable];
+        objc_setAssociatedObject(table,&PageCanvasViewsKey,views,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    [views addObject:view];
+    view.backgroundColor=CSListCornerCanvasColorForStyle(table.traitCollection.userInterfaceStyle);
+}
+BOOL CSListCornerRefreshPageAppearance(id owner, CSListCornerPage page) {
+    CSListCornerSnapshot *configuration=CSListCornerConfiguration.sharedConfiguration.snapshot;
+    if (!configuration.enabled || page==CSListCornerPageSession) return NO;
+    UITableView *table=CSListCornerOwnedTable(owner,page);
+    if (!table || !CSListCornerBeginOperation(table)) return NO;
+    @try {
+        CSListCornerPrepareTable(owner,page,NO);
+        UIUserInterfaceStyle style=table.traitCollection.userInterfaceStyle;
+        CSListCornerPageAppearance *state=objc_getAssociatedObject(table,&PageAppearanceKey);
+        if (state && state.style==style && state.configuration==configuration) return NO;
+        if (!state) {
+            state=[CSListCornerPageAppearance new];
+            objc_setAssociatedObject(table,&PageAppearanceKey,state,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        }
+        state.style=style; state.configuration=configuration;
+        NSHashTable *canvasViews=objc_getAssociatedObject(table,&PageCanvasViewsKey);
+        for (UIView *view in canvasViews.allObjects) {
+            // UITableView can retain an offscreen footer without redelivering it.
+            // Keep our own cached paint current, but exclude a view moved to another table.
+            UITableView *currentTable=CSListCornerTableForView(view);
+            if (currentTable && currentTable!=table) continue;
+            UIColor *canvas=CSListCornerCanvasColorForStyle(style);
+            if (![view.backgroundColor isEqual:canvas]) view.backgroundColor=canvas;
+        }
+        for (UITableViewCell *cell in table.visibleCells) {
+            UIView *background=objc_getAssociatedObject(cell,&PreviousBackgroundKey);
+            UIView *content=cell.contentView;
+            // Only repair cards already delivered by the native table callbacks.
+            if (background.superview!=content || !CSListCornerBeginOperation(cell)) continue;
+            @try {
+                if (CSListRefreshCardBackground(background,background.frame,configuration.radius,[configuration backgroundForStyle:style]))
+                    CSListCornerPrepareCellPaint(cell,content,style);
+            } @finally { CSListCornerEndOperation(cell); }
+        }
+        return YES;
+    } @finally { CSListCornerEndOperation(table); }
 }
 @interface CSListCornerPageContext ()
 @property(nonatomic, strong) UITableViewCell *cell;
@@ -271,6 +328,8 @@ static void CSListCornerAlignSessionItems(UITableViewCell *cell, UIView *content
     if (!CSListCornerValidRect(bounds) || !CSListCornerValidRect(frame)) return nil;
     CSListCornerPageContext *context=[self new]; context.cell=cell; context.table=table; context.content=content;
     context.indexPath=path; context.configuration=configuration; context.cardFrame=frame; context.style=content.traitCollection.userInterfaceStyle; context.page=page;
+    if (page!=CSListCornerPageSession && table.traitCollection.userInterfaceStyle!=UIUserInterfaceStyleUnspecified)
+        context.style=table.traitCollection.userInterfaceStyle;
     return context;
 }
 - (BOOL)nativeFirst:(BOOL *)first last:(BOOL *)last {
@@ -289,7 +348,7 @@ static void CSListCornerAlignSessionItems(UITableViewCell *cell, UIView *content
             objc_setAssociatedObject(self.cell,&SessionStateKey,state,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         }
     }
-    CSListCornerPrepareCellPaint(self.cell,self.content);
+    CSListCornerPrepareCellPaint(self.cell,self.content,self.style);
     UIView *previous=objc_getAssociatedObject(self.cell,&PreviousBackgroundKey);
     if (previous && previous.superview!=self.content) [previous removeFromSuperview];
     UIView *background=CSListCornerOwnedBackground(self.content);
@@ -322,7 +381,7 @@ void CSListCornerRefreshSessionGeometry(UITableViewCell *cell) {
         }
         if (content.subviews.firstObject!=background) [content insertSubview:background atIndex:0];
         background.hidden=NO;
-        CSListCornerPrepareCellPaint(cell,content);
+        CSListCornerPrepareCellPaint(cell,content,content.traitCollection.userInterfaceStyle);
         CSListCornerAlignSessionItems(cell,content,background);
     } @finally { CSListCornerEndOperation(cell); }
 }

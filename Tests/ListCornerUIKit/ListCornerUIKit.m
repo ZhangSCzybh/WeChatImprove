@@ -35,7 +35,7 @@
 - (instancetype)init { if ((self=[super init])) { _contentView=[UIView new];[self addSubview:_contentView]; }return self; }
 @end
 @implementation UITableView
-- (NSArray *)visibleCells { return [self.subviews filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id view,NSDictionary *bindings){return [view isKindOfClass:UITableViewCell.class];}]]; }
+- (NSArray *)visibleCells { self.visibleCellReads++;return [self.subviews filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id view,NSDictionary *bindings){return [view isKindOfClass:UITableViewCell.class];}]]; }
 - (void)drawFooterLine:(BOOL)draw { self.footerLineVisible=draw; }
 - (void)query { self.queries++;if(self.onQuery)self.onQuery();if(self.throwsOnQuery)[NSException raise:@"query" format:@"height callback queried/refreshed table"]; }
 - (NSInteger)numberOfSections { [self query];return self.rows.count; }

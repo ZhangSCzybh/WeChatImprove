@@ -17,8 +17,7 @@ spans = [
     ('static UIViewController *CSQuickCreatePage(', '// Inspect only'),
     ('static NSArray<id> *CSQuickOwners(', '@interface CSQuickRouteRequest'),
     ('@interface CSQuickRouteRequest', 'static BOOL CSQuickOpenClass('),
-    ('static BOOL CSQuickOpenClass(', 'static void CSQuickAfterPrivacyAuthentication('),
-    ('static BOOL CSQuickOpenCreateNote(', 'static BOOL CSQuickOpenPlugin('),
+    ('static BOOL CSQuickOpenClass(', 'static id CSQuickCurrentService('),
     ('static id CSQuickCurrentService(', '@implementation CSQuickPanelActionRouter'),
 ]
 (output / 'QuickPanelRouterProduction.h').write_text('\n'.join(source[source.index(start):source.index(end)] for start, end in spans))

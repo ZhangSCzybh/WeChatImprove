@@ -54,7 +54,15 @@ void CSListCornerMoreDecorateHeader(UIView *view) {
         CGFloat cardWidth=view.bounds.size.width,buttonX=92;
         // Only the plugin background is masked; native status cards and touch targets remain intact.
         UIView *background=CSListCornerOwnedBackground(view);
-        UIColor *nativeColor=objc_getAssociatedObject(view,&HeaderNativeColorKey);
+        UIUserInterfaceStyle style=table.traitCollection.userInterfaceStyle;
+        NSMutableDictionary *nativeColors=objc_getAssociatedObject(view,&HeaderNativeColorKey);
+        if (!nativeColors) {
+            nativeColors=[NSMutableDictionary dictionary];
+            objc_setAssociatedObject(view,&HeaderNativeColorKey,nativeColors,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        }
+        // Native may repaint its backing asynchronously after the parent trait callback.
+        // Do not reuse a fixed color captured under the opposite appearance meanwhile.
+        UIColor *nativeColor=nativeColors[@(style)];
         if (view.backgroundColor && ![view.backgroundColor isEqual:[UIColor clearColor]]) {
             nativeColor=view.backgroundColor;
         }
@@ -71,9 +79,9 @@ void CSListCornerMoreDecorateHeader(UIView *view) {
             if (item.backgroundColor && ![item.backgroundColor isEqual:[UIColor clearColor]]) nativeColor=item.backgroundColor;
             item.backgroundColor=[UIColor clearColor];
         }
-        if (nativeColor) objc_setAssociatedObject(view,&HeaderNativeColorKey,nativeColor,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        if (nativeColor) nativeColors[@(style)]=nativeColor;
         view.backgroundColor=[UIColor clearColor];
-        CSListApplyCardBackground(background,view.bounds,configuration.radius,YES,YES,nativeColor ?: [UIColor clearColor]);
+        CSListApplyCardBackground(background,view.bounds,configuration.radius,YES,YES,nativeColor ?: [configuration backgroundForStyle:style]);
         for (UIView *item in view.subviews) {
             if (item==background) continue;
             CGRect frame=CSListCornerNativeFrame(item); NSString *name=NSStringFromClass(item.class);

@@ -6,9 +6,14 @@ FOUNDATION_EXPORT UITableView * _Nullable CSListCornerOwnedTable(id owner, CSLis
 FOUNDATION_EXPORT BOOL CSListCornerOwnsTable(id owner, UITableView *table, CSListCornerPage page);
 FOUNDATION_EXPORT id _Nullable CSListCornerOwnerForTable(UITableView *table, CSListCornerPage page);
 FOUNDATION_EXPORT UIColor *CSListCornerCanvasColor(void);
+FOUNDATION_EXPORT UIColor *CSListCornerCanvasColorForStyle(UIUserInterfaceStyle style);
 FOUNDATION_EXPORT UIColor *CSListCornerSessionTableColor(UITableView *table);
 FOUNDATION_EXPORT UIView * _Nullable CSListCornerNativeContent(UITableViewCell *cell);
 FOUNDATION_EXPORT void CSListCornerPrepareTable(id owner, CSListCornerPage page, BOOL initial);
+// Refresh existing non-session surfaces after native layout/theme propagation; no row queries.
+FOUNDATION_EXPORT BOOL CSListCornerRefreshPageAppearance(id owner, CSListCornerPage page);
+// Register only plugin-created noninteractive canvas views, including native-cached footers.
+FOUNDATION_EXPORT void CSListCornerTrackPageCanvas(UITableView *table, UIView *view);
 FOUNDATION_EXPORT void CSListCornerRepairCellSeparators(UITableViewCell *cell, UITableView *table);
 FOUNDATION_EXPORT void CSListCornerRepairCellSelection(UITableViewCell *cell, UITableView *table);
 FOUNDATION_EXPORT UIView * _Nullable CSListCornerViewIvar(id object, const char *name, UIView *container);

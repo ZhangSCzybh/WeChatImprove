@@ -8,6 +8,7 @@ typedef struct { CGFloat top,left,bottom,right; } UIEdgeInsets;
 enum { UIViewAnimationOptionBeginFromCurrentState=1, UIViewAnimationOptionAllowUserInteraction=2,
        UIViewAnimationOptionCurveEaseOut=4 };
 enum { UITableViewStyleInsetGrouped=2, UITableViewRowAnimationNone=5 };
+enum { UIViewAutoresizingFlexibleWidth=1, UIViewAutoresizingFlexibleHeight=2 };
 typedef NS_ENUM(NSUInteger, CSSettingItemType) { CSSettingItemTypeNormal, CSSettingItemTypeInput };
 
 // The production selection method reads the shared item's native data API.
@@ -78,17 +79,31 @@ typedef NS_ENUM(NSUInteger, CSSettingItemType) { CSSettingItemTypeNormal, CSSett
 @property(nonatomic) CGFloat alpha;
 @property(nonatomic) CGAffineTransform transform;
 @property(nonatomic) BOOL hidden;
+@property(nonatomic) BOOL userInteractionEnabled;
+@property(nonatomic) NSInteger tag,autoresizingMask;
+@property(nonatomic,strong) id backgroundColor;
+@property(nonatomic,strong) NSMutableArray<UIView *> *subviews;
 @property(nonatomic, strong) HomeFixtureLayer *layer;
 @property(nonatomic, weak) UIView *superview;
 @property(nonatomic) NSUInteger requestedLayouts,completedLayouts;
 - (void)setNeedsLayout;
 - (void)layoutIfNeeded;
+- (instancetype)initWithFrame:(CGRect)frame;
+- (UIView *)viewWithTag:(NSInteger)tag;
+- (void)addSubview:(UIView *)view;
+- (void)removeFromSuperview;
+- (void)endEditing:(BOOL)force;
 + (void)performWithoutAnimation:(void (^)(void))actions;
 + (void)animateWithDuration:(NSTimeInterval)duration delay:(NSTimeInterval)delay options:(NSUInteger)options
                 animations:(void (^)(void))actions completion:(void (^)(BOOL))completion;
 @end
 @implementation UIView
 - (instancetype)init { if ((self=[super init])) { _layer=[HomeFixtureLayer new]; _alpha=1; _transform=CGAffineTransformIdentity; } return self; }
+- (instancetype)initWithFrame:(CGRect)frame { if ((self=[self init])) self.frame=frame; return self; }
+- (UIView *)viewWithTag:(NSInteger)tag { for (UIView *view in self.subviews) if (view.tag==tag) return view; return nil; }
+- (void)addSubview:(UIView *)view { if (!self.subviews) self.subviews=[NSMutableArray new]; [self.subviews addObject:view]; view.superview=self; }
+- (void)removeFromSuperview { [self.superview.subviews removeObject:self]; self.superview=nil; }
+- (void)endEditing:(BOOL)force {}
 - (void)setFrame:(CGRect)frame { _frame=frame; _bounds=(CGRect){CGPointZero,frame.size}; }
 - (void)setNeedsLayout { self.requestedLayouts++; }
 - (void)layoutIfNeeded { self.completedLayouts++; }
@@ -157,12 +172,13 @@ typedef NS_ENUM(NSUInteger, CSSettingItemType) { CSSettingItemTypeNormal, CSSett
 @end
 @interface CSPluginHeaderView : UIView
 @property(nonatomic) CGFloat measuredHeight,horizontalInset;
+@property(nonatomic,copy) CGFloat (^heightForAvailableWidth)(CGFloat width);
 @property(nonatomic) NSUInteger themeReloads;
 - (CGFloat)preferredHeightForWidth:(CGFloat)width;
 - (void)reloadTheme;
 @end
 @implementation CSPluginHeaderView
-- (CGFloat)preferredHeightForWidth:(CGFloat)width { return self.measuredHeight; }
+- (CGFloat)preferredHeightForWidth:(CGFloat)width { return self.heightForAvailableWidth ? self.heightForAvailableWidth(MAX(1,width-2*self.horizontalInset-56)) : self.measuredHeight; }
 - (void)reloadTheme { self.themeReloads++; }
 @end
 @interface UIColor : NSObject
@@ -170,6 +186,7 @@ typedef NS_ENUM(NSUInteger, CSSettingItemType) { CSSettingItemTypeNormal, CSSett
 + (instancetype)systemOrangeColor; + (instancetype)systemTealColor; + (instancetype)systemIndigoColor;
 + (instancetype)systemRedColor; + (instancetype)systemPinkColor; + (instancetype)systemCyanColor;
 + (instancetype)systemPurpleColor; + (instancetype)systemBrownColor;
++ (instancetype)systemBackgroundColor;
 @end
 @implementation UIColor
 + (instancetype)systemBlueColor { return nil; } + (instancetype)systemYellowColor { return nil; }
@@ -178,6 +195,7 @@ typedef NS_ENUM(NSUInteger, CSSettingItemType) { CSSettingItemTypeNormal, CSSett
 + (instancetype)systemRedColor { return nil; } + (instancetype)systemPinkColor { return nil; }
 + (instancetype)systemCyanColor { return nil; } + (instancetype)systemPurpleColor { return nil; }
 + (instancetype)systemBrownColor { return nil; }
++ (instancetype)systemBackgroundColor { return nil; }
 @end
 @interface CSSettingItem (NativeFactory)
 + (instancetype)itemWithTitle:(NSString *)title iconName:(NSString *)name iconColor:(UIColor *)color detail:(NSString *)detail;
@@ -213,9 +231,44 @@ static NSUInteger CSBackupAccountEpoch(void) { return accountEpoch; }
 - (void)presentSettingsFrom:(id)controller { self.presentations++; }
 @end
 
-@interface CSCustomViewController : NSObject
+@interface UIViewController : NSObject
+@property(nonatomic,strong) UIView *view;
+@property(nonatomic,strong) UIViewController *presentedViewController;
+- (void)viewWillAppear:(BOOL)animated;
+- (void)viewDidAppear:(BOOL)animated;
+- (void)viewWillDisappear:(BOOL)animated;
+- (void)viewDidLayoutSubviews;
+- (void)dismissViewControllerAnimated:(BOOL)animated completion:(void (^)(void))completion;
+@end
+@implementation UIViewController
+- (void)viewWillAppear:(BOOL)animated {}
+- (void)viewDidAppear:(BOOL)animated {}
+- (void)viewWillDisappear:(BOOL)animated {}
+- (void)viewDidLayoutSubviews {}
+- (void)dismissViewControllerAnimated:(BOOL)animated completion:(void (^)(void))completion { if (completion) completion(); }
+@end
+@interface CSAuthorizationManager : NSObject
+@property(nonatomic) BOOL authorized;
+@property(nonatomic) NSUInteger requests;
+@property(nonatomic,copy) void (^completion)(BOOL success,NSString *message);
++ (instancetype)sharedManager;
+- (BOOL)isAuthorized;
+- (void)requestAuthorizationWithPresentingViewController:(UIViewController *)controller completion:(void (^)(BOOL success,NSString *message))completion;
+@end
+@implementation CSAuthorizationManager
++ (instancetype)sharedManager { static CSAuthorizationManager *manager; if (!manager) { manager=[self new]; manager.authorized=YES; } return manager; }
+- (BOOL)isAuthorized { return self.authorized; }
+- (void)requestAuthorizationWithPresentingViewController:(UIViewController *)controller completion:(void (^)(BOOL success,NSString *message))completion { self.requests++; self.completion=completion; }
+@end
+static BOOL pluginEntryHidden;
+static void (^privacyCompletion)(BOOL);
+static BOOL CSCloseFriendPluginEntryHidden(void) { return pluginEntryHidden; }
+static void CSCloseFriendAuthenticate(UIViewController *controller,void (^completion)(BOOL)) { privacyCompletion=[completion copy]; }
+static UIViewController *CSNativeSettingsHostForContent(UIViewController *controller) { return controller; }
+
+@interface CSCustomViewController : UIViewController
 @property(nonatomic,strong) HomeFixtureNavigationController *navigationController;
-@property(nonatomic,copy) NSString *otherSettingsReturnScope;
+@property(nonatomic,copy) NSArray *otherSettingsReturnScope,*homePreparedScope;
 @property(nonatomic) NSUInteger authorPresentations;
 @property(nonatomic,strong) UITableView *tableView;
 @property(nonatomic,strong) NSArray<CSSettingSection *> *sections;
@@ -229,6 +282,9 @@ static NSUInteger CSBackupAccountEpoch(void) { return accountEpoch; }
 @property(nonatomic) CGFloat laidOutProfileHeight;
 @property(nonatomic) BOOL updatingHomeLayout,closeFriendEntryVisible;
 @property(nonatomic) BOOL suppressHomeTransition;
+@property(nonatomic) BOOL isAuthorized,authorizationPromptInFlight,returningFromAuthorization,headerVerseVisitActive;
+@property(nonatomic) CGSize lastHomeViewportSize;
+@property(nonatomic) NSUInteger headerRefreshes,verseRefreshes,appearanceRefreshes,agreementChecks,unauthorizedReturns;
 @property(nonatomic,strong) CSSettingsHomeAnimator *homeAnimator;
 @property(nonatomic,strong) CSPluginHeaderView *headerView;
 - (void)setupData;
@@ -244,12 +300,25 @@ static NSUInteger CSBackupAccountEpoch(void) { return accountEpoch; }
 - (void)updateHomeSearch:(NSString *)query;
 - (void)closeHomeSearch;
 - (void)updateHeaderLayout;
-- (NSString *)currentOtherSettingsScope;
+- (NSArray *)currentOtherSettingsScope;
+- (NSArray *)currentHomePreparationScope;
+- (BOOL)returningFromOtherSettingsInCurrentScope;
+- (void)refreshVisibleHomeAppearance;
+- (void)refreshHeaderContent;
+- (void)refreshHeaderVerse;
+- (void)checkUserAgreement;
+- (void)returnFromUnauthorizedSettings;
+- (void)resetCloseFriendQuickEntry;
 - (void)supportAuthor;
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath;
 @end
 @implementation CSCustomViewController
-- (NSString *)currentOtherSettingsScope { return account; }
+- (void)refreshHeaderContent { self.headerRefreshes++; [self updateHeaderLayout]; }
+- (void)refreshHeaderVerse { self.verseRefreshes++; self.headerVerseVisitActive=YES; }
+- (void)refreshVisibleHomeAppearance { self.appearanceRefreshes++; }
+- (void)checkUserAgreement { self.agreementChecks++; }
+- (void)returnFromUnauthorizedSettings { self.unauthorizedReturns++; }
+- (void)resetCloseFriendQuickEntry {}
 - (void)supportAuthor { self.authorPresentations++; }
 #include "SettingsHomeControllerUnderTest.h"
 @end
@@ -257,6 +326,7 @@ static NSUInteger CSBackupAccountEpoch(void) { return accountEpoch; }
 static CSCustomViewController *Controller(void) {
     CSCustomViewController *controller=[CSCustomViewController new];
     controller.navigationController=[HomeFixtureNavigationController new];
+    controller.view=[UIView new]; controller.view.frame=CGRectMake(0,0,390,844);
     controller.tableView=[UITableView new];
     controller.tableView.frame=CGRectMake(0,0,390,844);
     controller.tableView.adjustedContentInset=(UIEdgeInsets){88,0,34,0};
@@ -412,6 +482,77 @@ static void TestSectionHeaderReflow(void) {
     [controller updateHeaderLayout];
     Check(Near(controller.headerView.horizontalInset,20) && mounted.completedLayouts==2,@"returning to the portrait inset reflows existing section headers at unchanged viewport size");
 }
+static void TestHomeAppearancePreparation(void) {
+    CSCustomViewController *controller=Controller();
+    controller.pendingHomeDistance=@0;
+    NSUInteger reloads=controller.tableView.reloads;
+    [controller viewWillAppear:YES];
+    Check(controller.tableView.reloads==reloads+1 && Near([controller currentHomeDistance],0),@"the real entry lifecycle prepares its data once at the intended natural top before appearance");
+    reloads=controller.tableView.reloads;
+    [controller viewDidAppear:YES];
+    Check(controller.tableView.reloads==reloads,@"appearance completion reuses the prepared scope without rebuilding the table a second time");
+    Check(Near([controller currentHomeDistance],0) && controller.tableView.userInteractionEnabled && controller.settingsTabBar.userInteractionEnabled,@"removing the duplicate reload preserves final geometry and the authorization interaction gates");
+
+    [controller selectHomeTab:1]; [controller setHomeDistance:350];
+    [controller viewWillDisappear:YES];
+    [controller viewWillAppear:YES];
+    [controller viewDidLayoutSubviews];
+    Check(Near([controller currentHomeDistance],350),@"return entry preserves a user's existing deep scroll distance while preparing data");
+    reloads=controller.tableView.reloads; [controller viewDidAppear:YES];
+    Check(controller.tableView.reloads==reloads && Near([controller currentHomeDistance],350),@"the preserved user scroll remains intact when that return appearance completes");
+
+    controller.otherSettingsReturnScope=[controller currentOtherSettingsScope];
+    [controller viewWillDisappear:YES];
+    reloads=controller.tableView.reloads;
+    [controller viewWillAppear:YES]; [controller viewDidAppear:YES];
+    Check(controller.tableView.reloads==reloads && controller.appearanceRefreshes==1 && !controller.otherSettingsReturnScope,@"returning from other settings in the same account retains the existing appearance-only refresh path");
+
+    [controller viewWillDisappear:YES]; [controller viewWillAppear:YES];
+    reloads=controller.tableView.reloads; accountEpoch++;
+    [controller viewDidAppear:YES];
+    Check(controller.tableView.reloads==reloads+1 && controller.homeModel.selectedIndex==0 && Near([controller currentHomeDistance],0),@"an account epoch change during entry still rebuilds once for the new scope and clears old scroll state");
+
+    pluginEntryHidden=YES;
+    [controller viewWillDisappear:YES]; [controller viewWillAppear:YES];
+    reloads=controller.tableView.reloads; [controller viewDidAppear:YES];
+    Check(controller.tableView.reloads==reloads && privacyCompletion!=nil,@"a privacy-gated entry waits for its authentication callback without repeating the prepared reload");
+    pluginEntryHidden=NO;
+    void (^completion)(BOOL)=[privacyCompletion copy]; privacyCompletion=nil;
+    completion(YES);
+    Check(controller.tableView.reloads==reloads+1 && [controller.view viewWithTag:871042]==nil,@"privacy authentication that recursively enters didAppear refreshes the newly unlocked scope and removes its cover");
+
+    CSAuthorizationManager *authorization=CSAuthorizationManager.sharedManager;
+    authorization.authorized=NO;
+    [controller viewWillDisappear:YES]; [controller viewWillAppear:YES];
+    reloads=controller.tableView.reloads; NSUInteger requests=authorization.requests;
+    [controller viewDidAppear:YES];
+    Check(controller.tableView.reloads==reloads && authorization.requests==requests+1 && !controller.tableView.userInteractionEnabled,@"the normal no-reload completion still presents authorization and disables settings until it succeeds");
+    authorization.completion(YES,@"ok");
+    Check(controller.tableView.userInteractionEnabled && controller.settingsTabBar.userInteractionEnabled && !controller.authorizationPromptInFlight,@"authorization completion still restores both interaction gates");
+    authorization.authorized=YES; authorization.completion=nil;
+}
+static void TestEntryVerseAndSafeAreaReflow(void) {
+    CSCustomViewController *controller=Controller();
+    __block CGFloat verseTextWidth=260;
+    controller.headerView.heightForAvailableWidth=^CGFloat(CGFloat available) {
+        return 216+(verseTextWidth>available ? 14 : 0);
+    };
+    controller.pendingHomeDistance=@0;
+    [controller viewWillAppear:YES];
+    Check(Near(controller.laidOutProfileHeight,216),@"the configurable header measurement receives the real available verse width before entry");
+    controller.tableView.safeAreaInsets=(UIEdgeInsets){0,43,0,0};
+    [controller viewDidLayoutSubviews];
+    Check(Near(controller.laidOutProfileHeight,230) && Near([controller currentHomeDistance],0),@"a same-viewport safe-area change can genuinely wrap the verse during entry while keeping the profile at its natural top");
+    verseTextWidth=180; // A fast refreshed verse fits before entry completes.
+    [controller updateHeaderLayout];
+    NSUInteger reloads=controller.tableView.reloads;
+    [controller viewDidAppear:YES];
+    Check(Near(controller.laidOutProfileHeight,216) && Near([controller currentHomeDistance],0) && controller.tableView.reloads==reloads,@"a fast verse response finishes entry without a second table rebuild or profile displacement");
+    [controller selectHomeTab:1]; [controller setHomeDistance:350];
+    verseTextWidth=260; // A slow response wraps after entry and user scrolling.
+    [controller updateHeaderLayout];
+    Check(Near(controller.laidOutProfileHeight,230) && Near([controller currentHomeDistance],364),@"a slower verse reply after entry still remeasures and preserves the user's existing list anchor");
+}
 static void TestQuickPanelIntegration(void) {
     CSCloseFriendManager.sharedManager.visible=NO;
     CSCustomViewController *controller=Controller();
@@ -485,7 +626,7 @@ static void TestQuickPanelIntegration(void) {
         }
     }
     Check(visited.count==routes.count+2,@"all existing registered entries and the new quick panel execute their actual selection branches");
-    Check([controller.otherSettingsReturnScope isEqual:account],@"the other-settings route still captures the current account scope");
+    Check([controller.otherSettingsReturnScope isEqual:[controller currentOtherSettingsScope]],@"the other-settings route still captures the current account scope");
     [controller selectHomeTab:2];
     NSArray<NSString *> *enhancementTitles=[controller.sections.firstObject.items valueForKey:@"title"];
     NSUInteger automationIndex=[enhancementTitles indexOfObject:@"自动功能"];
@@ -514,6 +655,6 @@ static void TestQuickPanelIntegration(void) {
     CSCloseFriendManager.sharedManager.visible=NO;
 }
 int main(void) { @autoreleasepool {
-    TestController(); TestSearchInPlace(); TestSectionHeaderReflow(); TestQuickPanelIntegration();
-    printf("SettingsHomeControllerTests: %lu checks, %lu failures (real setupData and selection/controller methods; quick-panel enhancement placement/search/route, all existing navigation destinations, selected/search state, inline palette search, current-policy visibility, account-reset races, per-Tab restoration, actual rail geometry, async header reflow and group transition delegation; UIKit/navigation/layout/animation are fixtures)\n",(unsigned long)checks,(unsigned long)failures);
+    TestController(); TestSearchInPlace(); TestSectionHeaderReflow(); TestHomeAppearancePreparation(); TestEntryVerseAndSafeAreaReflow(); TestQuickPanelIntegration();
+    printf("SettingsHomeControllerTests: %lu checks, %lu failures (real setupData, selection and lifecycle methods; quick-panel routes, no duplicate completion reload, preserved user scroll, privacy/account/authorization boundaries, width-dependent verse reflow, existing search/Tab restoration and rail geometry; UIKit/navigation/layout/animation are fixtures)\n",(unsigned long)checks,(unsigned long)failures);
 } return failures ? 1 : 0; }

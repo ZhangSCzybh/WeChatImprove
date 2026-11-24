@@ -38,6 +38,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
 @property (nonatomic, strong) CSSettingItem *hapticFeedbackItem;
 @property (nonatomic, strong) CSSettingItem *clickEffectItem;
 @property (nonatomic, strong) CSSettingItem *indicatorColorItem;
+@property (nonatomic, strong) CSSettingItem *selectedIconColorItem;
 @property (nonatomic, strong) CSSettingItem *borderAnimationItem;
 @property (nonatomic, strong) CSSettingItem *borderColorItem;
 
@@ -60,6 +61,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
 @property (nonatomic, strong) UIColor *bgColor;
 @property (nonatomic, strong) UIColor *borderColor;
 @property (nonatomic, strong) UIColor *indicatorColor;
+@property (nonatomic, strong) UIColor *selectedIconColor;
 @property (nonatomic, assign) CGFloat positionOffset;
 @property (nonatomic, assign) CGFloat scale;
 @property (nonatomic, assign) CGFloat contentHeight;
@@ -103,6 +105,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
     self.clickEffect=p.clickEffect;
     self.bgColor=p.backgroundColor; self.borderColor=p.borderColor;
     self.indicatorColor=p.indicatorColor;
+    self.selectedIconColor=p.selectedIconColor;
     self.chatText=[p titleAtIndex:0]; self.contactsText=[p titleAtIndex:1];
     self.discoverText=[p titleAtIndex:2]; self.meText=[p titleAtIndex:3];
 }
@@ -169,6 +172,24 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
 - (void)refreshIndicatorColorItem {
     [self updateIndicatorColorDetail];
     [self refreshVisibleItems:@[self.indicatorColorItem]];
+}
+
+- (void)saveSelectedIconColorSetting {
+    [self saveColor:self.selectedIconColor withRedKey:kTabBarSelectedIconColorRedKey
+          greenKey:kTabBarSelectedIconColorGreenKey blueKey:kTabBarSelectedIconColorBlueKey
+          alphaKey:kTabBarSelectedIconColorAlphaKey];
+    [self finishSavingSettings];
+}
+
+- (void)updateSelectedIconColorDetail {
+    CGFloat red=0,green=0,blue=0,alpha=0;
+    self.selectedIconColorItem.detail=self.selectedIconColor && [self.selectedIconColor getRed:&red green:&green blue:&blue alpha:&alpha] ?
+        [NSString stringWithFormat:@"R:%.0f G:%.0f B:%.0f A:%.0f",red*255,green*255,blue*255,alpha*100] : @"原生默认（随浅色/深色）";
+}
+
+- (void)refreshSelectedIconColorItem {
+    [self updateSelectedIconColorDetail];
+    [self refreshVisibleItems:@[self.selectedIconColorItem]];
 }
 
 - (void)refreshInputItem:(CSSettingItem *)item {
@@ -289,6 +310,29 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
     };
     
     [self updateIconItemsState];
+
+    self.selectedIconColorItem=[CSSettingItem itemWithTitle:@"选中图标颜色"
+        iconName:@"paintpalette.fill" iconColor:UIColor.systemGreenColor detail:nil];
+    [self updateSelectedIconColorDetail];
+    self.selectedIconColorItem.actionBlock=^{
+        UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"选中图标颜色"
+            message:@"仅修改原生图标的选中颜色。已上传的图标（含普通图标回退）保持图片原色；原生默认随微信浅色和深色外观变化。" preferredStyle:UIAlertControllerStyleActionSheet];
+        [alert addAction:[UIAlertAction actionWithTitle:@"自定义颜色" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action) {
+            [weakSelf showSelectedIconColorPicker];
+        }]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"恢复原生默认" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action) {
+            weakSelf.selectedIconColor=nil;
+            [weakSelf saveSelectedIconColorSetting];
+            [weakSelf refreshSelectedIconColorItem];
+        }]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];
+        if (alert.popoverPresentationController) {
+            alert.popoverPresentationController.sourceView=weakSelf.view;
+            alert.popoverPresentationController.sourceRect=CGRectMake(CGRectGetMidX(weakSelf.view.bounds),CGRectGetMidY(weakSelf.view.bounds),1,1);
+            alert.popoverPresentationController.permittedArrowDirections=0;
+        }
+        [weakSelf presentViewController:alert animated:YES completion:nil];
+    };
     
     // 创建文本自定义设置项
     self.chatTextItem = [CSSettingItem inputItemWithTitle:@"替换微信文本"
@@ -612,7 +656,8 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
                                                                 items:@[self.chatIconItem,
                                                                        self.contactsIconItem,
                                                                        self.discoverIconItem,
-                                                                       self.meIconItem]];
+                                                                       self.meIconItem,
+                                                                       self.selectedIconColorItem]];
     
     CSSettingSection *textSection = [CSSettingSection sectionWithHeader:@"文本自定义"
                                                                 items:@[self.chatTextItem,
@@ -957,11 +1002,19 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
     [self presentViewController:colorPicker animated:YES completion:nil];
 }
 
+- (void)showSelectedIconColorPicker {
+    UIColorPickerViewController *colorPicker=[UIColorPickerViewController new];
+    colorPicker.delegate=self;
+    colorPicker.selectedColor=self.selectedIconColor ?: UIColor.systemGreenColor;
+    colorPicker.view.tag=1003;
+    [self presentViewController:colorPicker animated:YES completion:nil];
+}
+
 #pragma mark - UIColorPickerViewControllerDelegate
 
 - (void)colorPickerViewControllerDidFinish:(UIColorPickerViewController *)viewController {
     // Selecting a color saves live. Merely opening/dismissing must preserve nil.
-    if (viewController.view.tag==1002) return;
+    if (viewController.view.tag==1002 || viewController.view.tag==1003) return;
     BOOL border=viewController.view.tag==1001;
     if (border) self.borderColor=viewController.selectedColor;
     else self.bgColor=viewController.selectedColor;
@@ -970,6 +1023,12 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
 }
 
 - (void)colorPickerViewControllerDidSelectColor:(UIColorPickerViewController *)viewController {
+    if (viewController.view.tag==1003) {
+        self.selectedIconColor=viewController.selectedColor;
+        [self saveSelectedIconColorSetting];
+        [self refreshSelectedIconColorItem];
+        return;
+    }
     if (viewController.view.tag==1002) {
         self.indicatorColor=viewController.selectedColor;
         [self saveIndicatorColorSetting];
@@ -1029,6 +1088,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
         [defaults setInteger:kDefaultBorderStyle forKey:kTabBarBorderStyleKey];
         for (NSString *key in @[kTabBarContentHeightKey,kTabBarBorderWidthKey,kTabBarHapticFeedbackKey,kTabBarClickEffectKey,kTabBarBorderAnimationKey,kTabBarBorderColorRedKey,kTabBarBorderColorGreenKey,kTabBarBorderColorBlueKey,kTabBarBorderColorAlphaKey]) [defaults removeObjectForKey:key];
         for (NSString *key in @[kTabBarIndicatorColorRedKey,kTabBarIndicatorColorGreenKey,kTabBarIndicatorColorBlueKey,kTabBarIndicatorColorAlphaKey]) [defaults removeObjectForKey:key];
+        for (NSString *key in @[kTabBarSelectedIconColorRedKey,kTabBarSelectedIconColorGreenKey,kTabBarSelectedIconColorBlueKey,kTabBarSelectedIconColorAlphaKey]) [defaults removeObjectForKey:key];
         
         [defaults removeObjectForKey:kTabBarBgColorRedKey];
         [defaults removeObjectForKey:kTabBarBgColorGreenKey];
@@ -1222,7 +1282,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
     if (section == 0) {
         return @"开启悬浮导航栏，配合隐藏文本使用更佳。";
     } else if (section == 1) {
-        return @"为每个Tab设置自定义图标，支持普通和选中两种状态";
+        return @"图标支持普通和选中两种状态；上传图片始终保留原色，选中图标颜色仅作用于原生图标。";
     } else if (section == 2) {
         return @"开启隐藏标签文本后，自定义文本不会显示。";
     }

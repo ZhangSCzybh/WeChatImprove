@@ -411,7 +411,7 @@ static UIView *CSMomentsCreateSharedCover(CSMomentsCardModel *model, UIViewContr
         _locationView.clipsToBounds = YES;
         _locationView.userInteractionEnabled = NO;
         [self.contentView addSubview:_locationView];
-        _locationIconView = [[UIImageView alloc] initWithImage:[UIImage systemImageNamed:@"location.fill"]];
+        _locationIconView = [[UIImageView alloc] initWithImage:[UIImage systemImageNamed:@"mappin.and.ellipse"]];
         _locationIconView.contentMode = UIViewContentModeScaleAspectFit;
         _locationIconView.tintColor = UIColor.systemGreenColor;
         [self.contentView addSubview:_locationIconView];

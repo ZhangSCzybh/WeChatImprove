@@ -277,6 +277,10 @@ static BOOL CSContacts(id value) {
             @[@"standard",@"com.wechat.enhance.tabbar_style.icon.selected.me",@"tabbar",@"string",@"global",@"file"],
             @[@"standard",@"com.wechat.enhance.tabbar_style.position_offset",@"tabbar",@"number",@"global",@""],
             @[@"standard",@"com.wechat.enhance.tabbar_style.scale",@"tabbar",@"number",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.tabbar_style.selected_icon_color.red",@"tabbar",@"number",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.tabbar_style.selected_icon_color.green",@"tabbar",@"number",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.tabbar_style.selected_icon_color.blue",@"tabbar",@"number",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.tabbar_style.selected_icon_color.alpha",@"tabbar",@"number",@"global",@""],
             @[@"standard",@"com.wechat.enhance.tabbar_style.text.chat",@"tabbar",@"string",@"global",@""],
             @[@"standard",@"com.wechat.enhance.tabbar_style.text.contacts",@"tabbar",@"string",@"global",@""],
             @[@"standard",@"com.wechat.enhance.tabbar_style.text.discover",@"tabbar",@"string",@"global",@""],
@@ -483,6 +487,7 @@ static BOOL CSContacts(id value) {
             if (valid && [key isEqual:@"com.wechat.enhance.home_theme.custom_rgb"]) valid=[value doubleValue]>=0 && [value doubleValue]<=0xffffff && floor([value doubleValue])==[value doubleValue];
             if (valid && [key isEqual:@"com.wechat.enhance.quick_panel.trigger_locations"]) valid=[value doubleValue]>=1 && [value doubleValue]<=3 && floor([value doubleValue])==[value doubleValue];
             if (valid && [key isEqual:@"com.wechat.enhance.quick_panel.background_opacity"]) valid=[value doubleValue]>=0 && [value doubleValue]<=1;
+            if (valid && [key hasPrefix:@"com.wechat.enhance.tabbar_style.selected_icon_color."]) valid=[value doubleValue]>=0 && [value doubleValue]<=1;
             if (valid && [registered[@"domain"] isEqual:@"legacy"] && [key isEqual:@"BackgroundRunCheckInterval"])
                 valid=[value doubleValue]>=10 && [value doubleValue]<=30 && floor([value doubleValue])==[value doubleValue];
         }
@@ -502,7 +507,7 @@ static BOOL CSContacts(id value) {
                 if (valid) for (id item in value) if (!CSNumber(item) || floor([item doubleValue])!=[item doubleValue]) { valid=NO; break; }
             } else if ([key isEqual:@"com.wechat.enhance.quick_panel.selected_actions"]) {
                 // This backup schema stays independent of the UIKit quick-panel implementation.
-                NSSet *known=[NSSet setWithArray:@[@"scan",@"wallet",@"moments",@"my_qrcode",@"favorites",@"plugin_home",@"profile",@"create_group",@"add_friend",@"emoji_store",@"panel_settings",@"payment_code",@"channels",@"file_transfer",@"chat_background",@"receive_code",@"my_moments",@"create_note",@"switch_account"]];
+                NSSet *known=[NSSet setWithArray:@[@"scan",@"wallet",@"moments",@"my_qrcode",@"favorites",@"plugin_home",@"profile",@"create_group",@"add_friend",@"emoji_store",@"panel_settings",@"payment_code",@"channels",@"file_transfer",@"chat_background",@"receive_code",@"my_moments",@"create_note",@"switch_account",@"dark_mode",@"global_search"]];
                 valid=[value isKindOfClass:NSArray.class] && [value count]<=known.count;
                 NSMutableSet *seen=[NSMutableSet new];
                 if (valid) for (id identifier in value) {

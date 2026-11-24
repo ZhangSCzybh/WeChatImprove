@@ -13,6 +13,8 @@ static CSBubbleStyleConfiguration *CSStyle;
 static NSCache *CSImages;
 static NSCache *CSBodyMetrics;
 static NSHashTable<UIView *> *CSCells;
+static NSHashTable<UIView *> *CSVoiceTransPreviews;
+static char CSVoiceTransPreviewKey;
 static atomic_bool CSReloadQueued;
 static UIColor *CSTextColors[4];
 static void CSLoadTextColors(void) {
@@ -46,6 +48,22 @@ static void CSLoadTextColors(void) {
 @property(nonatomic) BOOL appliedDark;
 @end
 @implementation CSBubbleBinding @end
+
+// The native V2 preview is a plain UIView, not a message image or BubbleInfo.
+// Protocols describe the public UIKit/CALayer accessors without inspecting layers.
+@protocol CSBubblePreviewBackground <NSObject>
+@property(nonatomic, strong) UIColor *backgroundColor;
+@end
+@protocol CSBubblePreviewLayer <NSObject>
+@property(nonatomic) CGFloat cornerRadius;
+@end
+@interface CSBubblePreviewBinding : NSObject
+@property(nonatomic, weak) UIView *background;
+@property(nonatomic, strong) UIColor *nativeColor, *generatedColor;
+@property(nonatomic) CGFloat nativeRadius, generatedRadius;
+@property(nonatomic) BOOL radiusOwned;
+@end
+@implementation CSBubblePreviewBinding @end
 
 @interface CSBubbleDecodedImages : NSObject
 @property(nonatomic,strong) UIImage *light, *dark;
@@ -253,10 +271,16 @@ static void CSDescribe(CSBubbleBinding *binding, id model) {
     binding.describedInnerType=innerType;binding.describedRefer=isRefer;
     binding.outgoing=sender!=0;binding.position=(NSUInteger)position;
     BOOL textModel=[className isEqual:@"TextMessageViewModel"];
+    // Native speech-to-text sending keeps a specialized text model after its
+    // recording overlay closes. Keep this list exact: other text subclasses
+    // include payment cards and do not share the ordinary text contract.
+    BOOL voiceTransText=[className isEqual:@"VoiceTransTextMessageViewModel"] ||
+        [className isEqual:@"VoiceTransTextMessageViewModelV2"];
     BOOL quotedText=textModel && type==49 &&
         ((CSUnsigned(wrap,@"m_uiAppMsgInnerType",&innerType) && innerType==57) ||
          (CSUnsigned(wrap,@"isReferMsgType",&isRefer) && isRefer));
-    BOOL ordinary=(textModel && (type==1 || quotedText)) || (type==34 && [className isEqual:@"VoiceMessageViewModel"]);
+    BOOL ordinary=((textModel || voiceTransText) && type==1) || quotedText ||
+        (type==34 && [className isEqual:@"VoiceMessageViewModel"]);
     // Both native call-record variants expose voice/video status and the same
     // background contract. Exact classes and a real background are required;
     // message type numbers alone also identify signaling/system content.
@@ -271,6 +295,71 @@ BOOL CSBubbleStyleIsDark(UIView *cell) {
     if (style==UIUserInterfaceStyleUnspecified) style=cell.window.traitCollection.userInterfaceStyle;
     if (style==UIUserInterfaceStyleUnspecified) style=UITraitCollection.currentTraitCollection.userInterfaceStyle;
     return style==UIUserInterfaceStyleDark;
+}
+static BOOL CSVoiceTransPreviewState(UIView *preview, unsigned long long *state, BOOL *expanding, BOOL *animating) {
+    unsigned long long circle=0,expand=0,animate=0;
+    if (![NSStringFromClass(object_getClass(preview)) isEqual:@"VoiceTransView_ContentV2"] ||
+        !CSUnsigned(preview,@"recordState",state) || !CSUnsigned(preview,@"isStillEntranceCircle",&circle) ||
+        !CSUnsigned(preview,@"entranceExpanding",&expand) || !CSUnsigned(preview,@"entranceAnimating",&animate)) return NO;
+    if (expanding) *expanding=expand!=0;
+    if (animating) *animating=animate!=0;
+    return (*state==1 || *state==2) && !circle;
+}
+static id<CSBubblePreviewLayer> CSPreviewLayer(UIView *background) {
+    id layer=CSMessageNativeObject(background,@"layer");
+    Method getter=class_getInstanceMethod(object_getClass(layer),@selector(cornerRadius));
+    Method setter=class_getInstanceMethod(object_getClass(layer),@selector(setCornerRadius:));
+    char result[16]={0},argument[16]={0};
+    if (!getter || !setter || method_getNumberOfArguments(getter)!=2 || method_getNumberOfArguments(setter)!=3) return nil;
+    method_getReturnType(getter,result,sizeof(result));method_getArgumentType(setter,2,argument,sizeof(argument));
+    return result[0]==@encode(CGFloat)[0] && argument[0]==@encode(CGFloat)[0] ? layer : nil;
+}
+static void CSPreviewRestore(CSBubblePreviewBinding *binding) {
+    UIView<CSBubblePreviewBackground> *view=(id)binding.background;
+    if (binding.generatedColor && view.backgroundColor==binding.generatedColor) view.backgroundColor=binding.nativeColor;
+    id<CSBubblePreviewLayer> layer=CSPreviewLayer(view);
+    if (binding.radiusOwned && layer && layer.cornerRadius==binding.generatedRadius) layer.cornerRadius=binding.nativeRadius;
+    binding.generatedColor=nil;binding.radiusOwned=NO;
+}
+void CSBubbleStyleVoiceTransPreviewApply(UIView *preview) {
+    if (!NSThread.isMainThread || ![preview isKindOfClass:UIView.class] ||
+        ![NSStringFromClass(object_getClass(preview)) isEqual:@"VoiceTransView_ContentV2"]) return;
+    CSBubbleStyleStart();[CSVoiceTransPreviews addObject:preview];
+    CSBubblePreviewBinding *binding=objc_getAssociatedObject(preview,&CSVoiceTransPreviewKey);
+    if (!CSStyle.enabled) { if (binding) CSPreviewRestore(binding);return; }
+    unsigned long long state=ULLONG_MAX;BOOL expanding=NO,animating=NO;
+    BOOL normal=CSVoiceTransPreviewState(preview,&state,&expanding,&animating);
+    // prepareForSendCollapse resets state to zero without recoloring the bubble.
+    // Keep the already styled view through its native collapse animation.
+    if (!normal) { if (state!=0 && binding) CSPreviewRestore(binding);return; }
+    UIView<CSBubblePreviewBackground> *background=CSMessageNativeObject(preview,@"contentView");
+    if (![background isKindOfClass:UIView.class]) { if (binding) CSPreviewRestore(binding);return; }
+    if (!binding || binding.background!=background) {
+        if (binding) CSPreviewRestore(binding);
+        binding=[CSBubblePreviewBinding new];binding.background=background;
+        objc_setAssociatedObject(preview,&CSVoiceTransPreviewKey,binding,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    UIColor *current=CSMessageNativeObject(background,@"backgroundColor");
+    if (!binding.generatedColor || current!=binding.generatedColor) binding.nativeColor=current;
+    CSBubbleRGBA components=[CSStyle colorForOutgoing:YES dark:CSBubbleStyleIsDark(preview)];
+    UIColor *color=[UIColor colorWithRed:components.red green:components.green blue:components.blue alpha:components.alpha];
+    if (![current isEqual:color]) background.backgroundColor=color;
+    binding.generatedColor=background.backgroundColor;
+    // Native expansion owns its interpolated radius until the entrance completes.
+    if (expanding || animating) return;
+    id<CSBubblePreviewLayer> layer=CSPreviewLayer(background);
+    if (!layer) return;
+    CGFloat radius=CSBubbleFittedRadius(CSStyle.radius,0,1,(CSBubbleInsets){0,0,0,0},background.frame.size);
+    if (radius<1) return;
+    if (!binding.radiusOwned || layer.cornerRadius!=binding.generatedRadius) binding.nativeRadius=layer.cornerRadius;
+    if (layer.cornerRadius!=radius) layer.cornerRadius=radius;
+    binding.generatedRadius=radius;binding.radiusOwned=YES;
+}
+UIColor *CSBubbleStyleVoiceTransPreviewTextColor(UIView *preview, UIColor *nativeColor) {
+    if (!NSThread.isMainThread) return nativeColor;
+    CSBubbleStyleStart();unsigned long long state=0;
+    if (!CSStyle.enabled || !CSVoiceTransPreviewState(preview,&state,NULL,NULL)) return nativeColor;
+    return CSTextColors[CSBubbleStyleIsDark(preview) ? 2 : 0] ?: nativeColor;
 }
 static BOOL CSModelTemplates(id model, BOOL dark, UIImage **normal, UIImage **pressed) {
     if (!NSThread.isMainThread) return NO;
@@ -502,6 +591,7 @@ static void CSReload(void) {
         CSStyle=next;CSLoadTextColors();
         if (backgroundChanged) [CSImages removeAllObjects];
         for (UIView *cell in CSCells.allObjects) CSBubbleStyleApply(cell);
+        for (UIView *preview in CSVoiceTransPreviews.allObjects) CSBubbleStyleVoiceTransPreviewApply(preview);
     });
 }
 static void CSSettingsNotification(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef info) {
@@ -515,6 +605,7 @@ void CSBubbleStyleStart(void) {
         CSImages=[NSCache new]; CSImages.countLimit=128; CSImages.totalCostLimit=8*1024*1024;
         CSBodyMetrics=[NSCache new]; CSBodyMetrics.countLimit=128; CSBodyMetrics.totalCostLimit=4*1024*1024;
         CSCells=[NSHashTable weakObjectsHashTable];
+        CSVoiceTransPreviews=[NSHashTable weakObjectsHashTable];
         [NSNotificationCenter.defaultCenter addObserverForName:NSUserDefaultsDidChangeNotification object:nil queue:nil usingBlock:^(__unused NSNotification *note) { CSReload(); }];
         [NSNotificationCenter.defaultCenter addObserverForName:UIApplicationDidReceiveMemoryWarningNotification object:nil queue:NSOperationQueue.mainQueue usingBlock:^(__unused NSNotification *note) { [CSImages removeAllObjects]; [CSBodyMetrics removeAllObjects]; }];
         CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(),NULL,CSSettingsNotification,CFSTR("com.wechat.enhance.bubble_style.settings_changed"),NULL,CFNotificationSuspensionBehaviorDeliverImmediately);

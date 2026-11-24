@@ -1,0 +1,8 @@
+Command: bash Tests/verify-group-initial-viewport.sh
+Working directory: /Users/zhangshichao/Documents/Workspace/WeChatImprove
+Started UTC: 2026-11-24T03:31:00.786320+00:00
+
+Group initial viewport: 96 checks, 0 failures
+
+Exit code: 0
+Elapsed seconds: 1.565

@@ -1,0 +1,2 @@
+$ xcrun --sdk iphoneos clang -target arm64e-apple-ios15.0 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.2.sdk -fobjc-arc -fblocks -fsyntax-only -Wall -Wextra -Werror -IHeaders -IHooks -IControllers Controllers/CSReleaseNotesViewController.m
+exit_code=0

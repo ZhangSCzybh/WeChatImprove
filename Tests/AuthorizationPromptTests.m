@@ -135,11 +135,16 @@ static UIViewController *CSNativeSettingsHostForContent(UIViewController *conten
 @property(nonatomic) BOOL authorizationPromptInFlight;
 @property(nonatomic) BOOL returningFromAuthorization;
 @property(nonatomic) NSUInteger agreementChecks;
+@property(nonatomic,strong) NSNumber *homeAppearanceDistance;
+@property(nonatomic,copy) NSArray *homePreparedScope,*otherSettingsReturnScope;
 - (void)setupData;
 - (void)reloadSettingsKeepingPosition;
 - (void)finishHeaderVerseVisitIfLeaving;
 - (void)checkUserAgreement;
 - (void)returnFromUnauthorizedSettings;
+- (void)updateHeaderLayout;
+- (void)refreshHeaderContent;
+- (NSArray *)currentHomePreparationScope;
 @end
 
 static BOOL CSCloseFriendPluginEntryHidden(void) { return NO; }
@@ -163,6 +168,9 @@ static void CSCloseFriendAuthenticate(UIViewController *controller, void (^compl
     return self;
 }
 - (void)setupData {}
+- (void)updateHeaderLayout {}
+- (void)refreshHeaderContent {}
+- (NSArray *)currentHomePreparationScope { return @[@"authorization-fixture"]; }
 // Scrolling is covered separately; keep this lifecycle fixture focused on the
 // observable reload and interaction gates used by the extracted production code.
 - (void)reloadSettingsKeepingPosition { [self.tableView reloadData]; }

@@ -113,6 +113,7 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
 @property(nonatomic, strong) UILabel *emptySearchLabel;
 @property(nonatomic, strong) NSMutableDictionary<NSNumber *,NSNumber *> *tabScrollDistances;
 @property(nonatomic, strong) NSNumber *pendingHomeDistance;
+@property(nonatomic, copy) NSArray *homePreparedScope;
 @property(nonatomic) CGFloat laidOutProfileHeight;
 @property(nonatomic) BOOL updatingHomeLayout;
 @property(nonatomic, strong) CSSettingsHomeAnimator *homeAnimator;
@@ -217,6 +218,7 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
     }
     [self refreshHeaderContent];
     [self refreshHeaderVerse];
+    self.homePreparedScope=[self currentHomePreparationScope];
     // Covers direct third-party plugin registration routes before any settings content appears.
     UIView *cover=[self.view viewWithTag:871042];
     if(CSCloseFriendPluginEntryHidden() && !cover) {
@@ -229,6 +231,7 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
 // All entry routes use the authorization manager's native alert.
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
+    [self updateHeaderLayout];
     if (self.returningFromAuthorization || self.authorizationPromptInFlight) return;
     if(CSCloseFriendPluginEntryHidden()) {
         CSCloseFriendAuthenticate(self,^(BOOL success){
@@ -239,9 +242,15 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
     }
     [[self.view viewWithTag:871042] removeFromSuperview];
 
-    if (![self returningFromOtherSettingsInCurrentScope]) {
+    // A normal entry already prepared this scope before its first frame. Only
+    // rebuild here if account/privacy readiness changed during that entry (or
+    // authentication re-entered this method without another viewWillAppear).
+    NSArray *scope=[self currentHomePreparationScope];
+    if (![self.homePreparedScope isEqual:scope]) {
         [self setupData];
         [self reloadSettingsKeepingPosition];
+        [self refreshHeaderContent];
+        self.homePreparedScope=scope;
     }
     self.otherSettingsReturnScope=nil;
     CSAuthorizationManager *authManager = [CSAuthorizationManager sharedManager];
@@ -553,40 +562,43 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
 - (void)updateHeaderLayout {
     if (!self.tableView || !self.headerView || self.updatingHomeLayout) return;
     self.updatingHomeLayout=YES;
-    CGFloat width=CGRectGetWidth(self.tableView.bounds);
-    if (width>0) {
-        CGFloat oldHeight=self.laidOutProfileHeight;
-        CGFloat distance=[self currentHomeDistance];
-        UIEdgeInsets margins=self.tableView.layoutMargins, safe=self.tableView.safeAreaInsets;
-        self.headerView.horizontalInset=MAX(20,MAX(MAX(margins.left,margins.right),MAX(safe.left,safe.right)+16));
-        CGFloat height=[self.headerView preferredHeightForWidth:width];
-        self.headerView.frame=CGRectMake(0,0,width,height);
-        CGRect containerFrame=CGRectMake(0,0,width,height+76);
-        if (!CGRectEqualToRect(self.headerContainer.frame,containerFrame)) {
-            [self.homeAnimator cancel];
-            self.headerContainer.frame=containerFrame;
-            self.tableView.tableHeaderView=self.headerContainer;
-            [self.tableView layoutIfNeeded];
-        }
-        self.laidOutProfileHeight=height;
-        if (oldHeight>0 && fabs(height-oldHeight)>0.5) {
-            for (NSNumber *key in self.tabScrollDistances.allKeys)
-                self.tabScrollDistances[key]=@(CSSettingsHomeAdjustedDistance(self.tabScrollDistances[key].doubleValue,oldHeight,height));
-            if (self.pendingHomeDistance)
-                self.pendingHomeDistance=@(CSSettingsHomeAdjustedDistance(self.pendingHomeDistance.doubleValue,oldHeight,height));
-            distance=CSSettingsHomeAdjustedDistance(distance,oldHeight,height);
+    [UIView performWithoutAnimation:^{
+        CGFloat width=CGRectGetWidth(self.tableView.bounds);
+        if (width>0) {
+            CGFloat oldHeight=self.laidOutProfileHeight;
+            CGFloat distance=[self currentHomeDistance];
+            UIEdgeInsets margins=self.tableView.layoutMargins, safe=self.tableView.safeAreaInsets;
+            self.headerView.horizontalInset=MAX(20,MAX(MAX(margins.left,margins.right),MAX(safe.left,safe.right)+16));
+            CGFloat height=[self.headerView preferredHeightForWidth:width];
+            self.headerView.frame=CGRectMake(0,0,width,height);
+            CGRect containerFrame=CGRectMake(0,0,width,height+76);
+            if (!CGRectEqualToRect(self.headerContainer.frame,containerFrame)) {
+                [self.homeAnimator cancel];
+                self.headerContainer.frame=containerFrame;
+                self.tableView.tableHeaderView=self.headerContainer;
+                [self.tableView layoutIfNeeded];
+            }
+            self.laidOutProfileHeight=height;
+            BOOL heightChanged=oldHeight>0 && fabs(height-oldHeight)>0.5;
+            if (heightChanged) {
+                for (NSNumber *key in self.tabScrollDistances.allKeys)
+                    self.tabScrollDistances[key]=@(CSSettingsHomeAdjustedDistance(self.tabScrollDistances[key].doubleValue,oldHeight,height));
+                if (self.pendingHomeDistance)
+                    self.pendingHomeDistance=@(CSSettingsHomeAdjustedDistance(self.pendingHomeDistance.doubleValue,oldHeight,height));
+                distance=CSSettingsHomeAdjustedDistance(distance,oldHeight,height);
+            }
+            [self.headerView setNeedsLayout];
+            [self.headerView layoutIfNeeded];
+            for (UIView *sectionHeader in self.homeSectionHeaders.allObjects) {
+                if (!sectionHeader.superview) continue;
+                [sectionHeader setNeedsLayout];
+                [sectionHeader layoutIfNeeded];
+            }
             [self updateHomeFooter];
-            [self setHomeDistance:distance];
+            if (heightChanged) [self setHomeDistance:distance];
+            [self positionSettingsTabBar];
         }
-        [self.headerView setNeedsLayout];
-        for (UIView *sectionHeader in self.homeSectionHeaders.allObjects) {
-            if (!sectionHeader.superview) continue;
-            [sectionHeader setNeedsLayout];
-            [sectionHeader layoutIfNeeded];
-        }
-        [self updateHomeFooter];
-        [self positionSettingsTabBar];
-    }
+    }];
     self.updatingHomeLayout=NO;
 }
 
@@ -1247,6 +1259,10 @@ static NSString * const kUserAgreementAcceptedKey = @"com.wechat.tweak.user.agre
 - (NSArray *)currentOtherSettingsScope {
     return @[[CSUserInfoHelper getUserWXID] ?: @"",@(CSBackupAccountEpoch()),
         @([CSCloseFriendManager.sharedManager settingsEntryVisible])];
+}
+- (NSArray *)currentHomePreparationScope {
+    return @[[self currentOtherSettingsScope],@(CSBackupIsReady()),
+        @(CSBackupAccountIsSuspended()),@(CSCloseFriendPluginEntryHidden())];
 }
 - (BOOL)returningFromOtherSettingsInCurrentScope {
     return self.headerVerseVisitActive && self.otherSettingsReturnScope &&
