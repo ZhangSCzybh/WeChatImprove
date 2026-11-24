@@ -80,10 +80,16 @@ int main(void) { @autoreleasepool {
                                          @"com.wechat.enhance.merge_messages.enabled":@YES,
                                          @"com.wechat.enhance.inputText.enabled":@YES,
                                          @"com.wechat.enhance.inputText.roundedCorners":@YES,
-                                         @"com.wechat.enhance.inputText.border.enabled":@YES}};
+                                         @"com.wechat.enhance.inputText.border.enabled":@YES,
+                                         @"com.wechat.enhance.inputText.gesture.enabled":@YES}};
     Check(Count(States(dedup, @{}, 11, YES))==3, @"independent children collapse to one homepage module");
     Check(Count(States(@{@"standard":@{@"com.wechat.enhance.voice_playback.progress_enabled":@YES}}, @{}, 11, YES))==1, @"voice progress is independently enabled without forwarding");
     Check(Count(States(@{@"standard":@{@"com.wechat.enhance.inputText.border.enabled":@YES}}, @{}, 11, YES))==1, @"input border independently enables its module");
+    Check(Count(States(@{@"standard":@{@"com.wechat.enhance.inputText.gesture.enabled":@YES}}, @{}, 11, YES))==1,
+          @"input gestures independently enable the existing input module without the placeholder switch");
+    Check(Count(States(@{@"standard":@{@"com.wechat.enhance.inputText.gesture.leftAction":@1,
+                                      @"com.wechat.enhance.inputText.gesture.rightAction":@5}}, @{}, 11, YES))==0,
+          @"remembered input gesture actions do not enable a disabled module");
     NSDictionary *payments=@{@"standard":@{@"com.wechat.enhance.redenvelop.autoReceive":@YES,
                                             @"kReceiveTransferAutoEnableKey":@YES},
                               @"legacy":@{@"BackgroundRunEnabled":@YES}};

@@ -1,0 +1,13 @@
+{
+  "prepared_at": "2026-11-24T14:20:12.741670+08:00",
+  "version": "2.9-6",
+  "checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "work": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2.9-6-final-krbcf3bu",
+  "output": "/Users/zhangshichao/Documents/Workspace/WeChatImprove/packages/2.9-6",
+  "preservation_baseline": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2.9-6-final-krbcf3bu/preserved-environment-preparation.json",
+  "preserved_file_count": 2670,
+  "session_source_sha256": "6f50aa164cd17d72b14decaafe1c9e4cac75efdc5ac3b2ed58d24bbcb8b3fd46",
+  "status": "prepared_only_no_build_started",
+  "device_feedback": "User confirmed beta03 works on the original device; final 2.9-6 is a diagnostic cleanup with local validation pending.",
+  "awaiting": "Root confirmation that runtime cleanup and tests have finalized; recapture a new explicit final baseline immediately before building."
+}

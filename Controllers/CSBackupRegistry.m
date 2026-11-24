@@ -169,6 +169,9 @@ static BOOL CSContacts(id value) {
             @[@"standard",@"com.wechat.enhance.inputText.cornerRadius",@"input",@"number",@"global",@""],
             @[@"standard",@"com.wechat.enhance.inputText.enabled",@"input",@"bool",@"global",@""],
             @[@"standard",@"com.wechat.enhance.inputText.fontSize",@"input",@"number",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.inputText.gesture.enabled",@"input",@"bool",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.inputText.gesture.leftAction",@"input",@"number",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.inputText.gesture.rightAction",@"input",@"number",@"global",@""],
             @[@"standard",@"com.wechat.enhance.inputText.roundedCorners",@"input",@"bool",@"global",@""],
             @[@"standard",@"com.wechat.enhance.left_swipe_other.action",@"message_actions",@"number",@"global",@""],
             @[@"standard",@"com.wechat.enhance.left_swipe_self.action",@"message_actions",@"number",@"global",@""],
@@ -487,6 +490,8 @@ static BOOL CSContacts(id value) {
             if (valid && [key isEqual:@"com.wechat.enhance.home_theme.custom_rgb"]) valid=[value doubleValue]>=0 && [value doubleValue]<=0xffffff && floor([value doubleValue])==[value doubleValue];
             if (valid && [key isEqual:@"com.wechat.enhance.quick_panel.trigger_locations"]) valid=[value doubleValue]>=1 && [value doubleValue]<=3 && floor([value doubleValue])==[value doubleValue];
             if (valid && [key isEqual:@"com.wechat.enhance.quick_panel.background_opacity"]) valid=[value doubleValue]>=0 && [value doubleValue]<=1;
+            if (valid && ([@[@"com.wechat.enhance.inputText.gesture.leftAction",@"com.wechat.enhance.inputText.gesture.rightAction"] containsObject:key]))
+                valid=[value doubleValue]>=0 && [value doubleValue]<=5 && floor([value doubleValue])==[value doubleValue];
             if (valid && [key hasPrefix:@"com.wechat.enhance.tabbar_style.selected_icon_color."]) valid=[value doubleValue]>=0 && [value doubleValue]<=1;
             if (valid && [registered[@"domain"] isEqual:@"legacy"] && [key isEqual:@"BackgroundRunCheckInterval"])
                 valid=[value doubleValue]>=10 && [value doubleValue]<=30 && floor([value doubleValue])==[value doubleValue];

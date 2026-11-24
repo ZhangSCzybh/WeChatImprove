@@ -1,0 +1,59 @@
+{
+  "version": "2.9-6",
+  "verified_at": "2026-11-24T14:29:01.156367+08:00",
+  "scope": "Focused release regression after removing temporary gesture diagnostics. User confirmed beta03 works on the original device; the final package is compiled and checked locally without a new device installation.",
+  "total_checks": 338,
+  "failures": 0,
+  "tests": [
+    {
+      "command": "bash Tests/verify-input-text-gesture-runtime.sh",
+      "checks": 74,
+      "failures": 0,
+      "exit_code": 0,
+      "evidence": "regression-input-text-gesture-runtime.log",
+      "scope": "Input binding, actual placeholder/gesture adapter collaboration, lifecycle, foreground recovery, explicit disappearance, editor identity, native arbitration scope, cancellation, release and single execution."
+    },
+    {
+      "command": "bash Tests/verify-input-text-gesture.sh",
+      "editing_and_preferences_checks": 91,
+      "direction_policy_checks": 34,
+      "failures": 0,
+      "exit_code": 0,
+      "evidence": "regression-input-text-gesture-editing-policy.log"
+    },
+    {
+      "command": "bash Tests/verify-avatar-input-style.sh",
+      "checks": 139,
+      "failures": 0,
+      "exit_code": 0,
+      "evidence": "regression-avatar-input-style.log",
+      "scope": "Existing avatar and input style behavior with isolated gesture bridge stubs, plus 20000 avatar updates and 30000 input callbacks. Actual style/gesture collaboration is covered in the 74-check runtime suite."
+    }
+  ],
+  "strict_ios_syntax": {
+    "evidence": "syntax-checks-final.json",
+    "source_files": 3,
+    "architectures": [
+      "arm64",
+      "arm64e"
+    ],
+    "checks": 6,
+    "diagnostics": 0
+  },
+  "production_manifest": "source-manifest.json",
+  "test_manifest": "test-manifest.json",
+  "functional_sources_identical_to_device_confirmed_beta03": {
+    "Hooks/InputTextHooks.xm": "f2a95831b01f44535f936d6fb1da36bf501c890c57d293053d78d2657b17b0c0",
+    "Hooks/InputTextGestureHooks.xm": "4ffe0edb6805f64ccb25194231944ea4cc64e48d2ae594579c209976a9be7572",
+    "Controllers/CSInputTextGestureEditing.h": "3b59982605a0649c2f2d373b2b36ef6212d6bd6c9ef365332505f5de82f2bff7",
+    "Controllers/CSInputTextGestureEditing.m": "08212e81858ee55a4d315ce2c31cd2ddf0ce9cc0da3d448c3733d36aae405bb3",
+    "Controllers/CSInputTextGesturePolicy.h": "086e207470dc74a17c7966c8389019df541fb95ce9e1fed99661093379632086",
+    "Controllers/CSInputTextGesturePreferences.h": "101817e099158f1b8cbc8d08443ce4d8931ac0d2e5d968e7fa26f49e797ac8ed",
+    "Controllers/CSInputTextGesturePreferences.m": "e92ff684047d8c1807141eb60968ec3afc7c97d16857dfa4b8f7b14d656608e0"
+  },
+  "runtime_source_sha256": "818c69772a6533636c8b566dfe82b017a7ede8074f6b1dd2ee39345e0c15f191",
+  "placeholder_source_sha256": "2946595d79f08ed5d488685fd8c802f700c2e713fd708a6b93cb219bd68a1a87",
+  "user_animation_source_sha256": "6f50aa164cd17d72b14decaafe1c9e4cac75efdc5ac3b2ed58d24bbcb8b3fd46",
+  "diagnostic_binary_removal": "build-validation.json",
+  "limits": "Host UIKit doubles and a minimal failure graph do not simulate actual UIKit gesture arbitration. The user device confirmation applies to beta03; 2.9-6 final received cleanup review, host regression, compilation and package verification."
+}

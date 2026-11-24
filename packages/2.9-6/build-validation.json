@@ -1,0 +1,184 @@
+{
+  "version": "2.9-6",
+  "verified_at": "2026-11-24T14:26:32.581357+08:00",
+  "source_checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove",
+  "build_root": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2.9-6-final-krbcf3bu",
+  "builds": [
+    {
+      "scheme": "rootful",
+      "package": "com.wechat.improve_2.9-6_iphoneos-arm.deb",
+      "metadata": {
+        "Package": "com.wechat.improve",
+        "Name": "WeChatImprove",
+        "Description": "微信增强插件，支持聊天分组、界面定制、消息增强、朋友圈卡片布局与配置备份。",
+        "Maintainer": "再也不会",
+        "Author": "再也不会",
+        "Section": "Tweaks",
+        "Depends": "mobilesubstrate (>= 0.9.5000)",
+        "Architecture": "iphoneos-arm",
+        "Version": "2.9-6",
+        "Installed-Size": "10100"
+      },
+      "package_sha256": "5edfd24f81781db4cef0c595899562ce260f43481a70c4a334ce86dd9e7f43c6",
+      "install_path": "/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib",
+      "payload_paths": [
+        "Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib",
+        "Library/MobileSubstrate/DynamicLibraries/WeChatImprove.plist"
+      ],
+      "binary_architectures": [
+        "arm64",
+        "arm64e"
+      ],
+      "binary_sha256": "1e25493c389979d9b727d6294885d1e3c8090f5e0d369a07199698e4062f365a",
+      "embedded_version_present": true,
+      "slices": {
+        "arm64": {
+          "platform": "iOS",
+          "minimum_ios": "15.0",
+          "uuid": "A3B19D22-9E68-315C-8916-BA3C5F60840E"
+        },
+        "arm64e": {
+          "platform": "iOS",
+          "minimum_ios": "15.0",
+          "uuid": "80573884-1B6F-39C9-93F7-4DF082114A14"
+        }
+      },
+      "dsym": [
+        {
+          "architecture": "arm64",
+          "uuid": "A3B19D22-9E68-315C-8916-BA3C5F60840E",
+          "matches_binary": true,
+          "source_bundle": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2.9-6-final-krbcf3bu/rootful/obj/arm64/WeChatImprove.dylib.dSYM"
+        },
+        {
+          "architecture": "arm64e",
+          "uuid": "80573884-1B6F-39C9-93F7-4DF082114A14",
+          "matches_binary": true,
+          "source_bundle": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2.9-6-final-krbcf3bu/rootful/obj/arm64e/WeChatImprove.dylib.dSYM"
+        }
+      ],
+      "injection_plist_matches_source": true,
+      "removed_input_gesture_diagnostics": {
+        "removed_module_symbol_and_field_names": [
+          "CSInputTextGestureDiagnosticSummary",
+          "showInputGestureDiagnosticAlert",
+          "CSInputGestureRecordBinding",
+          "CSInputGestureObservedChats",
+          "CSInputGestureCreatedBindings",
+          "CSInputGestureInputCallbacks",
+          "CSInputGestureLastBindingComponents",
+          "CSInputGestureLastBindingStatus",
+          "CSInputGestureLastComponents",
+          "CSInputGestureLastResult",
+          "CSInputGestureLastTouchAt"
+        ],
+        "removed_diagnostic_only_strings": [
+          "暂无检测结果",
+          "请先返回聊天输入框滑动，再打开此处查看最近一次检测结果。\n\n%@",
+          "当前存活聊天页：%lu\n当前绑定输入框：%lu\n累计观察聊天页：%lu"
+        ],
+        "historical_release_note_text_permitted": true,
+        "packaged_binary_tokens_absent": true,
+        "packaged_binary_strings_absent": true,
+        "compiled_dsym_tokens_absent": {
+          "arm64": true,
+          "arm64e": true
+        }
+      },
+      "extraction_directory": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2.9-6-final-krbcf3bu/verify/rootful"
+    },
+    {
+      "scheme": "rootless",
+      "package": "com.wechat.improve_2.9-6_iphoneos-arm64.deb",
+      "metadata": {
+        "Package": "com.wechat.improve",
+        "Name": "WeChatImprove",
+        "Description": "微信增强插件，支持聊天分组、界面定制、消息增强、朋友圈卡片布局与配置备份。",
+        "Maintainer": "再也不会",
+        "Author": "再也不会",
+        "Section": "Tweaks",
+        "Depends": "mobilesubstrate (>= 0.9.5000)",
+        "Architecture": "iphoneos-arm64",
+        "Version": "2.9-6",
+        "Installed-Size": "10100"
+      },
+      "package_sha256": "8b18fc95f002679a1c8180de1194a322bdf5d89b292050e842212299dbc02d5a",
+      "install_path": "/var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib",
+      "payload_paths": [
+        "var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib",
+        "var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.plist"
+      ],
+      "binary_architectures": [
+        "arm64",
+        "arm64e"
+      ],
+      "binary_sha256": "92f5b0f3f580cecf1ef24ed39a0668e8a57eb354569513de6bbc42c7e4151f73",
+      "embedded_version_present": true,
+      "slices": {
+        "arm64": {
+          "platform": "iOS",
+          "minimum_ios": "15.0",
+          "uuid": "537E6F32-B28E-350E-B613-ABB1385EECC8"
+        },
+        "arm64e": {
+          "platform": "iOS",
+          "minimum_ios": "15.0",
+          "uuid": "58A35249-78D8-3ABD-8FC1-0D0F85C18C88"
+        }
+      },
+      "dsym": [
+        {
+          "architecture": "arm64",
+          "uuid": "537E6F32-B28E-350E-B613-ABB1385EECC8",
+          "matches_binary": true,
+          "source_bundle": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2.9-6-final-krbcf3bu/rootless/obj/arm64/WeChatImprove.dylib.dSYM"
+        },
+        {
+          "architecture": "arm64e",
+          "uuid": "58A35249-78D8-3ABD-8FC1-0D0F85C18C88",
+          "matches_binary": true,
+          "source_bundle": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2.9-6-final-krbcf3bu/rootless/obj/arm64e/WeChatImprove.dylib.dSYM"
+        }
+      ],
+      "injection_plist_matches_source": true,
+      "removed_input_gesture_diagnostics": {
+        "removed_module_symbol_and_field_names": [
+          "CSInputTextGestureDiagnosticSummary",
+          "showInputGestureDiagnosticAlert",
+          "CSInputGestureRecordBinding",
+          "CSInputGestureObservedChats",
+          "CSInputGestureCreatedBindings",
+          "CSInputGestureInputCallbacks",
+          "CSInputGestureLastBindingComponents",
+          "CSInputGestureLastBindingStatus",
+          "CSInputGestureLastComponents",
+          "CSInputGestureLastResult",
+          "CSInputGestureLastTouchAt"
+        ],
+        "removed_diagnostic_only_strings": [
+          "暂无检测结果",
+          "请先返回聊天输入框滑动，再打开此处查看最近一次检测结果。\n\n%@",
+          "当前存活聊天页：%lu\n当前绑定输入框：%lu\n累计观察聊天页：%lu"
+        ],
+        "historical_release_note_text_permitted": true,
+        "packaged_binary_tokens_absent": true,
+        "packaged_binary_strings_absent": true,
+        "compiled_dsym_tokens_absent": {
+          "arm64": true,
+          "arm64e": true
+        }
+      },
+      "extraction_directory": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2.9-6-final-krbcf3bu/verify/rootless"
+    }
+  ],
+  "dylib_matches_rootful": true,
+  "symbols_bundle_count": 4,
+  "source_manifest_matches_after_build": true,
+  "preserved_environment_files": 2670,
+  "preservation_baseline": "/private/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2.9-6-final-krbcf3bu/preserved-environment-build-final.json",
+  "preserved_environment_since_selected_baseline_unchanged": true,
+  "allowed_external_concurrent_changes": false,
+  "initial_environment_difference_report": null,
+  "environment_differences_before_build": "/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2.9-6-final-krbcf3bu/environment-differences-before-build.json",
+  "device_validation": "User confirmed beta03 works on the original device. This 2.9-6 final package receives local regression, compilation and payload checks; no new device installation is performed by this build."
+}

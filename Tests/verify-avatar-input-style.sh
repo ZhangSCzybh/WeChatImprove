@@ -20,7 +20,7 @@ for name,parent in [('BaseMsgContentViewController','UIViewController'),('MMGrow
           '[super setPlaceholder:text animated:animated];','[super setAttributedPlaceholder:text animated:animated];']
         for r in replacements: body=body.replace('%orig;',r,1)
     else:
-        for r in ['[super layoutSubviews];','[super updateToolViewHeight:animated];','[super onWillAppear];','[super onViewDidInit];']:body=body.replace('%orig;',r,1)
+        for r in ['[super layoutSubviews];','[super didMoveToWindow];','[super updateToolViewHeight:animated];','[super onWillAppear];','[super onViewDidInit];']:body=body.replace('%orig;',r,1)
     assert '%' not in body
     result.append('@interface '+name+' : '+parent+' @end\n@implementation '+name+'\n'+body+'\n@end\n')
 s=(root/'Hooks/CSAvatarShape.xm').read_text()

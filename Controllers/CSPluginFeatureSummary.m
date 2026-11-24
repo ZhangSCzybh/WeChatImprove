@@ -141,7 +141,7 @@ static NSDictionary *AccountSnapshot(id source, BOOL stored, NSUInteger epoch) {
         @[@"tabbar", @"standard", @[@"com.wechat.enhance.tabbar_style.enabled"]],
         @[@"quick_panel", @"standard", @[@"com.wechat.enhance.quick_panel.enabled"]],
         @[@"attachments", @"standard", @[@"com.wechat.tweak.chat.attachment.layout.enabled"]],
-        @[@"input", @"standard", @[@"com.wechat.enhance.inputText.enabled", @"com.wechat.enhance.inputText.roundedCorners", @"com.wechat.enhance.inputText.border.enabled"]],
+        @[@"input", @"standard", @[@"com.wechat.enhance.inputText.enabled", @"com.wechat.enhance.inputText.roundedCorners", @"com.wechat.enhance.inputText.border.enabled", @"com.wechat.enhance.inputText.gesture.enabled"]],
         @[@"groups", @"standard", @[@"com.wechat.enhance.chat_group.enabled"]],
         @[@"message_time", @"standard", @[@"com.wechat.enhance.messageTime.enabled"]],
         @[@"background_blur", @"legacy", @[@"com.wechat.tweak.background.blur.enabled"]],

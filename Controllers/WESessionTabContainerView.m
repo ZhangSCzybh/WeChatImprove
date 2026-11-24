@@ -12,7 +12,7 @@ static CGFloat const kActionButtonWidth = 44.0;
 static NSTimeInterval const kIndicatorDuration = 0.20;
 static NSString *const kIndicatorAnimationKey = @"CSGroupIndicator.selection";
 static NSTimeInterval const kCapsulePressDuration = 0.12;
-static NSTimeInterval const kCapsuleSettleDuration = 0.46;
+static NSTimeInterval const kCapsuleSettleDuration = 0.22;
 
 static CGRect CSGroupCapsuleFrame(CGRect title, CGRect bounds) {
     if (CGRectIsEmpty(title) || CGRectIsEmpty(bounds)) return CGRectZero;
@@ -599,7 +599,7 @@ static UIImage *CSGroupSearchIcon(void) {
     [self updateIndicatorPositionAnimated:animate];
     self.settlingInteractiveTransition=NO;
     if (animate && self.indicatorStyle == CSGroupIndicatorStyleCapsule) {
-        [UIView animateWithDuration:kCapsuleSettleDuration delay:0 usingSpringWithDamping:.62 initialSpringVelocity:.82
+        [UIView animateWithDuration:kCapsuleSettleDuration delay:0 usingSpringWithDamping:1 initialSpringVelocity:0
             options:UIViewAnimationOptionAllowUserInteraction | UIViewAnimationOptionBeginFromCurrentState
             animations:^{ [self scrollToSelectedTab]; } completion:nil];
     } else if (animate) {
@@ -698,7 +698,7 @@ static UIImage *CSGroupSearchIcon(void) {
             [UIView animateWithDuration:kCapsulePressDuration delay:0 options:options | UIViewAnimationOptionCurveEaseOut
                 animations:changes completion:nil];
         } else {
-            [UIView animateWithDuration:kCapsuleSettleDuration delay:0 usingSpringWithDamping:.62 initialSpringVelocity:.82
+            [UIView animateWithDuration:kCapsuleSettleDuration delay:0 usingSpringWithDamping:1 initialSpringVelocity:0
                 options:options animations:changes completion:nil];
         }
     } else {

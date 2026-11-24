@@ -1,6 +1,7 @@
 #import "../Controllers/CSBackupBootstrap.h"
 #import <UIKit/UIKit.h>
 #import "CSInputTextStyle.h"
+#import "CSInputTextGesture.h"
 
 @interface BaseMsgContentViewController : UIViewController @end
 @interface MMGrowTextView : UIView @end
@@ -10,14 +11,14 @@
 
 // Scope styles to the owning chat instead of a process-wide "in chat" flag.
 %hook BaseMsgContentViewController
-- (void)viewWillAppear:(BOOL)animated { %orig; CSInputTextStyleChatVisibility(self, YES); }
-- (void)viewWillDisappear:(BOOL)animated { CSInputTextStyleChatVisibility(self, NO); %orig; }
+- (void)viewWillAppear:(BOOL)animated { %orig; CSInputTextStyleChatVisibility(self, YES); CSInputTextGestureChatVisibility(self, YES); }
+- (void)viewWillDisappear:(BOOL)animated { CSInputTextGestureChatVisibility(self, NO); CSInputTextStyleChatVisibility(self, NO); %orig; }
 %end
 
 %hook MMGrowTextView
-- (void)layoutSubviews { %orig; CSInputTextStyleApply(self); }
-- (void)didMoveToWindow { %orig; CSInputTextStyleApply(self); }
-- (void)didMoveToSuperview { %orig; CSInputTextStyleApply(self); }
+- (void)layoutSubviews { %orig; CSInputTextStyleApply(self); CSInputTextGestureApplyGrow(self); }
+- (void)didMoveToWindow { %orig; CSInputTextStyleApply(self); CSInputTextGestureApplyGrow(self); }
+- (void)didMoveToSuperview { %orig; CSInputTextStyleApply(self); CSInputTextGestureApplyGrow(self); }
 - (void)traitCollectionDidChange:(UITraitCollection *)previous { %orig; CSInputTextStyleApply(self); }
 
 // Keep the latest native placeholder for disable/leave-chat restoration. A depth
@@ -49,10 +50,11 @@
 %end
 
 %hook MMInputToolView
-- (void)layoutSubviews { %orig; CSInputTextStyleApply(self.textView); }
-- (void)updateToolViewHeight:(BOOL)animated { %orig; CSInputTextStyleApply(self.textView); }
-- (void)onWillAppear { %orig; CSInputTextStyleApply(self.textView); }
-- (void)onViewDidInit { %orig; CSInputTextStyleApply(self.textView); }
+- (void)layoutSubviews { %orig; CSInputTextStyleApply(self.textView); CSInputTextGestureApplyTool(self); }
+- (void)didMoveToWindow { %orig; CSInputTextGestureApplyTool(self); }
+- (void)updateToolViewHeight:(BOOL)animated { %orig; CSInputTextStyleApply(self.textView); CSInputTextGestureApplyTool(self); }
+- (void)onWillAppear { %orig; CSInputTextStyleApply(self.textView); CSInputTextGestureApplyTool(self); }
+- (void)onViewDidInit { %orig; CSInputTextStyleApply(self.textView); CSInputTextGestureApplyTool(self); }
 %end
 
 %ctor {

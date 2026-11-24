@@ -34,11 +34,16 @@ int main(void){@autoreleasepool{
     for(NSString *key in voiceKeys)[standard setBool:YES forKey:key];
     NSString *momentsLayoutKey=@"com.wechat.enhance.moments_layout.enabled";
     [standard setBool:YES forKey:momentsLayoutKey];
+    NSDictionary *inputGestureValues=@{@"com.wechat.enhance.inputText.gesture.enabled":@YES,
+                                      @"com.wechat.enhance.inputText.gesture.leftAction":@1,
+                                      @"com.wechat.enhance.inputText.gesture.rightAction":@5};
+    for(NSString *key in inputGestureValues)[standard setObject:inputGestureValues[key] forKey:key];
     NSError *error=nil;NSSet *all=[NSSet setWithArray:CSBackupRegistry.moduleTitles.allKeys],*alice=[NSSet setWithObject:@"alice"],*tabbar=[NSSet setWithObject:@"tabbar"];
     Check(![engine save:@"strict" error:&error]&&error!=nil,@"ordinary backups still reject missing images");
     error=nil;NSDictionary *reset=[engine resetSnapshot:&error];Check(reset!=nil&&error==nil,@"missing tabbar, navigation and contact images do not block reset entry");
     for(NSString *key in voiceKeys)Check([Field(reset[@"fields"],key)[@"present"] isEqual:@NO],@"reset snapshot removes each registered playback/forward preference");
     Check([Field(reset[@"fields"],momentsLayoutKey)[@"present"] isEqual:@NO],@"reset snapshot removes registered moments layout preference");
+    for(NSString *key in inputGestureValues)Check([Field(reset[@"fields"],key)[@"present"] isEqual:@NO],@"reset snapshot includes all registered input gesture preferences");
     NSDictionary *preview=[engine preview:reset modules:tabbar accounts:alice error:&error];Check(preview!=nil,@"missing images do not block reset preview");
     Check([preview[@"warnings"] count]>0,@"preview discloses lost images");
     BOOL removal=NO;for(NSDictionary *change in preview[@"changes"])if([change[@"key"] isEqual:icon])removal=[change[@"before"][@"value"] isEqual:missing]&&[change[@"reset"] boolValue];
@@ -65,6 +70,7 @@ int main(void){@autoreleasepool{
     Check([standard objectForKey:icon]==nil&&[standard objectForKey:otherIcon]==nil,@"selected tabbar preferences cleared");
     for(NSString *key in voiceKeys)Check([standard boolForKey:key],@"unselected message-actions module retains playback and forward preferences");
     Check([standard boolForKey:momentsLayoutKey],@"unselected moments layout module retains the enabled preference");
+    for(NSString *key in inputGestureValues)Check([[standard objectForKey:key] isEqual:inputGestureValues[key]],@"partial reset preserves the unselected input gesture switch and directional actions");
     Check([[standard objectForKey:navImage] isEqual:missing]&&[[standard objectForKey:text] isEqual:@"keep"],@"unselected navigation preferences preserved including missing path");
     Check([engine applyPending:&error],@"completed partial reset is idempotent");
     reset=[engine resetSnapshot:&error];preview=[engine preview:reset modules:all accounts:alice error:&error];
@@ -72,6 +78,7 @@ int main(void){@autoreleasepool{
     Check([standard objectForKey:contacts]==nil&&[standard objectForKey:navImage]==nil,@"full reset removes selected missing image references");
     for(NSString *key in voiceKeys)Check([standard objectForKey:key]==nil,@"full reset removes playback progress and preserves forwarding reset semantics");
     Check([standard objectForKey:momentsLayoutKey]==nil,@"full reset removes moments layout preference and restores its disabled default");
+    for(NSString *key in inputGestureValues)Check([standard objectForKey:key]==nil,@"full reset removes input gesture preferences and restores disabled defaults");
     Check([[standard objectForKey:@"host.account"] isEqual:@"host-secret"]&&[standard integerForKey:@"kReceiveTransferTotalCountKey"]==99,@"host account and payment statistics preserved");
     Check([store records:NULL].count==0,@"prepare, reset, interrupted rollback and startup never create backup files");
     Check([engine save:@"after reset" error:&error]!=nil,@"complete backup works after full reset");

@@ -1,4 +1,5 @@
 #import "CSInputTextStyle.h"
+#import "CSInputTextGesturePreferences.h"
 #import "CSInputTextSettingsViewController.h"
 #import <UIKit/UIKit.h>
 
@@ -145,6 +146,31 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
     
     // 准备可能的section数组
     NSMutableArray *sectionsArray = [NSMutableArray arrayWithObject:basicSection];
+
+    // Input gestures are independent of placeholder and border appearance.
+    CSSettingItem *gestureEnabledItem = [CSSettingItem switchItemWithTitle:@"启用输入框滑动"
+                                                                iconName:@"hand.draw"
+                                                               iconColor:UIColor.systemTealColor
+                                                             switchValue:CSInputTextGesturePreferences.enabled
+                                                       valueChangedBlock:^(BOOL isOn) {
+        [CSInputTextGesturePreferences setEnabled:isOn];
+        [weakSelf setupData];
+        [weakSelf.tableView reloadData];
+    }];
+    NSMutableArray *gestureItems = [NSMutableArray arrayWithObject:gestureEnabledItem];
+    if (CSInputTextGesturePreferences.enabled) {
+        [gestureItems addObject:[CSSettingItem itemWithTitle:@"左滑输入框"
+                                                   iconName:@"arrow.left"
+                                                  iconColor:UIColor.systemPurpleColor
+                                                     detail:[CSInputTextGesturePreferences titleForAction:
+                                                             [CSInputTextGesturePreferences actionForKey:CSInputTextGestureLeftActionKey]]]];
+        [gestureItems addObject:[CSSettingItem itemWithTitle:@"右滑输入框"
+                                                   iconName:@"arrow.right"
+                                                  iconColor:UIColor.systemBlueColor
+                                                     detail:[CSInputTextGesturePreferences titleForAction:
+                                                             [CSInputTextGesturePreferences actionForKey:CSInputTextGestureRightActionKey]]]];
+    }
+    [sectionsArray addObject:[CSSettingSection sectionWithHeader:@"输入框滑动" items:gestureItems]];
     
     // 如果启用了圆角，添加圆角设置组
     if (isRoundedCornersEnabled) {
@@ -298,7 +324,8 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
     if ([sectionHeader isEqualToString:@"圆角设置"] || 
         [sectionHeader isEqualToString:@"边框设置"] ||
         [sectionHeader isEqualToString:@"内容设置"] || 
-        [sectionHeader isEqualToString:@"高级样式"]) {
+        [sectionHeader isEqualToString:@"高级样式"] ||
+        ([sectionHeader isEqualToString:@"输入框滑动"] && indexPath.row > 0)) {
         
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         
@@ -358,7 +385,9 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
     // 获取当前部分的头部标题
     NSString *sectionHeader = self.sections[section].header;
     
-    if ([sectionHeader isEqualToString:@"圆角设置"]) {
+    if ([sectionHeader isEqualToString:@"输入框滑动"]) {
+        return @"在当前聊天输入框内单指左滑或右滑执行操作。清空、复制、剪切针对全部输入内容；粘贴插入光标处或替换选区；发送等同点击微信发送按钮。输入法选词期间不触发，左右滑默认禁用。";
+    } else if ([sectionHeader isEqualToString:@"圆角设置"]) {
         return @"调整输入框圆角的大小，数值越大圆角越明显";
     } else if ([sectionHeader isEqualToString:@"边框设置"]) {
         return @"自定义输入框边框的宽度和颜色";
@@ -382,7 +411,9 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
     NSString *sectionHeader = self.sections[indexPath.section].header;
     
     // 根据部分标题判断
-    if ([sectionHeader isEqualToString:@"圆角设置"] && indexPath.row == 0) {
+    if ([sectionHeader isEqualToString:@"输入框滑动"] && indexPath.row > 0) {
+        [self showInputGestureActionPickerAtIndexPath:indexPath];
+    } else if ([sectionHeader isEqualToString:@"圆角设置"] && indexPath.row == 0) {
         [self showCornerRadiusInputAlert];
     } else if ([sectionHeader isEqualToString:@"边框设置"]) {
         if (indexPath.row == 0) { // 边框宽度
@@ -411,6 +442,33 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
 
 #pragma mark - 辅助方法
 
+- (void)showInputGestureActionPickerAtIndexPath:(NSIndexPath *)indexPath {
+    NSString *key = indexPath.row == 1 ? CSInputTextGestureLeftActionKey : CSInputTextGestureRightActionKey;
+    NSString *title = indexPath.row == 1 ? @"左滑输入框" : @"右滑输入框";
+    CSInputTextGestureAction current = [CSInputTextGesturePreferences actionForKey:key];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:title
+                                                                 message:@"请选择滑动后执行的操作"
+                                                          preferredStyle:UIAlertControllerStyleActionSheet];
+    __weak typeof(self) weakSelf = self;
+    for (NSInteger value = CSInputTextGestureActionDisabled; value <= CSInputTextGestureActionSend; value++) {
+        CSInputTextGestureAction action = (CSInputTextGestureAction)value;
+        NSString *actionTitle = [CSInputTextGesturePreferences titleForAction:action];
+        if (action == current) actionTitle = [actionTitle stringByAppendingString:@" ✓"];
+        [alert addAction:[UIAlertAction actionWithTitle:actionTitle style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *selected) {
+            [CSInputTextGesturePreferences setAction:action forKey:key];
+            [weakSelf setupData];
+            [weakSelf.tableView reloadData];
+        }]];
+    }
+    [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];
+    UIPopoverPresentationController *popover = alert.popoverPresentationController;
+    if (popover) {
+        popover.sourceView = self.tableView;
+        popover.sourceRect = [self.tableView rectForRowAtIndexPath:indexPath];
+    }
+    [self presentViewController:alert animated:YES completion:nil];
+}
+
 - (void)showInputTextAlert {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSString *currentText = [defaults objectForKey:kInputTextContentKey];
@@ -438,7 +496,7 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
             
             // 更新UI
             // 找到内容设置组的索引
-            for (NSInteger i = 0; i < self.sections.count; i++) {
+            for (NSUInteger i = 0; i < self.sections.count; i++) {
                 CSSettingSection *section = self.sections[i];
                 if ([section.header isEqualToString:@"内容设置"]) {
                     CSSettingItem *textContentItem = section.items[0];
@@ -486,7 +544,7 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
         
         // 更新UI
         // 找到高级样式组的索引
-        for (NSInteger i = 0; i < self.sections.count; i++) {
+        for (NSUInteger i = 0; i < self.sections.count; i++) {
             CSSettingSection *section = self.sections[i];
             if ([section.header isEqualToString:@"高级样式"]) {
                 CSSettingItem *fontSizeItem = section.items[0];
@@ -535,7 +593,7 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
         
         // 更新UI
         // 找到高级样式组的索引
-        for (NSInteger i = 0; i < self.sections.count; i++) {
+        for (NSUInteger i = 0; i < self.sections.count; i++) {
             CSSettingSection *section = self.sections[i];
             if ([section.header isEqualToString:@"高级样式"]) {
                 CSSettingItem *alphaItem = section.items[2];
@@ -593,7 +651,7 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
     CSInputTextStylePreferencesChanged();
     
     // 重新加载颜色指示器显示 - 根据section标题来刷新
-    for (NSInteger i = 0; i < self.sections.count; i++) {
+    for (NSUInteger i = 0; i < self.sections.count; i++) {
         if ([self.sections[i].header isEqualToString:@"高级样式"] && self.colorTagTextColor) {
             [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:i] withRowAnimation:UITableViewRowAnimationNone];
             break;
@@ -659,7 +717,7 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
         
         // 更新UI
         // 找到圆角设置组的索引
-        for (NSInteger i = 0; i < self.sections.count; i++) {
+        for (NSUInteger i = 0; i < self.sections.count; i++) {
             CSSettingSection *section = self.sections[i];
             if ([section.header isEqualToString:@"圆角设置"]) {
                 CSSettingItem *cornerRadiusItem = section.items[0];
@@ -707,7 +765,7 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
         
         // 更新UI
         // 找到边框设置组的索引
-        for (NSInteger i = 0; i < self.sections.count; i++) {
+        for (NSUInteger i = 0; i < self.sections.count; i++) {
             CSSettingSection *section = self.sections[i];
             if ([section.header isEqualToString:@"边框设置"]) {
                 CSSettingItem *borderWidthItem = section.items[0];
@@ -721,4 +779,4 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
     [self presentViewController:alert animated:YES completion:nil];
 }
 
-@end 
+@end

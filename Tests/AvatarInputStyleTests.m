@@ -74,6 +74,14 @@ static void Pump(void) { [NSRunLoop.mainRunLoop runUntilDate:[NSDate dateWithTim
 - (void)onWillAppear { self.nativeUpdates++; }
 - (void)onViewDidInit { self.nativeUpdates++; }
 @end
+
+// Isolate these style unit tests from the gesture runtime while retaining every
+// bridge call in the generated hooks. The input gesture runtime suite
+// covers real CSInputTextStyle + CSInputTextGesture behavior together.
+void CSInputTextGestureChatVisibility(UIViewController *controller, BOOL visible) {}
+void CSInputTextGestureApplyGrow(UIView *grow) {}
+void CSInputTextGestureApplyTool(UIView *tool) {}
+
 #import "StyleHooksUnderTest.h"
 
 static NSProcessInfoThermalState thermal=NSProcessInfoThermalStateNominal;

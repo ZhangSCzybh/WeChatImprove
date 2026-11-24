@@ -186,6 +186,21 @@ int main(void) { @autoreleasepool {
     CHECK(Valid([@"opaque UIColor archive" dataUsingEncoding:NSUTF8StringEncoding],Entry(@"com.wechat.enhance.inputText.color")));
     CHECK(!Valid(NSData.data,Entry(@"com.wechat.enhance.inputText.color")));
     CHECK(!Valid(@"not data",Entry(@"com.wechat.enhance.inputText.color")));
+    NSDictionary *inputGestureEnabled=Entry(@"com.wechat.enhance.inputText.gesture.enabled");
+    CHECK([inputGestureEnabled[@"module"] isEqual:@"input"] && [inputGestureEnabled[@"scope"] isEqual:@"global"] &&
+          [inputGestureEnabled[@"type"] isEqual:@"bool"] && [inputGestureEnabled[@"domain"] isEqual:@"standard"]);
+    CHECK(Valid(@YES,inputGestureEnabled) && Valid(@NO,inputGestureEnabled));
+    CHECK(!Valid(@2,inputGestureEnabled) && !Valid(@"YES",inputGestureEnabled) && !Valid(@0.5,inputGestureEnabled));
+    CHECK([CSBackupRegistry entryForDomain:@"legacy" key:inputGestureEnabled[@"key"]]==nil);
+    for (NSString *key in @[@"com.wechat.enhance.inputText.gesture.leftAction", @"com.wechat.enhance.inputText.gesture.rightAction"]) {
+        NSDictionary *entry=Entry(key);
+        CHECK([entry[@"module"] isEqual:@"input"] && [entry[@"scope"] isEqual:@"global"] &&
+              [entry[@"type"] isEqual:@"number"] && [entry[@"domain"] isEqual:@"standard"] && entry[@"resource"]==nil);
+        for (NSInteger action=0;action<=5;action++) CHECK(Valid(@(action),entry));
+        for (id invalid in @[@(-1),@6,@1.5,@"2",@(NAN),@(INFINITY),NSNull.null,@[],@{}]) CHECK(!Valid(invalid,entry));
+        CHECK([CSBackupRegistry entryForDomain:@"legacy" key:key]==nil);
+    }
+    CHECK(Entry(@"com.wechat.enhance.inputText.gesture.unknown")==nil);
     CHECK(!Valid(@5,Entry(@"WCTimeLineMessageTailText")));
     NSDictionary *profile=@{@"version":@1,@"customTabs":@[@{@"id":@"custom_1",@"name":@"Work",@"members":@[@"wxid_a"],@"created":[NSDate date],@"updated":[NSDate date]}],@"presetNames":@{@"preset_0":@"All"},@"tabOrder":@[@"preset_0",@"custom_1"],@"hiddenPresetTabs":@[],@"selectedTabID":@"preset_0",@"filterDuplicates":@YES,@"legacyImported":@NO};
     NSDictionary *profilesEntry=Entry(@"com.wechat.enhance.chat_group.account_profiles");
