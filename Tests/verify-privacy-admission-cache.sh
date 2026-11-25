@@ -16,7 +16,7 @@ def method(text,marker):
             depth-=1
             if not depth:return text[start:end+1]
     raise AssertionError(marker)
-markers=['- (void)performSessionListLayout:','- (void)invalidateNativeSnapshot']
+markers=['- (void)performSessionListLayout:','- (void)prepareForVisibility {','- (void)invalidateNativeSnapshot']
 bodies=[method(adapter,marker) for marker in markers]
 (output/'AdmissionProductionBody.h').write_text('\n\n'.join(bodies)+'\n')
 shield=(source/'Controllers/CSCloseFriendListShield.m').read_text()

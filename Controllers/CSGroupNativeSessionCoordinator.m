@@ -116,6 +116,12 @@ static BOOL CSNativeSelectionController(id controller) {
 @property(nonatomic,weak) id nativePresentationOwner;
 @property(nonatomic,copy) NSString *nativePresentationAccount;
 @property(nonatomic) NSUInteger nativePresentationEpoch;
+@property(nonatomic,copy,readwrite) NSString *pagePreviewTabID;
+@property(nonatomic,weak) id pagePreviewOwner, pagePreviewManager;
+@property(nonatomic,strong) CSNativeSessionBaseline *pagePreviewBaseline;
+@property(nonatomic,copy) NSString *pagePreviewAccount, *pagePreviewSourceTabID;
+@property(nonatomic,copy) NSArray *pagePreviewConfiguration;
+@property(nonatomic) NSUInteger pagePreviewEpoch, pagePreviewPrivacyRevision, pagePreviewRevision;
 @property(nonatomic,strong) CSGroupNativeModelResult *cachedModel;
 @property(nonatomic,strong) CSNativeSessionBaseline *cachedModelBaseline;
 @property(nonatomic,copy) NSArray *cachedModelKey;
@@ -129,6 +135,9 @@ static BOOL CSNativeSelectionController(id controller) {
 - (void)applyBaselineCandidate;
 - (void)performPublication:(void (^)(void))publication;
 - (void)queuePublicationRecovery;
+- (void)clearPagePreview;
+- (BOOL)pagePreviewContextMatchesPolicy:(CSCloseFriendSnapshot *)policy;
+- (NSString *)effectiveSelectedTabIDForPolicy:(CSCloseFriendSnapshot *)policy grouping:(BOOL)grouping;
 @end
 
 @implementation CSGroupNativeSessionCoordinator
@@ -149,12 +158,13 @@ static BOOL CSNativeSelectionController(id controller) {
     if (!NSThread.isMainThread) return;
     Class cls=NSClassFromString(@"NewMainFrameViewController");
     if (!controller || (cls && [controller isKindOfClass:cls])) {
-        if (_mainController!=controller) self.nativePresentation=NO;
+        if (_mainController!=controller) { [self clearPagePreview];self.nativePresentation=NO; }
         _mainController=controller;
     }
 }
 - (void)setNativePresentation:(BOOL)value {
     if (!NSThread.isMainThread) return;
+    if (value) [self clearPagePreview];
     _nativePresentation=value && self.mainController!=nil;
     self.nativePresentationOwner=_nativePresentation ? self.mainController : nil;
     self.nativePresentationAccount=_nativePresentation ? CSGroupCurrentAccountID() : nil;
@@ -164,6 +174,103 @@ static BOOL CSNativeSelectionController(id controller) {
     return _nativePresentation && self.nativePresentationOwner==self.mainController &&
         self.nativePresentationEpoch==CSCloseFriendAccountEpoch() &&
         [self.nativePresentationAccount isEqual:CSGroupCurrentAccountID()];
+}
+- (void)clearPagePreview {
+    self.pagePreviewTabID=nil;self.pagePreviewOwner=nil;self.pagePreviewManager=nil;
+    self.pagePreviewBaseline=nil;self.pagePreviewAccount=nil;self.pagePreviewSourceTabID=nil;
+    self.pagePreviewConfiguration=nil;
+}
+- (BOOL)pagePreviewContextMatchesPolicy:(CSCloseFriendSnapshot *)policy {
+    NSString *selected=self.preferences.selectedTabID;
+    return self.pagePreviewTabID.length && self.pagePreviewOwner && self.pagePreviewOwner==self.mainController &&
+        self.pagePreviewManager==self.manager && self.pagePreviewBaseline==self.baseline &&
+        self.pagePreviewRevision==self.revision && !self.dirty && !self.compatibilityFallback &&
+        !self.restoringCompatibilityFallback && !self.nativePresentation &&
+        self.pagePreviewEpoch==CSCloseFriendAccountEpoch() && !CSBackupAccountIsSuspended() &&
+        [self.pagePreviewAccount isEqual:CSGroupCurrentAccountID()] &&
+        [self.pagePreviewAccount isEqual:self.preferences.accountID] &&
+        !policy.blocked && [policy.options[@"hideSessions"] isKindOfClass:NSNumber.class] &&
+        [policy.accountID isEqual:self.pagePreviewAccount] && policy.revision==self.pagePreviewPrivacyRevision &&
+        ([selected isEqual:self.pagePreviewSourceTabID] || [selected isEqual:self.pagePreviewTabID]) &&
+        [self.pagePreviewConfiguration isEqual:[self modelKeyForPolicy:policy grouping:YES]];
+}
+- (NSString *)effectiveSelectedTabIDForPolicy:(CSCloseFriendSnapshot *)policy grouping:(BOOL)grouping {
+    if (self.pagePreviewTabID.length) {
+        if (grouping && [self pagePreviewContextMatchesPolicy:policy]) return self.pagePreviewTabID;
+        [self clearPagePreview];
+    }
+    return self.preferences.selectedTabID;
+}
+- (BOOL)pagePreviewTokenIsValidForOwner:(id)owner {
+    if (!NSThread.isMainThread || !owner || self.pagePreviewOwner!=owner || owner!=self.mainController ||
+        self.depth || self.publicationDepth || self.refreshing || self.completeSourceDepth || self.restoringCompleteSource ||
+        self.boundary || self.dirty || self.compatibilityFallback || self.restoringCompatibilityFallback ||
+        _nativePresentation || !CSNativeGroupEnabled() || CSBackupAccountIsSuspended() ||
+        !self.pagePreviewTabID.length || !self.model.isValid || ![self.model.selectedTabID isEqual:self.pagePreviewTabID]) return NO;
+    CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
+    NSString *selected=self.preferences.selectedTabID;
+    // The normal source/privacy hooks revoke this token. Re-reading every
+    // session's identity on each pan event would make finger motion O(source).
+    return self.pagePreviewManager && self.pagePreviewManager==self.manager && self.pagePreviewBaseline==self.baseline &&
+        self.pagePreviewRevision==self.revision && self.pagePreviewEpoch==self.epoch &&
+        self.epoch==CSCloseFriendAccountEpoch() && self.pagePreviewPrivacyRevision==self.privacyRevision &&
+        [self.pagePreviewAccount isEqual:self.accountID] && [self.pagePreviewAccount isEqual:self.preferences.accountID] &&
+        !policy.blocked && [policy.options[@"hideSessions"] isKindOfClass:NSNumber.class] &&
+        [policy.accountID isEqual:self.pagePreviewAccount] && policy.revision==self.pagePreviewPrivacyRevision &&
+        ([selected isEqual:self.pagePreviewSourceTabID] || [selected isEqual:self.pagePreviewTabID]) &&
+        [self.pagePreviewConfiguration isEqual:[self modelKeyForPolicy:policy grouping:YES]];
+}
+- (BOOL)pagePreviewIsValidForOwner:(id)owner {
+    if (!NSThread.isMainThread || !owner || self.pagePreviewOwner!=owner || self.depth || self.publicationDepth ||
+        self.refreshing || self.completeSourceDepth || self.restoringCompleteSource || self.boundary ||
+        !self.model.isValid || ![self.model.selectedTabID isEqual:self.pagePreviewTabID] ||
+        !CSNativeGroupEnabled() || ![self permitsSelectedGroup]) return NO;
+    CSNativeSessionBaseline *baseline=self.pagePreviewBaseline;
+    CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
+    if (![self pagePreviewContextMatchesPolicy:policy] || CSNativeService(@"MainSessionMgr")!=self.pagePreviewManager ||
+        ![self completeSourcePolicy:policy matchesBaseline:baseline surface:CSCloseFriendSurfaceSession]) return NO;
+    // Native identity getters may synchronously mutate source or relock policy.
+    id registeredManager=CSNativeService(@"MainSessionMgr");
+    BOOL permits=[self permitsSelectedGroup];
+    CSCloseFriendSnapshot *after=CSCloseFriendCurrentSnapshot();
+    return permits && CSNativeGroupEnabled() && registeredManager==self.pagePreviewManager &&
+        !self.boundary && self.model.isValid && [self.model.selectedTabID isEqual:self.pagePreviewTabID] &&
+        self.pagePreviewOwner==owner && [self pagePreviewContextMatchesPolicy:after];
+}
+- (BOOL)beginPagePreviewForTabID:(NSString *)tabID owner:(id)owner {
+    if (!NSThread.isMainThread || !owner || owner!=self.mainController || ![tabID isKindOfClass:NSString.class] ||
+        !tabID.length || self.pagePreviewTabID.length || self.depth || self.publicationDepth || self.refreshing ||
+        self.completeSourceDepth || self.restoringCompleteSource || self.compatibilityFallback ||
+        self.restoringCompatibilityFallback || self.boundary || self.dirty || !self.model.isValid ||
+        !CSNativeGroupEnabled() || ![self permitsSelectedGroup]) return NO;
+    [self.preferences reload];
+    NSString *source=self.preferences.selectedTabID;
+    CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
+    CSNativeSessionBaseline *baseline=self.baseline;
+    NSArray *configuration=[self modelKeyForPolicy:policy grouping:YES];
+    BOOL targetExists=NO;
+    for (WESessionTabItem *tab in self.preferences.tabs) if ([tab.tabId isEqual:tabID]) { targetExists=YES;break; }
+    if (!targetExists || !source.length || [source isEqual:tabID] || ![self.model.selectedTabID isEqual:source] ||
+        self.cachedModelBaseline!=baseline || ![configuration isEqual:self.cachedModelKey] ||
+        self.epoch!=baseline.epoch || ![self.accountID isEqual:baseline.accountID] || self.privacyRevision!=policy.revision ||
+        CSNativeService(@"MainSessionMgr")!=self.manager || !CSNativeManagerSupported(self.manager) ||
+        ![self completeSourcePolicy:policy matchesBaseline:baseline surface:CSCloseFriendSurfaceSession]) return NO;
+    self.pagePreviewTabID=tabID;self.pagePreviewOwner=owner;self.pagePreviewManager=self.manager;
+    self.pagePreviewBaseline=baseline;self.pagePreviewAccount=baseline.accountID;self.pagePreviewEpoch=baseline.epoch;
+    self.pagePreviewSourceTabID=source;self.pagePreviewPrivacyRevision=policy.revision;
+    self.pagePreviewRevision=self.revision;self.pagePreviewConfiguration=configuration;
+    [self refreshFromPreferences];
+    if ([self pagePreviewIsValidForOwner:owner]) return YES;
+    // A failed setter/identity read may already have invalidated the token.
+    // Still restore committed selection before returning the failed preview.
+    [self clearPagePreview];[self refreshFromPreferences];
+    return NO;
+}
+- (void)endPagePreviewForOwner:(id)owner {
+    if (!NSThread.isMainThread || !owner ||
+        (self.pagePreviewOwner ? self.pagePreviewOwner!=owner : owner!=self.mainController)) return;
+    [self clearPagePreview];
+    [self refreshFromPreferences];
 }
 - (BOOL)permitsSelectedGroup {
     if (self.nativePresentation || !self.mainController) return NO;
@@ -236,6 +343,7 @@ static BOOL CSNativeSelectionController(id controller) {
 - (void)useCompatibilityFallback {
     if (!NSThread.isMainThread) { dispatch_async(dispatch_get_main_queue(), ^{ [self useCompatibilityFallback]; });return; }
     if (self.compatibilityFallback || self.restoringCompatibilityFallback) return;
+    [self clearPagePreview];
     NSString *account=CSGroupCurrentAccountID();NSUInteger epoch=CSCloseFriendAccountEpoch();
     CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
     if (![self compatibilityPolicy:policy account:account epoch:epoch]) {
@@ -534,11 +642,12 @@ static BOOL CSNativeSelectionController(id controller) {
         self.preferences=[[CSGroupPreferences alloc] initWithDefaults:NSUserDefaults.standardUserDefaults accountID:account];
     else [self.preferences reload];
     BOOL grouping=CSNativeGroupEnabled() && [self permitsSelectedGroup];
+    NSString *selectedTabID=[self effectiveSelectedTabIDForPolicy:policy grouping:grouping];
     NSSet *hidden=[policy concealsSurface:CSCloseFriendSurfaceSession] ? policy.protectedUserNames : [NSSet set];
     NSArray *key=[self modelKeyForPolicy:policy grouping:grouping];
     BOOL sameConfiguration=self.cachedModel.isValid && [key isEqual:self.cachedModelKey];
     CSGroupNativeModelResult *model=nil;
-    BOOL selectionChanged=grouping && ![self.cachedModel.selectedTabID isEqual:self.preferences.selectedTabID];
+    BOOL selectionChanged=grouping && ![self.cachedModel.selectedTabID isEqual:selectedTabID];
     NSArray *folded=nil;BOOL copiedFolded=NO;
     if (sameConfiguration && self.cachedModelBaseline==baseline && !selectionChanged) model=self.cachedModel;
     else if (sameConfiguration) {
@@ -555,7 +664,7 @@ static BOOL CSNativeSelectionController(id controller) {
             if (candidate) candidate=[CSGroupNativeModel modelByUpdatingResult:candidate changedUserNames:self.pendingNativeNames
                 rowProvider:^CSGroupRow *(id session,NSIndexPath *path,BOOL top) { return CSGroupRowForNativeSession(session,path,top); }];
         }
-        if (candidate) model=[CSGroupNativeModel modelBySelectingTabID:self.preferences.selectedTabID fromResult:candidate foldedRows:folded];
+        if (candidate) model=[CSGroupNativeModel modelBySelectingTabID:selectedTabID fromResult:candidate foldedRows:folded];
         // The delta API has verified unchanged identities, membership and native
         // partitions. A source event's speculative Structure hint is resolved.
         if (model && self.cachedModelBaseline!=baseline) self.pendingNativeKind&=~CSGroupChangeStructure;
@@ -565,7 +674,7 @@ static BOOL CSNativeSelectionController(id controller) {
         if (!copiedFolded) folded=CSGroupCopyFoldedRowsSelectingSummary(^CSGroupRow *(NSArray *rows) { (void)rows;return nil; });
         model=[CSGroupNativeModel buildWithTopSessions:baseline.top normalSessions:baseline.normal
             allTopSessions:baseline.allTop allSessions:baseline.statisticsSessions tabs:self.preferences.tabs
-            selectedTabID:self.preferences.selectedTabID groupingEnabled:grouping filterDuplicates:self.preferences.filterDuplicates
+            selectedTabID:selectedTabID groupingEnabled:grouping filterDuplicates:self.preferences.filterDuplicates
             accountID:account hiddenUserNames:hidden privacyRevision:policy.revision scopeFoldedEntry:grouping foldedRows:folded
             rowProvider:^CSGroupRow *(id session,NSIndexPath *path,BOOL top) { return CSGroupRowForNativeSession(session,path,top); }];
     }
@@ -626,6 +735,7 @@ static BOOL CSNativeSelectionController(id controller) {
         self.applied=NO;self.baseline=nil;
         [self useCompatibilityFallback];return;
     }
+    [self clearPagePreview];
     if (self.depth || self.publicationDepth) {
         // A source read may synchronously trigger a real native change. Its
         // result cannot then be accepted as a stable complete-source read.
@@ -675,6 +785,7 @@ static BOOL CSNativeSelectionController(id controller) {
         return;
     }
     if (!CSNativeRegisteredManager(manager)) { original();return; }
+    [self clearPagePreview];
     if (!self.pendingNativeChanges || !self.changeScopeDepth) [self recordChangeNames:nil kind:CSGroupChangeUnknown];
     if (self.depth || self.publicationDepth) {
         if (self.completeSourceDepth || self.publicationDepth) {
@@ -729,6 +840,7 @@ static BOOL CSNativeSelectionController(id controller) {
             self.completeSourcePrivacyRevision==after.revision;
     }
     if (self.depth || self.refreshing) return NO;
+    [self clearPagePreview];
     id registeredManager=CSNativeService(@"MainSessionMgr");
     if (self.compatibilityFallback || (!CSNativeManagerSupported(registeredManager) && !CSNativeManagerSupported(self.manager) &&
         !self.baseline && !self.applied)) {
@@ -863,6 +975,7 @@ static BOOL CSNativeSelectionController(id controller) {
 - (void)invalidateNativeData {
     if ([self recordCompatibilityNativeChange]) return;
     if (NSThread.isMainThread) {
+        [self clearPagePreview];
         if (!self.changeScopeDepth) [self recordChangeNames:nil kind:CSGroupChangeUnknown];
         self.dirty=YES;
         if (self.publicationDepth) self.publicationMutationRevision++;
@@ -881,6 +994,7 @@ static BOOL CSNativeSelectionController(id controller) {
     if (!policy.blocked && [policy.options[@"hideSessions"] isKindOfClass:NSNumber.class] &&
         policy.revision==self.privacyRevision && [policy.accountID isEqual:self.accountID] && self.epoch==CSCloseFriendAccountEpoch()) return;
     if (!self.depth && !self.publicationDepth) { self.publicationRecoveryPending=NO;self.publicationRecoveryAttempts=0; }
+    [self clearPagePreview];
     self.revision++;self.sourceChanged=YES;
     if (self.publicationDepth) {
         self.dirty=YES;self.publicationMutationRevision++;
@@ -904,6 +1018,7 @@ static BOOL CSNativeSelectionController(id controller) {
         }
     }
     [self closeNativePublication];
+    [self clearPagePreview];
     self.publicationRecoveryPending=NO;self.publicationRecoveryAttempts=0;
     self.baseline=nil;self.preferences=nil;self.accountID=nil;self.epoch=CSCloseFriendAccountEpoch();
     self.cachedModel=nil;self.cachedModelBaseline=nil;self.cachedModelKey=nil;

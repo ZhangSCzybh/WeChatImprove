@@ -58,7 +58,7 @@ typedef NSInteger UITableViewScrollPosition;
 @property(nonatomic,strong) CSGroupPreferences *preferences;
 @property(nonatomic,strong) NSMutableSet *prefetchedPaths;
 @property(nonatomic,strong) NSMutableDictionary *nativeRows,*displayRows;
-@property(nonatomic) BOOL active,publishing,dirty,swipeActive,pendingScrollToTop,nativePresentation,snapshotRetryAttempted;
+@property(nonatomic) BOOL active,publishing,dirty,swipeActive,pendingScrollToTop,nativePresentation,snapshotRetryAttempted,usesNativeSessionModel;
 @property(nonatomic) NSUInteger refreshRequests,fallbacks,snapshotRetryGeneration;
 @property(nonatomic,copy) NSString *publishedTabID;
 - (BOOL)isActive;
@@ -70,6 +70,9 @@ typedef NSInteger UITableViewScrollPosition;
 - (void)requestRefresh;
 - (void)requestRecovery;
 - (void)scheduleRefresh;
+- (void)beginUserDragging;
+- (void)beginUserScrolling;
+- (void)restorePendingViewport;
 - (void)deferNativePresentation; // Baseline-only spy: production must never call it.
 #if HAS_STABLE_SNAPSHOT
 - (CSGroupProjection *)projectionForSections:(NSArray *)sections tabs:(NSArray *)tabs selectedTabID:(NSString *)selected accountID:(NSString *)account;
@@ -78,6 +81,10 @@ typedef NSInteger UITableViewScrollPosition;
 @implementation CSGroupListAdapter
 - (void)requestRecovery { [self requestRefresh]; }
 - (void)scheduleRefresh { [self requestRefresh]; }
+// Viewport ownership is covered separately; keep the production invocation routing intact.
+- (void)beginUserDragging {}
+- (void)beginUserScrolling {}
+- (void)restorePendingViewport {}
 #include "GroupSelectionBodies.h"
 - (BOOL)isActive { return self.active; }
 + (instancetype)adapterForTable:(UITableView *)table { return table.adapter; }

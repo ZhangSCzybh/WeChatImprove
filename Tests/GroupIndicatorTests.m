@@ -282,11 +282,11 @@ static NSUInteger checks,failures;
 static void Check(BOOL c,NSString *message) { checks++; if (!c) { failures++; fprintf(stderr,"FAIL: %s\n",message.UTF8String); } }
 static ViewAnimation *LastCapsuleAnimation(void) {
     for (ViewAnimation *animation in viewAnimations.reverseObjectEnumerator)
-        if ((fabs(animation.duration-.12)<.001 || fabs(animation.duration-.46)<.001) && !CGRectEqualToRect(animation.beforeFrame,animation.afterFrame)) return animation;
+        if ((fabs(animation.duration-.12)<.001 || fabs(animation.duration-.22)<.001) && !CGRectEqualToRect(animation.beforeFrame,animation.afterFrame)) return animation;
     return nil;
 }
 static BOOL IsCapsuleSpring(ViewAnimation *animation) {
-    return animation.spring && fabs(animation.duration-.46)<.001 && fabs(animation.damping-.62)<.001 && fabs(animation.velocity-.82)<.001 && !animation.delay &&
+    return animation.spring && fabs(animation.duration-.22)<.001 && fabs(animation.damping-1)<.001 && fabs(animation.velocity)<.001 && !animation.delay &&
         (animation.options & (UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState)) == (UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState);
 }
 static WESessionTabContainerView *Fixture(void) {
@@ -372,6 +372,129 @@ static void CheckStartupViewport(void) {
 
     view=StartupFixture(); [view updateTabs:StartupTabs(2)]; FinishStartupLayout(view);
     Check(fabs(view.scrollView.contentOffset.x)<.001 && CGRectGetMinX(view.tabButtons[0].frame)>kTabMinGap,@"nonoverflowing groups keep their existing evenly distributed spacing");
+}
+
+static WESessionTabContainerView *PublishedFixture(CSGroupIndicatorStyle style,NSArray<WESessionTabItem *> *tabs) {
+    CSGroupSetIndicatorStyle(testDefaults,style);
+    WESessionTabContainerView *view=StartupFixture();
+    view.window=[NSObject new]; view.searchButton.hidden=YES; observedIndicator=view.indicatorView;
+    [view updateTabs:tabs];
+    // UIColor and UIFont rendering are outside this host replay. Retain the
+    // production button configuration while selection, records, and layout use
+    // the extracted container methods without a substitute implementation.
+    if (style==CSGroupIndicatorStyleCapsule) for (WETabButton *button in view.tabButtons) {
+        [button configureCapsuleEnabled:YES color:[UIColor new] textColor:[UIColor new]];
+        button.capsuleTitleLabel.frame=[button tabTitleFrame];
+    }
+    FinishStartupLayout(view);
+    return view;
+}
+static CGRect SelectionFrame(WESessionTabContainerView *view,NSInteger index) {
+    return view.indicatorStyle==CSGroupIndicatorStyleCapsule ?
+        [view capsuleFrameForButton:view.tabButtons[index] pressed:NO] : [view indicatorFrameForIndex:index];
+}
+static BOOL SettlesFromFrame(WESessionTabContainerView *view,CGRect start,CGRect target) {
+    if (view.indicatorStyle==CSGroupIndicatorStyleCapsule) {
+        ViewAnimation *animation=LastCapsuleAnimation();
+        return IsCapsuleSpring(animation) && CGRectEqualToRect(animation.beforeFrame,start) && CGRectEqualToRect(animation.afterFrame,target);
+    }
+    CAAnimationGroup *animation=(id)[view.indicatorView.layer animationForKey:kIndicatorAnimationKey];
+    if (!animation || animation.animations.count!=2 || fabs(animation.duration-.20)>.001) return NO;
+    CAKeyframeAnimation *position=(id)animation.animations[0],*size=(id)animation.animations[1];
+    return position.values.count==2 && size.values.count==2 &&
+        CGPointEqualToPoint([position.values.firstObject CGPointValue],CGPointMake(CGRectGetMidX(start),CGRectGetMidY(start))) &&
+        CGPointEqualToPoint([position.values.lastObject CGPointValue],CGPointMake(CGRectGetMidX(target),CGRectGetMidY(target))) &&
+        CGSizeEqualToSize([size.values.firstObject CGSizeValue],start.size) &&
+        CGSizeEqualToSize([size.values.lastObject CGSizeValue],target.size);
+}
+static void CheckPublishedPageHandoff(void) {
+    NSArray<WESessionTabItem *> *tabs=StartupTabs(5);
+    for (NSNumber *styleValue in @[@(CSGroupIndicatorStyleUnderline),@(CSGroupIndicatorStyleCapsule)]) {
+        CSGroupIndicatorStyle style=styleValue.integerValue;
+        NSString *name=CSGroupIndicatorStyleName(style);
+        WESessionTabContainerView *view=PublishedFixture(style,tabs);
+        UIView *indicator=view.indicatorView;
+        CGRect source=SelectionFrame(view,0),target=SelectionFrame(view,1);
+        Check(view.tabLayoutValid && view.renderedTabRecords.count==5 && CGRectEqualToRect(indicator.frame,source),
+              [NSString stringWithFormat:@"%@ page handoff starts from published records and real container layout",name]);
+        CGFloat fraction=64.0/320.0;
+        [view updateInteractiveTransitionToIndex:1 progress:fraction];
+        CGFloat expected=CGRectGetMidX(source)+(CGRectGetMidX(target)-CGRectGetMidX(source))*fraction;
+        Check(view.interactiveTransition && view.selectedIndex==0 && !view.haptics &&
+              fabs(CGRectGetMidX(indicator.frame)-expected)<.001 && ![indicator.layer animationForKey:kIndicatorAnimationKey],
+              [NSString stringWithFormat:@"%@ follows a page-width fraction without committing or queuing a tween",name]);
+        fraction=108.0/320.0;
+        [view updateInteractiveTransitionToIndex:1 progress:fraction];
+        expected=CGRectGetMidX(source)+(CGRectGetMidX(target)-CGRectGetMidX(source))*fraction;
+        CGRect interactiveFrame=indicator.frame;
+        Check(fabs(CGRectGetMidX(interactiveFrame)-expected)<.001 && CGRectGetMidX(interactiveFrame)<CGRectGetMidX(target)-1,
+              [NSString stringWithFormat:@"%@ retains remaining travel at a partial page drag",name]);
+        NSUInteger layoutCalls=view.layoutCalls;
+        [view selectTabAtIndex:1 animated:YES];
+        Check(view.selectedIndex==1 && [view.selectedTabID isEqual:tabs[1].tabId] && !view.interactiveTransition &&
+              view.layoutCalls==layoutCalls && view.haptics==1,
+              [NSString stringWithFormat:@"%@ commits before passive publication without an old-selection layout",name]);
+        Check(SettlesFromFrame(view,interactiveFrame,target),
+              [NSString stringWithFormat:@"%@ release starts at current geometry and keeps its existing settle style",name]);
+
+        NSString *animationKey=style==CSGroupIndicatorStyleCapsule ? @"UIKit.position" : kIndicatorAnimationKey;
+        if (style==CSGroupIndicatorStyleCapsule)
+            [indicator.layer addAnimation:[CABasicAnimation animationWithKeyPath:@"position"] forKey:animationKey];
+        CAAnimation *settle=[indicator.layer animationForKey:animationKey];
+        // UIKit owns capsule presentation; a retained stand-in makes accidental
+        // removeAllAnimations calls observable during the passive refreshes.
+        CALayer *presentation=[CALayer layer]; presentation.frame=interactiveFrame; indicator.layer.visibleLayer=presentation;
+        NSUInteger animations=viewAnimations.count,adds=indicator.layer.animationAdds,clears=indicator.layer.animationClears;
+        view.selectedTabID=tabs[1].tabId;
+        Check([indicator.layer animationForKey:animationKey]==settle && indicator.layer.animationAdds==adds &&
+              indicator.layer.animationClears==clears && viewAnimations.count==animations && CGRectEqualToRect(indicator.frame,target),
+              [NSString stringWithFormat:@"%@ same-target stable-ID acknowledgement preserves the running settle",name]);
+        NSArray<WETabButton *> *buttons=view.tabButtons;
+        [view updateTabs:StartupTabs(5)];
+        Check(view.tabButtons==buttons && [indicator.layer animationForKey:animationKey]==settle &&
+              indicator.layer.animationClears==clears && viewAnimations.count==animations,
+              [NSString stringWithFormat:@"%@ publication with equal records retains buttons and the running settle",name]);
+        [view setNeedsLayout]; [view layoutIfNeeded];
+        Check([indicator.layer animationForKey:animationKey]==settle && indicator.layer.animationAdds==adds &&
+              indicator.layer.animationClears==clears && viewAnimations.count==animations && view.haptics==1 &&
+              indicator.layer.visibleLayer==presentation && CGRectEqualToRect(indicator.frame,target),
+              [NSString stringWithFormat:@"%@ unchanged real layout preserves presentation and avoids restarting the settle",name]);
+
+        indicator.layer.visibleLayer=nil;
+        [view updateInteractiveTransitionToIndex:2 progress:88.0/320.0];
+        CGRect cancelFrame=indicator.frame;
+        [view cancelInteractiveTransition];
+        Check(view.selectedIndex==1 && [view.selectedTabID isEqual:tabs[1].tabId] && view.haptics==1 &&
+              !view.interactiveTransition && SettlesFromFrame(view,cancelFrame,target),
+              [NSString stringWithFormat:@"%@ cancelled next drag returns continuously to its committed source group",name]);
+        CAAnimation *cancel=[indicator.layer animationForKey:kIndicatorAnimationKey];
+        animations=viewAnimations.count; clears=indicator.layer.animationClears;
+        view.selectedTabID=tabs[1].tabId; [view updateTabs:StartupTabs(5)]; [view setNeedsLayout]; [view layoutIfNeeded];
+        Check(CGRectEqualToRect(indicator.frame,target) && viewAnimations.count==animations && indicator.layer.animationClears==clears &&
+              [indicator.layer animationForKey:kIndicatorAnimationKey]==cancel && view.haptics==1,
+              [NSString stringWithFormat:@"%@ rollback reconciliation keeps the source and does not replay feedback",name]);
+
+        view=PublishedFixture(style,tabs); indicator=view.indicatorView; reducedMotion=YES;
+        [view updateInteractiveTransitionToIndex:1 progress:108.0/320.0];
+        Check(!view.interactiveTransition && view.selectedIndex==0 && CGRectEqualToRect(indicator.frame,SelectionFrame(view,0)),
+              [NSString stringWithFormat:@"%@ Reduce Motion preserves direct-selection ownership without a page preview",name]);
+        animations=viewAnimations.count;
+        [view selectTabAtIndex:1 animated:YES];
+        Check(view.selectedIndex==1 && CGRectEqualToRect(indicator.frame,SelectionFrame(view,1)) &&
+              !indicator.layer.animationKeys.count && viewAnimations.count==animations,
+              [NSString stringWithFormat:@"%@ Reduce Motion still commits directly without an indicator or viewport animation",name]);
+        reducedMotion=NO;
+    }
+    WESessionTabContainerView *view=PublishedFixture(CSGroupIndicatorStyleNone,tabs);
+    [view updateInteractiveTransitionToIndex:1 progress:108.0/320.0];
+    NSUInteger animations=viewAnimations.count;
+    Check(!view.interactiveTransition && view.selectedIndex==0,@"animation-off page gesture keeps direct-switch behavior");
+    [view selectTabAtIndex:1 animated:YES];
+    Check(view.selectedIndex==1 && !view.indicatorView.layer.animationKeys.count && viewAnimations.count==animations &&
+          CGRectEqualToRect(view.indicatorView.frame,SelectionFrame(view,1)),@"animation-off selection commits with its existing static indicator");
+    view.selectedTabID=tabs[1].tabId; [view updateTabs:StartupTabs(5)]; [view setNeedsLayout]; [view layoutIfNeeded];
+    Check(view.selectedIndex==1 && view.haptics==1 && viewAnimations.count==animations,
+          @"animation-off passive publication keeps the committed selection without extra feedback");
 }
 int main(void) { @autoreleasepool {
     viewAnimations=[NSMutableArray array];
@@ -538,11 +661,11 @@ int main(void) { @autoreleasepool {
     CGRect pressedB=shared.frame;
     [b sendActionsForControlEvents:UIControlEventTouchUpInside];
     ViewAnimation *settle=LastCapsuleAnimation();
-    Check(IsCapsuleSpring(settle) && CGRectEqualToRect(settle.beforeFrame,pressedB) && CGRectEqualToRect(settle.afterFrame,restB),@"release continues from the pressed frame with the bottom bar's 460ms .62/.82 spring");
+    Check(IsCapsuleSpring(settle) && CGRectEqualToRect(settle.beforeFrame,pressedB) && CGRectEqualToRect(settle.afterFrame,restB),@"release continues from the pressed frame with its existing 220ms critically damped settle");
     Check(v.layoutCalls==layoutCalls && shared.layer.animationClears==clears,@"release never performs an old-selection layout or clears the moving shared capsule");
     Check(v.selectedIndex==1 && [v.selectedTabID isEqual:@"tab1"] && v.selectionCallbacks==1 && v.callbackIndex==1 && v.haptics==1,@"release commits exactly once through the existing selection callback");
     Check(!v.capsulePressedButton && !v.capsuleTouchButton && v.indicatorView==shared && b.capsuleTitleLabel.alpha==1 && a.capsuleTitleLabel.alpha==0,@"release retains one background and the committed title state");
-    Check(IsCapsuleSpring(viewAnimations.lastObject),@"selected-label viewport reveal shares the same bottom-bar spring parameters");
+    Check(IsCapsuleSpring(viewAnimations.lastObject),@"selected-label viewport reveal shares the existing 220ms critically damped parameters");
     animationCount=viewAnimations.count;
     for (NSUInteger repeat=0;repeat<5;repeat++) { v.selectedTabID=@"tab1"; [v updateIndicatorPosition]; }
     [b sendActionsForControlEvents:UIControlEventTouchUpInside];
@@ -667,6 +790,7 @@ int main(void) { @autoreleasepool {
     CSGroupSetIndicatorStyle(testDefaults,CSGroupIndicatorStyleNone); v.indicatorStyle=CSGroupIndicatorStyleNone;
     [v updateIndicatorPositionAnimated:NO];
     Check(!v.indicatorView.hidden && ![v.indicatorView.layer animationForKey:kIndicatorAnimationKey],@"disabled style preserves its original static underline");
+    CheckPublishedPageHandoff();
     [testDefaults removePersistentDomainForName:suite];
     printf("Group indicator: %lu checks, %lu failures\n",(unsigned long)checks,(unsigned long)failures);
     return failures ? 1 : 0;

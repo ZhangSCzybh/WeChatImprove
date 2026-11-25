@@ -152,6 +152,7 @@ static BOOL CSContacts(id value) {
             @[@"standard",@"com.wechat.enhance.chat_group.indicator_animation_enabled",@"groups",@"bool",@"global",@""],
             @[@"standard",@"com.wechat.enhance.chat_group.indicator_color",@"groups",@"data",@"global",@""],
             @[@"standard",@"com.wechat.enhance.chat_group.indicator_color_dark",@"groups",@"data",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.chat_group.page_transition_enabled",@"groups",@"bool",@"global",@""],
             @[@"standard",@"com.wechat.enhance.chat_group.selected_text_color",@"groups",@"data",@"global",@""],
             @[@"standard",@"com.wechat.enhance.chat_group.selected_text_color_dark",@"groups",@"data",@"global",@""],
             @[@"standard",@"com.wechat.enhance.chat_group.selection_indicator_style",@"groups",@"number",@"global",@""],

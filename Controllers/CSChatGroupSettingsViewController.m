@@ -336,7 +336,7 @@ static NSString * const kScrollSensitivityKey = @"com.wechat.enhance.scroll_sens
         [weakSelf showColorPicker];
     };
     
-    CSSettingItem *indicatorAnimationItem = [CSSettingItem itemWithTitle:@"分组切换动画"
+    CSSettingItem *indicatorAnimationItem = [CSSettingItem itemWithTitle:@"分组指示器切换动画"
         iconName:@"wand.and.stars" iconColor:[UIColor systemPurpleColor]
         detail:CSGroupIndicatorStyleName(CSGroupCurrentIndicatorStyle(defaults))];
     indicatorAnimationItem.actionBlock = ^{ [weakSelf showIndicatorStylePicker]; };
@@ -371,6 +371,16 @@ static NSString * const kScrollSensitivityKey = @"com.wechat.enhance.scroll_sens
         [defaults setBool:isOn forKey:kSwipeGestureEnabledKey];
         [defaults synchronize];
         
+        [weakSelf reloadChatGroupSettings];
+    }];
+
+    CSSettingItem *pageTransitionItem = [CSSettingItem switchItemWithTitle:@"页面转场动画"
+                                                               iconName:@"rectangle.on.rectangle"
+                                                              iconColor:[UIColor systemBlueColor]
+                                                            switchValue:CSGroupPageTransitionEnabled(defaults)
+                                                      valueChangedBlock:^(BOOL isOn) {
+        [defaults setBool:isOn forKey:CSGroupPageTransitionEnabledKey];
+        [defaults synchronize];
         [weakSelf reloadChatGroupSettings];
     }];
     
@@ -420,7 +430,7 @@ static NSString * const kScrollSensitivityKey = @"com.wechat.enhance.scroll_sens
                                                                   items:groupItems];
     
     CSSettingSection *otherSection = [CSSettingSection sectionWithHeader:@"其他设置"
-                                                                  items:@[fontSizeItem, searchButtonItem, indicatorColorItem, selectedTextColorItem, indicatorAnimationItem, hapticFeedbackItem, filterDuplicateItem, swipeGestureItem, hideGroupBadgeItem, hideAllBadgeItem, scrollSensitivityItem]];
+                                                                  items:@[fontSizeItem, searchButtonItem, indicatorColorItem, selectedTextColorItem, indicatorAnimationItem, hapticFeedbackItem, filterDuplicateItem, swipeGestureItem, pageTransitionItem, hideGroupBadgeItem, hideAllBadgeItem, scrollSensitivityItem]];
     
     CSSettingSection *infoSection = [CSSettingSection sectionWithHeader:@""
                                                                   items:@[infoItem]];
@@ -463,7 +473,7 @@ static NSString * const kScrollSensitivityKey = @"com.wechat.enhance.scroll_sens
         if (!self.groupPreferences.accountID.length) return @"当前账号尚未确认，账号分组暂不可编辑；确认登录账号后将自动载入。";
         return @"点击右上角\"排序\"可拖拽调整分组顺序，左滑可编辑或隐藏或删除";
     } else if (section == 2){
-        return @"分组标签字号：默认 18 pt，可自定义 12–28 pt，并随系统文字大小缩放。\n显示分组栏搜索按钮：开启时使用标签栏右侧搜索入口，收起聊天列表整块原生搜索区域（含背景、留白和占位）；关闭时恢复。\n添加分组：请在本页点击“添加自定义分组”。\n过滤重复会话：开启后分组内的好友、群聊将不会出现在私信和群列表，在列表安全更新后生效。\n分组切换手势：在会话区域左侧 85% 起手横滑可切换分组；从会话右侧 15% 起手左滑可展开原生菜单。按手指落点区分，滑动中途不改变用途；菜单展开时暂停切组。分组栏也支持横滑，标签过多时优先滚动标签。\n隐藏分组角标：隐藏除\"全部\"外的其他分组角标。\n隐藏全部角标：隐藏\"全部\"分组的角标。\n滑动灵敏度：建议默认，相对流畅。\n分组指示器切换动画：可选下划线、胶囊包裹或关闭，升级沿用原开关状态。下划线保留移动伸展；胶囊按下时立即以 Neo 的0.12秒 EaseOut预览，仅背景微扩至1.08×1.04，标题和角标不缩放；松手沿用单次选择，取消或滑出标签时恢复；选中及横滑过渡沿用0.28秒，背景直接使用指示器颜色，标题使用选中文本颜色。关闭后保留下划线并直接落位。遵循系统减弱动态效果。";
+        return @"分组标签字号：默认 18 pt，可自定义 12–28 pt，并随系统文字大小缩放。\n显示分组栏搜索按钮：开启时使用标签栏右侧搜索入口，收起聊天列表整块原生搜索区域（含背景、留白和占位）；关闭时恢复。\n添加分组：请在本页点击“添加自定义分组”。\n过滤重复会话：开启后分组内的好友、群聊将不会出现在私信和群列表，在列表安全更新后生效。\n分组切换手势：在会话区域左侧 85% 起手横滑可切换分组；从会话右侧 15% 起手左滑可展开原生菜单。按手指落点区分，滑动中途不改变用途；菜单展开时暂停切组。分组栏也支持横滑，标签过多时优先滚动标签。\n页面转场动画：默认关闭；开启后，横滑时原页与相邻页跟随手指移动，取消回弹，松手确认后进入新页，遵循系统减弱动态效果。\n隐藏分组角标：隐藏除\"全部\"外的其他分组角标。\n隐藏全部角标：隐藏\"全部\"分组的角标。\n滑动灵敏度：建议默认，相对流畅。\n分组指示器切换动画：可选下划线、胶囊包裹或关闭，升级沿用原开关状态。下划线保留移动伸展；胶囊按下时立即以 Neo 的0.12秒 EaseOut预览，仅背景微扩至1.08×1.04，标题和角标不缩放；松手沿用单次选择，取消或滑出标签时恢复；选中及横滑过渡沿用0.28秒，背景直接使用指示器颜色，标题使用选中文本颜色。关闭后保留下划线并直接落位。遵循系统减弱动态效果。";
     } else {
         return nil;
     }
@@ -1120,7 +1130,7 @@ static NSString * const kScrollSensitivityKey = @"com.wechat.enhance.scroll_sens
 
 - (void)showInfoAlert {
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"聊天分组功能说明"
-                                                                            message:@"聊天分组功能在聊天列表顶部显示会话分组标签，方便您快速切换查看不同类型的会话。开启分组栏搜索按钮后，使用该按钮搜索，并收起整块原生搜索区域。\n\n【主要功能】\n• 预设分组：全部、群聊、私聊、服务\n• 自定义分组：在设置页点击“添加自定义分组”创建\n• 分组排序：拖拽调整分组顺序\n• 分组隐藏：可隐藏不需要的分组\n\n【高级设置】\n• 分组标签字号：默认 18 pt，可自定义 12–28 pt\n• 显示分组栏搜索按钮：开启时收起整块原生搜索区域及占位，关闭时恢复\n• 指示器背景色：自定义选中指示器颜色\n• 选中文本颜色：自定义选中文本颜色\n• 切换触感：切换分组时的触感反馈\n• 过滤重复会话：避免会话重复显示\n• 分组切换手势：会话区域左侧 85% 起手横滑切组，右侧 15% 起手左滑展开菜单，按起点区分；菜单展开时暂停切组。分组栏也可横滑，标签过多时优先滚动标签\n• 隐藏角标：隐藏分组角标\n• 滑动灵敏度：调整列表滑动速度\n• 分组指示器切换动画：下划线、胶囊包裹或关闭；胶囊按下采用 Neo 的0.12秒 EaseOut背景预览，标题和角标不缩放，松手单次选择，取消或滑出标签时恢复，选中及横滑过渡沿用0.28秒；胶囊沿用指示器颜色与选中文本颜色，深浅色分别配置；关闭保留静态下划线，遵循系统减弱动态效果\n\n设置将在当前滚动或编辑结束后更新。"
+                                                                            message:@"聊天分组功能在聊天列表顶部显示会话分组标签，方便您快速切换查看不同类型的会话。开启分组栏搜索按钮后，使用该按钮搜索，并收起整块原生搜索区域。\n\n【主要功能】\n• 预设分组：全部、群聊、私聊、服务\n• 自定义分组：在设置页点击“添加自定义分组”创建\n• 分组排序：拖拽调整分组顺序\n• 分组隐藏：可隐藏不需要的分组\n\n【高级设置】\n• 分组标签字号：默认 18 pt，可自定义 12–28 pt\n• 显示分组栏搜索按钮：开启时收起整块原生搜索区域及占位，关闭时恢复\n• 指示器背景色：自定义选中指示器颜色\n• 选中文本颜色：自定义选中文本颜色\n• 切换触感：切换分组时的触感反馈\n• 过滤重复会话：避免会话重复显示\n• 分组切换手势：会话区域左侧 85% 起手横滑切组，右侧 15% 起手左滑展开菜单，按起点区分；菜单展开时暂停切组。分组栏也可横滑，标签过多时优先滚动标签\n• 页面转场动画：默认关闭，开启后横滑时两页跟随手指移动，取消回弹，松手确认进入新页，遵循系统减弱动态效果\n• 隐藏角标：隐藏分组角标\n• 滑动灵敏度：调整列表滑动速度\n• 分组指示器切换动画：下划线、胶囊包裹或关闭；胶囊按下采用 Neo 的0.12秒 EaseOut背景预览，标题和角标不缩放，松手单次选择，取消或滑出标签时恢复，选中及横滑过渡沿用0.28秒；胶囊沿用指示器颜色与选中文本颜色，深浅色分别配置；关闭保留静态下划线，遵循系统减弱动态效果\n\n设置将在当前滚动或编辑结束后更新。"
                                                                      preferredStyle:UIAlertControllerStyleAlert];
     
     UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"了解了"

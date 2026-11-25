@@ -4,6 +4,7 @@
 // Appearance preferences follow the existing global group colors and haptics.
 static NSString *const CSGroupTabFontSizeKey = @"com.wechat.enhance.chat_group.tab_font_size";
 static NSString *const CSGroupSearchButtonVisibleKey = @"com.wechat.enhance.chat_group.show_search_button";
+static NSString *const CSGroupPageTransitionEnabledKey = @"com.wechat.enhance.chat_group.page_transition_enabled";
 static NSString *const CSGroupIndicatorAnimationEnabledKey = @"com.wechat.enhance.chat_group.indicator_animation_enabled";
 // Use a new key: an abandoned release used indicator_animation_style for other motions.
 static NSString *const CSGroupIndicatorStyleKey = @"com.wechat.enhance.chat_group.selection_indicator_style";
@@ -28,6 +29,11 @@ NS_INLINE NSInteger CSGroupTabFontSize(NSUserDefaults *defaults) {
 NS_INLINE BOOL CSGroupSearchButtonVisible(NSUserDefaults *defaults) {
     id stored = [defaults objectForKey:CSGroupSearchButtonVisibleKey];
     return [stored isKindOfClass:NSNumber.class] ? [stored boolValue] : YES;
+}
+
+NS_INLINE BOOL CSGroupPageTransitionEnabled(NSUserDefaults *defaults) {
+    id stored = [defaults objectForKey:CSGroupPageTransitionEnabledKey];
+    return [stored isKindOfClass:NSNumber.class] && [stored doubleValue] == 1.0;
 }
 
 NS_INLINE CSGroupIndicatorStyle CSGroupCurrentIndicatorStyle(NSUserDefaults *defaults) {

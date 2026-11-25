@@ -149,6 +149,9 @@ static SearchPolicy *CSCloseFriendCurrentSnapshot(void) { return nil; }
 @property(nonatomic,strong) NSMutableSet *prefetchedPaths;
 @property(nonatomic,strong) NSDictionary<NSNumber *,Proxy *> *proxies;
 @property(nonatomic,copy) NSString *publishedTabID;
+@property(nonatomic,copy) NSString *pagePreviewTabID;
+@property(nonatomic,copy) NSDictionary *pageTransitionContext;
+@property(nonatomic) BOOL preparingPagePreview;
 @property(nonatomic) BOOL chromeVisible,searching,searchChromeVisible,pendingScrollToTop,presentationSuspended,updatingHeader;
 @property(nonatomic) BOOL publishing,privacyRefreshPending,dirty,swipeActive,recoveryPending,nativePresentation,projecting,publishedEnabled;
 @property(nonatomic) BOOL appearanceDirty,snapshotRetryAttempted,sessionLayoutHeld;
@@ -163,6 +166,9 @@ static SearchPolicy *CSCloseFriendCurrentSnapshot(void) { return nil; }
 - (void)layout;
 - (void)publishHeader:(UIView *)header;
 - (void)shieldVisiblePrivateRows;
+- (void)cancelPageTransition;
+- (void)cancelInvalidPageTransition;
+- (void)finishPageTransitionIfReady;
 + (instancetype)adapterForTable:(UITableView *)table;
 + (void)setPresentationSuspended:(BOOL)suspended forController:(id)controller;
 + (void)attachToController:(id)controller;
@@ -188,6 +194,10 @@ static SearchPolicy *CSCloseFriendCurrentSnapshot(void) { return nil; }
 - (void)prepareInitialViewport {}
 - (void)clearPendingViewport {}
 - (void)restorePendingViewport {}
+// Snapshot animation lifecycle is tested separately from search projection.
+- (void)cancelPageTransition {}
+- (void)cancelInvalidPageTransition {}
+- (void)finishPageTransitionIfReady {}
 - (NSDictionary *)captureViewportForTabID:(NSString *)tabID { (void)tabID; return nil; }
 - (void)restoreViewportFromSource:(NSDictionary *)viewport { (void)viewport; }
 - (void)consumeRefreshRequest {}
@@ -423,6 +433,17 @@ int main(void) { @autoreleasepool {
     // The native source deliberately contains a protected private chat and a
     // group chat so switching to All, or dropping privacy, changes visible rows.
     privacyEnabled=YES; hiddenNames=[NSSet setWithObject:@"hidden"];
+    host=[Host new]; host.adapter=List(); a=host.adapter; a.controller=host;
+    a.sourceSections=@[@[Row(0,@"ordinary",CSGroupRowCategoryPrivate),Row(1,@"hidden",CSGroupRowCategoryPrivate),Row(2,@"group",CSGroupRowCategoryGroup)]];
+    [a refresh]; a.table.tracking=YES; NSUInteger previewPublications=a.publications;
+    [a refresh];
+    Check(a.publications==previewPublications,@"ordinary tracking still blocks real compatibility publication outside preview preparation");
+    a.preparingPagePreview=YES;a.pagePreviewTabID=@"preset_1";a.pageTransitionContext=@{@"source":@"preset_2"};
+    [a refresh];
+    Check([a.publishedTabID isEqual:@"preset_1"] && [DisplayedNames(a) isEqual:@[@"group"]],@"transient preview renders actual neighboring group rows while horizontal tracking continues");
+    Check([a.preferences.selectedTabID isEqual:@"preset_2"] && [a.chrome.selectedTabID isEqual:@"preset_2"],@"actual target publication preserves saved source selection and indicator ownership");
+    a.pagePreviewTabID=nil;[a refresh];
+    Check([a.publishedTabID isEqual:@"preset_2"] && [DisplayedNames(a) isEqual:@[@"ordinary"]] && [a.preferences.selectedTabID isEqual:@"preset_2"],@"clearing transient preview republishes the private source with privacy filtering intact");
     host=[Host new]; host.adapter=List(); a=host.adapter; a.controller=host;
     a.sourceSections=@[@[Row(0,@"ordinary",CSGroupRowCategoryPrivate), Row(1,@"hidden",CSGroupRowCategoryPrivate), Row(2,@"group",CSGroupRowCategoryGroup)]];
     [a refresh];

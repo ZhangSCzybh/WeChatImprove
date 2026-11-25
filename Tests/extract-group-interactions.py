@@ -4,8 +4,9 @@ import sys
 root = Path(__file__).resolve().parent.parent
 source = (Path(sys.argv[2]) if len(sys.argv) > 2 else root / 'Controllers/CSGroupListAdapter.m').read_text()
 methods = []
-for marker in ['- (void)cancelScheduledRefresh {', '- (void)requestRecovery {', '- (BOOL)groupPanMoving', '- (NSInteger)listZoneForTouch:', '- (BOOL)nativeMenuGesture:', '- (BOOL)closeMenusForGroupSwitch', '- (BOOL)gestureRecognizerShouldBegin:', '- (void)groupPan:', '- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gesture shouldBeRequiredToFailByGestureRecognizer:', '- (NSUInteger)nativeMenuState', '- (void)nativeMenuDidChange', '- (void)updateGroupGestureAvailability', '- (void)endSwipeEditing', '- (void)reconcileDeletedSwipeRow',
+for marker in ['- (void)cancelScheduledRefresh {', '- (void)consumeRefreshRequest {', '- (void)requestRecovery {', '- (void)ensureListPanHost {', '- (BOOL)groupPanMoving', '- (NSInteger)listZoneForTouch:', '- (BOOL)nativeMenuGesture:', '- (BOOL)closeMenusForGroupSwitch', '- (BOOL)gestureRecognizerShouldBegin:', '- (void)groupPan:', '- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gesture shouldBeRequiredToFailByGestureRecognizer:', '- (NSUInteger)nativeMenuState', '- (void)nativeMenuDidChange', '- (void)updateGroupGestureAvailability', '- (void)endSwipeEditing', '- (void)reconcileDeletedSwipeRow',
                '- (BOOL)performNativeEditingContext:', '- (BOOL)forwardSwipeInvocation:',
+               '- (void)selectSwipeIndex:(NSInteger)index direction:(NSInteger)direction {',
                '- (BOOL)keepsGroupHeaderDuringSearch', '+ (NSString *)groupTitleForTitleView:', '+ (void)recordNativeTitle:', '- (void)refreshNavigationTitle', '- (BOOL)groupSwipesAvailable',
                '- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gesture shouldReceiveTouch:']:
     if marker in ['- (BOOL)groupPanMoving', '- (NSInteger)listZoneForTouch:', '- (BOOL)nativeMenuGesture:', '- (BOOL)closeMenusForGroupSwitch'] and marker not in source:
@@ -31,7 +32,7 @@ for marker in ['- (void)cancelScheduledRefresh {', '- (void)requestRecovery {', 
 # the host's private model; a counter stands in for the admitted reload.
 start = source.index('- (void)refresh {')
 end = source.index('    self.publishing=YES; self.dirty=NO;', start)
-methods.append(source[start:end] + '    self.refreshCount++; self.dirty=NO;\n}')
+methods.append(source[start:end] + '    (void)sourceViewport; self.refreshCount++; self.dirty=NO;\n}')
 start = source.index('- (void)requestRefresh {')
 end = source.index('\n- (void)beginNativeChange', start)
 methods.append(source[start:end].replace('- (void)requestRefresh {', '- (void)enqueueRefresh {', 1))

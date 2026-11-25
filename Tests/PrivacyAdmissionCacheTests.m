@@ -12,6 +12,7 @@ static NSString *account=@"admission-fixture-account";
 static NSUInteger epoch=7,snapshotReads,rowChecks,originalLayouts,checks,failures;
 static CSCloseFriendSnapshot *policy;
 static CSCloseFriendRuntime *runtimeProvider;
+static char CellRowKey;
 static CSCloseFriendSnapshot *CSCloseFriendCurrentSnapshot(void) {
     snapshotReads++;
     return runtimeProvider ? [runtimeProvider snapshotForEpoch:epoch suspended:NO] : policy;
@@ -52,20 +53,46 @@ id CSGetService(Class cls) { (void)cls; return nil; }
 - (void)prepareForPublication;
 @end
 #include "AdmissionShieldBody.h"
+// This suite owns compatibility-list privacy admission. Entering the native
+// model coordinator would cross that explicit fixture boundary.
+@interface CSGroupNativeSessionCoordinator : NSObject
+@property(nonatomic) BOOL boundary;
+@property(nonatomic) NSUInteger revision;
++ (instancetype)sharedCoordinator;
+@end
+@implementation CSGroupNativeSessionCoordinator
++ (instancetype)sharedCoordinator { [NSException raise:@"UnexpectedNativeModel" format:@"Privacy admission fixture uses compatibility rows"]; return nil; }
+@end
 @interface CSGroupListAdapter : NSObject
 @property(nonatomic,strong) AdmissionTable *table;
 @property(nonatomic,strong) CSGroupProjection *projection;
 @property(nonatomic,strong) CSCloseFriendListShield *privacyShield;
 @property(nonatomic) BOOL active,snapshotRetryAttempted,sessionLayoutHeld,privacyRefreshPending,dirty,publishing;
 @property(nonatomic) NSUInteger snapshotEpoch,changeDepth,layoutRequests,modelRevision;
+@property(nonatomic) BOOL usesNativeSessionModel,nativeBoundaryHeld,pageActive,pageCancelledBeforeShield;
+@property(nonatomic) NSUInteger nativeModelRevision,pageCancellations;
 - (BOOL)isActive;
 - (void)requestRefresh;
 - (void)performSessionListLayout:(void (^)(void))layout;
 - (void)invalidateNativeSnapshot;
+- (BOOL)adoptCompatibilityModelIfNeeded;
+- (void)restorePendingViewport;
+- (void)cancelInvalidPageTransition;
+- (void)cancelPageTransition;
+- (void)finishPageTransitionIfReady;
+- (void)prepareForVisibility;
 @end
 @implementation CSGroupListAdapter
 - (BOOL)isActive { return self.active; }
 - (void)requestRefresh { self.layoutRequests++; self.dirty=YES; }
+- (BOOL)adoptCompatibilityModelIfNeeded { return NO; }
+- (void)restorePendingViewport {}
+- (void)cancelInvalidPageTransition {}
+- (void)finishPageTransitionIfReady {}
+- (void)cancelPageTransition {
+    self.pageCancellations++; self.pageActive=NO; self.pageCancelledBeforeShield=YES;
+    for (UITableViewCell *cell in self.table.visibleCells) if (cell.hidden) self.pageCancelledBeforeShield=NO;
+}
 #include "AdmissionProductionBody.h"
 @end
 static void Check(BOOL pass,NSString *name) {
@@ -175,16 +202,30 @@ int main(void) { @autoreleasepool {
     adapter=Fresh();Warm(adapter);[adapter invalidateNativeSnapshot];Layout(adapter);Record(@"native-invalidation",adapter);
     Check(rowChecks==32 && originalLayouts==1,@"explicit native invalidation discards admission for same projection and policy");
 
-    adapter=Fresh();adapter.projection=Projection(32,YES);Layout(adapter);Record(@"unsafe-projection",adapter);
+    adapter=Fresh();adapter.pageActive=YES;adapter.projection=Projection(32,YES);Layout(adapter);Record(@"unsafe-projection",adapter);
     CheckHeld(adapter,@"hidden row in projection");
+    Check(!adapter.pageActive && adapter.pageCancellations==1 && adapter.pageCancelledBeforeShield,@"unsafe layout synchronously removes the sibling page snapshot before shielding cells");
     Check(adapter.dirty && adapter.layoutRequests==1,@"hidden row requests one event-driven filtered publication");
     rowChecks=0;Layout(adapter);Check(!originalLayouts && rowChecks>0,@"failed scan is never accepted as a reusable successful admission");
     adapter=Fresh();Warm(adapter);adapter.projection=Projection(32,YES);Layout(adapter);Record(@"safe-then-unsafe-identity",adapter);
     CheckHeld(adapter,@"unsafe replacement projection");
-    adapter=Fresh();[adapter performSessionListLayout:^{originalLayouts++;policy=[[AdmissionPolicy alloc]initWithAccountID:account profile:Profile() revealed:NO revision:24 blocked:NO];}];Record(@"policy-changed-during-original",adapter);
+    adapter=Fresh();adapter.pageActive=YES;[adapter performSessionListLayout:^{originalLayouts++;policy=[[AdmissionPolicy alloc]initWithAccountID:account profile:Profile() revealed:NO revision:24 blocked:NO];}];Record(@"policy-changed-during-original",adapter);
     Check(originalLayouts==1 && adapter.sessionLayoutHeld && AllHidden(adapter) && adapter.dirty && adapter.layoutRequests==1,@"policy change during original shields before returning and marks one recovery");
+    Check(!adapter.pageActive && adapter.pageCancellations==1 && adapter.pageCancelledBeforeShield,@"policy invalidation inside layout cancels the page snapshot before its synchronous shielding return");
     ((AdmissionProjection *)adapter.projection).fixtureRevision=24;snapshotReads=0;rowChecks=0;originalLayouts=0;Layout(adapter);
     Check(rowChecks==32 && originalLayouts==1,@"post-layout policy change cannot preserve an old successful admission");
+
+    adapter=Fresh();adapter.pageActive=YES;
+    NSArray *safeRows=adapter.projection.sections.firstObject;
+    for (NSUInteger i=0;i<adapter.table.visibleCells.count;i++)
+        objc_setAssociatedObject(adapter.table.visibleCells[i],&CellRowKey,@{@"row":safeRows[i],@"account":account},OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    [adapter prepareForVisibility];
+    Check(adapter.pageActive && !adapter.pageCancellations && !adapter.sessionLayoutHeld && !adapter.layoutRequests,
+        @"a proven safe visibility boundary preserves the active page snapshot without adding recovery");
+    policy=[[AdmissionPolicy alloc]initWithAccountID:account profile:Profile() revealed:NO revision:24 blocked:NO];
+    [adapter prepareForVisibility];
+    Check(!adapter.pageActive && adapter.pageCancellations==1 && adapter.pageCancelledBeforeShield && AllHidden(adapter) && adapter.sessionLayoutHeld && !originalLayouts,
+        @"unsafe visibility synchronously cancels the sibling page snapshot before cell shielding and before any native layout");
 
     // This uses the real runtime snapshot getter and monotonic expiry, with only
     // persistence/credentials replaced by in-memory providers. No disk or real account.

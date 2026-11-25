@@ -13,6 +13,11 @@ int main(void) { @autoreleasepool {
     CHECK(Entry(@"GameCheat_Enabled") != nil);
     CHECK(Entry(@"WCTimeLineMessageTailText") != nil);
     CHECK(Entry(@"kReceiveTransferAutoEnableKey") != nil);
+    NSDictionary *groupPageTransition=Entry(@"com.wechat.enhance.chat_group.page_transition_enabled");
+    CHECK([groupPageTransition[@"module"] isEqual:@"groups"] && [groupPageTransition[@"scope"] isEqual:@"global"] && [groupPageTransition[@"type"] isEqual:@"bool"]);
+    CHECK(Valid(@YES,groupPageTransition) && Valid(@NO,groupPageTransition));
+    CHECK(!Valid(@"YES",groupPageTransition) && !Valid(@2,groupPageTransition) && !Valid(@0.5,groupPageTransition));
+    CHECK([CSBackupRegistry entryForDomain:@"legacy" key:@"com.wechat.enhance.chat_group.page_transition_enabled"]==nil);
     NSDictionary *homeIndex=Entry(@"com.wechat.enhance.home_theme.index"),*homeRGB=Entry(@"com.wechat.enhance.home_theme.custom_rgb");
     CHECK([homeIndex[@"module"] isEqual:@"home_theme"] && [homeIndex[@"scope"] isEqual:@"global"]);
     CHECK([CSBackupRegistry.moduleTitles[@"home_theme"] isEqual:@"首页调色"]);

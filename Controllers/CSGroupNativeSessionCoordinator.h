@@ -29,6 +29,22 @@ FOUNDATION_EXPORT NSNotificationName const CSGroupNativeSessionModelDidChangeNot
 @property(nonatomic, readonly) NSUInteger epoch;
 /// Temporary All presentation for native navigation/search; preferences stay intact.
 @property(nonatomic) BOOL nativePresentation;
+/// A main-controller-owned, temporary native group selection. Preferences are
+/// unchanged until the caller separately commits the user's selection. The
+/// caller must cover the real table before beginning, refresh its native rows,
+/// and restore/reload the committed group before removing a cancelled cover.
+/// All methods are main-thread-only. Source/account/privacy changes invalidate
+/// the preview; callers must discard both copied pages when validity fails.
+@property(nonatomic, copy, readonly, nullable) NSString *pagePreviewTabID;
+- (BOOL)beginPagePreviewForTabID:(NSString *)tabID owner:(id)owner;
+/// Fast gesture-time token check. Reads saved coordinator/configuration state
+/// and the current privacy snapshot, without host identity or service getters.
+/// Use the full check below before accepting captured pixels or committing.
+- (BOOL)pagePreviewTokenIsValidForOwner:(id)owner;
+- (BOOL)pagePreviewIsValidForOwner:(id)owner;
+/// Clears the override before synchronously restoring current preferences.
+/// Commit callers first write and verify preferences, then end the preview.
+- (void)endPagePreviewForOwner:(id)owner;
 - (void)setMainController:(nullable id)controller;
 - (void)refreshFromPreferences;
 - (void)invalidateNativeData;

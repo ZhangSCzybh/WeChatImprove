@@ -155,13 +155,14 @@ static id CSGroupReadObject(id object,NSString *key) {
 @property(nonatomic,strong) NSArray<WESessionTabItem *> *displayedTabs;
 @property(nonatomic,copy) NSString *publishedTabID;
 @property(nonatomic,copy) NSDictionary *presentationViewport,*switchViewport;
-@property(nonatomic,copy) NSArray *initialViewportKey;
+@property(nonatomic,copy) NSArray *initialViewportKey,*pageSourceReturnKey;
 @property(nonatomic) NSUInteger initialViewportGeneration,viewportGeneration,modelRevision,snapshotEpoch,nativeModelRevision;
 @property(nonatomic) NSUInteger changeDepth,snapshotRetryGeneration,recoveryAttempts;
 @property(nonatomic) BOOL initialViewportPending,presentationSuspended,presentationReturnFinished,restoringViewport;
 @property(nonatomic) BOOL active,chromeVisible,searching,nativePresentation,searchChromeVisible,publishing,dirty;
 @property(nonatomic) BOOL privacyRefreshPending,sessionLayoutHeld,snapshotRetryAttempted,swipeActive,usesNativeSessionModel,recoveryPending;
 @property(nonatomic) BOOL groupPanMoving;
+@property(nonatomic) BOOL preparingPagePreview;
 @property(nonatomic) NSUInteger nativeMenuState;
 + (instancetype)adapterForController:(id)controller;
 + (void)setPresentationSuspended:(BOOL)suspended forController:(id)controller;
@@ -181,6 +182,8 @@ static id CSGroupReadObject(id object,NSString *key) {
 - (void)clearPendingViewport;
 - (void)beginUserScrolling;
 - (void)selectIndex:(NSInteger)index;
+- (void)preparePageTransitionForSelection:(NSInteger)index;
+- (void)cancelPageTransition;
 @end
 @implementation CSGroupListAdapter
 #include "GroupInitialViewportBodies.h"
@@ -193,6 +196,9 @@ static id CSGroupReadObject(id object,NSString *key) {
 - (void)requestRefresh { self.dirty=YES; }
 - (void)layout {}
 - (void)refresh { self.publishedTabID=self.preferences.selectedTabID; }
+// This suite owns viewport geometry; the page animator is an independent boundary.
+- (void)preparePageTransitionForSelection:(NSInteger)index { (void)index; }
+- (void)cancelPageTransition {}
 + (void)refreshFoldedListsForAccount:(NSString *)account { (void)account; }
 @end
 
@@ -313,6 +319,15 @@ int main(void) { @autoreleasepool {
     a=List(0,1800);HideGroup(a);a.nativeModelRevision++;[a restorePendingViewport];Check(a.table.offsetWrites==0,@"stale native revision blocks startup restore");
     a=List(0,1800);HideGroup(a);applicationActive=NO;[a restorePendingViewport];Check(a.table.offsetWrites==0,@"inactive application leaves native position alone");
 
+    a=List(0,1800);[a cancelInitialViewport];a.table.tracking=YES;a.groupPanMoving=YES;
+    Check(![a restoreScrollHeight:180] && !a.table.offsetWrites,@"ordinary horizontal tracking retains viewport ownership outside preview preparation");
+    a.preparingPagePreview=YES;
+    Check([a restoreScrollHeight:180] && a.table.offsetWrites==1 && Near(a.table.contentOffset.y,77),@"explicit preview preparation alone can restore source height while the horizontal finger remains down");
+    NSUInteger previewWrites=a.table.offsetWrites;a.table.dragging=YES;
+    Check(![a restoreScrollHeight:200] && a.table.offsetWrites==previewWrites,@"preview preparation does not bypass native vertical dragging");
+    a.table.dragging=NO;a.dirty=YES;
+    Check(![a restoreScrollHeight:200] && a.table.offsetWrites==previewWrites,@"preview preparation does not bypass dirty model safety");
+
     for (NSString *geometry in @[@"window",@"detached",@"hidden",@"width",@"height",@"nan",@"tableHeight",@"content"]) {
         a=List(0,1800);HideGroup(a);
         if ([geometry isEqual:@"window"]) a.table.window=nil;
@@ -325,16 +340,22 @@ int main(void) { @autoreleasepool {
         if ([geometry isEqual:@"content"]) a.table.contentSize=CGSizeMake(390,NAN);
         [a restorePendingViewport];Check(a.table.offsetWrites==0,[NSString stringWithFormat:@"unready %@ geometry cannot write",geometry]);
     }
-    a=List(0,1800);[a beginUserScrolling];CheckCancelled(a,@"real user scrolling consumes startup ownership");
+    a=List(0,1800);a.pageSourceReturnKey=@[currentAccount,@(currentEpoch),@(a.viewportGeneration)];
+    [a beginUserScrolling];CheckCancelled(a,@"real user scrolling consumes startup ownership");
+    Check(!a.pageSourceReturnKey && a.viewportGeneration==1,@"a vertical positioning command invalidates the completed return key with its viewport generation");
     a=List(0,1800);[a prepareForNativeSearch];a.searching=NO;CheckCancelled(a,@"native search consumes startup ownership");
-    a=List(0,1800);[CSGroupListAdapter setPresentationSuspended:YES forController:a.controller];
+    a=List(0,1800);a.pageSourceReturnKey=@[currentAccount,@(currentEpoch),@(a.viewportGeneration)];
+    [CSGroupListAdapter setPresentationSuspended:YES forController:a.controller];
     Check(!a.initialViewportPending && a.presentationViewport,@"leaving main list ends startup and captures the normal return height");
+    Check(!a.pageSourceReturnKey,@"the first departure invalidates the previous completed return key");
     [CSGroupListAdapter setPresentationSuspended:NO forController:a.controller];a.dirty=NO;
     [a prepareInitialViewport];Check(!a.initialViewportPending,@"returning to a previously shown list does not rearm startup");
     a=List(0,1800);[a selectIndex:0];CheckCancelled(a,@"an explicit same-index selection command ends startup ownership");
     a=List(0,1800);[a selectIndex:1];Check(!a.initialViewportPending && [a.preferences.selectedTabID isEqual:@"custom_1"],@"a new group selection supersedes startup ownership");
     [a prepareInitialViewport];Check(!a.initialViewportPending,@"a new group selection cannot rearm startup on refresh");
-    a=List(0,1800);[a clearPendingViewport];CheckCancelled(a,@"explicit native positioning consumes startup ownership");
+    a=List(0,1800);a.pageSourceReturnKey=@[currentAccount,@(currentEpoch),@(a.viewportGeneration)];
+    [a clearPendingViewport];CheckCancelled(a,@"explicit native positioning consumes startup ownership");
+    Check(!a.pageSourceReturnKey,@"clearing pending positioning also consumes the completed return key");
     a=List(0,1800);groupingEnabled=NO;[a restorePendingViewport];groupingEnabled=YES;CheckCancelled(a,@"disabling grouping cancels the current startup request");
     a=List(0,1800);a.controller.folded=YES;a.initialViewportKey=nil;[a prepareInitialViewport];Check(!a.initialViewportPending,@"folded group page never creates startup positioning");
     a=List(0,1800);[a cancelInitialViewport];currentEpoch++;[a prepareInitialViewport];
@@ -366,6 +387,11 @@ int main(void) { @autoreleasepool {
 
     a=List(0,1800);HideGroup(a);[CSGroupListAdapter finishPresentationReturnForController:a.controller];
     Check(a.table.layouts==1 && a.table.offsetWrites==1 && !a.presentationViewport,@"first didAppear restores startup without a departure viewport");
+    Check([a.pageSourceReturnKey isEqual:@[currentAccount,@(currentEpoch),@(a.viewportGeneration)]],@"didAppear records return ownership independently of startup restoration");
+    a=List(0,1800);[a cancelInitialViewport];a.viewportGeneration=4;
+    [CSGroupListAdapter finishPresentationReturnForController:a.controller];
+    Check(!a.presentationViewport && !a.initialViewportPending && !a.table.layouts && !a.table.offsetWrites &&
+        [a.pageSourceReturnKey isEqual:@[currentAccount,@(currentEpoch),@4]],@"a return without captured or startup geometry still records its exact account epoch and generation for the first pan");
     a=List(0,1800);HideGroup(a);a.dirty=YES;[CSGroupListAdapter finishPresentationReturnForController:a.controller];
     Check(a.table.layouts==0 && a.table.offsetWrites==0 && a.initialViewportPending,@"didAppear waits for dirty model publication");
     a.dirty=NO;[a restorePendingViewport];Check(a.table.offsetWrites==1,@"publication after didAppear fulfills the retained startup request");

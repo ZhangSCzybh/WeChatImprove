@@ -5,6 +5,7 @@
 #import "CSCloseFriendListShield.h"
 #import "CSGroupPreferences.h"
 #import "CSGroupAppearance.h"
+#import "CSGroupPageAnimator.h"
 #import "CSGroupInvocationMapper.h"
 #import "CSGroupNativeBridge.h"
 #import "CSGroupNativeModel.h"
@@ -58,7 +59,25 @@ static BOOL Option(NSString *suffix) {
 @property (nonatomic, readwrite) BOOL updatingHeader;
 @property (nonatomic, strong) UIPanGestureRecognizer *pan;
 @property (nonatomic, strong) UIPanGestureRecognizer *listPan;
+- (void)ensureListPanHost;
 @property (nonatomic) BOOL barTouchAllowed, listTouchAllowed, swipeActive;
+@property (nonatomic, strong) CSGroupPageAnimator *pageAnimator;
+@property (nonatomic, copy) NSDictionary *pageTransitionContext;
+@property (nonatomic) NSUInteger pageTransitionGeneration;
+@property (nonatomic) BOOL pageSelectionAccepted, checkingPageTransition;
+@property (nonatomic, copy) NSString *pagePreviewTabID, *pagePreviewAttemptedTarget;
+@property (nonatomic) BOOL preparingPagePreview, restoringPagePreview, pageRollingBack;
+@property (nonatomic) CGFloat pageReleaseVelocity;
+- (BOOL)beginSwipePageTransitionToIndex:(NSInteger)index direction:(NSInteger)direction;
+- (void)preparePageSourceForPan;
+- (void)restorePagePreview;
+- (void)rollbackPageTransitionWithVelocity:(CGFloat)velocity;
+- (void)cancelPageTransition;
+- (void)cancelInvalidPageTransition;
+- (void)finishPageTransitionIfReady;
+- (BOOL)pageTransitionTargetIsReady;
+- (void)selectSwipeIndex:(NSInteger)index direction:(NSInteger)direction;
+- (void)preparePageTransitionForSelection:(NSInteger)index;
 @property (nonatomic, strong) CSGroupRow *swipeRow;
 @property (nonatomic, copy) NSString *swipeAccount;
 @property (nonatomic, copy) NSIndexPath *swipeDisplayPath;
@@ -76,6 +95,7 @@ static BOOL Option(NSString *suffix) {
 @property (nonatomic) BOOL presentationSuspended;
 @property (nonatomic, copy) NSDictionary *presentationViewport, *switchViewport;
 @property (nonatomic) BOOL presentationReturnFinished, restoringViewport;
+@property (nonatomic, copy) NSArray *pageSourceReturnKey;
 @property (nonatomic) NSUInteger viewportGeneration;
 @property (nonatomic, copy) NSArray *initialViewportKey;
 @property (nonatomic) NSUInteger initialViewportGeneration;
@@ -202,6 +222,8 @@ static BOOL Option(NSString *suffix) {
 
 @implementation CSGroupListAdapter
 - (void)dealloc {
+    [_pageAnimator cancel];
+    [_listPan.view removeGestureRecognizer:_listPan];
     [_table.panGestureRecognizer removeTarget:self action:@selector(tablePan:)];
     [_tabBadgeSourceTimer invalidate]; [NSNotificationCenter.defaultCenter removeObserver:self];
 }
@@ -252,6 +274,8 @@ static BOOL Option(NSString *suffix) {
     objc_setAssociatedObject(controller,&PresentationSuspendedKey,@(suspended),OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     CSGroupListAdapter *adapter=[self adapterForController:controller];
     if (suspended && !adapter.presentationSuspended) {
+        adapter.pageSourceReturnKey=nil;
+        [adapter cancelPageTransition];
         [adapter cancelInitialViewport];
         // willDisappear and didDisappear share one departure. The second call
         // must not replace its height with a covered/host-adjusted viewport.
@@ -276,6 +300,12 @@ static BOOL Option(NSString *suffix) {
 + (void)finishPresentationReturnForController:(id)controller {
     if (!NSThread.isMainThread || !controller) return;
     CSGroupListAdapter *adapter=[self adapterForController:controller];
+    if (!adapter || adapter.presentationSuspended) return;
+    // Appearance completion is independent of whether departure geometry could
+    // be captured or has already been restored. Keep one source-preparation
+    // request until the first horizontal gesture or a newer positioning command.
+    NSString *account=CSGroupCurrentAccountID();
+    adapter.pageSourceReturnKey=account.length ? @[account,@(CSCloseFriendAccountEpoch()),@(adapter.viewportGeneration)] : nil;
     if (!adapter.presentationViewport && !adapter.initialViewportPending) return;
     if (adapter.presentationViewport) adapter.presentationReturnFinished=YES;
     // The host has completed viewDidAppear. Dirty/privacy-held geometry waits
@@ -542,7 +572,7 @@ static BOOL Option(NSString *suffix) {
     }
 }
 + (void)settingsChanged {
-    dispatch_async(dispatch_get_main_queue(), ^{ for (CSGroupListAdapter *adapter in Adapters().allObjects) { @synchronized (adapter) { adapter.pendingChanges|=CSGroupChangeUnknown; } [adapter invalidateNativeSnapshot]; adapter.appearanceDirty=YES; [adapter requestTabBadgeSourceRefresh]; [adapter refresh]; [adapter layout]; } });
+    dispatch_async(dispatch_get_main_queue(), ^{ for (CSGroupListAdapter *adapter in Adapters().allObjects) { [adapter cancelPageTransition]; @synchronized (adapter) { adapter.pendingChanges|=CSGroupChangeUnknown; } [adapter invalidateNativeSnapshot]; adapter.appearanceDirty=YES; [adapter requestTabBadgeSourceRefresh]; [adapter refresh]; [adapter layout]; } });
 }
 + (void)closeFriendPolicyChanged:(NSNotification *)notification {
     (void)notification;
@@ -552,6 +582,7 @@ static BOOL Option(NSString *suffix) {
     for (CSGroupListAdapter *adapter in Adapters().allObjects) {
         // Preserve the header and ordinary rows even if the native model is in a
         // transaction. Redact sensitive rows before attempting the safe publication.
+        [adapter cancelPageTransition];
         adapter.privacyRefreshPending=YES; adapter.dirty=YES;
         [adapter shieldVisiblePrivateRows];
         [adapter cancelScheduledRefresh]; [adapter invalidateNativeSnapshot];
@@ -583,6 +614,7 @@ static BOOL Option(NSString *suffix) {
     }
     CSGroupAppInactive=![notification.name isEqual:UIApplicationDidBecomeActiveNotification];
     for (CSGroupListAdapter *adapter in Adapters().allObjects) {
+        [adapter cancelPageTransition];
         [adapter cancelScheduledRefresh]; [adapter invalidateNativeSnapshot];
         @synchronized (adapter) { adapter.pendingChanges|=CSGroupChangeUnknown; } adapter.dirty=YES; adapter.recoveryPending=NO;
         adapter.cachedNativeSections=nil; [adapter.projection discardComputationCache];
@@ -612,6 +644,7 @@ static BOOL Option(NSString *suffix) {
     proxy.target=target; return proxy;
 }
 - (void)detach {
+    [self cancelPageTransition];
     [self.table.panGestureRecognizer removeTarget:self action:@selector(tablePan:)];
     objc_setAssociatedObject(self,@selector(performSessionListLayout:),nil,OBJC_ASSOCIATION_RETAIN);
     [self cancelTabBadgeSourceRefresh];
@@ -622,7 +655,7 @@ static BOOL Option(NSString *suffix) {
     [self.privacyShield prepareForPublication]; self.privacyShield=nil;
     [self refreshNavigationTitle];
     self.presentationSuspended=YES; [self cancelScheduledRefresh];
-    [self publishHeader:self.nativeHeader]; [self.chrome removeFromSuperview]; [self.chrome removeGestureRecognizer:self.pan]; [table removeGestureRecognizer:self.listPan];
+    [self publishHeader:self.nativeHeader]; [self.chrome removeFromSuperview]; [self.chrome removeGestureRecognizer:self.pan]; [self.listPan.view removeGestureRecognizer:self.listPan];
     objc_setAssociatedObject(table,&AdapterKey,nil,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     if (table.dataSource==self.proxies[@0]) table.dataSource=self.proxies[@0].target;
     if (table.delegate==self.proxies[@1]) table.delegate=self.proxies[@1].target;
@@ -632,8 +665,14 @@ static BOOL Option(NSString *suffix) {
     [self.completions removeAllObjects];
     [self.nativeActions removeAllObjects];
 }
+- (void)ensureListPanHost {
+    // The cover and table are siblings. Their stable parent must own the pan so
+    // a new touch can interrupt settling without removing its own recognizer.
+    UIView *host=self.table.superview ?: self.table;
+    if (self.listPan && self.listPan.view!=host) [host addGestureRecognizer:self.listPan];
+}
 - (void)ensureChrome {
-    if (self.chrome) return;
+    if (self.chrome) { [self ensureListPanHost]; return; }
     self.chrome=[WESessionTabContainerView new];
     __weak typeof(self) weakSelf=self;
     self.chrome.onTabSelected=^(NSInteger index) { [weakSelf selectIndex:index]; };
@@ -651,10 +690,13 @@ static BOOL Option(NSString *suffix) {
     [self.chrome addGestureRecognizer:self.pan];
     self.listPan=[[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(groupPan:)];
     self.listPan.delegate=self; self.listPan.maximumNumberOfTouches=1;
+    // Wait for the group direction decision before delivering row press feedback.
+    // A failed pan still lets the native row receive its touch sequence.
+    self.listPan.delaysTouchesBegan=YES;
     // Once a row swipe belongs to grouping, cancel the row's pending tap.
     // Rejected right-zone touches never reach this recognizer.
     self.listPan.cancelsTouchesInView=YES;
-    [self.table addGestureRecognizer:self.listPan];
+    [self ensureListPanHost];
 }
 - (UIView *)nativeTableHeaderView { return self.nativeHeader; }
 - (void)setNativeTableHeaderView:(UIView *)header {
@@ -667,6 +709,7 @@ static BOOL Option(NSString *suffix) {
     [self layout];
 }
 - (void)prepareForNativeSearch {
+    [self cancelPageTransition];
     [self clearPendingViewport];
     [self invalidateNativeSnapshot];
     if (!self.searching) {
@@ -692,6 +735,7 @@ static BOOL Option(NSString *suffix) {
     @finally { self.updatingHeader=NO; }
 }
 - (void)layout {
+    [self cancelInvalidPageTransition];
     UITableView *table=self.table; if (self.presentationSuspended || !CSGroupApplicationActive() || !table || self.updatingHeader) return;
     __block UIView *installed=nil;
     CSGroupWithDisplayIndices(table, ^{ installed=table.tableHeaderView; });
@@ -745,8 +789,10 @@ static BOOL Option(NSString *suffix) {
     if (table.decelerationRate!=deceleration) table.decelerationRate=deceleration;
     [self updateGroupGestureAvailability];
     [self restorePendingViewport];
+    [self finishPageTransitionIfReady];
 }
 - (void)performSessionListLayout:(void (^)(void))layout {
+    [self cancelInvalidPageTransition];
     if ([self adoptCompatibilityModelIfNeeded]) {
         if (!self.publishing) [self requestRefresh];
         return;
@@ -804,6 +850,7 @@ static BOOL Option(NSString *suffix) {
     if (ready && !admitted) for (NSArray *section in projection.sections) for (CSGroupRow *row in section)
         if ([policy hidesUserName:row.userName surface:CSCloseFriendSurfaceSession]) ready=NO;
     if (!ready) {
+        [self cancelPageTransition];
         self.sessionLayoutHeld=YES;
         if (!self.privacyShield) self.privacyShield=[CSCloseFriendListShield new];
         for (UITableViewCell *cell in self.table.visibleCells) [self.privacyShield shieldCell:cell];
@@ -833,6 +880,7 @@ static BOOL Option(NSString *suffix) {
     if (!proofStillValid) objc_setAssociatedObject(self,@selector(performSessionListLayout:),nil,OBJC_ASSOCIATION_RETAIN);
     if (current.blocked || current.revision!=policy.revision || epoch!=CSCloseFriendAccountEpoch() ||
         ![current.accountID isEqual:account] || ![account isEqual:CSGroupCurrentAccountID()]) {
+        [self cancelPageTransition];
         self.sessionLayoutHeld=YES;
         if (!self.privacyShield) self.privacyShield=[CSCloseFriendListShield new];
         for (UITableViewCell *cell in self.table.visibleCells) [self.privacyShield shieldCell:cell];
@@ -855,6 +903,7 @@ static BOOL Option(NSString *suffix) {
     self.sessionLayoutHeld=NO;
     [self.privacyShield prepareForPublication];
     [self restorePendingViewport];
+    [self finishPageTransitionIfReady];
 }
 + (void)prepareForListVisibility {
     if (!NSThread.isMainThread) return;
@@ -882,6 +931,7 @@ static BOOL Option(NSString *suffix) {
         epoch!=CSCloseFriendAccountEpoch() || ![current.accountID isEqual:account] ||
         ![account isEqual:CSGroupCurrentAccountID()]) unsafe=YES;
     if (!unsafe) return;
+    [self cancelPageTransition];
     // Neutralize the existing content layer before the animator can expose it.
     // Preserve table geometry/gestures; only a completed publication releases it.
     if (!self.privacyShield) self.privacyShield=[CSCloseFriendListShield new];
@@ -1028,6 +1078,7 @@ static BOOL Option(NSString *suffix) {
     return YES;
 }
 - (void)nativeSessionModelChanged:(NSNotification *)notification {
+    [self cancelInvalidPageTransition];
     if ([self adoptCompatibilityModelIfNeeded]) { [self requestRefresh];return; }
     if (!self.usesNativeSessionModel) return;
     CSGroupNativeSessionCoordinator *coordinator=[CSGroupNativeSessionCoordinator sharedCoordinator];
@@ -1043,6 +1094,7 @@ static BOOL Option(NSString *suffix) {
     [self mergePendingChangeOfKind:[kind isKindOfClass:NSNumber.class] ? kind.unsignedIntegerValue : CSGroupChangeUnknown
         changedUserNames:named ? names : nil];
     [self invalidateNativeSnapshot];
+    [self cancelInvalidPageTransition];
     // Keep immutable values as reuse candidates; account/epoch/revision checks
     // still gate every read and all current host identities are revalidated.
     self.tabBadgeSections=nil;
@@ -1093,7 +1145,7 @@ static BOOL Option(NSString *suffix) {
     [self pruneNativeActions];
     if ((!CSGroupApplicationActive() && !self.privacyRefreshPending) ||
         (self.presentationSuspended && !self.nativeActions.count)) { self.dirty=YES; return; }
-    if (self.changeDepth || (!self.privacyRefreshPending && !self.presentationSuspended &&
+    if (self.changeDepth || (!self.privacyRefreshPending && !self.presentationSuspended && !self.preparingPagePreview &&
         [self refreshInteractionIsBlocking])) {
         self.dirty=YES; [self scheduleRefresh]; return;
     }
@@ -1201,7 +1253,8 @@ static BOOL Option(NSString *suffix) {
         BOOL appearanceChanged=self.appearanceDirty;
         if (appearanceChanged) { [self.chrome refreshAppearance];self.appearanceDirty=NO; }
         [self.chrome updateTabs:tabs];
-        if (appearanceChanged || ![self.chrome.selectedTabID isEqual:selected]) self.chrome.selectedTabID=selected;
+        NSString *chromeSelection=self.pagePreviewTabID ? self.pageTransitionContext[@"source"] : selected;
+        if (appearanceChanged || ![self.chrome.selectedTabID isEqual:chromeSelection]) self.chrome.selectedTabID=chromeSelection;
         [tabs enumerateObjectsUsingBlock:^(WESessionTabItem *tab,NSUInteger index,BOOL *stop) {
             (void)stop;CSGroupBadge *badge=[model.projection badgeForTabID:tab.tabId];
             BOOL hidden=Option(tab.type==WETabTypeAll ? @"hide_all_badge" : @"hide_group_badge");
@@ -1233,6 +1286,7 @@ static BOOL Option(NSString *suffix) {
         if (!finished && changes) [self mergePendingChangeOfKind:changes changedUserNames:changedUserNames];
         if (finished) {
             [self restorePendingViewport];
+            [self finishPageTransitionIfReady];
             NSArray *actions=[self.nativeActions copy];[self.nativeActions removeAllObjects];
             for (void (^action)(void) in actions) action();
         }
@@ -1262,6 +1316,7 @@ static BOOL Option(NSString *suffix) {
     }
 }
 - (void)refresh {
+    [self cancelInvalidPageTransition];
     if (NSThread.isMainThread) [self adoptCompatibilityModelIfNeeded];
     if (self.usesNativeSessionModel) { [self refreshNativeSessionModel]; return; }
     if (!NSThread.isMainThread) { [self requestRefresh]; return; }
@@ -1276,7 +1331,7 @@ static BOOL Option(NSString *suffix) {
     }
     // A horizontal row swipe starts tracking before UIKit reports editing or
     // dragging. Reloading in that window replaces the cell under the finger.
-    if (!self.privacyRefreshPending && !self.presentationSuspended && (self.table.tracking || [self groupPanMoving])) { self.dirty=YES; [self scheduleRefresh]; return; }
+    if (!self.privacyRefreshPending && !self.presentationSuspended && !self.preparingPagePreview && (self.table.tracking || [self groupPanMoving])) { self.dirty=YES; [self scheduleRefresh]; return; }
     NSUInteger menuState=(self.privacyRefreshPending || self.presentationSuspended) ? 0 : [self nativeMenuState];
     if (menuState) {
         self.dirty=YES;
@@ -1335,7 +1390,7 @@ static BOOL Option(NSString *suffix) {
         if (!self.preferences || changed) self.preferences=[[CSGroupPreferences alloc] initWithDefaults:NSUserDefaults.standardUserDefaults accountID:account];
         else [self.preferences reload];
         [self ensureChrome];
-        NSArray *tabs=self.preferences.tabs; NSString *selected=self.preferences.selectedTabID;
+        NSArray *tabs=self.preferences.tabs; NSString *selected=self.pagePreviewTabID ?: self.preferences.selectedTabID;
         // A privacy change during search must rebuild this same group. It must
         // neither retain newly hidden rows nor replace the transition with All.
         if (self.nativePresentation || !enabled || (self.searching && !keepsSearchGroup)) {
@@ -1372,7 +1427,8 @@ static BOOL Option(NSString *suffix) {
         self.publishedEnabled=Option(@"enabled");
         self.publishedTabID=selected;
         if (self.appearanceDirty) { [self.chrome refreshAppearance]; self.appearanceDirty=NO; }
-        self.chrome.selectedTabID=selected; [self.chrome updateTabs:tabs]; self.chrome.selectedTabID=selected;
+        NSString *chromeSelection=self.pagePreviewTabID ? self.pageTransitionContext[@"source"] : selected;
+        self.chrome.selectedTabID=chromeSelection; [self.chrome updateTabs:tabs]; self.chrome.selectedTabID=chromeSelection;
         id logic=CSGroupReadObject(self.controller,@"m_mainFrameLogicController");
         [tabs enumerateObjectsUsingBlock:^(WESessionTabItem *tab, NSUInteger index, BOOL *stop) {
             (void)stop; if (!projection && tab.type!=WETabTypeAll) return;
@@ -1407,6 +1463,7 @@ static BOOL Option(NSString *suffix) {
                 [self.privacyShield prepareForPublication];
         }
         if (finished) [self restorePendingViewport];
+        [self finishPageTransitionIfReady];
         NSArray *callbacks=[self.completions copy]; [self.completions removeAllObjects];
         for (void (^completion)(BOOL) in callbacks) completion(finished);
         if (finished && CSGroupApplicationActive() && (!self.isActive || CSGroupPrivacyActive()) && !self.changeDepth) {
@@ -1735,11 +1792,13 @@ static BOOL Option(NSString *suffix) {
     @finally { [self endNativeChange]; }
 }
 - (void)useNativePresentation {
+    [self cancelPageTransition];
     if (!self.isActive || self.swipeActive || self.table.editing || [self nativeMenuState]) return;
     [self clearPendingViewport];
     [self saveAnchor]; self.nativePresentation=YES; [self.table setEditing:NO animated:NO]; [self refresh];
 }
 - (void)performInNativePresentation:(void (^)(void))action {
+    [self cancelPageTransition];
     NSString *account=CSGroupCurrentAccountID(); if (!account.length) return;
     [self clearPendingViewport];
     NSUInteger epoch=CSCloseFriendAccountEpoch();
@@ -2095,6 +2154,7 @@ static BOOL Option(NSString *suffix) {
 }
 - (void)clearPendingViewport {
     [self cancelInitialViewport];
+    self.pageSourceReturnKey=nil;
     self.presentationViewport=nil; self.switchViewport=nil; self.presentationReturnFinished=NO;
 }
 - (void)prepareInitialViewport {
@@ -2147,6 +2207,7 @@ static BOOL Option(NSString *suffix) {
     [self restoreScrollHeight:height];
 }
 - (void)beginUserScrolling {
+    [self cancelPageTransition];
     // A real drag is a newer positioning command. Waiting for that drag to end
     // must not resurrect a height or row saved before the user took control.
     self.viewportGeneration++;
@@ -2169,7 +2230,7 @@ static BOOL Option(NSString *suffix) {
     if (self.restoringViewport || self.presentationSuspended || !CSGroupApplicationActive() || self.publishing || self.dirty ||
         self.changeDepth || self.privacyRefreshPending || self.sessionLayoutHeld || self.snapshotRetryAttempted ||
         !self.isActive || !self.chromeVisible || !self.publishedTabID.length || self.searching || self.nativePresentation || self.nativeActions.count ||
-        table.tracking || table.dragging || table.decelerating || table.editing || self.swipeActive || [self groupPanMoving] || [self nativeMenuState]) return NO;
+        (!self.preparingPagePreview && table.tracking) || table.dragging || table.decelerating || table.editing || self.swipeActive || (!self.preparingPagePreview && [self groupPanMoving]) || [self nativeMenuState]) return NO;
     NSString *account=CSGroupCurrentAccountID(), *tabID=self.publishedTabID;
     NSUInteger epoch=CSCloseFriendAccountEpoch(), revision=self.modelRevision;
     CSGroupProjection *projection=self.projection;
@@ -2209,7 +2270,7 @@ static BOOL Option(NSString *suffix) {
         self.presentationSuspended || !CSGroupApplicationActive() || self.publishing || self.dirty || self.changeDepth ||
         self.privacyRefreshPending || self.sessionLayoutHeld || self.snapshotRetryAttempted || !self.isActive || !self.chromeVisible ||
         self.searching || self.nativePresentation || self.nativeActions.count ||
-        table.tracking || table.dragging || table.decelerating || table.editing || self.swipeActive || [self groupPanMoving] || [self nativeMenuState]) return NO;
+        (!self.preparingPagePreview && table.tracking) || table.dragging || table.decelerating || table.editing || self.swipeActive || (!self.preparingPagePreview && [self groupPanMoving]) || [self nativeMenuState]) return NO;
     if (self.usesNativeSessionModel) {
         CSGroupNativeSessionCoordinator *coordinator=CSGroupNativeSessionCoordinator.sharedCoordinator;
         if (coordinator.boundary || self.nativeModelRevision!=coordinator.revision || coordinator.epoch!=epoch ||
@@ -2274,6 +2335,7 @@ static BOOL Option(NSString *suffix) {
     if (!self.presentationViewport && !self.switchViewport) [self saveAnchor];
 }
 - (void)restoreViewportFromSource:(NSDictionary *)viewport {
+    if (self.preparingPagePreview) return;
     if (!self.presentationViewport && !self.switchViewport && [self validViewport:viewport] &&
         ![viewport[@"tab"] isEqual:self.publishedTabID] && self.publishedTabID.length &&
         !self.searching && !self.nativePresentation && !self.nativeActions.count) {
@@ -2324,6 +2386,7 @@ static BOOL Option(NSString *suffix) {
     }
 }
 - (void)selectIndex:(NSInteger)index {
+    [self preparePageTransitionForSelection:index];
     if (self.swipeActive || self.table.editing || [self nativeMenuState]) { self.chrome.selectedTabID=self.publishedTabID; return; }
     NSArray *tabs=self.displayedTabs; if (index<0 || index>=(NSInteger)tabs.count) return;
     if (![self.preferences.accountID isEqualToString:CSGroupCurrentAccountID()]) { [self requestRefresh]; return; }
@@ -2378,7 +2441,7 @@ static BOOL Option(NSString *suffix) {
             (adapter.searching && ![adapter keepsGroupHeaderDuringSearch]) ||
             ![adapter.preferences.accountID isEqual:CSGroupCurrentAccountID()]) continue;
         for (WESessionTabItem *tab in adapter.displayedTabs)
-            if ([tab.tabId isEqual:adapter.publishedTabID]) return tab.displayName;
+            if ([tab.tabId isEqual:(adapter.pagePreviewTabID ? adapter.pageTransitionContext[@"source"] : adapter.publishedTabID)]) return tab.displayName;
     }
     return nil;
 }
@@ -2401,6 +2464,294 @@ static BOOL Option(NSString *suffix) {
             ((void(*)(id,SEL,unsigned int,id))objc_msgSend)(titleView,render,[before[@"status"] unsignedIntValue],title);
     }
 }
+- (void)restorePagePreview {
+    if (!self.pagePreviewTabID || self.restoringPagePreview) return;
+    NSDictionary *context=self.pageTransitionContext;
+    self.restoringPagePreview=YES;
+    BOOL preparing=self.preparingPagePreview;
+    self.preparingPagePreview=YES;
+    self.pagePreviewTabID=nil;
+    @try {
+        if (self.usesNativeSessionModel)
+            [CSGroupNativeSessionCoordinator.sharedCoordinator endPagePreviewForOwner:self.controller];
+        // Clear the override before refreshing, so a cancellation never publishes
+        // the neighbor as the user's selected group. This performs no preference write.
+        [self refresh];
+        if (self.pageTransitionContext==context &&
+            [context[@"account"] isEqual:CSGroupCurrentAccountID()] &&
+            [context[@"account"] isEqual:self.preferences.accountID] &&
+            [context[@"epoch"] unsignedIntegerValue]==CSCloseFriendAccountEpoch() &&
+            [self.preferences.selectedTabID isEqual:context[@"source"]])
+            [self restoreScrollHeight:[context[@"height"] doubleValue]];
+    } @finally {
+        self.preparingPagePreview=preparing;
+        self.restoringPagePreview=NO;
+    }
+}
+- (void)cancelPageTransition {
+    if (!self.pageAnimator && !self.pageTransitionContext && !self.pagePreviewTabID) return;
+    NSUInteger generation=++self.pageTransitionGeneration;
+    NSDictionary *context=self.pageTransitionContext;
+    // Privacy/lifecycle invalidations must remove copied pixels synchronously.
+    CSGroupPageAnimator *animator=self.pageAnimator;
+    self.pageAnimator=nil;
+    [animator cancel];
+    if (self.pageTransitionGeneration!=generation || self.pageTransitionContext!=context) return;
+    [self restorePagePreview];
+    if (self.pageTransitionGeneration==generation && self.pageTransitionContext==context) {
+        self.pageTransitionContext=nil; self.pageSelectionAccepted=NO; self.pageRollingBack=NO;
+    }
+}
+- (BOOL)pageTransitionContextIsValid {
+    NSDictionary *context=self.pageTransitionContext;
+    if (!context || !self.pageAnimator.isActive || !CSGroupPageTransitionEnabled(NSUserDefaults.standardUserDefaults) ||
+        UIAccessibilityIsReduceMotionEnabled() || !CSGroupApplicationActive() || self.presentationSuspended ||
+        self.searching || self.nativePresentation || self.nativeActions.count || !self.chromeVisible ||
+        !Option(@"enabled") || !Option(@"swipe_gesture_enabled") ||
+        [context[@"nativeModel"] boolValue]!=self.usesNativeSessionModel ||
+        self.modelRevision!=[context[@"revision"] unsignedIntegerValue] ||
+        ![self.pageAnimator matchesTable:self.table belowView:self.chrome]) return NO;
+    NSString *account=context[@"account"], *selected=self.preferences.selectedTabID;
+    CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
+    if (policy.blocked || ![policy.options[@"hideSessions"] isKindOfClass:NSNumber.class] ||
+        ![account isEqual:CSGroupCurrentAccountID()] || ![account isEqual:self.preferences.accountID] ||
+        ![policy.accountID isEqual:account] || policy.revision!=[context[@"policy"] unsignedIntegerValue] ||
+        CSCloseFriendAccountEpoch()!=[context[@"epoch"] unsignedIntegerValue] ||
+        ![selected isEqual:context[self.pageSelectionAccepted ? @"target" : @"source"]]) return NO;
+    if (self.pagePreviewTabID && self.usesNativeSessionModel &&
+        ![CSGroupNativeSessionCoordinator.sharedCoordinator pagePreviewTokenIsValidForOwner:self.controller]) return NO;
+    return YES;
+}
+- (void)cancelInvalidPageTransition {
+    if (!NSThread.isMainThread || !self.pageAnimator || self.preparingPagePreview || self.restoringPagePreview) return;
+    if (![self pageTransitionContextIsValid] ||
+        (self.pageAnimator.isAnimating && ![self pageTransitionTargetIsReady])) [self cancelPageTransition];
+}
+- (void)preparePageSourceForPan {
+    if (!NSThread.isMainThread || !CSGroupApplicationActive() || ![self groupSwipesAvailable] || !self.isActive ||
+        self.pageAnimator || self.pagePreviewTabID || self.preparingPagePreview || self.restoringPagePreview || self.restoringViewport ||
+        self.presentationSuspended || self.publishing || self.changeDepth || self.privacyRefreshPending ||
+        self.snapshotRetryAttempted || self.searching || self.nativePresentation || self.nativeActions.count ||
+        self.table.dragging || self.table.decelerating || self.table.editing || self.swipeActive || [self nativeMenuState]) return;
+    NSString *selected=self.preferences.selectedTabID, *account=CSGroupCurrentAccountID();
+    NSArray *returnKey=self.pageSourceReturnKey;
+    BOOL completedReturn=account.length && [returnKey isEqual:@[account,@(CSCloseFriendAccountEpoch()),@(self.viewportGeneration)]];
+    BOOL returning=completedReturn || (self.presentationReturnFinished && [self validViewport:self.presentationViewport]);
+    BOOL switching=[self validViewport:self.switchViewport] && [self.switchViewport[@"targetTab"] isEqual:selected];
+    BOOL unpublished=selected.length && ![selected isEqual:self.publishedTabID];
+    if ((self.presentationViewport && !self.presentationReturnFinished) || (!returning && !switching)) return;
+    CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
+    NSUInteger epoch=CSCloseFriendAccountEpoch();
+    if (!account.length || ![account isEqual:self.preferences.accountID] || !self.projection.isValid ||
+        ![self.projection.accountID isEqual:account] || self.snapshotEpoch!=epoch || policy.blocked ||
+        ![policy.accountID isEqual:account] || ![policy.options[@"hideSessions"] isKindOfClass:NSNumber.class] ||
+        CSGroupReadInteger(self.projection,@"privacyRevision",-1)!=(long long)policy.revision) return;
+    if (self.usesNativeSessionModel) {
+        CSGroupNativeSessionCoordinator *coordinator=CSGroupNativeSessionCoordinator.sharedCoordinator;
+        if (coordinator.boundary || coordinator.epoch!=epoch || ![coordinator.accountID isEqual:account]) return;
+    }
+    UITableView *table=self.table;
+    id controller=self.controller;
+    NSUInteger viewportGeneration=self.viewportGeneration;
+    NSDictionary *pendingViewport=self.presentationViewport ?: self.switchViewport;
+    // Horizontal ownership is already decided. Finish only a pending return or
+    // accepted selection; ordinary data changes still wait for the pan to end.
+    // The shared restore retains its account/policy/generation proofs and consumes
+    // the request only after the real table accepts the saved height.
+    self.preparingPagePreview=YES;
+    @try {
+        if (completedReturn) [self cancelInitialViewport];
+        if (self.dirty || unpublished || self.sessionLayoutHeld) [self refresh];
+        CSCloseFriendSnapshot *currentPolicy=CSCloseFriendCurrentSnapshot();
+        if (self.table!=table || self.controller!=controller || self.viewportGeneration!=viewportGeneration ||
+            ![account isEqual:CSGroupCurrentAccountID()] || epoch!=CSCloseFriendAccountEpoch() ||
+            self.presentationSuspended || self.searching || self.nativePresentation || self.nativeActions.count ||
+            self.privacyRefreshPending || self.snapshotRetryAttempted || currentPolicy.blocked ||
+            currentPolicy.revision!=policy.revision || ![currentPolicy.accountID isEqual:account] ||
+            ![selected isEqual:self.preferences.selectedTabID] ||
+            (completedReturn ? self.pageSourceReturnKey!=returnKey :
+                (self.presentationViewport ?: self.switchViewport)!=pendingViewport)) return;
+        if (!self.dirty && !self.publishing) {
+            // A previously withheld native layout may have consumed UIKit's
+            // dirty flag. Request it again; only the verified layout hook may
+            // release its hold before either page is captured.
+            CSGroupWithDisplayIndices(table, ^{ [table setNeedsLayout]; [table layoutIfNeeded]; });
+            if (self.table!=table || self.controller!=controller || self.viewportGeneration!=viewportGeneration ||
+                ![account isEqual:CSGroupCurrentAccountID()] || epoch!=CSCloseFriendAccountEpoch() ||
+                ![selected isEqual:self.preferences.selectedTabID] ||
+                (completedReturn ? self.pageSourceReturnKey!=returnKey :
+                    (self.presentationViewport ?: self.switchViewport)!=pendingViewport)) return;
+            [self restorePendingViewport];
+        }
+        if (completedReturn && self.pageSourceReturnKey==returnKey &&
+            self.table==table && self.controller==controller &&
+            !self.presentationSuspended && !self.dirty && !self.publishing && !self.changeDepth &&
+            !self.privacyRefreshPending && !self.sessionLayoutHeld && !self.snapshotRetryAttempted &&
+            !self.initialViewportPending && !self.presentationViewport && !self.switchViewport &&
+            [self.publishedTabID isEqual:self.preferences.selectedTabID] &&
+            [returnKey isEqual:@[CSGroupCurrentAccountID() ?: @"",@(CSCloseFriendAccountEpoch()),@(self.viewportGeneration)]])
+            self.pageSourceReturnKey=nil;
+    } @finally { self.preparingPagePreview=NO; }
+}
+- (BOOL)beginSwipePageTransitionToIndex:(NSInteger)index direction:(NSInteger)direction {
+    if (!CSGroupPageTransitionEnabled(NSUserDefaults.standardUserDefaults) || UIAccessibilityIsReduceMotionEnabled() ||
+        ![self groupSwipesAvailable] || !self.isActive || self.presentationSuspended || self.publishing || self.dirty ||
+        self.preparingPagePreview || self.restoringPagePreview || self.changeDepth || self.privacyRefreshPending || self.sessionLayoutHeld || self.snapshotRetryAttempted ||
+        self.nativePresentation || self.nativeActions.count || self.presentationViewport || self.switchViewport ||
+        self.table.dragging || self.table.decelerating || self.table.editing || self.swipeActive || [self nativeMenuState] ||
+        index<0 || index>=(NSInteger)self.displayedTabs.count || !self.projection.isValid) return NO;
+    NSString *account=CSGroupCurrentAccountID(), *source=self.publishedTabID;
+    NSString *target=[self.displayedTabs[(NSUInteger)index] tabId];
+    CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
+    NSUInteger epoch=CSCloseFriendAccountEpoch();
+    CGFloat height=self.table.contentOffset.y+self.table.adjustedContentInset.top;
+    if (!account.length || !source.length || [source isEqual:target] || !isfinite(height) ||
+        ![source isEqual:self.preferences.selectedTabID] || ![account isEqual:self.preferences.accountID] ||
+        ![self.projection.accountID isEqual:account] || self.snapshotEpoch!=epoch || policy.blocked ||
+        ![policy.accountID isEqual:account] || ![policy.options[@"hideSessions"] isKindOfClass:NSNumber.class] ||
+        CSGroupReadInteger(self.projection,@"privacyRevision",-1)!=(long long)policy.revision) return NO;
+    // Only an actual capture attempt is expensive enough to latch a failure.
+    // A temporary busy/menu/publication guard can recover during this same pan.
+    self.pagePreviewAttemptedTarget=target;
+    NSDictionary *context=@{@"account":account,@"epoch":@(epoch),@"policy":@(policy.revision),
+        @"source":source,@"target":target,@"nativeModel":@(self.usesNativeSessionModel),
+        @"revision":@(self.modelRevision),@"height":@(MAX(0,height))};
+    CSGroupPageAnimator *animator=[CSGroupPageAnimator new];
+    self.pageAnimator=animator; self.pageTransitionContext=context;
+    self.pageSelectionAccepted=NO; self.pageRollingBack=NO;
+    NSUInteger generation=++self.pageTransitionGeneration;
+    if (![animator beginWithTable:self.table belowView:self.chrome direction:direction] ||
+        self.pageTransitionContext!=context || ![self pageTransitionContextIsValid]) {
+        [animator cancel];
+        if (self.pageTransitionContext==context) [self cancelPageTransition];
+        return NO;
+    }
+    [self cancelInitialViewport];
+    self.preparingPagePreview=YES;
+    self.pagePreviewTabID=target;
+    @try {
+        BOOL admitted=!self.usesNativeSessionModel ||
+            [CSGroupNativeSessionCoordinator.sharedCoordinator beginPagePreviewForTabID:target owner:self.controller];
+        if (admitted && self.pageTransitionContext==context) {
+            [self refresh];
+            [self restoreScrollHeight:[context[@"height"] doubleValue]];
+            CSGroupWithDisplayIndices(self.table, ^{ [self.table layoutIfNeeded]; });
+        }
+        __weak typeof(self) weakSelf=self;
+        if (!admitted || self.pageTransitionContext!=context ||
+            ![animator prepareIncomingWithTable:self.table belowView:self.chrome readiness:^BOOL {
+                CSGroupListAdapter *adapter=weakSelf;
+                return adapter.pageTransitionGeneration==generation && adapter.pageTransitionContext==context &&
+                    adapter.pageAnimator==animator && [adapter pageTransitionTargetIsReady];
+            }]) {
+            if (self.pageTransitionContext==context) [self cancelPageTransition];
+            return NO;
+        }
+    } @finally { self.preparingPagePreview=NO; }
+    [self cancelInvalidPageTransition];
+    BOOL prepared=self.pageAnimator==animator && animator.isActive;
+    if (prepared) self.pagePreviewAttemptedTarget=nil;
+    return prepared;
+}
+- (void)preparePageTransitionForSelection:(NSInteger)index {
+    // A tab tap is a new selection command; it never inherits a pan's preview.
+    (void)index;
+    [self cancelPageTransition];
+}
+- (void)rollbackPageTransitionWithVelocity:(CGFloat)velocity {
+    if (!self.pageAnimator) return;
+    CSGroupPageAnimator *animator=self.pageAnimator;
+    NSDictionary *context=self.pageTransitionContext;
+    NSUInteger generation=self.pageTransitionGeneration;
+    self.pageRollingBack=YES;
+    // Restore the actual source while the two snapshots still cover it. Removing
+    // the cover after rebound can then reveal only the source, without a flash.
+    [self restorePagePreview];
+    if (self.pageAnimator!=animator || ![self pageTransitionTargetIsReady]) {
+        if (self.pageTransitionContext==context) [self cancelPageTransition];
+        return;
+    }
+    __weak typeof(self) weakSelf=self;
+    [animator settleCommitting:NO velocity:velocity readiness:^BOOL {
+        CSGroupListAdapter *adapter=weakSelf;
+        return adapter.pageTransitionGeneration==generation && adapter.pageTransitionContext==context &&
+            [adapter pageTransitionTargetIsReady];
+    } completion:^(BOOL committed) {
+        (void)committed;
+        CSGroupListAdapter *adapter=weakSelf;
+        if (adapter.pageTransitionGeneration==generation && adapter.pageTransitionContext==context)
+            [adapter cancelPageTransition];
+    }];
+}
+- (void)selectSwipeIndex:(NSInteger)index direction:(NSInteger)direction {
+    NSString *target=index>=0 && index<(NSInteger)self.displayedTabs.count ? [self.displayedTabs[(NSUInteger)index] tabId] : nil;
+    [self cancelInvalidPageTransition];
+    if (!self.pageAnimator || ![target isEqual:self.pageTransitionContext[@"target"]]) {
+        [self cancelPageTransition];
+        // Unavailable/unsafe previews retain the established direct switch path.
+        [self.chrome selectTabAtIndex:index animated:YES]; [self selectIndex:index]; return;
+    }
+    (void)direction;
+    if (![self pageTransitionTargetIsReady]) { [self cancelPageTransition]; return; }
+    NSDictionary *context=self.pageTransitionContext;
+    NSUInteger generation=self.pageTransitionGeneration;
+    self.preferences.selectedTabID=target;
+    if (self.pageTransitionGeneration!=generation || self.pageTransitionContext!=context) return;
+    if (![self.preferences.selectedTabID isEqual:target]) { [self rollbackPageTransitionWithVelocity:0]; return; }
+    self.pageSelectionAccepted=YES;
+    // Start at the finger's current indicator geometry before publication
+    // acknowledges this selection through the nonanimated selectedTabID setter.
+    [self.chrome selectTabAtIndex:index animated:YES];
+    if (self.pageTransitionGeneration!=generation || self.pageTransitionContext!=context) return;
+    [self restorePagePreview];
+    if (self.pageTransitionGeneration!=generation || self.pageTransitionContext!=context) return;
+    [self.anchors removeObjectForKey:target];
+    [self refreshNavigationTitle];
+    [CSGroupListAdapter refreshFoldedListsForAccount:self.preferences.accountID];
+    [self finishPageTransitionIfReady];
+}
+- (BOOL)pageTransitionTargetIsReady {
+    if (![self pageTransitionContextIsValid]) return NO;
+    UITableView *table=self.table;
+    NSString *expected=self.pageRollingBack ? self.pageTransitionContext[@"source"] : self.pageTransitionContext[@"target"];
+    if (self.publishing || self.dirty || self.changeDepth || self.privacyRefreshPending || self.sessionLayoutHeld ||
+        self.snapshotRetryAttempted || self.switchViewport || self.presentationViewport || self.initialViewportPending ||
+        table.dragging || table.decelerating || table.editing || self.swipeActive ||
+        [self nativeMenuState] || !self.projection.isValid || ![self.publishedTabID isEqual:expected] ||
+        ![self.projection.accountID isEqual:self.pageTransitionContext[@"account"]] ||
+        self.snapshotEpoch!=[self.pageTransitionContext[@"epoch"] unsignedIntegerValue] ||
+        CSGroupReadInteger(self.projection,@"privacyRevision",-1)!=[self.pageTransitionContext[@"policy"] longLongValue]) return NO;
+    if (self.usesNativeSessionModel) {
+        CSGroupNativeSessionCoordinator *coordinator=CSGroupNativeSessionCoordinator.sharedCoordinator;
+        if (coordinator.boundary || self.nativeModelRevision!=coordinator.revision ||
+            (self.pagePreviewTabID && ![coordinator pagePreviewIsValidForOwner:self.controller]) ||
+            coordinator.epoch!=CSCloseFriendAccountEpoch() || ![coordinator.accountID isEqual:CSGroupCurrentAccountID()]) return NO;
+    }
+    return YES;
+}
+- (void)finishPageTransitionIfReady {
+    if (!self.pageAnimator || !self.pageSelectionAccepted || self.checkingPageTransition || self.preparingPagePreview) return;
+    [self cancelInvalidPageTransition];
+    if (!self.pageAnimator || self.pageAnimator.isAnimating || ![self pageTransitionTargetIsReady]) return;
+    CSGroupPageAnimator *animator=self.pageAnimator;
+    NSDictionary *context=self.pageTransitionContext;
+    NSUInteger generation=self.pageTransitionGeneration;
+    self.checkingPageTransition=YES;
+    @try {
+        __weak typeof(self) weakSelf=self;
+        [animator settleCommitting:YES velocity:self.pageReleaseVelocity readiness:^BOOL {
+            CSGroupListAdapter *adapter=weakSelf;
+            return adapter.pageTransitionGeneration==generation && adapter.pageTransitionContext==context &&
+                adapter.pageAnimator==animator && [adapter pageTransitionTargetIsReady];
+        } completion:^(BOOL committed) {
+            (void)committed;
+            CSGroupListAdapter *adapter=weakSelf;
+            if (adapter.pageTransitionGeneration==generation && adapter.pageTransitionContext==context)
+                [adapter cancelPageTransition];
+        }];
+    } @finally { self.checkingPageTransition=NO; }
+}
+
 - (BOOL)groupSwipesAvailable {
     return self.table && Option(@"enabled") && Option(@"swipe_gesture_enabled") && self.chromeVisible && !self.searching;
 }
@@ -2414,6 +2765,10 @@ static BOOL Option(NSString *suffix) {
         if (view==self.table || view==self.chrome) break;
     }
     if (gesture==self.listPan) {
+        // A parent-owned recognizer also sees sibling controls. Only the actual
+        // list subtree or this animator's current cover belongs to grouping.
+        BOOL listTouch=touch.view==self.table || [touch.view isDescendantOfView:self.table];
+        if (!listTouch && ![self.pageAnimator ownsTouchView:touch.view]) return NO;
         // Menu state never changes zone ownership; menu buttons still receive taps
         // unless a left-zone horizontal group pan actually begins.
         if ([self listZoneForTouch:touch]!=0) return NO;
@@ -2455,27 +2810,58 @@ static BOOL Option(NSString *suffix) {
             CSGroupListAdapter *adapter=weakSelf;
             if (adapter.dirty) [adapter scheduleRefresh];
             [adapter restorePendingViewport];
+            [adapter finishPageTransitionIfReady];
         });
     }
     // Admission is latched at touch-down; crossing the 85% boundary cannot change owners.
     BOOL admitted=[self groupSwipesAvailable] && (pan==self.pan ? self.barTouchAllowed : self.listTouchAllowed);
-    if (!admitted || pan.state==UIGestureRecognizerStateCancelled || pan.state==UIGestureRecognizerStateFailed) {
-        [self.chrome cancelInteractiveTransition]; return;
+    if (pan.state==UIGestureRecognizerStateBegan) {
+        [self cancelPageTransition]; self.pagePreviewAttemptedTarget=nil;
     }
+    if (!admitted || pan.state==UIGestureRecognizerStateCancelled || pan.state==UIGestureRecognizerStateFailed) {
+        [self.chrome cancelInteractiveTransition];
+        [self rollbackPageTransitionWithVelocity:0]; return;
+    }
+    if ((pan.state==UIGestureRecognizerStateBegan || pan.state==UIGestureRecognizerStateChanged) &&
+        CSGroupPageTransitionEnabled(NSUserDefaults.standardUserDefaults) && !UIAccessibilityIsReduceMotionEnabled())
+        [self preparePageSourceForPan];
     CGPoint p=[pan translationInView:self.chrome],v=[pan velocityInView:self.chrome];
     NSInteger index=self.chrome.selectedIndex+(p.x<0 || (p.x==0 && v.x<0) ? 1 : -1);
     BOOL valid=index>=0 && index<(NSInteger)self.displayedTabs.count;
     if (pan.state==UIGestureRecognizerStateBegan || pan.state==UIGestureRecognizerStateChanged) {
         if (valid) {
+            NSString *target=[self.displayedTabs[(NSUInteger)index] tabId];
+            if (self.pageAnimator && ![target isEqual:self.pageTransitionContext[@"target"]]) [self cancelPageTransition];
+            if (!self.pageAnimator && CSGroupPageTransitionEnabled(NSUserDefaults.standardUserDefaults) &&
+                !UIAccessibilityIsReduceMotionEnabled() && ![self.pagePreviewAttemptedTarget isEqual:target]) {
+                if ([self closeMenusForGroupSwitch])
+                    [self beginSwipePageTransitionToIndex:index direction:index>self.chrome.selectedIndex ? 1 : -1];
+            }
+            [self cancelInvalidPageTransition];
+            [self.pageAnimator updateTranslation:p.x];
             CGFloat travel=MAX(88,MIN(160,CGRectGetWidth(self.table.bounds)*0.28));
-            [self.chrome updateInteractiveTransitionToIndex:index progress:MIN(1,fabs(p.x)/travel)];
-        } else [self.chrome cancelInteractiveTransition];
+            CGFloat progress=self.pageAnimator.isActive ? self.pageAnimator.progress : MIN(1,fabs(p.x)/travel);
+            [self.chrome updateInteractiveTransitionToIndex:index progress:progress];
+        } else { [self cancelPageTransition]; [self.chrome cancelInteractiveTransition]; }
         return;
     }
     if (pan.state!=UIGestureRecognizerStateEnded) return;
-    if ((fabs(p.x)>=44 || fabs(v.x)>=350) && valid && [self closeMenusForGroupSwitch]) {
-        [self.chrome selectTabAtIndex:index animated:YES]; [self selectIndex:index];
-    } else [self.chrome cancelInteractiveTransition];
+    self.pageReleaseVelocity=v.x;
+    [self.pageAnimator updateTranslation:p.x];
+    NSInteger direction=index>self.chrome.selectedIndex ? 1 : -1;
+    BOOL confirms=fabs(p.x)>=44 || fabs(v.x)>=350;
+    if (self.pageAnimator) {
+        // A fast pull back toward the source cancels the interactive page, even
+        // before the finger crosses zero. A forward flick can finish a short drag.
+        CGFloat forwardVelocity=-v.x*direction;
+        confirms=(fabs(p.x)>=44 || forwardVelocity>=350) && forwardVelocity>-350;
+    }
+    if (confirms && valid && [self closeMenusForGroupSwitch]) {
+        [self selectSwipeIndex:index direction:direction];
+    } else {
+        [self.chrome cancelInteractiveTransition];
+        [self rollbackPageTransitionWithVelocity:v.x];
+    }
 }
 @end
 BOOL CSGroupCardPosition(UITableView *table, NSIndexPath *path, BOOL *first, BOOL *last) {
