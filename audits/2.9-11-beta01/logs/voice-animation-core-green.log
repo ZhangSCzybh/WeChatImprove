@@ -1,5 +1,0 @@
-Final production adapter SHA256: 8710c9cdb459291d7138c6c5df531759e0dc0856388951390626ddff692d5a18
-Integration tests SHA256: 4ab818fc8390f510425b4d843b99adcf4ff404a05d1936d204695dd099a34a69
-Command: bash Tests/verify-merge-bubble-integration.sh --voice-animation-core
-PASS: 6 core native completion scenarios; 386 checks
-Exit status: 0

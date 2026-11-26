@@ -1,2 +1,0 @@
-Moments card geometry: 73467 checks passed (natural covers, two-line titles, optional location, stacked author/date, dynamic fonts, large counts, no overlaps).
-Moments card configuration: 113 checks passed (production configure/cleanup, first cover, video reuse/fallback, native emoji text/ABI, larger fonts, counts, timestamp/timezone/DST, optional location).

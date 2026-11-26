@@ -1,3 +1,0 @@
-rootless com.wechat.improve_2.9-11-beta06_iphoneos-arm64.deb 2419376 ['arm64', 'arm64e'] warnings=8 errors=0
-rootful com.wechat.improve_2.9-11-beta06_iphoneos-arm.deb 2423140 ['arm64', 'arm64e'] warnings=8 errors=0
-PASS: source, metadata, path, architecture, stage hash, dSYM UUID and ZIP checks
