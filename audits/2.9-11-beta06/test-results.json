@@ -1,0 +1,91 @@
+{
+  "tabbar": {
+    "command": "bash Tests/verify-tabbar.sh",
+    "exit_code": 0,
+    "geometry": "PASS",
+    "selected_icon_native_restore": "PASS",
+    "neo_touch_checks": 97,
+    "native_touch_checks": 121,
+    "structure_lifecycle_checks": 666,
+    "preferences_native_lifecycle": "PASS",
+    "log": "logs/tabbar.log"
+  },
+  "syntax": [
+    {
+      "architecture": "arm64",
+      "command": [
+        "xcrun",
+        "--sdk",
+        "iphoneos",
+        "clang",
+        "-fobjc-arc",
+        "-fblocks",
+        "-fsyntax-only",
+        "-miphoneos-version-min=15.0",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unused-parameter",
+        "-Wno-deprecated-declarations",
+        "-Wno-sign-compare",
+        "-IHeaders",
+        "-IHeadersFile",
+        "-IControllers",
+        "-arch",
+        "arm64",
+        "Controllers/CSTabBarStyleSettingsViewController.m",
+        "Controllers/CSTabBarPreviewView.m",
+        "Controllers/CSReleaseNotesViewController.m"
+      ],
+      "exit_code": 0
+    },
+    {
+      "architecture": "arm64e",
+      "command": [
+        "xcrun",
+        "--sdk",
+        "iphoneos",
+        "clang",
+        "-fobjc-arc",
+        "-fblocks",
+        "-fsyntax-only",
+        "-miphoneos-version-min=15.0",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unused-parameter",
+        "-Wno-deprecated-declarations",
+        "-Wno-sign-compare",
+        "-IHeaders",
+        "-IHeadersFile",
+        "-IControllers",
+        "-arch",
+        "arm64e",
+        "Controllers/CSTabBarStyleSettingsViewController.m",
+        "Controllers/CSTabBarPreviewView.m",
+        "Controllers/CSReleaseNotesViewController.m"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "source_delta_since_beta05": [
+    "Controllers/CSReleaseNotesViewController.m",
+    "Controllers/CSTabBarStyleSettingsViewController.m",
+    "Headers/CSTabBarGeometry.h",
+    "Headers/CSUserInfoHelper.h",
+    "control"
+  ],
+  "settings_review": {
+    "blocking_findings": 0,
+    "scope": [
+      "requested names and order",
+      "54/60/62 heights with retained width ratios",
+      "picker titles contain names only",
+      "description reads shared names and defaults",
+      "existing manual dimensions retained"
+    ]
+  },
+  "backup_regression_rerun": false,
+  "backup_unchanged_since_beta05": true,
+  "device_verified": false
+}

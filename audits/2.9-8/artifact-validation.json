@@ -1,0 +1,40 @@
+{
+  "version": "2.9-8",
+  "schemes": {
+    "rootful": {
+      "deb": "packages/2.9-8/com.wechat.improve_2.9-8_iphoneos-arm.deb",
+      "architecture": "iphoneos-arm",
+      "install_path": "Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib",
+      "uuids": {
+        "arm64": "D59E18E6-222D-348E-A059-8DF4505CE7AF",
+        "arm64e": "B4F57255-5A08-3D01-9A33-B06EC7E26D8C"
+      },
+      "dsym_uuids_match": true,
+      "compiled_per_arch": {
+        "arm64": 297,
+        "arm64e": 297
+      },
+      "warnings": 8,
+      "errors": 0,
+      "minimum_ios": "15.0"
+    },
+    "rootless": {
+      "deb": "packages/2.9-8/com.wechat.improve_2.9-8_iphoneos-arm64.deb",
+      "architecture": "iphoneos-arm64",
+      "install_path": "var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib",
+      "uuids": {
+        "arm64": "9E814A40-10E2-3996-9DE3-AC50832DCCAA",
+        "arm64e": "E099C444-2C34-3E9C-A502-272A7B9E7DA8"
+      },
+      "dsym_uuids_match": true,
+      "compiled_per_arch": {
+        "arm64": 297,
+        "arm64e": 297
+      },
+      "warnings": 8,
+      "errors": 0,
+      "minimum_ios": "15.0"
+    }
+  },
+  "source_units": 297
+}

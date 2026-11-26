@@ -3,7 +3,7 @@
 #import <CoreGraphics/CoreGraphics.h>
 #import <dispatch/dispatch.h>
 typedef struct { CGFloat top,left,bottom,right; } UIEdgeInsets;
-@class UIWindow, UITableViewCell, UIViewController;
+@class UIWindow, UITableViewCell, UIViewController, UIColor;
 @interface NSIndexPath (MessageUIKit)
 @property(nonatomic, readonly) NSInteger section;
 @property(nonatomic, readonly) NSInteger row;

@@ -122,6 +122,13 @@ typedef struct {
 @end
 @implementation CSMessageOriginOverride @end
 
+@interface CSMessageNativeLayoutState : NSObject
+@property(nonatomic, weak) id model;
+@property(nonatomic, copy) NSString *identity;
+@property(nonatomic) BOOL retryAvailable;
+@end
+@implementation CSMessageNativeLayoutState @end
+
 @interface CSMessageMergeContext : NSObject
 @property(nonatomic, weak) id owner;
 @property(nonatomic, weak) UITableView *table;
@@ -137,11 +144,12 @@ typedef struct {
 @property(nonatomic) BOOL dirty;
 @property(nonatomic) BOOL refreshing;
 @property(nonatomic) BOOL restorePending;
+@property(nonatomic) BOOL animationDeferred;
 - (void)schedule;
 - (void)flush;
 @end
 
-static char CSContextKey, CSStateKey, CSViewStateKey, CSOverridesKey, CSOriginKey, CSHeadOriginKey, CSDescriptorKey;
+static char CSContextKey, CSStateKey, CSViewStateKey, CSOverridesKey, CSOriginKey, CSHeadOriginKey, CSDescriptorKey, CSNativeLayoutKey;
 static NSHashTable *CSContexts;
 static NSHashTable *CSInactiveScenes;
 static BOOL CSAppInactive;
@@ -193,13 +201,33 @@ static CSMessageMergeContext *CSContext(id owner, BOOL create) {
     }
     return ctx;
 }
+static BOOL CSIsVoiceTransText(id model) {
+    id logical=CSParent(model);
+    NSString *name=NSStringFromClass([logical class]);
+    return ([name isEqual:@"VoiceTransTextMessageViewModel"] || [name isEqual:@"VoiceTransTextMessageViewModelV2"]) &&
+        CSUInt(CSMessageNativeObject(logical,@"messageWrap"),@"m_uiMessageType")==1;
+}
+static BOOL CSIsVoiceTransTextCell(UIView *view, id model) {
+    NSString *name=NSStringFromClass(view.class);
+    return CSIsVoiceTransText(model) &&
+        ([name isEqual:@"VoiceTransTextMessageCellView"] || [name isEqual:@"VoiceTransTextMessageCellViewV2"]);
+}
+static BOOL CSVoiceTransTextAnimating(UIView *view, id model) {
+    return CSIsVoiceTransTextCell(view,model) && CSBool(view,@"isAnimating",NO);
+}
+static CSMessageNativeLayoutState *CSPendingNativeLayout(UIView *view, id model) {
+    CSMessageNativeLayoutState *pending=objc_getAssociatedObject(view,&CSNativeLayoutKey);
+    return pending.model==model && [pending.identity isEqual:CSMessageNativeIdentity(model)] ? pending : nil;
+}
 static BOOL CSSupported(id model) {
     // Exact classes: subclasses with extra dynamic content require explicit qualification.
     NSString *name = NSStringFromClass([CSParent(model) class]);
     static NSSet *classes;
     static dispatch_once_t once;
     dispatch_once(&once, ^{ classes = [NSSet setWithArray:@[@"TextMessageViewModel",@"ImageMessageViewModel",@"VoiceMessageViewModel",@"VideoMessageViewModel",@"EmoticonMessageViewModel"]]; });
-    return [classes containsObject:name];
+    // Live speech-to-text sends keep these exact text models until the chat is
+    // reloaded. Match the bubble-style contract without admitting other cards.
+    return [classes containsObject:name] || CSIsVoiceTransText(model);
 }
 #ifdef CS_MERGE_TESTING
 NSUInteger CSMessageMergeDescriptorBuildCount;
@@ -492,7 +520,7 @@ static BOOL CSNativeGeometryChanged(CSMessageNativeGeometry previous, CSMessageN
 static BOOL CSNativeProfile(CSMessageMergeState *s, id logical, CGFloat *top, CGFloat *bottom) {
     if (!s.nativeGeometry.valid) return NO;
     NSString *kind=NSStringFromClass([logical class]);
-    BOOL usesTemplate=[kind isEqual:@"TextMessageViewModel"] || [kind isEqual:@"VoiceMessageViewModel"];
+    BOOL usesTemplate=[kind isEqual:@"TextMessageViewModel"] || [kind isEqual:@"VoiceMessageViewModel"] || CSIsVoiceTransText(logical);
     BOOL identity=!s.decision.hidesIdentity;
     // Match CommonMessageCellView.layoutInternal: CSS margin + native avatar
     // offset, replaced by ceil(CSS margin + UIFont dynamicLength:16) for a name.
@@ -667,6 +695,10 @@ void CSMessageMergeRender(UIView *view) {
     if (records.count) objc_setAssociatedObject(view,&CSOverridesKey,records,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     CSVoid(view,@"cs_messageTimeLayout");
     if (!s.singleRow || s.nativeHeight<=0 || (!s.decision.joinsPrevious && !s.decision.joinsNext)) return;
+    // The live send animation updates the model/table height while native
+    // shouldLayoutIfNeeded skips layoutInternal. Its intermediate child frames
+    // must not enlarge the published safety envelope or become a permanent rejection.
+    if (CSVoiceTransTextAnimating(view,model) || CSPendingNativeLayout(view,model)) return;
     BOOL transformed=!CGAffineTransformIsIdentity(view.transform);
     if (!CSCanCompact(s,CSAuxiliaryContentFlags(CSParent(model))) || transformed) {
         if (s.appliedDelta<0 && !s.geometryRejected) {
@@ -775,8 +807,64 @@ void CSMessageMergeRender(UIView *view) {
     view.frame=frame;
 }
 
+static CSMessageMergeState *CSOwnedVoiceTransState(UIView *view) {
+    if (!NSThread.isMainThread) return nil;
+    id model=CSMessageNativeObject(view,@"viewModel");
+    CSMessageMergeState *s=objc_getAssociatedObject(view,&CSViewStateKey);
+    if (s.model!=model || !s.context.config.enabled || !s.active || !s.singleRow ||
+        ![s.identity isEqual:CSMessageNativeIdentity(model)] ||
+        !CSQualifiedNativeVersion() || !CSIsVoiceTransTextCell(view,model)) return nil;
+    return s;
+}
+void CSMessageMergeNativeAnimationEnded(UIView *view) {
+    CSMessageMergeState *s=CSOwnedVoiceTransState(view);
+    if (!s || CSVoiceTransTextAnimating(view,s.model)) return;
+    CSMessageNativeLayoutState *pending=[CSMessageNativeLayoutState new];
+    pending.model=s.model;pending.identity=s.identity;pending.retryAvailable=YES;
+    objc_setAssociatedObject(view,&CSNativeLayoutKey,pending,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    // Clearing isAnimating does not prove that layoutInternal ran. Invalidate the
+    // cell cache and let the table's normal delegate remeasure the completed text.
+    // Keep intermediate frames quarantined until the real native layout finishes.
+    if (s.context.active) { CSVoid(view,@"resetLayoutCache"); [view setNeedsLayout]; }
+    s.needsLayout=YES;
+    [s.context schedule]; // Neighbor changes may also have been deferred before Prepare.
+}
+void CSMessageMergePerformNativeLayout(UIView *view, void (^native)(void)) {
+    id model=CSMessageNativeObject(view,@"viewModel");
+    CSMessageNativeLayoutState *pending=CSPendingNativeLayout(view,model);
+    native();
+    CSMessageMergeState *s=CSOwnedVoiceTransState(view);
+    if (!s || !pending || s.model!=model || CSVoiceTransTextAnimating(view,model) ||
+        CSPendingNativeLayout(view,model)!=pending) return;
+    objc_setAssociatedObject(view,&CSNativeLayoutKey,nil,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    [s.context schedule];
+}
+void CSMessageMergeNativeLayoutPassEnded(UIView *view) {
+    CSMessageMergeState *s=CSOwnedVoiceTransState(view);
+    CSMessageNativeLayoutState *pending=CSPendingNativeLayout(view,s.model);
+    if (!s.context.active || !pending.retryAvailable || CSVoiceTransTextAnimating(view,s.model) ||
+        view.bounds.size.width<=0 || view.bounds.size.height<=0) return;
+    // Text's stateful model-readiness gate can consume one pass before the cell
+    // even checks its layout cache. Retry once after that pass, never poll it.
+    pending.retryAvailable=NO;
+    __weak UIView *weakView=view;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIView *current=weakView;
+        CSMessageMergeState *state=CSOwnedVoiceTransState(current);
+        if (!state || CSPendingNativeLayout(current,state.model)!=pending || CSVoiceTransTextAnimating(current,state.model)) return;
+        if (!state.context.active) {
+            pending.retryAvailable=YES;state.needsLayout=YES;
+            [state.context schedule];
+            return;
+        }
+        CSVoid(current,@"resetLayoutCache");
+        [current setNeedsLayout];
+    });
+}
+
 void CSMessageMergeReuse(UIView *view) {
     CSMessageMergeRestore(view);
+    objc_setAssociatedObject(view,&CSNativeLayoutKey,nil,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     objc_setAssociatedObject(view,&CSViewStateKey,nil,OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
@@ -791,11 +879,12 @@ void CSMessageMergeReuse(UIView *view) {
 }
 - (void)flush {
     UITableView *table = self.table;
-    if (!self.dirty || !self.active || !CSCanPublish(self) || !table.window || self.mutationDepth || self.refreshing) return;
+    if ((!self.dirty && !self.animationDeferred) || !self.active || !CSCanPublish(self) || !table.window || self.mutationDepth || self.refreshing) return;
     if (table.dragging || table.decelerating || table.editing || table.hasUncommittedUpdates || CSBool(table,@"isReloadingData",NO) ||
         UIMenuController.sharedMenuController.menuVisible || CSBool(self.owner,@"isBeingDismissed",NO)) return;
     self.dirty = NO; self.refreshing = YES;
     @try {
+        self.animationDeferred=NO;
         NSArray<NSIndexPath *> *paths = [table.indexPathsForVisibleRows sortedArrayUsingSelector:@selector(compare:)];
         NSIndexPath *anchor = paths.firstObject;
         NSString *anchorID = nil;
@@ -809,11 +898,22 @@ void CSMessageMergeReuse(UIView *view) {
         BOOL navigating = CSMessageNavigationIsActive(self.owner);
         BOOL changed = NO;
         for (NSIndexPath *path in paths) {
+            id visibleCell=[table cellForRowAtIndexPath:path];
+            UIView *visibleView=CSMessageNativeObject(visibleCell,@"cellView");
+            id visibleModel=CSMessageNativeObject(visibleView,@"viewModel");
+            CSMessageMergeState *visibleState=objc_getAssociatedObject(visibleView,&CSViewStateKey);
+            // Prepare can reset the native model when a neighbor changes. Leave
+            // that work until the native completion reschedules this context.
+            // Settings/account changes still take the normal restoration path.
+            BOOL defer=visibleState.context==self && visibleState.model==visibleModel && visibleState.active && visibleState.singleRow &&
+                self.config.enabled && CSQualifiedNativeVersion() && [self.config appliesToGroup:[self.session hasSuffix:@"@chatroom"]] &&
+                [visibleState.account isEqual:self.account] && [visibleState.session isEqual:self.session] &&
+                [visibleState.identity isEqual:CSMessageNativeIdentity(visibleModel)] &&
+                CSConfigEqual(visibleState.configuration,self.config);
+            if (defer && CSVoiceTransTextAnimating(visibleView,visibleModel)) { self.animationDeferred=YES;continue; }
             CSMessageMergeState *s = CSPrepareModel(self,path);
             // Native insert/delete/replace may already have consumed the height work.
             // Appearance must still refresh the visible neighbors without another row update.
-            id visibleCell=[table cellForRowAtIndexPath:path];
-            UIView *visibleView=CSMessageNativeObject(visibleCell,@"cellView");
             if ([visibleView isKindOfClass:UIView.class]) CSBubbleStyleApply(visibleView);
             if (!s.needsLayout) continue;
             changed = YES; s.needsLayout = NO;
@@ -825,6 +925,11 @@ void CSMessageMergeReuse(UIView *view) {
             [view setNeedsLayout];
         }
         if (changed) [UIView performWithoutAnimation:^{ [table beginUpdates]; [table endUpdates]; [table layoutIfNeeded]; }];
+        for (NSIndexPath *path in paths) {
+            UIView *view=CSMessageNativeObject([table cellForRowAtIndexPath:path],@"cellView");
+            CSMessageMergeState *state=CSOwnedVoiceTransState(view);
+            if (state.context==self && CSPendingNativeLayout(view,state.model)) self.animationDeferred=YES;
+        }
         // Only correct plugin-induced height changes; never force bottom on new messages.
         NSArray *nodes = CSNodes(self.owner);
         if (changed && !navigating && anchorID.length && (NSUInteger)anchor.section < nodes.count &&
@@ -853,9 +958,12 @@ void CSMessageMergeActivate(id controller) {
     ctx.account=account;if (session.length) ctx.session=session;
     ctx.config=latest;
     if (changed) { ctx.epoch++;[ctx schedule]; }
-    else if (ctx.dirty) [ctx schedule];
+    else if (ctx.dirty || ctx.animationDeferred) [ctx schedule];
 }
-void CSMessageMergeDeactivate(id controller) { CSMessageMergeContext *ctx = CSContext(controller,NO); ctx.active = NO; }
+void CSMessageMergeDeactivate(id controller) {
+    CSMessageMergeContext *ctx = CSContext(controller,NO);ctx.active=NO;
+    if (ctx.animationDeferred) ctx.dirty=YES;
+}
 void CSMessageMergeWillMutate(id controller) {
     CSMessageMergeContext *ctx = CSContext(controller,NO);
     if (!ctx) return;
@@ -952,5 +1060,6 @@ static void CSSettingsChanged(CFNotificationCenterRef center, void *observer, CF
 
 BOOL CSMessageMergeLayoutSettled(id controller) {
     CSMessageMergeContext *ctx=CSContext(controller,NO);
-    return !ctx || ((!ctx.config.enabled && !ctx.restorePending) || (!ctx.dirty && !ctx.refreshing && !ctx.mutationDepth));
+    return !ctx || ((!ctx.config.enabled && !ctx.restorePending) ||
+        (!ctx.dirty && !ctx.refreshing && !ctx.mutationDepth && !ctx.animationDeferred));
 }

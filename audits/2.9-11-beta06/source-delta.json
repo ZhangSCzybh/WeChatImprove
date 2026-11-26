@@ -1,0 +1,11 @@
+{
+  "changed": [
+    "Controllers/CSReleaseNotesViewController.m",
+    "Controllers/CSTabBarStyleSettingsViewController.m",
+    "Headers/CSTabBarGeometry.h",
+    "Headers/CSUserInfoHelper.h",
+    "control"
+  ],
+  "removed": [],
+  "source_files": 42687
+}

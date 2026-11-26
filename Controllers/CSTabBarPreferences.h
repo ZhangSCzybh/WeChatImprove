@@ -16,9 +16,20 @@ typedef NS_ENUM(NSInteger, CSTabBarClickEffect) {
     CSTabBarClickEffectCapsule = 3,
 };
 
+typedef NS_ENUM(NSInteger, CSTabBarStructure) {
+    CSTabBarStructureClassic = 0,
+    CSTabBarStructureSeparated = 1,
+    CSTabBarStructureCentered = 2,
+};
+
 static NSString * const kTabBarStyleEnabledKey = @"com.wechat.enhance.tabbar_style.enabled";
 static NSString * const kTabBarHideTextKey = @"com.wechat.enhance.tabbar_style.hide_text";
 static NSString * const kTabBarSwipeSwitchKey = @"com.wechat.enhance.tabbar_style.swipe_switch";
+static NSString * const kTabBarStructureKey = @"com.wechat.enhance.tabbar_style.structure";
+static NSString * const kTabBarFunctionActionKey = @"com.wechat.enhance.tabbar_style.function_action";
+static NSString * const kTabBarFunctionGapKey = @"com.wechat.enhance.tabbar_style.function_gap";
+static NSString * const kTabBarFunctionSizeKey = @"com.wechat.enhance.tabbar_style.function_size";
+static NSString * const kTabBarCenterButtonScaleKey = @"com.wechat.enhance.tabbar_style.center_button_scale";
 
 static NSString * const kTabBarIconChatKey = @"com.wechat.enhance.tabbar_style.icon.chat";
 static NSString * const kTabBarIconContactsKey = @"com.wechat.enhance.tabbar_style.icon.contacts";
@@ -72,12 +83,16 @@ static const NSInteger kDefaultBorderStyle = 1; // 默认圆角
 
 
 static NSString * const kTabBarContentHeightKey = @"com.wechat.enhance.tabbar_style.content_height";
+static NSString * const kTabBarContentWidthKey = @"com.wechat.enhance.tabbar_style.content_width";
 static NSString * const kTabBarBorderWidthKey = @"com.wechat.enhance.tabbar_style.border_width";
 static NSString * const CSTabBarPreferencesDidChange = @"com.wechat.enhance.tabbar_style.changed";
 
 @interface CSTabBarPreferences : NSObject
 @property(nonatomic) BOOL enabled, hideText, swipeSwitch;
-@property(nonatomic) CGFloat scale, contentHeight, lift, cornerRadius, borderWidth;
+@property(nonatomic) CSTabBarStructure structure;
+@property(nonatomic, copy) NSString *functionAction;
+@property(nonatomic) CGFloat functionGap, functionSize, centerButtonScale;
+@property(nonatomic) CGFloat scale, contentHeight, contentWidth, lift, cornerRadius, borderWidth;
 @property(nonatomic) NSInteger borderStyle, haptic, animation;
 @property(nonatomic) CSTabBarClickEffect clickEffect;
 @property(nonatomic, strong) UIColor *backgroundColor, *borderColor;

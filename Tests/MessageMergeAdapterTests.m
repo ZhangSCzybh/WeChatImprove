@@ -120,6 +120,11 @@ static BOOL nativeMessageNamesVisible=YES;
 - (BOOL)isShowChatRoomDisplayName { return nativeMessageNamesVisible && !CSMessageMergeHidesName(self); }
 - (double)sectionHeight { self.nativeSectionReads++;return self.nativeCachedHeight; }
 @end
+// Exact sent speech-to-text models share the text fixture's native geometry.
+@interface VoiceTransTextMessageViewModel : TextMessageViewModel @end
+@implementation VoiceTransTextMessageViewModel @end
+@interface VoiceTransTextMessageViewModelV2 : TextMessageViewModel @end
+@implementation VoiceTransTextMessageViewModelV2 @end
 @interface VoiceMessageViewModel : TextMessageViewModel
 @property(nonatomic) BOOL canShowTranslateText;
 @property(nonatomic) BOOL bShowingQuickTranTips;
@@ -170,6 +175,22 @@ static BOOL nativeMessageNamesVisible=YES;
 @implementation NativeHierarchyCellView
 - (id)getContentView { return self.container; }
 @end
+@interface TextMessageCellView : NativeHierarchyCellView
+@property(nonatomic) BOOL nativeLayoutCacheClean;
+@property(nonatomic) NSUInteger nativeModelGateBlocks, nativeLayouts, nativeSkippedLayouts, nativeConsumedLayoutRequests, nativeCellResets;
+- (void)resetLayoutCache;
+@end
+@implementation TextMessageCellView
+- (void)resetLayoutCache { self.nativeLayoutCacheClean=NO;self.nativeCellResets++; }
+@end
+@interface VoiceTransTextMessageCellView : TextMessageCellView
+@property(nonatomic) BOOL isAnimating;
+@end
+@implementation VoiceTransTextMessageCellView @end
+@interface VoiceTransTextMessageCellViewV2 : TextMessageCellView
+@property(nonatomic) BOOL isAnimating;
+@end
+@implementation VoiceTransTextMessageCellViewV2 @end
 // Native MMHeadImageView owns a smaller, inset image view. The outer 43pt
 // interaction view is not the visible 37pt avatar in the supplied screenshot.
 @interface MMHeadImageView : UIView

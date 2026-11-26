@@ -14,6 +14,10 @@ static BOOL CSAccountID(id value) {
 }
 static BOOL CSNumber(id value) { return [value isKindOfClass:NSNumber.class] && isfinite([value doubleValue]); }
 static BOOL CSBoolean(id value) { return CSNumber(value) && ([value doubleValue]==0 || [value doubleValue]==1); }
+// Keep the backup schema independent of the UIKit action router.
+static NSArray<NSString *> *CSQuickActionIdentifiers(void) {
+    return @[@"scan",@"wallet",@"moments",@"my_qrcode",@"favorites",@"plugin_home",@"profile",@"create_group",@"add_friend",@"emoji_store",@"panel_settings",@"payment_code",@"channels",@"file_transfer",@"chat_background",@"receive_code",@"my_moments",@"create_note",@"switch_account",@"dark_mode",@"global_search"];
+}
 static BOOL CSStrings(id value) {
     if (![value isKindOfClass:NSArray.class] || [value count]>100000) return NO;
     for (id item in value) if (!CSNonemptyString(item)) return NO;
@@ -267,8 +271,14 @@ static BOOL CSContacts(id value) {
             @[@"standard",@"com.wechat.enhance.tabbar_style.border_width",@"tabbar",@"number",@"global",@""],
             @[@"standard",@"com.wechat.enhance.tabbar_style.click_effect",@"tabbar",@"number",@"global",@""],
             @[@"standard",@"com.wechat.enhance.tabbar_style.content_height",@"tabbar",@"number",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.tabbar_style.content_width",@"tabbar",@"number",@"global",@""],
             @[@"standard",@"com.wechat.enhance.tabbar_style.corner_radius",@"tabbar",@"number",@"global",@""],
             @[@"standard",@"com.wechat.enhance.tabbar_style.enabled",@"tabbar",@"bool",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.tabbar_style.structure",@"tabbar",@"number",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.tabbar_style.function_action",@"tabbar",@"string",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.tabbar_style.function_gap",@"tabbar",@"number",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.tabbar_style.function_size",@"tabbar",@"number",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.tabbar_style.center_button_scale",@"tabbar",@"number",@"global",@""],
             @[@"standard",@"com.wechat.enhance.tabbar_style.haptic_feedback",@"tabbar",@"number",@"global",@""],
             @[@"standard",@"com.wechat.enhance.tabbar_style.hide_text",@"tabbar",@"bool",@"global",@""],
             @[@"standard",@"com.wechat.enhance.tabbar_style.icon.chat",@"tabbar",@"string",@"global",@"file"],
@@ -494,11 +504,17 @@ static BOOL CSContacts(id value) {
             if (valid && ([@[@"com.wechat.enhance.inputText.gesture.leftAction",@"com.wechat.enhance.inputText.gesture.rightAction"] containsObject:key]))
                 valid=[value doubleValue]>=0 && [value doubleValue]<=5 && floor([value doubleValue])==[value doubleValue];
             if (valid && [key hasPrefix:@"com.wechat.enhance.tabbar_style.selected_icon_color."]) valid=[value doubleValue]>=0 && [value doubleValue]<=1;
+            if (valid && [key isEqual:@"com.wechat.enhance.tabbar_style.structure"]) valid=[value doubleValue]>=0 && [value doubleValue]<=2 && floor([value doubleValue])==[value doubleValue];
+            if (valid && [key isEqual:@"com.wechat.enhance.tabbar_style.function_gap"]) valid=[value doubleValue]>=0 && [value doubleValue]<=32;
+            if (valid && [key isEqual:@"com.wechat.enhance.tabbar_style.function_size"]) valid=[value doubleValue]>=44 && [value doubleValue]<=80;
+            if (valid && [key isEqual:@"com.wechat.enhance.tabbar_style.center_button_scale"]) valid=[value doubleValue]>=0.75 && [value doubleValue]<=1.8;
+            if (valid && [key isEqual:@"com.wechat.enhance.tabbar_style.content_width"]) valid=[value doubleValue]==0 || ([value doubleValue]>=176 && [value doubleValue]<=1024);
             if (valid && [registered[@"domain"] isEqual:@"legacy"] && [key isEqual:@"BackgroundRunCheckInterval"])
                 valid=[value doubleValue]>=10 && [value doubleValue]<=30 && floor([value doubleValue])==[value doubleValue];
         }
         else if ([type isEqual:@"string"]) {
             valid=[value isKindOfClass:NSString.class] && [value length]<=1048576;
+            if (valid && [key isEqual:@"com.wechat.enhance.tabbar_style.function_action"]) valid=[CSQuickActionIdentifiers() containsObject:value];
             if (valid && [key isEqual:@"com.wechat.enhance.quick_panel.background_style"]) valid=[@[@"default",@"color",@"image"] containsObject:value];
             if (valid && ([@[@"com.wechat.enhance.quick_panel.background_color_hex",@"com.wechat.enhance.quick_panel.text_color_hex",@"com.wechat.enhance.quick_panel.icon_color_hex"] containsObject:key])) {
                 valid=[value length]==7 && [value hasPrefix:@"#"];
@@ -513,7 +529,7 @@ static BOOL CSContacts(id value) {
                 if (valid) for (id item in value) if (!CSNumber(item) || floor([item doubleValue])!=[item doubleValue]) { valid=NO; break; }
             } else if ([key isEqual:@"com.wechat.enhance.quick_panel.selected_actions"]) {
                 // This backup schema stays independent of the UIKit quick-panel implementation.
-                NSSet *known=[NSSet setWithArray:@[@"scan",@"wallet",@"moments",@"my_qrcode",@"favorites",@"plugin_home",@"profile",@"create_group",@"add_friend",@"emoji_store",@"panel_settings",@"payment_code",@"channels",@"file_transfer",@"chat_background",@"receive_code",@"my_moments",@"create_note",@"switch_account",@"dark_mode",@"global_search"]];
+                NSSet *known=[NSSet setWithArray:CSQuickActionIdentifiers()];
                 valid=[value isKindOfClass:NSArray.class] && [value count]<=known.count;
                 NSMutableSet *seen=[NSMutableSet new];
                 if (valid) for (id identifier in value) {

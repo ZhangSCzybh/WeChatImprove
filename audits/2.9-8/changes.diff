@@ -1,0 +1,178 @@
+diff --git a/Controllers/CSGroupListAdapter.m b/Controllers/CSGroupListAdapter.m
+index 487acdf4..5600b11b 100644
+--- a/Controllers/CSGroupListAdapter.m
++++ b/Controllers/CSGroupListAdapter.m
+@@ -303,7 +303,8 @@ + (void)finishPresentationReturnForController:(id)controller {
+     if (!adapter || adapter.presentationSuspended) return;
+     // Appearance completion is independent of whether departure geometry could
+     // be captured or has already been restored. Keep one source-preparation
+-    // request until the first horizontal gesture or a newer positioning command.
++    // request until verified idle layout, the first horizontal gesture or a
++    // newer positioning command.
+     NSString *account=CSGroupCurrentAccountID();
+     adapter.pageSourceReturnKey=account.length ? @[account,@(CSCloseFriendAccountEpoch()),@(adapter.viewportGeneration)] : nil;
+     if (!adapter.presentationViewport && !adapter.initialViewportPending) return;
+@@ -327,6 +328,12 @@ + (void)layoutForController:(id)controller {
+     id table=CSGroupReadObject(controller,CSGroupIsFoldedController(controller) ? @"tableView" : @"m_tableView");
+     if (!adapter || adapter.table!=table) { [self attachToController:controller]; return; }
+     [adapter layout];
++    // Reconcile a returned source after the owner's real layout, before scroll
++    // tracking can defer publication. Passive layout must not consume an armed
++    // cold-start viewport; the first horizontal command still handles that case.
++    if (adapter.pageSourceReturnKey && !adapter.initialViewportPending && !adapter.table.tracking && ![adapter groupPanMoving] &&
++        CSGroupPageTransitionEnabled(NSUserDefaults.standardUserDefaults) && !UIAccessibilityIsReduceMotionEnabled())
++        [adapter preparePageSourceForPan];
+ }
+ + (NSNumber *)closeFriendAlertBadgeCount {
+     CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
+@@ -2554,8 +2561,8 @@ - (void)preparePageSourceForPan {
+     id controller=self.controller;
+     NSUInteger viewportGeneration=self.viewportGeneration;
+     NSDictionary *pendingViewport=self.presentationViewport ?: self.switchViewport;
+-    // Horizontal ownership is already decided. Finish only a pending return or
+-    // accepted selection; ordinary data changes still wait for the pan to end.
++    // A completed idle return or an admitted horizontal gesture may finish a
++    // pending return/selection; ordinary data changes still wait for pan end.
+     // The shared restore retains its account/policy/generation proofs and consumes
+     // the request only after the real table accepts the saved height.
+     self.preparingPagePreview=YES;
+@@ -2796,7 +2803,13 @@ - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gesture {
+     if ((gesture!=self.pan && gesture!=self.listPan) || ![self groupSwipesAvailable]) return NO;
+     if (!(gesture==self.pan ? self.barTouchAllowed : self.listTouchAllowed)) return NO;
+     UIPanGestureRecognizer *pan=(UIPanGestureRecognizer *)gesture;
+-    CGPoint v=[pan velocityInView:self.chrome]; return fabs(v.x)>fabs(v.y)*1.5;
++    CGPoint v=[pan velocityInView:self.chrome];
++    if (!(fabs(v.x)>fabs(v.y)*1.5)) return NO;
++    // Finish any late return layout before UIKit starts this horizontal pan.
++    // groupPan retains its revalidation for changes during recognition.
++    if (CSGroupPageTransitionEnabled(NSUserDefaults.standardUserDefaults) && !UIAccessibilityIsReduceMotionEnabled())
++        [self preparePageSourceForPan];
++    return YES;
+ }
+ - (void)groupPan:(UIPanGestureRecognizer *)pan {
+     if (pan!=self.pan && pan!=self.listPan) return;
+diff --git a/Controllers/CSMessageMergeAdapter.m b/Controllers/CSMessageMergeAdapter.m
+index 273e1f13..cc250ca1 100644
+--- a/Controllers/CSMessageMergeAdapter.m
++++ b/Controllers/CSMessageMergeAdapter.m
+@@ -193,13 +193,21 @@ static void CSInit(void) {
+     }
+     return ctx;
+ }
++static BOOL CSIsVoiceTransText(id model) {
++    id logical=CSParent(model);
++    NSString *name=NSStringFromClass([logical class]);
++    return ([name isEqual:@"VoiceTransTextMessageViewModel"] || [name isEqual:@"VoiceTransTextMessageViewModelV2"]) &&
++        CSUInt(CSMessageNativeObject(logical,@"messageWrap"),@"m_uiMessageType")==1;
++}
+ static BOOL CSSupported(id model) {
+     // Exact classes: subclasses with extra dynamic content require explicit qualification.
+     NSString *name = NSStringFromClass([CSParent(model) class]);
+     static NSSet *classes;
+     static dispatch_once_t once;
+     dispatch_once(&once, ^{ classes = [NSSet setWithArray:@[@"TextMessageViewModel",@"ImageMessageViewModel",@"VoiceMessageViewModel",@"VideoMessageViewModel",@"EmoticonMessageViewModel"]]; });
+-    return [classes containsObject:name];
++    // Live speech-to-text sends keep these exact text models until the chat is
++    // reloaded. Match the bubble-style contract without admitting other cards.
++    return [classes containsObject:name] || CSIsVoiceTransText(model);
+ }
+ #ifdef CS_MERGE_TESTING
+ NSUInteger CSMessageMergeDescriptorBuildCount;
+@@ -492,7 +500,7 @@ static BOOL CSNativeGeometryChanged(CSMessageNativeGeometry previous, CSMessageN
+ static BOOL CSNativeProfile(CSMessageMergeState *s, id logical, CGFloat *top, CGFloat *bottom) {
+     if (!s.nativeGeometry.valid) return NO;
+     NSString *kind=NSStringFromClass([logical class]);
+-    BOOL usesTemplate=[kind isEqual:@"TextMessageViewModel"] || [kind isEqual:@"VoiceMessageViewModel"];
++    BOOL usesTemplate=[kind isEqual:@"TextMessageViewModel"] || [kind isEqual:@"VoiceMessageViewModel"] || CSIsVoiceTransText(logical);
+     BOOL identity=!s.decision.hidesIdentity;
+     // Match CommonMessageCellView.layoutInternal: CSS margin + native avatar
+     // offset, replaced by ceil(CSS margin + UIFont dynamicLength:16) for a name.
+diff --git a/Controllers/CSReleaseNotesViewController.m b/Controllers/CSReleaseNotesViewController.m
+index 58a456a1..d9eea689 100644
+--- a/Controllers/CSReleaseNotesViewController.m
++++ b/Controllers/CSReleaseNotesViewController.m
+@@ -4,6 +4,11 @@
+ // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
+ static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
+     NSDictionary *releases = @{
++        @"2.9-8": @[
++            @{@"title": @"返回首页首滑准备", @"detail": @"页面转场开启时，在返回完成后的安全布局阶段提前准备来源列表，并在横滑识别前再次校验待恢复状态。保留初始定位、竖向滚动、搜索、原生菜单和隐私保护。"},
++            @{@"title": @"语音转文字消息合并", @"detail": @"将长按输入框语音转文字发送的两种专用文字模型纳入连续消息合并，沿用普通文字的气泡模板与紧密间距保护，支持发送后实时参与相邻消息合并。"},
++            @{@"title": @"完整功能与验证范围", @"detail": @"2.9-8 完整版包含全部既有模块，提供 Rootless 与 Rootful 安装包。主机回归和编译核验用于确认代码与产物；两处原设备运行效果均为真机未验证。"}
++        ],
+         @"2.9-7": @[
+             @{@"title": @"聊天分组跟手转场", @"detail": @"汇总本轮分组切换调整，保留独立的页面转场动画开关，默认关闭。开启后原列表与真实相邻列表随横滑同步移动，取消时回弹，确认后从当前进度完成切换，并遵循系统减弱动态效果。"},
+             @{@"title": @"连续横滑与返回准备", @"detail": @"保留快速连续切组接续、返回聊天页首次来源准备和真实布局验证；覆盖返回位置已恢复、未能捕获高度及列表重建等情况，沿用账号、隐私、搜索、原生菜单和竖向滚动保护。"},
+diff --git a/Headers/CSUserInfoHelper.h b/Headers/CSUserInfoHelper.h
+index 755fba35..9970fcf3 100644
+--- a/Headers/CSUserInfoHelper.h
++++ b/Headers/CSUserInfoHelper.h
+@@ -14,7 +14,7 @@ extern NSString * const kUserAvatarURLKey;    // 用户头像URL缓存键
+ extern NSString * const kChatAvatarURLKey;    // 聊天对象头像URL缓存键
+ 
+ // 插件信息相关常量
+-#define kPluginVersionString @"2.9-7"
++#define kPluginVersionString @"2.9-8"
+ 
+ #pragma mark - 类定义
+ 
+diff --git a/Hooks/SessionGroupHooks.xm b/Hooks/SessionGroupHooks.xm
+index 4bf56a64..8622e4f0 100644
+--- a/Hooks/SessionGroupHooks.xm
++++ b/Hooks/SessionGroupHooks.xm
+@@ -210,6 +210,7 @@ static void BindMainNativeCell(id table,UITableViewCell *cell,NSIndexPath *path)
+     Native(self,NO,^{ %orig; });
+     [CSGroupListAdapter attachToController:self];
+     [CSGroupListAdapter finishPresentationReturnForController:self];
++    [CSGroupListAdapter layoutForController:self];
+ }
+ - (void)viewWillDisappear:(BOOL)animated {
+     [CSGroupListAdapter setPresentationSuspended:YES forController:self];
+diff --git a/README.md b/README.md
+index 382974ad..0036ba15 100644
+--- a/README.md
++++ b/README.md
+@@ -2,7 +2,7 @@
+ 
+ 面向 iOS 微信的 Theos 插件，使用 Objective-C / Logos 接入微信原生界面，提供聊天分组、界面定制、消息增强、自动回复和配置备份等功能，可在插件设置中按需开启。
+ 
+-**源码版本：`2.9-7`** · **架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
++**源码版本：`2.9-8`** · **架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+ 
+ [功能概览](#功能概览) · [安装与入口](#安装与入口) · [使用说明](#使用说明) · [配置与备份](#配置与备份) · [源码编译](#源码编译) · [开发与验证](#开发与验证) · [常见问题](#常见问题)
+ 
+@@ -32,16 +32,16 @@
+ 
+ 需要能够向微信加载插件的 iOS 注入环境。近期适配参考为微信 `8.0.78`、`8.0.80`，广告净化等私有接口以 `8.0.80.34` 为核验依据；这不代表所有系统、微信版本及插件组合均已通过真机验证。安装包声明依赖 `mobilesubstrate >= 0.9.5000`。
+ 
+-当前源码版本为 **2.9-7 完整版**，沿用 beta06 的功能实现，完整包含聊天分组、界面定制、朋友圈布局、消息增强、自动回复、输入框操作、密友保护与配置备份等现有功能。聊天分组提供独立的“页面转场动画”开关，默认关闭；开启后，原列表与真实相邻列表跟随横滑同步移动，取消时回弹，确认后从当前进度完成切换，指示器与页面进度同步。包含连续快滑接续和返回聊天页首次来源准备、位置恢复及布局验证调整；系统“减弱动态效果”继续生效。按现有注入环境选择：
++当前源码版本为 **2.9-8 完整版**，聚焦返回首页后的首次分组转场准备，以及长按输入框语音转文字发送后的连续消息合并，完整包含聊天分组、界面定制、朋友圈布局、消息增强、自动回复、输入框操作、密友保护与配置备份等现有功能。聊天分组提供独立的“页面转场动画”开关，默认关闭；开启后，原列表与真实相邻列表跟随横滑同步移动，取消时回弹，确认后从当前进度完成切换，指示器与页面进度同步。保留连续快滑接续、位置恢复及布局验证，在返回完成后的安全布局阶段提前准备来源，并在横滑识别前复核；系统“减弱动态效果”继续生效。按现有注入环境选择：
+ 
+ | 环境／产物    | 下载                                                                           | 说明                                                      |
+ | -------- | ---------------------------------------------------------------------------- | ------------------------------------------------------- |
+-| Rootless | [安装包](packages/2.9-7/com.wechat.improve_2.9-7_iphoneos-arm64.deb) | 安装至 `/var/jb/Library/MobileSubstrate/DynamicLibraries/` |
+-| Rootful  | [安装包](packages/2.9-7/com.wechat.improve_2.9-7_iphoneos-arm.deb) | 安装至 `/Library/MobileSubstrate/DynamicLibraries/`        |
+-| 重签用动态库   | [WeChatImprove.dylib](packages/2.9-7/WeChatImprove.dylib)              | 与 Rootful 包内动态库一致                                       |
+-| 校验与调试    | [SHA-256 清单](packages/2.9-7/SHA256SUMS) · [调试符号](packages/2.9-7/symbols.zip) | 产物详情见[发布说明](packages/2.9-7/README.md)     |
++| Rootless | [安装包](packages/2.9-8/com.wechat.improve_2.9-8_iphoneos-arm64.deb) | 安装至 `/var/jb/Library/MobileSubstrate/DynamicLibraries/` |
++| Rootful  | [安装包](packages/2.9-8/com.wechat.improve_2.9-8_iphoneos-arm.deb) | 安装至 `/Library/MobileSubstrate/DynamicLibraries/`        |
++| 重签用动态库   | [WeChatImprove.dylib](packages/2.9-8/WeChatImprove.dylib)              | 与 Rootful 包内动态库一致                                       |
++| 校验与调试    | [SHA-256 清单](packages/2.9-8/SHA256SUMS) · [调试符号](packages/2.9-8/symbols.zip) | 产物详情见[发布说明](packages/2.9-8/README.md)     |
+ 
+-本版聚焦分组手势、选择、搜索、滚动位置、页面转场生命周期与开关备份回归；两种安装包与符号的核验结果见随包说明。交付目录保留两种 deb、动态库、调试符号、校验清单和说明六个文件。主机检查不代表原设备触摸与视觉效果已通过验收。
++本版聚焦聊天分组转场、滚动位置、连续消息合并与气泡样式，并执行六项核心门禁，与 2.9-7 正式版逐项比对；两种安装包与符号的核验结果见随包说明。交付目录包含两种 deb、动态库、调试符号、校验清单、说明与核心门禁记录。主机检查不代表原设备触摸与视觉效果已通过验收。
+ 
+ 两种安装包均包含 `arm64` / `arm64e`。包名中的 `iphoneos-arm64` / `iphoneos-arm` 是打包方案的架构标识，应按注入环境选择。Roothide 保留源码构建入口，尚无当前版本的运行验证结论。仓库未提供可直接安装的 IPA 或一键重签流程。
+ 
+diff --git a/control b/control
+index 3c8bffed..c863edde 100644
+--- a/control
++++ b/control
+@@ -1,6 +1,6 @@
+ Package: com.wechat.improve
+ Name: WeChatImprove
+-Version: 2.9-7
++Version: 2.9-8
+ Architecture: iphoneos-arm
+ Description: 微信增强插件，支持聊天分组、界面定制、消息增强、朋友圈卡片布局与配置备份。
+ Maintainer: 再也不会

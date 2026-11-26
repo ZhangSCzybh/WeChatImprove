@@ -1,5 +1,6 @@
 #import "CSTabBarPreferences.h"
 #import "CSTabBarGeometry.h"
+#import "CSQuickPanelPreferences.h"
 #include <sys/stat.h>
 static CSTabBarPreferences *CSCurrentTabBarPreferences;
 static NSMutableDictionary<NSString *, NSDictionary *> *CSIconCache;
@@ -13,6 +14,10 @@ static NSArray *CSIconSignature(NSString *path, NSString *identifier, NSNumber *
 static CGFloat CSNumber(NSUserDefaults *d, NSString *key, CGFloat fallback, CGFloat min, CGFloat max) {
     id value=[d objectForKey:key];
     return value && [value respondsToSelector:@selector(doubleValue)] ? CSTabBarClamp([value doubleValue],min,max,fallback) : fallback;
+}
+static CGFloat CSLayoutNumber(NSUserDefaults *d, NSString *key, CGFloat fallback, CGFloat min, CGFloat max) {
+    id value=[d objectForKey:key];
+    return [value isKindOfClass:NSNumber.class] ? CSTabBarClamp([value doubleValue],min,max,fallback) : fallback;
 }
 @implementation CSTabBarPreferences
 + (instancetype)current {
@@ -31,8 +36,22 @@ static CGFloat CSNumber(NSUserDefaults *d, NSString *key, CGFloat fallback, CGFl
     CSTabBarPreferences *p=[self new];
     p.enabled=[d boolForKey:kTabBarStyleEnabledKey]; p.hideText=[d boolForKey:kTabBarHideTextKey];
     p.swipeSwitch=[d objectForKey:kTabBarSwipeSwitchKey] ? [d boolForKey:kTabBarSwipeSwitchKey] : YES;
+    id structure=[d objectForKey:kTabBarStructureKey];
+    double structureValue=[structure isKindOfClass:NSNumber.class] ? [structure doubleValue] : 0;
+    p.structure=isfinite(structureValue) && structureValue>=CSTabBarStructureClassic &&
+        structureValue<=CSTabBarStructureCentered && floor(structureValue)==structureValue ?
+        (CSTabBarStructure)structureValue : CSTabBarStructureClassic;
+    id functionAction=[d objectForKey:kTabBarFunctionActionKey];
+    p.functionAction=[functionAction isKindOfClass:NSString.class] &&
+        [CSQuickPanelPreferences.allActionIdentifiers containsObject:functionAction] ? functionAction : @"scan";
+    p.functionGap=CSLayoutNumber(d,kTabBarFunctionGapKey,12,0,32);
+    p.functionSize=CSLayoutNumber(d,kTabBarFunctionSizeKey,52,44,80);
+    p.centerButtonScale=CSLayoutNumber(d,kTabBarCenterButtonScaleKey,1,.75,1.8);
     p.scale=CSNumber(d,kTabBarScaleKey,kDefaultScale,.6,1);
     p.contentHeight=CSNumber(d,kTabBarContentHeightKey,52,44,80);
+    id contentWidth=[d objectForKey:kTabBarContentWidthKey];
+    double widthValue=[contentWidth isKindOfClass:NSNumber.class] ? [contentWidth doubleValue] : 0;
+    p.contentWidth=isfinite(widthValue) && widthValue>=176 && widthValue<=1024 ? widthValue : 0;
     p.lift=CSNumber(d,kTabBarPositionOffsetKey,0,0,100);
     p.cornerRadius=CSNumber(d,kTabBarCornerRadiusKey,kDefaultCornerRadius,0,40);
     p.borderWidth=CSNumber(d,kTabBarBorderWidthKey,1,0,6);

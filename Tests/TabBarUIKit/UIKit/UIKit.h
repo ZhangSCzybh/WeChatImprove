@@ -4,6 +4,8 @@
 #import <QuartzCore/QuartzCore.h>
 #import <dispatch/dispatch.h>
 typedef struct { CGFloat top,left,bottom,right; } UIEdgeInsets;
+typedef NSUInteger UIAccessibilityTraits;
+static const UIAccessibilityTraits UIAccessibilityTraitButton=1;
 typedef NS_ENUM(NSInteger, UIViewContentMode) { UIViewContentModeScaleToFill, UIViewContentModeScaleAspectFit };
 typedef NS_ENUM(NSInteger, UIUserInterfaceLayoutDirection) { UIUserInterfaceLayoutDirectionLeftToRight, UIUserInterfaceLayoutDirectionRightToLeft };
 typedef NS_ENUM(NSInteger, UIUserInterfaceStyle) { UIUserInterfaceStyleUnspecified,UIUserInterfaceStyleLight,UIUserInterfaceStyleDark };
@@ -73,6 +75,8 @@ BOOL UIAccessibilityIsReduceMotionEnabled(void);
 @property(nonatomic) CGFloat alpha;
 @property(nonatomic) BOOL hidden,clipsToBounds,userInteractionEnabled,isAccessibilityElement;
 @property(nonatomic) UIViewContentMode contentMode;
+@property(nonatomic,copy) NSString *accessibilityLabel,*accessibilityIdentifier;
+@property(nonatomic) UIAccessibilityTraits accessibilityTraits;
 @property(nonatomic) UIUserInterfaceLayoutDirection effectiveUserInterfaceLayoutDirection;
 @property(nonatomic,strong) CALayer *layer;
 @property(nonatomic,strong) UIColor *backgroundColor;
@@ -112,6 +116,7 @@ BOOL UIAccessibilityIsReduceMotionEnabled(void);
 @property(nonatomic,strong) UIColor *appliedTint;
 @property(nonatomic) CGSize renderedSize;
 + (instancetype)imageWithContentsOfFile:(NSString *)path;
++ (instancetype)systemImageNamed:(NSString *)name;
 - (UIImage *)imageWithTintColor:(UIColor *)color renderingMode:(NSInteger)mode;
 @end
 typedef NS_ENUM(NSInteger, UIImageRenderingMode) { UIImageRenderingModeAutomatic,UIImageRenderingModeAlwaysOriginal,UIImageRenderingModeAlwaysTemplate };

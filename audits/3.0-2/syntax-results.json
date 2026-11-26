@@ -1,0 +1,20 @@
+{
+  "architectures": [
+    "arm64",
+    "arm64e"
+  ],
+  "sdk": "iphoneos",
+  "minimum_ios": "15.0",
+  "warnings_as_errors": true,
+  "sources": [
+    "CSTabBarStyleSettingsViewController.m",
+    "CSTabBarPreferences.m",
+    "CSTabBarPreviewView.m",
+    "CSBackupRegistry.m",
+    "CSReleaseNotesViewController.m"
+  ],
+  "exit_codes": {
+    "arm64": 0,
+    "arm64e": 0
+  }
+}

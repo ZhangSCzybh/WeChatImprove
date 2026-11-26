@@ -182,7 +182,6 @@ static id CSGroupReadObject(id object,NSString *key) {
 - (void)clearPendingViewport;
 - (void)beginUserScrolling;
 - (void)selectIndex:(NSInteger)index;
-- (void)preparePageTransitionForSelection:(NSInteger)index;
 - (void)cancelPageTransition;
 @end
 @implementation CSGroupListAdapter
@@ -197,7 +196,6 @@ static id CSGroupReadObject(id object,NSString *key) {
 - (void)layout {}
 - (void)refresh { self.publishedTabID=self.preferences.selectedTabID; }
 // This suite owns viewport geometry; the page animator is an independent boundary.
-- (void)preparePageTransitionForSelection:(NSInteger)index { (void)index; }
 - (void)cancelPageTransition {}
 + (void)refreshFoldedListsForAccount:(NSString *)account { (void)account; }
 @end

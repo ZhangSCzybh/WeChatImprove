@@ -1,0 +1,13 @@
+{
+  "existing_files": 1437,
+  "checked_files": 1437,
+  "all_existing_files_unchanged": true,
+  "all_existing_artifacts_unchanged": true,
+  "filesystem_metadata_changes": [],
+  "artifact_changes": [],
+  "make_clean": false,
+  "original_theos_preserved": true,
+  "prior_release_packages_preserved": true,
+  "database_modified": false,
+  "device_installed": false
+}

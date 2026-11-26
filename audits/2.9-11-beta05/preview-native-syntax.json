@@ -1,0 +1,56 @@
+[
+  {
+    "architecture": "arm64",
+    "command": [
+      "xcrun",
+      "--sdk",
+      "iphoneos",
+      "clang",
+      "-fobjc-arc",
+      "-fblocks",
+      "-fsyntax-only",
+      "-miphoneos-version-min=15.0",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-Wno-unused-parameter",
+      "-Wno-deprecated-declarations",
+      "-Wno-sign-compare",
+      "-IHeaders",
+      "-IHeadersFile",
+      "-IControllers",
+      "-arch",
+      "arm64",
+      "Controllers/CSTabBarPreviewView.m",
+      "Controllers/CSTabBarNativeAdapter.m"
+    ],
+    "exit_code": 0
+  },
+  {
+    "architecture": "arm64e",
+    "command": [
+      "xcrun",
+      "--sdk",
+      "iphoneos",
+      "clang",
+      "-fobjc-arc",
+      "-fblocks",
+      "-fsyntax-only",
+      "-miphoneos-version-min=15.0",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-Wno-unused-parameter",
+      "-Wno-deprecated-declarations",
+      "-Wno-sign-compare",
+      "-IHeaders",
+      "-IHeadersFile",
+      "-IControllers",
+      "-arch",
+      "arm64e",
+      "Controllers/CSTabBarPreviewView.m",
+      "Controllers/CSTabBarNativeAdapter.m"
+    ],
+    "exit_code": 0
+  }
+]

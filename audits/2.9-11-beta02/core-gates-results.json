@@ -1,0 +1,28 @@
+[
+  {
+    "command": "bash Tests/verify-backup-registry.sh",
+    "exit_code": 0,
+    "result": "2425 assertions passed"
+  },
+  {
+    "command": "bash Tests/verify-quick-panel-preferences.sh",
+    "exit_code": 0,
+    "result": "PASS, isolated defaults suite"
+  },
+  {
+    "command": "bash Tests/verify-quick-panel-router.sh",
+    "exit_code": 0,
+    "result": "396 checks passed"
+  },
+  {
+    "command": "bash Tests/verify-quick-panel-gesture.sh",
+    "exit_code": 0,
+    "result": "745862 checks passed, 200000 deterministic randomized input pairs"
+  },
+  {
+    "command": "bash Tests/verify-tabbar.sh",
+    "exit_code": 0,
+    "result": "geometry, selected icon restore, 121 native touch checks including 97 Neo checks, 176 structure lifecycle checks, preferences/native lifecycle passed",
+    "log": "logs/tabbar.log"
+  }
+]

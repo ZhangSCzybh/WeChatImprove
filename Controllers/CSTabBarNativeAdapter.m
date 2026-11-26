@@ -3,6 +3,8 @@
 #import "CSTabBarPreferences.h"
 #import "CSTabBarSwipeSwitcher.h"
 #import "CSTabBarGeometry.h"
+#import "CSQuickPanelPreferences.h"
+#import "CSQuickPanelActionRouter.h"
 #import <QuartzCore/QuartzCore.h>
 #import <objc/runtime.h>
 
@@ -80,7 +82,14 @@ static void CSSetFrame(UIView *view, CGRect frame) {
 @property(nonatomic) BOOL applied, geometryApplied, applying, clips;
 @property(nonatomic) NSUInteger itemGeneration, styleGeneration;
 @property(nonatomic, strong) CSTabBarPreferences *stylePreferences;
-@property(nonatomic) CGRect floatingRect;
+@property(nonatomic) CGRect floatingRect, functionRect;
+@property(nonatomic, strong) UIControl *functionButton;
+@property(nonatomic, strong) UIVisualEffectView *functionMaterial;
+@property(nonatomic, strong) UIImageView *functionImage;
+@property(nonatomic, strong) CAShapeLayer *functionBorder;
+@property(nonatomic, copy) NSString *renderedFunctionAction;
+@property(nonatomic) UIUserInterfaceStyle renderedFunctionStyle;
+- (void)performFunctionAction;
 @property(nonatomic, strong) UIColor *nativeBackground;
 @property(nonatomic, strong) NSMapTable<UIView *,NSNumber *> *backgroundHidden;
 @property(nonatomic, strong) NSArray<CSTabBarButtonState *> *buttons;
@@ -486,7 +495,9 @@ static void CSUpdateInset(CSTabBarState *s) {
     if (!s.insetApplied || fabs(indicator.bottom-s.appliedIndicatorInset)>.01) s.nativeIndicatorInset=indicator.bottom;
     CGRect viewport=[table convertRect:table.bounds toView:s.bar];
     CGFloat system=table.adjustedContentInset.bottom-inset.bottom;
-    CGFloat desired=CSTabBarRequiredBottomInset(CGRectGetMaxY(viewport),CGRectGetMinY(s.floatingRect),s.nativeInset,system);
+    CGFloat top=CGRectGetMinY(s.floatingRect);
+    if (s.functionRect.size.width>0) top=MIN(top,CGRectGetMinY(s.functionRect));
+    CGFloat desired=CSTabBarRequiredBottomInset(CGRectGetMaxY(viewport),top,s.nativeInset,system);
     s.appliedInset=desired;
     s.appliedIndicatorInset=s.nativeIndicatorInset+MAX(0,desired-s.nativeInset);
     s.insetApplied=YES;
@@ -516,6 +527,7 @@ static void CSRestoreVisuals(CSTabBarState *s) {
     [s.backgroundHidden removeAllObjects];
     CSRestoreGeometry(s);
     s.surface.hidden=YES;
+    s.functionButton.hidden=YES;
 }
 static void CSStop(CSTabBarState *s) {
     if (!s) return;
@@ -531,6 +543,7 @@ static void CSStop(CSTabBarState *s) {
     for (UIControl *control in s.trackingControls) [control removeFromSuperview];
     s.trackingControls=nil;
     [s.surface removeFromSuperview];
+    [s.functionButton removeFromSuperview];
 }
 static NSInteger CSDesiredAnimation(CSTabBarState *s) {
     if (CSAnimationInactive || UIApplication.sharedApplication.applicationState!=UIApplicationStateActive ||
@@ -653,6 +666,66 @@ static void CSRenderSurface(CSTabBarState *s, UIView *container) {
     CSRenderBorderAnimation(s,radius,line);
 }
 
+// The function key is a separate control, so it never acquires a native tab index.
+static void CSRenderFunction(CSTabBarState *s, UIView *container) {
+    CSTabBarPreferences *p=CSTabBarPreferences.current;
+    if (p.structure==CSTabBarStructureClassic || s.functionRect.size.width<=0) {
+        s.functionButton.hidden=YES;
+        [s.functionButton removeFromSuperview];
+        return;
+    }
+    if (!s.functionButton) {
+        s.functionButton=[UIControl new];
+        s.functionButton.isAccessibilityElement=YES;
+        s.functionButton.accessibilityTraits=UIAccessibilityTraitButton;
+        s.functionButton.accessibilityIdentifier=@"cs.tabbar.function";
+        [s.functionButton addTarget:s action:@selector(performFunctionAction) forControlEvents:UIControlEventTouchUpInside];
+        s.functionMaterial=[[UIVisualEffectView alloc] initWithEffect:[UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemMaterial]];
+        s.functionMaterial.userInteractionEnabled=NO;
+        [s.functionButton addSubview:s.functionMaterial];
+        s.functionImage=[UIImageView new]; s.functionImage.userInteractionEnabled=NO;
+        s.functionImage.contentMode=UIViewContentModeScaleAspectFit;
+        [s.functionButton addSubview:s.functionImage];
+        s.functionBorder=[CAShapeLayer layer]; s.functionBorder.fillColor=UIColor.clearColor.CGColor;
+        [s.functionButton.layer addSublayer:s.functionBorder];
+    }
+    if (s.functionButton.superview!=container) [container addSubview:s.functionButton];
+    s.functionButton.hidden=NO; s.functionButton.userInteractionEnabled=!s.snapshotSource;
+    s.functionButton.accessibilityLabel=[CSQuickPanelPreferences titleForActionIdentifier:p.functionAction];
+    CSSetFrame(s.functionButton,s.functionRect);
+    CSSetFrame(s.functionMaterial,s.functionButton.bounds);
+    CGFloat radius=MIN(s.functionRect.size.width,s.functionRect.size.height)/2;
+    s.functionButton.layer.cornerRadius=radius;
+    s.functionMaterial.layer.cornerRadius=radius; s.functionMaterial.clipsToBounds=YES;
+    s.functionMaterial.hidden=p.backgroundColor!=nil;
+    s.functionButton.backgroundColor=p.backgroundColor ?: s.nativeBackground ?: UIColor.clearColor;
+    BOOL dark=s.bar.traitCollection.userInterfaceStyle==UIUserInterfaceStyleDark;
+    UIColor *foreground=[UIColor colorWithRed:dark?1:0 green:dark?1:0 blue:dark?1:0 alpha:1];
+    if (![s.renderedFunctionAction isEqualToString:p.functionAction] || s.renderedFunctionStyle!=s.bar.traitCollection.userInterfaceStyle) {
+        NSString *symbol=[CSQuickPanelPreferences symbolNameForActionIdentifier:p.functionAction] ?: @"qrcode.viewfinder";
+        s.functionImage.image=[[UIImage systemImageNamed:symbol] imageWithTintColor:foreground renderingMode:UIImageRenderingModeAlwaysOriginal];
+        s.renderedFunctionAction=p.functionAction; s.renderedFunctionStyle=s.bar.traitCollection.userInterfaceStyle;
+    }
+    BOOL centered=p.structure==CSTabBarStructureCentered;
+    CGFloat edge=MIN(s.functionRect.size.width,s.functionRect.size.height);
+    CGFloat icon=centered ? MIN(42,MAX(22,edge*.56)) : MIN(32,MAX(20,edge*.48));
+    CSSetFrame(s.functionImage,CGRectMake((s.functionRect.size.width-icon)/2,(s.functionRect.size.height-icon)/2,icon,icon));
+    CGFloat line=p.borderColor ? p.borderWidth : (centered ? 1.25 : 0);
+    UIColor *stroke=p.borderColor ?: [UIColor colorWithRed:dark?1:0 green:dark?1:0 blue:dark?1:0 alpha:.18];
+    s.functionBorder.frame=s.functionButton.bounds;
+    s.functionBorder.path=[UIBezierPath bezierPathWithRoundedRect:CGRectInset(s.functionButton.bounds,line/2,line/2) cornerRadius:MAX(0,radius-line/2)].CGPath;
+    s.functionBorder.strokeColor=[stroke resolvedColorWithTraitCollection:s.bar.traitCollection].CGColor;
+    s.functionBorder.lineWidth=line;
+    // The center key visibly bridges its two neighboring slots. Keep its
+    // material clipped to the capsule while allowing the soft shadow outside.
+    s.functionButton.clipsToBounds=NO;
+    s.functionButton.layer.shadowColor=[UIColor colorWithRed:0 green:0 blue:0 alpha:1].CGColor;
+    s.functionButton.layer.shadowOpacity=centered ? (dark?.24:.16) : 0;
+    s.functionButton.layer.shadowRadius=centered ? 8 : 0;
+    s.functionButton.layer.shadowOffset=centered ? CGSizeMake(0,3) : CGSizeZero;
+    s.functionButton.layer.shadowPath=centered ? [UIBezierPath bezierPathWithRoundedRect:s.functionButton.bounds cornerRadius:radius].CGPath : nil;
+}
+
 static BOOL CSNativeControlAvailable(CSTabBarState *s, NSUInteger index) {
     if (index>=s.buttons.count) return NO;
     UIControl *button=(UIControl *)s.buttons[index].button;
@@ -737,12 +810,16 @@ void CSTabBarUpdate(MMTabBar *bar) {
         [buttons addObject:button];
     }
     CSTabBarPreferences *p=CSTabBarPreferences.current;
-    CSTabBarRect rect=CSTabBarFloatingRect(CGRectGetWidth(bar.bounds),CGRectGetHeight(bar.bounds),p.scale,p.contentHeight,p.lift);
+    CSTabBarRect rect=CSTabBarFloatingRectWithWidth(CGRectGetWidth(bar.bounds),CGRectGetHeight(bar.bounds),p.scale,p.contentHeight,p.lift,p.contentWidth);
+    BOOL rtl=(s.snapshotSource ?: bar).effectiveUserInterfaceLayoutDirection==UIUserInterfaceLayoutDirectionRightToLeft;
+    CSTabBarLayout layout=CSTabBarLayoutMake(rect,p.structure,p.functionGap,p.functionSize,p.centerButtonScale,rtl,CGRectGetWidth(bar.bounds));
+    CGRect occupied=CSRect(layout.mainRect);
+    if (layout.actionRect.width>0) occupied=CGRectUnion(occupied,CSRect(layout.actionRect));
     if (rect.width<=0 || bar.layer.mask) { CSStop(s); s.applying=NO; return; }
     for (UIView *ancestor=bar.superview;ancestor;ancestor=ancestor.superview) {
         // A navigation transition can move the whole bar beyond a clipping ancestor.
         // Only reject floating overflow when the native bar itself is fully inside it.
-        if (ancestor.clipsToBounds && CGRectContainsRect(ancestor.bounds,[bar convertRect:bar.bounds toView:ancestor]) && !CGRectContainsRect(ancestor.bounds,[bar convertRect:CSRect(rect) toView:ancestor])) {
+        if (ancestor.clipsToBounds && CGRectContainsRect(ancestor.bounds,[bar convertRect:bar.bounds toView:ancestor]) && !CGRectContainsRect(ancestor.bounds,[bar convertRect:occupied toView:ancestor])) {
             CSStop(s); s.applying=NO; return;
         }
     }
@@ -757,14 +834,13 @@ void CSTabBarUpdate(MMTabBar *bar) {
     }
     if (![bar.backgroundColor isEqual:UIColor.clearColor]) bar.backgroundColor=UIColor.clearColor;
     bar.clipsToBounds=NO;
-    s.floatingRect=CSRect(rect); s.applied=YES; s.geometryApplied=YES;
+    s.floatingRect=CSRect(layout.mainRect); s.functionRect=CSRect(layout.actionRect); s.applied=YES; s.geometryApplied=YES;
     NSMutableArray *buttonStates=[NSMutableArray array];
-    BOOL rtl=bar.effectiveUserInterfaceLayoutDirection==UIUserInterfaceLayoutDirectionRightToLeft;
     CSReconcileHaptic(s);
     for (NSUInteger i=0;i<items.count;i++) {
         MMTabBarItemView *item=items[i]; UIControl *button=buttons[i];
         CSTabBarButtonState *b=[CSTabBarButtonState new]; b.button=button; b.frame=button.frame; b.item=item; b.itemFrame=item.frame; [buttonStates addObject:b];
-        CGRect frame=CSRect(CSTabBarItemRect(rect,(unsigned)i,(unsigned)items.count,rtl));
+        CGRect frame=CSRect(CSTabBarLayoutItemRect(layout,(unsigned)i,(unsigned)items.count,rtl));
         CSSetFrame(button,[bar convertRect:frame toView:button.superview]);
         // New item renderers are children of their native UIControl. Position the
         // control first, then fill its content; applying two bar-space frames to
@@ -777,7 +853,7 @@ void CSTabBarUpdate(MMTabBar *bar) {
         CSApplyItemAtIndex(item,bar,index);
     }
     s.buttons=buttonStates;
-    [CATransaction begin]; [CATransaction setDisableActions:YES]; CSRenderSurface(s,bar); [CATransaction commit];
+    [CATransaction begin]; [CATransaction setDisableActions:YES]; CSRenderSurface(s,bar); CSRenderFunction(s,bar); [CATransaction commit];
     // Hidden/detached bars retain their styled appearance for native transition snapshots.
     // They must not retain ownership of a page's scroll inset or receive touches.
     CSTabBarControllerLayout *scope=objc_getAssociatedObject(s.controller,&CSControllerLayoutKey);
@@ -785,6 +861,9 @@ void CSTabBarUpdate(MMTabBar *bar) {
     else { s.insetDeferred=NO; CSUpdateVisibleInset(s); }
     CSReconcileClickEffect(s);
     CSCacheSwipeGeometry(s,items,buttons);
+    // Native controls and our tracking controls can be reinserted during layout.
+    // Keep the overlapping center key above both in the actual view hierarchy.
+    if (s.functionButton.superview==bar && bar.subviews.lastObject!=s.functionButton) [bar addSubview:s.functionButton];
     CSReconcileCapsule(s,YES);
     s.applying=NO;
 }
@@ -826,7 +905,7 @@ UIView *CSTabBarStyleSnapshot(MMTabBar *bar, UIView *nativeSnapshot) {
     snapshot.bounds=nativeSnapshot.bounds; snapshot.backgroundColor=UIColor.clearColor;
     snapshot.userInteractionEnabled=NO; snapshot.clipsToBounds=NO;
     CSTabBarState *copy=[CSTabBarState new];
-    copy.bar=bar; copy.floatingRect=s.floatingRect; copy.nativeBackground=s.nativeBackground;
+    copy.bar=bar; copy.snapshotSource=bar; copy.floatingRect=s.floatingRect; copy.functionRect=s.functionRect; copy.nativeBackground=s.nativeBackground;
     [CATransaction begin]; [CATransaction setDisableActions:YES]; CSRenderSurface(copy,snapshot); [CATransaction commit];
     if (s.capsule && CSTabBarPreferences.current.clickEffect!=CSTabBarClickEffectNone) {
         UIView *host=[[UIView alloc] initWithFrame:copy.surface.bounds];
@@ -838,6 +917,7 @@ UIView *CSTabBarStyleSnapshot(MMTabBar *bar, UIView *nativeSnapshot) {
         [host addSubview:capsule]; [copy.surface addSubview:host];
     }
     for (UIView *image in images) [snapshot addSubview:image];
+    CSRenderFunction(copy,snapshot);
     return snapshot;
 }
 void CSTabBarBeginLayout(MMTabBar *bar) {
@@ -904,6 +984,13 @@ static BOOL CSLiquidCanTrack(CSTabBarState *s) {
 }
 static NSInteger CSLiquidIndex(CSTabBarState *s, CGPoint point, BOOL strict) {
     if (!isfinite(point.x) || !isfinite(point.y) || s.swipeCount!=4) return NSNotFound;
+    if (s.functionRect.size.width>0) {
+        // The whole inserted slot, including its visual padding, belongs to the
+        // function key. Do not let the tab touch slop claim its edges or the gap.
+        if (point.x>=CGRectGetMinX(s.functionRect) && point.x<=CGRectGetMaxX(s.functionRect)) return NSNotFound;
+        if (CSTabBarPreferences.current.structure==CSTabBarStructureSeparated &&
+            (point.x<CGRectGetMinX(s.floatingRect) || point.x>=CGRectGetMaxX(s.floatingRect))) return NSNotFound;
+    }
     if (strict) {
         for (NSInteger i=0;i<4;i++) {
             if (!CSNativeControlAvailable(s,(NSUInteger)i)) continue;
@@ -947,7 +1034,7 @@ static void CSLiquidUpdate(CSTabBarState *s, CGPoint point, BOOL animated) {
     if (s.capsule) {
         CGRect content=s.capsuleHost.bounds, rest=s->swipeFrames[index];
         CGFloat touchX=point.x-CGRectGetMinX(s.floatingRect);
-        CGFloat slotWidth=CGRectGetWidth(s.floatingRect)/4;
+        CGFloat slotWidth=CGRectGetWidth(s.trackingControls[index].frame);
         CGFloat q=1-MIN(1,fabs(touchX-CGRectGetMidX(rest))/MAX(1,slotWidth*.48));
         BOOL underline=CSTabBarPreferences.current.clickEffect==CSTabBarClickEffectUnderline;
         CGFloat width=MIN(CGRectGetWidth(content)-4,rest.size.width*(underline?1.12:1.02+.06*q));
@@ -1041,11 +1128,15 @@ BOOL CSTabBarContainsPoint(MMTabBar *bar, CGPoint point, BOOL *handled) {
     *handled=s.applied && CSTabBarPreferences.current.enabled;
     if (!*handled || bar.hidden || bar.alpha<.01 || !bar.userInteractionEnabled) return NO;
     CGFloat radius=CSTabBarPreferences.current.borderStyle==0 ? s.floatingRect.size.height/2 : MIN(CSTabBarPreferences.current.cornerRadius,s.floatingRect.size.height/2);
-    return [[UIBezierPath bezierPathWithRoundedRect:s.floatingRect cornerRadius:radius] containsPoint:point];
+    if ([[UIBezierPath bezierPathWithRoundedRect:s.floatingRect cornerRadius:radius] containsPoint:point]) return YES;
+    return s.functionRect.size.width>0 && [[UIBezierPath bezierPathWithRoundedRect:s.functionRect cornerRadius:MIN(s.functionRect.size.width,s.functionRect.size.height)/2] containsPoint:point];
 }
 UIView *CSTabBarHitTest(MMTabBar *bar, CGPoint point, UIEvent *event, BOOL *handled) {
     CSTabBarState *s=CSState(bar,NO);
     if (!CSTabBarContainsPoint(bar,point,handled)) return nil;
+    if (s.functionRect.size.width>0 && CGRectContainsPoint(s.functionRect,point)) {
+        return [s.functionButton hitTest:[bar convertPoint:point toView:s.functionButton] withEvent:event];
+    }
     for (UIControl *control in s.trackingControls.reverseObjectEnumerator) {
         NSUInteger index=[s.trackingControls indexOfObjectIdenticalTo:control];
         BOOL available=CSNativeControlAvailable(s,index);
@@ -1060,7 +1151,16 @@ UIView *CSTabBarHitTest(MMTabBar *bar, CGPoint point, UIEvent *event, BOOL *hand
     }
     return bar;
 }
-@implementation CSTabBarState @end
+@implementation CSTabBarState
+- (void)performFunctionAction {
+    MMTabBar *bar=self.bar;
+    CSTabBarPreferences *p=CSTabBarPreferences.current;
+    if (self.snapshotSource || !self.applied || !self.geometryApplied || !p.enabled || p.structure==CSTabBarStructureClassic ||
+        bar.hidden || bar.alpha<.01 || !bar.userInteractionEnabled || !self.functionButton.window ||
+        self.functionButton.window!=bar.window || self.controller.viewIfLoaded.window!=bar.window) return;
+    [CSQuickPanelActionRouter performActionWithIdentifier:p.functionAction fromViewController:(UIViewController *)self.controller];
+}
+@end
 
 static atomic_bool CSPreferencesPending;
 static void CSRefreshPreferences(void) {

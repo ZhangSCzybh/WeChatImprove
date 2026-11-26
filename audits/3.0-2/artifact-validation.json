@@ -1,0 +1,81 @@
+{
+  "version": "3.0-2",
+  "schemes": {
+    "rootless": {
+      "file": "com.wechat.improve_3.0-2_iphoneos-arm64.deb",
+      "bytes": 2424364,
+      "sha256": "98621be49cba98db39e308285f2bc5331a3a3c34748efe71e6b685dc89ae64e8",
+      "architecture": "iphoneos-arm64",
+      "dylib_path": "var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib",
+      "dylib_sha256": "37d79e8988e51486bdb2ee49b386c20a287990526c943a1ab5ef9f5c675863f8",
+      "slices": [
+        "arm64",
+        "arm64e"
+      ],
+      "min_os": {
+        "arm64": "15.0",
+        "arm64e": "15.0"
+      },
+      "dSYM_UUIDs": {
+        "arm64": "DE4CD767-2EB8-3F00-BB24-E1A1203147EA",
+        "arm64e": "E56C5178-FA41-37C4-9D8E-91D1A6E0F893"
+      },
+      "warnings": 8,
+      "warning_lines": [
+        "Controllers/CSSettingsTableViewController.m:19:10: warning: 'automaticallyAdjustsScrollViewInsets' is deprecated: first deprecated in iOS 11.0 - Use UIScrollView's contentInsetAdjustmentBehavior instead [-Wdeprecated-declarations]",
+        "Controllers/CSSettingsTableViewController.m:19:10: warning: 'automaticallyAdjustsScrollViewInsets' is deprecated: first deprecated in iOS 11.0 - Use UIScrollView's contentInsetAdjustmentBehavior instead [-Wdeprecated-declarations]",
+        "Hooks/CloseFriendNotificationHooks.xm:393:62: warning: 'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]",
+        "Hooks/CloseFriendNotificationHooks.xm:393:62: warning: 'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]",
+        "Hooks/RedEnvelopHooks.xm:132:61: warning: 'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]",
+        "Hooks/RedEnvelopHooks.xm:132:61: warning: 'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]",
+        "ld: warning: -multiply_defined is obsolete",
+        "ld: warning: -multiply_defined is obsolete"
+      ],
+      "errors": 0,
+      "stage_hash_matches": true,
+      "injection_plist_matches": true,
+      "diagnostic_markers_absent": true,
+      "new_layout_APIs_present": true
+    },
+    "rootful": {
+      "file": "com.wechat.improve_3.0-2_iphoneos-arm.deb",
+      "bytes": 2421544,
+      "sha256": "aec54cdc8f3be763d279fd818c04a5121de46855d2e065e8fefc6bc59190f6ec",
+      "architecture": "iphoneos-arm",
+      "dylib_path": "Library/MobileSubstrate/DynamicLibraries/WeChatImprove.dylib",
+      "dylib_sha256": "77341ef62a5bfa9b7f56e8fcaca766b113451921d49ae7e90f12e0ee1da19191",
+      "slices": [
+        "arm64",
+        "arm64e"
+      ],
+      "min_os": {
+        "arm64": "15.0",
+        "arm64e": "15.0"
+      },
+      "dSYM_UUIDs": {
+        "arm64": "E4EACC23-CE1E-31E6-893B-39518A1F34DC",
+        "arm64e": "D61E8F2E-3665-3629-8476-907E4AEB676E"
+      },
+      "warnings": 8,
+      "warning_lines": [
+        "Controllers/CSSettingsTableViewController.m:19:10: warning: 'automaticallyAdjustsScrollViewInsets' is deprecated: first deprecated in iOS 11.0 - Use UIScrollView's contentInsetAdjustmentBehavior instead [-Wdeprecated-declarations]",
+        "Controllers/CSSettingsTableViewController.m:19:10: warning: 'automaticallyAdjustsScrollViewInsets' is deprecated: first deprecated in iOS 11.0 - Use UIScrollView's contentInsetAdjustmentBehavior instead [-Wdeprecated-declarations]",
+        "Hooks/CloseFriendNotificationHooks.xm:393:62: warning: 'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]",
+        "Hooks/CloseFriendNotificationHooks.xm:393:62: warning: 'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]",
+        "Hooks/RedEnvelopHooks.xm:132:61: warning: 'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]",
+        "Hooks/RedEnvelopHooks.xm:132:61: warning: 'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]",
+        "ld: warning: -multiply_defined is obsolete",
+        "ld: warning: -multiply_defined is obsolete"
+      ],
+      "errors": 0,
+      "stage_hash_matches": true,
+      "injection_plist_matches": true,
+      "diagnostic_markers_absent": true,
+      "new_layout_APIs_present": true
+    }
+  },
+  "source_manifest_unchanged": true,
+  "symbol_zip_crc": true,
+  "source_units": 298,
+  "installed_on_device": false
+}

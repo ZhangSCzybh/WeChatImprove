@@ -294,7 +294,7 @@ CS_GROUP_REFRESH_TEST_PROPERTIES
 - (void)prepareInitialViewport;
 - (NSDictionary *)captureViewportForTabID:(NSString *)tabID;
 - (void)restorePendingViewport;
-- (void)selectSwipeIndex:(NSInteger)index direction:(NSInteger)direction;
+- (void)selectSwipeIndex:(NSInteger)index;
 - (BOOL)beginSwipePageTransitionToIndex:(NSInteger)index direction:(NSInteger)direction;
 - (void)ensureListPanHost;
 - (void)preparePageSourceForPan;

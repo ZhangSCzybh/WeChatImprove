@@ -1,0 +1,84 @@
+{
+  "baseline_version": "2.9-7",
+  "version": "2.9-8",
+  "new_gate_failures": 0,
+  "gates": [
+    {
+      "gate": "group-interactions",
+      "baseline_exit_code": 0,
+      "exit_code": 0,
+      "baseline_log": "logs/baseline-group-interactions.log",
+      "log": "logs/fixed-group-interactions.log"
+    },
+    {
+      "gate": "group-page-lifecycle",
+      "baseline_exit_code": 0,
+      "exit_code": 0,
+      "baseline_log": "logs/baseline-group-page-lifecycle.log",
+      "log": "logs/fixed-group-page-lifecycle.log"
+    },
+    {
+      "gate": "group-page-animator",
+      "baseline_exit_code": 0,
+      "exit_code": 0,
+      "baseline_log": "logs/baseline-group-page-animator.log",
+      "log": "logs/fixed-group-page-animator.log"
+    },
+    {
+      "gate": "group-lifecycle",
+      "baseline_exit_code": 1,
+      "exit_code": 1,
+      "baseline_log": "logs/baseline-group-lifecycle.log",
+      "log": "logs/final-group-lifecycle.log"
+    },
+    {
+      "gate": "group-initial-viewport",
+      "baseline_exit_code": 0,
+      "exit_code": 0,
+      "baseline_log": "logs/baseline-group-initial-viewport.log",
+      "log": "logs/fixed-group-initial-viewport.log"
+    },
+    {
+      "gate": "group-native-preview",
+      "baseline_exit_code": 0,
+      "exit_code": 0,
+      "baseline_log": "logs/baseline-group-native-preview.log",
+      "log": "logs/fixed-group-native-preview.log"
+    },
+    {
+      "gate": "group-search",
+      "baseline_exit_code": 0,
+      "exit_code": 0,
+      "baseline_log": "logs/baseline-group-search.log",
+      "log": "logs/final-group-search.log"
+    },
+    {
+      "gate": "group-selection",
+      "baseline_exit_code": 1,
+      "exit_code": 1,
+      "baseline_log": "logs/baseline-group-selection.log",
+      "log": "logs/fixed-group-selection.log"
+    },
+    {
+      "gate": "group-indicator",
+      "baseline_exit_code": 0,
+      "exit_code": 0,
+      "baseline_log": "logs/baseline-group-indicator.log",
+      "log": "logs/fixed-group-indicator.log"
+    },
+    {
+      "gate": "message-merge",
+      "baseline_exit_code": 1,
+      "exit_code": 1,
+      "baseline_log": "logs/baseline-message-merge.log",
+      "log": "logs/fixed-message-merge.log"
+    },
+    {
+      "gate": "bubble-style",
+      "baseline_exit_code": 0,
+      "exit_code": 0,
+      "baseline_log": "logs/baseline-bubble-style.log",
+      "log": "logs/fixed-bubble-style.log"
+    }
+  ]
+}

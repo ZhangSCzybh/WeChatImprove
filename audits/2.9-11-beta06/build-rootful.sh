@@ -1,0 +1,4 @@
+#!/bin/sh
+set -eu
+cd /Users/zhangshichao/Documents/Workspace/WeChatImprove
+make package -j4 THEOS=/Users/zhangshichao/theos SCHEME=rootful _THEOS_LOCAL_DATA_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2.9-11-beta06-su3see4a/build-rootful _THEOS_SWIFT_AUXILIARY_DIR=/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-2.9-11-beta06-su3see4a/swift-rootful THEOS_PACKAGE_DIR=/Users/zhangshichao/Documents/Workspace/WeChatImprove/packages/2.9-11-beta06 PACKAGE_VERSION=2.9-11-beta06 PACKAGE_BUILDNAME= DEBUG=0 FINALPACKAGE=1 KEEP_LOGOS_INTERMEDIATES=1

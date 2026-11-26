@@ -1,0 +1,44 @@
+{
+  "rootless": {
+    "warnings": 8,
+    "unchanged_from_beta04": true,
+    "normalized_warning_lines": [
+      "Controllers/CSSettingsTableViewController.m:19:10: warning: 'automaticallyAdjustsScrollViewInsets' is deprecated: first deprecated in iOS 11.0 - Use UIScrollView's contentInsetAdjustmentBehavior instead [-Wdeprecated-declarations]",
+      "Controllers/CSSettingsTableViewController.m:19:10: warning: 'automaticallyAdjustsScrollViewInsets' is deprecated: first deprecated in iOS 11.0 - Use UIScrollView's contentInsetAdjustmentBehavior instead [-Wdeprecated-declarations]",
+      "Hooks/CloseFriendNotificationHooks.xm:393:62: warning: 'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]",
+      "Hooks/CloseFriendNotificationHooks.xm:393:62: warning: 'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]",
+      "Hooks/RedEnvelopHooks.xm:132:61: warning: 'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]",
+      "Hooks/RedEnvelopHooks.xm:132:61: warning: 'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]",
+      "ld: warning: -multiply_defined is obsolete",
+      "ld: warning: -multiply_defined is obsolete"
+    ],
+    "normalization": "Ignore output order and interleaved source excerpts before the diagnostic location; retain source path, line, column and warning message.",
+    "compile_steps": 596,
+    "compile_steps_by_arch": {
+      "arm64": 298,
+      "arm64e": 298
+    },
+    "unique_source_units": 298
+  },
+  "rootful": {
+    "warnings": 8,
+    "unchanged_from_beta04": true,
+    "normalized_warning_lines": [
+      "Controllers/CSSettingsTableViewController.m:19:10: warning: 'automaticallyAdjustsScrollViewInsets' is deprecated: first deprecated in iOS 11.0 - Use UIScrollView's contentInsetAdjustmentBehavior instead [-Wdeprecated-declarations]",
+      "Controllers/CSSettingsTableViewController.m:19:10: warning: 'automaticallyAdjustsScrollViewInsets' is deprecated: first deprecated in iOS 11.0 - Use UIScrollView's contentInsetAdjustmentBehavior instead [-Wdeprecated-declarations]",
+      "Hooks/CloseFriendNotificationHooks.xm:393:62: warning: 'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]",
+      "Hooks/CloseFriendNotificationHooks.xm:393:62: warning: 'UILocalNotification' is deprecated: first deprecated in iOS 10.0 - Use UserNotifications Framework's UNNotificationRequest [-Wdeprecated-declarations]",
+      "Hooks/RedEnvelopHooks.xm:132:61: warning: 'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]",
+      "Hooks/RedEnvelopHooks.xm:132:61: warning: 'statusBarFrame' is deprecated: first deprecated in iOS 13.0 - Use the statusBarManager property of the window scene instead. [-Wdeprecated-declarations]",
+      "ld: warning: -multiply_defined is obsolete",
+      "ld: warning: -multiply_defined is obsolete"
+    ],
+    "normalization": "Ignore output order and interleaved source excerpts before the diagnostic location; retain source path, line, column and warning message.",
+    "compile_steps": 596,
+    "compile_steps_by_arch": {
+      "arm64": 298,
+      "arm64e": 298
+    },
+    "unique_source_units": 298
+  }
+}

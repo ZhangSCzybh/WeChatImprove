@@ -1,0 +1,44 @@
+{
+  "tabbar": {
+    "command": "bash Tests/verify-tabbar.sh",
+    "exit_code": 0,
+    "geometry": "PASS",
+    "structure_checks": 1151,
+    "neo_touch_checks": 97,
+    "modern_total_touch_checks": 121,
+    "log": "logs/tabbar.log"
+  },
+  "backup_registry": {
+    "command": "bash Tests/verify-backup-registry.sh",
+    "exit_code": 0,
+    "assertions": 2459,
+    "log": "logs/backup-registry.log"
+  },
+  "strict_syntax": {
+    "architectures": [
+      "arm64",
+      "arm64e"
+    ],
+    "sdk": "iphoneos",
+    "minimum_ios": "15.0",
+    "warnings_as_errors": true,
+    "sources": [
+      "CSTabBarStyleSettingsViewController.m",
+      "CSTabBarPreferences.m",
+      "CSTabBarPreviewView.m",
+      "CSBackupRegistry.m",
+      "CSReleaseNotesViewController.m"
+    ],
+    "exit_codes": {
+      "arm64": 0,
+      "arm64e": 0
+    }
+  },
+  "git_diff_check": 0,
+  "version_consistency": true,
+  "full_builds": {
+    "rootless": 0,
+    "rootful": 0
+  },
+  "artifact_validation": 0
+}

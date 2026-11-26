@@ -1,0 +1,9 @@
+PASS: 235148 message merge/navigation checks
+In file included from /Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSMessageMergeAdapter.m:4:
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSBubbleStyleAdapter.h:28:19: error: unknown type name 'UIColor'
+   28 | FOUNDATION_EXPORT UIColor *CSBubbleStyleVoiceTransPreviewTextColor(UIView *preview, UIColor *nativeColor);
+      |                   ^
+/Users/zhangshichao/Documents/Workspace/WeChatImprove/Controllers/CSBubbleStyleAdapter.h:28:85: error: unknown type name 'UIColor'
+   28 | FOUNDATION_EXPORT UIColor *CSBubbleStyleVoiceTransPreviewTextColor(UIView *preview, UIColor *nativeColor);
+      |                                                                                     ^
+2 errors generated.

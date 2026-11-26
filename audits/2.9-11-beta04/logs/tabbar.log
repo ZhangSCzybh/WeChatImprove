@@ -1,0 +1,6 @@
+tabbar geometry: PASS
+2026-11-26 18:36:57.805 native[48833:36940838] tabbar selected icon color/native restore: PASS
+2026-11-26 18:36:57.814 native[48833:36940838] tabbar Neo touch/animation: 97 checks passed
+2026-11-26 18:36:57.818 native[48833:36940838] tabbar modern native hierarchy: PASS (121 total touch checks)
+2026-11-26 18:36:57.825 native[48833:36940838] tabbar structure lifecycle: PASS (290 checks)
+2026-11-26 18:36:57.833 native[48833:36940838] tabbar preferences/native lifecycle: PASS

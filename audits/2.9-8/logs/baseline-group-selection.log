@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/Users/zhangshichao/Documents/Workspace/WeChatImprove/Tests/extract-group-selection.py", line 18, in <module>
+    out=Path(sys.argv[1]);out.mkdir(exist_ok=True)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Applications/WorkBuddy.app/Contents/Resources/app.asar.unpacked/cli/vendor/sandbox-center-runtime-kit/shim/sitecustomize.py", line 884, in _brokered_path_mkdir
+    if _broker_request_host_operation(
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Applications/WorkBuddy.app/Contents/Resources/app.asar.unpacked/cli/vendor/sandbox-center-runtime-kit/shim/sitecustomize.py", line 617, in _broker_request_host_operation
+    raise error
+FileExistsError: [Errno 17] EEXIST: file already exists, mkdir '/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-group-selection.WNLeDd': '/var/folders/vh/8wytdb4s29342gz7592zc9kr0000gn/T/wechat-group-selection.WNLeDd'

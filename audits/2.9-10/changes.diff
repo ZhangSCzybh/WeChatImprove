@@ -1,0 +1,214 @@
+--- task-start/Controllers/CSGroupListAdapter.m
++++ 2.9-10/Controllers/CSGroupListAdapter.m
+@@ -2880,10 +2880,15 @@
+     NSString *selected=self.preferences.selectedTabID, *account=CSFS_ACCOUNT();
+     NSArray *returnKey=self.pageSourceReturnKey;
+     BOOL completedReturn=account.length && [returnKey isEqual:@[account,@(CSCloseFriendAccountEpoch()),@(self.viewportGeneration)]];
+-    BOOL returning=completedReturn || (self.presentationReturnFinished && [self validViewport:self.presentationViewport]);
++    // Some native returns deliver willAppear without our didAppear callback.
++    // An already admitted horizontal pan is a new positioning command, and may
++    // finish that exact, still-valid departure request through the shared restore.
++    // Passive layout and a merely possible/vertical gesture cannot do this.
++    BOOL gestureReturn=[self groupPanMoving] && [self validViewport:self.presentationViewport];
++    BOOL returning=completedReturn || ((self.presentationReturnFinished || gestureReturn) && [self validViewport:self.presentationViewport]);
+     BOOL switching=[self validViewport:self.switchViewport] && [self.switchViewport[@"targetTab"] isEqual:selected];
+     BOOL unpublished=selected.length && ![selected isEqual:self.publishedTabID];
+-    if (CSFS_REJECT((self.presentationViewport && !self.presentationReturnFinished)) ||
++    if (CSFS_REJECT((self.presentationViewport && !self.presentationReturnFinished && !gestureReturn)) ||
+         CSFS_REJECT((!returning && !switching))) return;
+     CSCloseFriendSnapshot *policy=CSFS_POLICY();
+     NSUInteger epoch=CSCloseFriendAccountEpoch();
+@@ -2912,7 +2917,7 @@
+     // the request only after the real table accepts the saved height.
+     self.preparingPagePreview=YES;
+     @try {
+-        if (completedReturn) [self cancelInitialViewport];
++        if (completedReturn || gestureReturn) [self cancelInitialViewport];
+         if (self.dirty || unpublished || self.sessionLayoutHeld) [self refresh];
+         CSCloseFriendSnapshot *currentPolicy=CSFS_POLICY();
+         if (CSFS_REJECT(self.table!=table) ||
+@@ -2945,6 +2950,9 @@
+         CSFS_REJECT(![selected isEqual:self.preferences.selectedTabID]) ||
+         CSFS_REJECT((completedReturn ? self.pageSourceReturnKey!=returnKey :
+                     (self.presentationViewport ?: self.switchViewport)!=pendingViewport))) return;
++            // Do not let refresh consume an unfinished return before the
++            // table/policy/generation checks above have accepted its real layout.
++            if (gestureReturn) self.presentationReturnFinished=YES;
+             [self restorePendingViewport];
+         }
+         if (completedReturn && self.pageSourceReturnKey==returnKey &&
+--- task-start/Controllers/CSGroupPageAnimator.m
++++ 2.9-10/Controllers/CSGroupPageAnimator.m
+@@ -18,6 +18,10 @@
+ @property(nonatomic, weak) UITableView *table;
+ @property(nonatomic, weak) UIView *host, *rail, *window;
+ @property(nonatomic) CGRect viewport;
++@property(nonatomic) CGRect sourceTableFrame, sourceTableBounds, sourceRailFrame, sourceRailBounds;
++@property(nonatomic) CGRect sourceHostBounds, sourceWindowBounds;
++@property(nonatomic) UIEdgeInsets sourceInset;
++@property(nonatomic) BOOL croppedViewport;
+ @property(nonatomic) NSInteger direction;
+ @property(nonatomic) NSUInteger generation;
+ @property(nonatomic, readwrite) CGFloat progress;
+@@ -67,7 +71,7 @@
+     self.generation++;
+     self.overlay=nil; self.outgoing=nil; self.incoming=nil; self.animating=NO;
+     self.table=nil; self.host=nil; self.rail=nil; self.window=nil;
+-    self.viewport=CGRectZero; self.direction=0; self.progress=0;
++    self.viewport=CGRectZero; self.croppedViewport=NO; self.direction=0; self.progress=0;
+     for (UIView *page in overlay.subviews) [page.layer removeAllAnimations];
+     [overlay.layer removeAllAnimations];
+     [overlay removeFromSuperview];
+@@ -170,6 +174,10 @@
+     snapshot.frame=overlay.bounds;
+     [overlay addSubview:snapshot];
+     self.table=table; self.host=host; self.rail=rail; self.window=table.window;
++    self.sourceTableFrame=table.frame; self.sourceTableBounds=table.bounds;
++    self.sourceRailFrame=rail.frame; self.sourceRailBounds=rail.bounds;
++    self.sourceHostBounds=host.bounds; self.sourceWindowBounds=table.window.bounds;
++    self.sourceInset=table.adjustedContentInset;
+     self.viewport=frame; self.direction=direction;
+     self.overlay=overlay; self.outgoing=snapshot;
+     // A sibling cover does not alter table/header geometry and cannot appear in
+@@ -188,6 +196,17 @@
+ #undef CSFS_ACCEPT
+ }
+ 
++- (BOOL)hasStableScrollGeometryForTable:(UITableView *)table belowView:(UIView *)rail {
++    UIEdgeInsets inset=table.adjustedContentInset;
++    return table && rail && self.table==table && self.rail==rail && self.host==table.superview &&
++        self.overlay.superview==self.host && self.window && self.window==table.window &&
++        CGRectEqualToRect(self.sourceTableFrame,table.frame) &&
++        CGSizeEqualToSize(self.sourceTableBounds.size,table.bounds.size) && self.sourceTableBounds.origin.x==table.bounds.origin.x &&
++        CGRectEqualToRect(self.sourceRailFrame,rail.frame) && CGRectEqualToRect(self.sourceRailBounds,rail.bounds) &&
++        CGRectEqualToRect(self.sourceHostBounds,self.host.bounds) && CGRectEqualToRect(self.sourceWindowBounds,table.window.bounds) &&
++        self.sourceInset.top==inset.top && self.sourceInset.left==inset.left &&
++        self.sourceInset.bottom==inset.bottom && self.sourceInset.right==inset.right;
++}
+ - (BOOL)matchesTable:(UITableView *)table belowView:(UIView *)rail {
+ #if defined(CS_GROUP_FIRST_SWIPE_DIAG)
+ #define CSFS_REJECT(...) ({ BOOL csfs_value=!!(__VA_ARGS__); if (csfs_value) [self cs_firstSwipeEvent:NSStringFromSelector(_cmd) reason:@#__VA_ARGS__]; csfs_value; })
+@@ -197,6 +216,14 @@
+ #define CSFS_ACCEPT(...) __VA_ARGS__
+ #endif
+ 
++    CGRect visible=[self visibleFrameForTable:table belowView:rail];
++    // Rollback can restore the longer source's scroll height. The cropped
++    // common viewport remains valid only inside its still-visible pixels and
++    // under the original physical geometry; expansion never invents pixels.
++    if (self.croppedViewport) {
++        if (CSFS_REJECT(![self hasStableScrollGeometryForTable:table belowView:rail])) return NO;
++        visible=CGRectIntersection(visible,self.viewport);
++    }
+     return CSFS_ACCEPT(self.overlay) &&
+         CSFS_ACCEPT(self.table==table) &&
+         CSFS_ACCEPT(self.rail==rail) &&
+@@ -204,7 +231,7 @@
+         CSFS_ACCEPT(self.overlay.superview==self.host) &&
+         CSFS_ACCEPT(self.window==table.window) &&
+         CSFS_ACCEPT(self.window!=nil) &&
+-        CSFS_ACCEPT(CGRectEqualToRect(self.viewport,[self visibleFrameForTable:table belowView:rail]));
++        CSFS_ACCEPT(CGRectEqualToRect(self.viewport,visible));
+ 
+ #undef CSFS_REJECT
+ #undef CSFS_ACCEPT
+@@ -225,6 +252,26 @@
+ #endif
+ 
+     if (CSFS_REJECT(self.animating)) return NO;
++    // A shorter target can clamp only the table's scroll origin, bringing its
++    // header/rail back on screen. Crop the existing outgoing snapshot to that
++    // smaller common viewport; never stretch it or waive matchesTable's proof.
++    // Replacement, rotation, inset changes and geometry expansion still reject.
++    if (!self.incoming && self.overlay && self.outgoing && self.sourceTableBounds.origin.y!=table.bounds.origin.y &&
++        [self hasStableScrollGeometryForTable:table belowView:rail]) {
++        CGRect current=[self visibleFrameForTable:table belowView:rail], previous=self.viewport;
++        if (!CGRectIsEmpty(current) && !CGRectEqualToRect(previous,current) && CGRectContainsRect(previous,current) &&
++            CGRectGetMinX(current)==CGRectGetMinX(previous) && CGRectGetWidth(current)==CGRectGetWidth(previous) &&
++            CGRectGetMaxY(current)==CGRectGetMaxY(previous)) {
++            NSUInteger cropGeneration=self.generation;
++            UIView *overlay=self.overlay, *outgoing=self.outgoing;
++            [UIView performWithoutAnimation:^{
++                overlay.frame=current;
++                outgoing.frame=CGRectOffset(outgoing.frame,previous.origin.x-current.origin.x,previous.origin.y-current.origin.y);
++            }];
++            if (self.generation!=cropGeneration || self.overlay!=overlay) return NO;
++            self.viewport=current; self.croppedViewport=YES;
++        }
++    }
+     if (CSFS_REJECT(UIAccessibilityIsReduceMotionEnabled()) ||
+         CSFS_REJECT(![self matchesTable:table belowView:rail])) {
+         [self cancel]; return NO;
+--- task-start/Controllers/CSReleaseNotesViewController.m
++++ 2.9-10/Controllers/CSReleaseNotesViewController.m
+@@ -4,6 +4,11 @@
+ // 发布时与 kPluginVersionString、control 同步维护。按版本取值，避免显示其他版本的说明。
+ static NSArray<NSDictionary<NSString *, NSString *> *> *CSCurrentReleaseNotes(void) {
+     NSDictionary *releases = @{
++        @"2.9-10": @[
++            @{@"title": @"修复返回后首滑准备阻断", @"detail": @"依据真机诊断日志，修正原生返回完成通知缺失时保存视口持续阻断横滑转场的问题。已识别的横滑在账号、隐私和真实布局校验内补完返回高度恢复，再准备页面转场；不再依赖先竖向滚动清除请求。修复效果仍需原设备确认。"},
++            @{@"title": @"适配短列表预览的可视区域", @"detail": @"目标列表较短、滚动位置被原生钳制时，在同一列表与稳定外部几何下裁剪旧快照到共同可视区域，保留转场一致性校验、取消恢复和安全边界。曲线、阈值及指示器保持现状。"},
++            @{@"title": @"正式版与验证范围", @"detail": @"正式构建关闭首滑诊断记录与导出入口，提供完整 Rootless 和 Rootful 安装包。语音转文字合并保持现状；主机回归与编译不代表修复已通过真机验证。"}
++        ],
+         @"2.9-9": @[
+             @{@"title": @"首次分组转场诊断版", @"detail": @"2.9-8 的首次转场修复已被用户真机反馈证伪。本版针对返回后直接横滑与先竖滑再横滑的状态差异记录实际 guard、视口、布局和快照结果，等待真机日志定位，不宣称已修复。"},
+             @{@"title": @"本地日志与导出", @"detail": @"复现两种路径后，在设置 Tab 的其他设置中导出首滑诊断日志。只记录状态和几何，不保存聊天正文、账号标识、分组标识或快照图片。保留所有安全 guard、转场曲线、阈值及现有其他功能。"},
+--- task-start/Headers/CSUserInfoHelper.h
++++ 2.9-10/Headers/CSUserInfoHelper.h
+@@ -14,7 +14,7 @@
+ extern NSString * const kChatAvatarURLKey;    // 聊天对象头像URL缓存键
+ 
+ // 插件信息相关常量
+-#define kPluginVersionString @"2.9-9"
++#define kPluginVersionString @"2.9-10"
+ 
+ #pragma mark - 类定义
+ 
+--- task-start/README.md
++++ 2.9-10/README.md
+@@ -2,7 +2,7 @@
+ 
+ 面向 iOS 微信的 Theos 插件，使用 Objective-C / Logos 接入微信原生界面，提供聊天分组、界面定制、消息增强、自动回复和配置备份等功能，可在插件设置中按需开启。
+ 
+-**源码版本：`2.9-9`（首滑诊断版）** · **架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
++**源码版本：`2.9-10`（正式修复版）** · **架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+ 
+ [功能概览](#功能概览) · [安装与入口](#安装与入口) · [使用说明](#使用说明) · [配置与备份](#配置与备份) · [源码编译](#源码编译) · [开发与验证](#开发与验证) · [常见问题](#常见问题)
+ 
+@@ -32,16 +32,16 @@
+ 
+ 需要能够向微信加载插件的 iOS 注入环境。近期适配参考为微信 `8.0.78`、`8.0.80`，广告净化等私有接口以 `8.0.80.34` 为核验依据；这不代表所有系统、微信版本及插件组合均已通过真机验证。安装包声明依赖 `mobilesubstrate >= 0.9.5000`。
+ 
+-当前源码版本为 **2.9-9 首滑诊断版**。2.9-8 的返回首滑修复已被用户真机反馈证伪，本版保留原有行为和安全 guard，记录“返回后直接横滑失败／先竖滑再横滑成功”的状态差异，等待真机日志定位，**尚未确认修复**。复现两种路径后，进入插件首页 **设置 Tab → 其他设置 → 导出首滑诊断日志**，回传当前进程的 JSONL 文件。日志保存在微信数据容器 `Documents/WeChatImproveDiagnostics/first-swipe-2.9-9-*.jsonl`，仅记录状态、版本和几何，不含聊天正文、账号／分组标识或截图。包含全部既有功能，语音转文字合并本轮保持现状；转场曲线、阈值、指示器和系统减弱动态效果行为不变。所有运行期结论均为 **真机未验证**。按现有注入环境选择：
+-
+-| 环境／产物    | 下载                                                                           | 说明                                                      |
+-| -------- | ---------------------------------------------------------------------------- | ------------------------------------------------------- |
+-| Rootless | [安装包](packages/2.9-9/com.wechat.improve_2.9-9_iphoneos-arm64.deb) | 安装至 `/var/jb/Library/MobileSubstrate/DynamicLibraries/` |
+-| Rootful  | [安装包](packages/2.9-9/com.wechat.improve_2.9-9_iphoneos-arm.deb) | 安装至 `/Library/MobileSubstrate/DynamicLibraries/`        |
+-| 重签用动态库   | [WeChatImprove.dylib](packages/2.9-9/WeChatImprove.dylib)              | 与 Rootful 包内动态库一致                                       |
+-| 校验与调试    | [SHA-256 清单](packages/2.9-9/SHA256SUMS) · [调试符号](packages/2.9-9/symbols.zip) | 产物详情见[发布说明](packages/2.9-9/README.md)     |
+-
+-本版聚焦首次转场的真机差异诊断，并执行六项核心门禁，与 2.9-8 逐项比对；两种安装包与符号的核验结果见随包说明。交付目录包含两种 deb、动态库、调试符号、校验清单、说明与核心门禁记录。主机检查不代表原设备触摸与视觉效果已通过验收。
++当前交付为 **2.9-10 正式修复版**。基于 2.9-9 真机日志，修复返回完成通知缺失导致保存视口阻断首次横滑的问题，并处理短列表滚动位置钳制后的预览裁剪。正式构建关闭首滑诊断记录与导出入口，包含全部既有功能；语音转文字合并、转场曲线、阈值和指示器保持现状。修复效果为 **真机未验证**。按现有注入环境选择：
++
++| 环境／产物 | 下载 | 说明 |
++| --- | --- | --- |
++| Rootless | [安装包](packages/2.9-10/com.wechat.improve_2.9-10_iphoneos-arm64.deb) | 安装至 `/var/jb/Library/MobileSubstrate/DynamicLibraries/` |
++| Rootful | [安装包](packages/2.9-10/com.wechat.improve_2.9-10_iphoneos-arm.deb) | 安装至 `/Library/MobileSubstrate/DynamicLibraries/` |
++| 重签用动态库 | [WeChatImprove.dylib](packages/2.9-10/WeChatImprove.dylib) | 与 Rootful 包内动态库一致 |
++| 校验与调试 | [SHA-256 清单](packages/2.9-10/SHA256SUMS) · [调试符号](packages/2.9-10/symbols.zip) | 产物详情见[发布说明](packages/2.9-10/README.md) |
++
++本版执行六项核心门禁并与 2.9-8 逐项比对，同时聚焦分组来源准备、页面动画及相关交互回归。日志时序、修复范围和设备复验步骤见[审计报告](audits/2.9-10/README.md)。主机检查不代表原设备触摸与视觉效果已通过验收。
+ 
+ 两种安装包均包含 `arm64` / `arm64e`。包名中的 `iphoneos-arm64` / `iphoneos-arm` 是打包方案的架构标识，应按注入环境选择。Roothide 保留源码构建入口，尚无当前版本的运行验证结论。仓库未提供可直接安装的 IPA 或一键重签流程。
+ 
+--- task-start/control
++++ 2.9-10/control
+@@ -1,6 +1,6 @@
+ Package: com.wechat.improve
+ Name: WeChatImprove
+-Version: 2.9-9
++Version: 2.9-10
+ Architecture: iphoneos-arm
+ Description: 微信增强插件，支持聊天分组、界面定制、消息增强、朋友圈卡片布局与配置备份。
+ Maintainer: 再也不会

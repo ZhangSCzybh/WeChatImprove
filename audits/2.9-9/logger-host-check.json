@@ -1,0 +1,17 @@
+{
+  "FIRST": {
+    "records": 2,
+    "file_bytes": 1063,
+    "queue_dropped": 0,
+    "size_limit_dropped": 0,
+    "io_error": 0
+  },
+  "STRESS": {
+    "records": 141,
+    "file_bytes": 4568516,
+    "queue_dropped": 4862,
+    "size_limit_dropped": 0,
+    "io_error": 0
+  },
+  "isolation": "Temporary copy of production logger with only NSHomeDirectory() replaced by a temporary directory; macro enabled. No device/UI claim."
+}

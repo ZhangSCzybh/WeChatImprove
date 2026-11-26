@@ -76,8 +76,7 @@ static BOOL Option(NSString *suffix) {
 - (void)cancelInvalidPageTransition;
 - (void)finishPageTransitionIfReady;
 - (BOOL)pageTransitionTargetIsReady;
-- (void)selectSwipeIndex:(NSInteger)index direction:(NSInteger)direction;
-- (void)preparePageTransitionForSelection:(NSInteger)index;
+- (void)selectSwipeIndex:(NSInteger)index;
 @property (nonatomic, strong) CSGroupRow *swipeRow;
 @property (nonatomic, copy) NSString *swipeAccount;
 @property (nonatomic, copy) NSIndexPath *swipeDisplayPath;
@@ -303,7 +302,8 @@ static BOOL Option(NSString *suffix) {
     if (!adapter || adapter.presentationSuspended) return;
     // Appearance completion is independent of whether departure geometry could
     // be captured or has already been restored. Keep one source-preparation
-    // request until the first horizontal gesture or a newer positioning command.
+    // request until verified idle layout, the first horizontal gesture or a
+    // newer positioning command.
     NSString *account=CSGroupCurrentAccountID();
     adapter.pageSourceReturnKey=account.length ? @[account,@(CSCloseFriendAccountEpoch()),@(adapter.viewportGeneration)] : nil;
     if (!adapter.presentationViewport && !adapter.initialViewportPending) return;
@@ -327,6 +327,12 @@ static BOOL Option(NSString *suffix) {
     id table=CSGroupReadObject(controller,CSGroupIsFoldedController(controller) ? @"tableView" : @"m_tableView");
     if (!adapter || adapter.table!=table) { [self attachToController:controller]; return; }
     [adapter layout];
+    // Reconcile a returned source after the owner's real layout, before scroll
+    // tracking can defer publication. Passive layout must not consume an armed
+    // cold-start viewport; the first horizontal command still handles that case.
+    if (adapter.pageSourceReturnKey && !adapter.initialViewportPending && !adapter.table.tracking && ![adapter groupPanMoving] &&
+        CSGroupPageTransitionEnabled(NSUserDefaults.standardUserDefaults) && !UIAccessibilityIsReduceMotionEnabled())
+        [adapter preparePageSourceForPan];
 }
 + (NSNumber *)closeFriendAlertBadgeCount {
     CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
@@ -2386,7 +2392,8 @@ static BOOL Option(NSString *suffix) {
     }
 }
 - (void)selectIndex:(NSInteger)index {
-    [self preparePageTransitionForSelection:index];
+    // A tab tap is a new selection command; it never inherits a pan's preview.
+    [self cancelPageTransition];
     if (self.swipeActive || self.table.editing || [self nativeMenuState]) { self.chrome.selectedTabID=self.publishedTabID; return; }
     NSArray *tabs=self.displayedTabs; if (index<0 || index>=(NSInteger)tabs.count) return;
     if (![self.preferences.accountID isEqualToString:CSGroupCurrentAccountID()]) { [self requestRefresh]; return; }
@@ -2536,10 +2543,16 @@ static BOOL Option(NSString *suffix) {
     NSString *selected=self.preferences.selectedTabID, *account=CSGroupCurrentAccountID();
     NSArray *returnKey=self.pageSourceReturnKey;
     BOOL completedReturn=account.length && [returnKey isEqual:@[account,@(CSCloseFriendAccountEpoch()),@(self.viewportGeneration)]];
-    BOOL returning=completedReturn || (self.presentationReturnFinished && [self validViewport:self.presentationViewport]);
+    // Some native returns deliver willAppear without our didAppear callback.
+    // An already admitted horizontal pan is a new positioning command, and may
+    // finish that exact, still-valid departure request through the shared restore.
+    // Passive layout and a merely possible/vertical gesture cannot do this.
+    BOOL gestureReturn=[self groupPanMoving] && [self validViewport:self.presentationViewport];
+    BOOL returning=completedReturn || ((self.presentationReturnFinished || gestureReturn) && [self validViewport:self.presentationViewport]);
     BOOL switching=[self validViewport:self.switchViewport] && [self.switchViewport[@"targetTab"] isEqual:selected];
     BOOL unpublished=selected.length && ![selected isEqual:self.publishedTabID];
-    if ((self.presentationViewport && !self.presentationReturnFinished) || (!returning && !switching)) return;
+    if ((self.presentationViewport && !self.presentationReturnFinished && !gestureReturn) ||
+        (!returning && !switching)) return;
     CSCloseFriendSnapshot *policy=CSCloseFriendCurrentSnapshot();
     NSUInteger epoch=CSCloseFriendAccountEpoch();
     if (!account.length || ![account isEqual:self.preferences.accountID] || !self.projection.isValid ||
@@ -2554,13 +2567,13 @@ static BOOL Option(NSString *suffix) {
     id controller=self.controller;
     NSUInteger viewportGeneration=self.viewportGeneration;
     NSDictionary *pendingViewport=self.presentationViewport ?: self.switchViewport;
-    // Horizontal ownership is already decided. Finish only a pending return or
-    // accepted selection; ordinary data changes still wait for the pan to end.
+    // A completed idle return or an admitted horizontal gesture may finish a
+    // pending return/selection; ordinary data changes still wait for pan end.
     // The shared restore retains its account/policy/generation proofs and consumes
     // the request only after the real table accepts the saved height.
     self.preparingPagePreview=YES;
     @try {
-        if (completedReturn) [self cancelInitialViewport];
+        if (completedReturn || gestureReturn) [self cancelInitialViewport];
         if (self.dirty || unpublished || self.sessionLayoutHeld) [self refresh];
         CSCloseFriendSnapshot *currentPolicy=CSCloseFriendCurrentSnapshot();
         if (self.table!=table || self.controller!=controller || self.viewportGeneration!=viewportGeneration ||
@@ -2581,6 +2594,9 @@ static BOOL Option(NSString *suffix) {
                 ![selected isEqual:self.preferences.selectedTabID] ||
                 (completedReturn ? self.pageSourceReturnKey!=returnKey :
                     (self.presentationViewport ?: self.switchViewport)!=pendingViewport)) return;
+            // Do not let refresh consume an unfinished return before the
+            // table/policy/generation checks above have accepted its real layout.
+            if (gestureReturn) self.presentationReturnFinished=YES;
             [self restorePendingViewport];
         }
         if (completedReturn && self.pageSourceReturnKey==returnKey &&
@@ -2653,11 +2669,6 @@ static BOOL Option(NSString *suffix) {
     if (prepared) self.pagePreviewAttemptedTarget=nil;
     return prepared;
 }
-- (void)preparePageTransitionForSelection:(NSInteger)index {
-    // A tab tap is a new selection command; it never inherits a pan's preview.
-    (void)index;
-    [self cancelPageTransition];
-}
 - (void)rollbackPageTransitionWithVelocity:(CGFloat)velocity {
     if (!self.pageAnimator) return;
     CSGroupPageAnimator *animator=self.pageAnimator;
@@ -2683,7 +2694,7 @@ static BOOL Option(NSString *suffix) {
             [adapter cancelPageTransition];
     }];
 }
-- (void)selectSwipeIndex:(NSInteger)index direction:(NSInteger)direction {
+- (void)selectSwipeIndex:(NSInteger)index {
     NSString *target=index>=0 && index<(NSInteger)self.displayedTabs.count ? [self.displayedTabs[(NSUInteger)index] tabId] : nil;
     [self cancelInvalidPageTransition];
     if (!self.pageAnimator || ![target isEqual:self.pageTransitionContext[@"target"]]) {
@@ -2691,7 +2702,6 @@ static BOOL Option(NSString *suffix) {
         // Unavailable/unsafe previews retain the established direct switch path.
         [self.chrome selectTabAtIndex:index animated:YES]; [self selectIndex:index]; return;
     }
-    (void)direction;
     if (![self pageTransitionTargetIsReady]) { [self cancelPageTransition]; return; }
     NSDictionary *context=self.pageTransitionContext;
     NSUInteger generation=self.pageTransitionGeneration;
@@ -2796,7 +2806,13 @@ static BOOL Option(NSString *suffix) {
     if ((gesture!=self.pan && gesture!=self.listPan) || ![self groupSwipesAvailable]) return NO;
     if (!(gesture==self.pan ? self.barTouchAllowed : self.listTouchAllowed)) return NO;
     UIPanGestureRecognizer *pan=(UIPanGestureRecognizer *)gesture;
-    CGPoint v=[pan velocityInView:self.chrome]; return fabs(v.x)>fabs(v.y)*1.5;
+    CGPoint v=[pan velocityInView:self.chrome];
+    if (!(fabs(v.x)>fabs(v.y)*1.5)) return NO;
+    // Finish any late return layout before UIKit starts this horizontal pan.
+    // groupPan retains its revalidation for changes during recognition.
+    if (CSGroupPageTransitionEnabled(NSUserDefaults.standardUserDefaults) && !UIAccessibilityIsReduceMotionEnabled())
+        [self preparePageSourceForPan];
+    return YES;
 }
 - (void)groupPan:(UIPanGestureRecognizer *)pan {
     if (pan!=self.pan && pan!=self.listPan) return;
@@ -2857,7 +2873,7 @@ static BOOL Option(NSString *suffix) {
         confirms=(fabs(p.x)>=44 || forwardVelocity>=350) && forwardVelocity>-350;
     }
     if (confirms && valid && [self closeMenusForGroupSwitch]) {
-        [self selectSwipeIndex:index direction:direction];
+        [self selectSwipeIndex:index];
     } else {
         [self.chrome cancelInteractiveTransition];
         [self rollbackPageTransitionWithVelocity:v.x];

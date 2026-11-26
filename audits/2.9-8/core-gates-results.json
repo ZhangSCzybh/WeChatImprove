@@ -1,0 +1,43 @@
+{
+  "baseline_version": "2.9-7",
+  "version": "2.9-8",
+  "new_failures": 0,
+  "gates": [
+    {
+      "gate": "tabbar",
+      "baseline_exit_code": 0,
+      "exit_code": 0,
+      "log": "logs/final-tabbar.log"
+    },
+    {
+      "gate": "settings-tab-bar",
+      "baseline_exit_code": 0,
+      "exit_code": 0,
+      "log": "logs/final-settings-tab-bar.log"
+    },
+    {
+      "gate": "settings-home",
+      "baseline_exit_code": 0,
+      "exit_code": 0,
+      "log": "logs/final-settings-home.log"
+    },
+    {
+      "gate": "moments-card",
+      "baseline_exit_code": 0,
+      "exit_code": 0,
+      "log": "logs/final-moments-card.log"
+    },
+    {
+      "gate": "moments-share",
+      "baseline_exit_code": 0,
+      "exit_code": 0,
+      "log": "logs/final-moments-share.log"
+    },
+    {
+      "gate": "plugin-header-entry",
+      "baseline_exit_code": 0,
+      "exit_code": 0,
+      "log": "logs/final-plugin-header-entry.log"
+    }
+  ]
+}

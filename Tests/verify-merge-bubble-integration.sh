@@ -1,5 +1,6 @@
 #!/bin/bash
 set -euo pipefail
+# --voice-animation-core runs only the six native completion regressions.
 project_dir="$(cd "$(dirname "$0")/.." && pwd)"
 test_dir="$(mktemp -d "${TMPDIR:-/tmp}/wechat-merge-bubble.XXXXXX")"
 trap 'rm -rf "$test_dir"' EXIT
@@ -15,4 +16,4 @@ xcrun --sdk macosx clang -DCS_MERGE_TESTING=1 -DCS_BUBBLE_TESTING=1 -DCS_MERGE_B
   "$project_dir/Controllers/CSBubbleStylePolicy.m" "$project_dir/Controllers/CSBubbleStyleAdapter.m" \
   "$project_dir/Controllers/CSBubbleTextColors.m" "$project_dir/Tests/MergeBubbleIntegrationTests.m" \
   -o "$test_dir/integration-tests"
-"$test_dir/integration-tests"
+"$test_dir/integration-tests" "$@"

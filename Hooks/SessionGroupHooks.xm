@@ -210,6 +210,7 @@ static void BindMainNativeCell(id table,UITableViewCell *cell,NSIndexPath *path)
     Native(self,NO,^{ %orig; });
     [CSGroupListAdapter attachToController:self];
     [CSGroupListAdapter finishPresentationReturnForController:self];
+    [CSGroupListAdapter layoutForController:self];
 }
 - (void)viewWillDisappear:(BOOL)animated {
     [CSGroupListAdapter setPresentationSuspended:YES forController:self];

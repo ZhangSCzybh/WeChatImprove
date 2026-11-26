@@ -279,9 +279,8 @@ static CSGroupNativeSessionCoordinator *coordinator;
 - (BOOL)validViewport:(NSDictionary *)viewport;
 - (void)preparePageSourceForPan;
 - (BOOL)beginSwipePageTransitionToIndex:(NSInteger)index direction:(NSInteger)direction;
-- (void)preparePageTransitionForSelection:(NSInteger)index;
 - (void)rollbackPageTransitionWithVelocity:(CGFloat)velocity;
-- (void)selectSwipeIndex:(NSInteger)index direction:(NSInteger)direction;
+- (void)selectSwipeIndex:(NSInteger)index;
 - (BOOL)pageTransitionTargetIsReady;
 - (void)finishPageTransitionIfReady;
 - (BOOL)groupSwipesAvailable;
@@ -584,7 +583,7 @@ static void TestPreviewAndCommit(void) {
     Check(animator.begins==1 && animator.prepares==1 && !animator.settles && [a pageTransitionTargetIsReady],@"prepared target remains interactive with no settle animation before release");
     [animator updateTranslation:-125]; a.pageReleaseVelocity=-600;
     a.chrome.interactiveTransition=YES;a.chrome.indicatorProgress=.3125;[events removeAllObjects];
-    [a selectSwipeIndex:1 direction:1];
+    [a selectSwipeIndex:1];
     Check(a.preferences.writes==1 && [a.preferences.selectedTabID isEqual:@"target"] && a.pageSelectionAccepted,@"confirmation writes the selected target exactly once");
     Check(!a.pagePreviewTabID && [a.publishedTabID isEqual:@"target"] && !a.directSelections,@"confirmation ends the override and preserves the actual committed target");
     Check(animator.settles==1 && animator.lastCommit && animator.lastVelocity==-600 && animator.translation==-125 && animator.begins==1 && animator.prepares==1,@"confirmation settles from existing progress and velocity without recapturing either page");
@@ -606,10 +605,10 @@ static void TestRollbackAndRejectedWrite(void) {
     animator.completion(NO); NSUInteger generation=a.pageTransitionGeneration; [a cancelPageTransition];
     Check(!a.pageAnimator && !a.pageTransitionContext && a.pageTransitionGeneration==generation,@"completed rollback cleanup is idempotent");
     a=Fixture(); [a beginSwipePageTransitionToIndex:1 direction:1]; animator=a.pageAnimator; a.preferences.rejectsWrites=YES;
-    [a selectSwipeIndex:1 direction:1];
+    [a selectSwipeIndex:1];
     Check(a.preferences.writes==1 && [a.preferences.selectedTabID isEqual:@"source"] && [a.publishedTabID isEqual:@"source"] && animator.settles==1 && !animator.lastCommit,@"a rejected preference write rebounds to the real source instead of revealing an unaccepted target");
     Check(!a.chrome.animatedSelections && a.chrome.selectedIndex==0,@"rejected selection never begins a target indicator settle");
-    a=Fixture(); animationEnabled=NO; [a selectSwipeIndex:1 direction:1];
+    a=Fixture(); animationEnabled=NO; [a selectSwipeIndex:1];
     Check(a.directSelections==1 && a.preferences.writes==1 && !a.pageAnimator,@"disabled animation retains the established direct selection route");
 }
 static void TestPublicationBarriers(void) {
@@ -678,9 +677,9 @@ static void TestInvalidation(void) {
     Check(!a.pageAnimator && !a.pagePreviewTabID && coordinator.previewEnds==1,@"invalid native preview ownership cancels copied pixels and releases its override");
     a=Fixture();a.usesNativeSessionModel=YES;[a beginSwipePageTransitionToIndex:1 direction:1];coordinator.previewValid=NO;
     Check([a pageTransitionContextIsValid] && ![a pageTransitionTargetIsReady],@"light ownership validation cannot substitute for full release publication proof");
-    [a selectSwipeIndex:1 direction:1];
+    [a selectSwipeIndex:1];
     Check(!a.pageAnimator && !a.pagePreviewTabID && !a.preferences.writes,@"failed full native proof at release cancels preview before any selection write");
-    a=Fixture(); [a beginSwipePageTransitionToIndex:1 direction:1]; [a preparePageTransitionForSelection:1];
+    a=Fixture(); [a beginSwipePageTransitionToIndex:1 direction:1]; [a cancelPageTransition];
     Check(!a.pageAnimator && !a.pagePreviewTabID && !a.preferences.writes,@"a tab tap cancels even a matching pan preview before normal selection");
     a=Fixture(); [a beginSwipePageTransitionToIndex:1 direction:1]; NSUInteger restores=a.heightRestores;
     currentAccount=@"other";a.preferences.accountID=currentAccount;[a cancelPageTransition];
@@ -697,7 +696,7 @@ static void TestReentryAndStaleCompletion(void) {
     [a finishPageTransitionIfReady]; Check(animator.settles==1 && !a.checkingPageTransition,@"synchronous settle reentry cannot start a second settle or leave its guard latched");
     a=Ready(); animator=a.pageAnimator; weakAdapter=a; duringSettle=^{ weakAdapter.dirty=YES; };
     [a finishPageTransitionIfReady]; Check(animator.settles==1 && !animator.motions && !a.pageAnimator,@"settle readiness recovery rejects visual motion without relying on a revision change");
-    a=Fixture(); [a beginSwipePageTransitionToIndex:1 direction:1]; animator=a.pageAnimator; [a selectSwipeIndex:1 direction:1];
+    a=Fixture(); [a beginSwipePageTransitionToIndex:1 direction:1]; animator=a.pageAnimator; [a selectSwipeIndex:1];
     void (^oldCompletion)(BOOL)=animator.completion; [a cancelPageTransition];
     Check([a beginSwipePageTransitionToIndex:0 direction:-1],@"a new gesture can preview back from the last committed target");
     CSGroupPageAnimator *second=a.pageAnimator; NSDictionary *context=a.pageTransitionContext; NSUInteger generation=a.pageTransitionGeneration;
@@ -705,7 +704,7 @@ static void TestReentryAndStaleCompletion(void) {
     Check(a.pageAnimator==second && a.pageTransitionContext==context && a.pageTransitionGeneration==generation && second.active,@"old settle completion cannot clear a newer preview or advance its generation");
     [second updateTranslation:45];oldCompletion(NO);
     Check(a.pageAnimator==second && a.pageTransitionContext==context && second.translation==45 && a.preferences.writes==1,@"an obsolete completion during the next drag cannot change its pixels, identity or saved selection");
-    [a selectSwipeIndex:0 direction:-1];oldCompletion(YES);
+    [a selectSwipeIndex:0];oldCompletion(YES);
     Check(a.pageAnimator==second && a.pageTransitionContext==context && second.animating && a.preferences.writes==2 && [a.preferences.selectedTabID isEqual:@"source"],@"an obsolete first completion after the second end cannot cancel its newer accepted settle");
     a=Fixture();[a beginSwipePageTransitionToIndex:1 direction:1];weakAdapter=a;
     CSGroupPageAnimator *replacement=[CSGroupPageAnimator new];replacement.active=replacement.matches=YES;
@@ -716,7 +715,7 @@ static void TestReentryAndStaleCompletion(void) {
     a=Fixture();[a beginSwipePageTransitionToIndex:1 direction:1];weakAdapter=a;
     replacement=[CSGroupPageAnimator new];replacement.active=replacement.matches=YES;replacementContext=@{@"new-selection":@YES};
     a.preferences.onSelectionWrite=^{ weakAdapter.pageAnimator=replacement;weakAdapter.pageTransitionContext=replacementContext;weakAdapter.pageTransitionGeneration++; };
-    [a selectSwipeIndex:1 direction:1];
+    [a selectSwipeIndex:1];
     Check(a.pageAnimator==replacement && a.pageTransitionContext==replacementContext && !a.chrome.selections && !a.titles && !foldedRefreshes,@"preference-write reentry cannot apply old confirmation effects to its replacement session");
 }
 static void TestAcceptedSelectionReentry(void) {
@@ -734,7 +733,7 @@ static void TestAcceptedSelectionReentry(void) {
             adapter.anchors[@"target"]=@73;
             refreshesAfterReentry=adapter.refreshes;generationAfterReentry=adapter.pageTransitionGeneration;
         };
-        [a selectSwipeIndex:1 direction:1];
+        [a selectSwipeIndex:1];
         Check(callbacks==1 && a.preferences.writes==1 && a.chrome.animatedSelections==1,@"accepted indicator animation permits one synchronous lifecycle interruption after the accepted preference write");
         Check(a.refreshes==refreshesAfterReentry && a.pageTransitionGeneration==generationAfterReentry && !a.titles && !foldedRefreshes && !oldAnimator.settles && [a.anchors[@"target"] isEqual:@73],@"the first post-animation identity guard prevents old preview restore, anchor cleanup, title and folded-list effects after synchronous interruption");
         Check(replace.boolValue ? (a.pageAnimator==replacement && a.pageTransitionContext==replacementContext && [a.pagePreviewTabID isEqual:@"new-preview"] && replacement.active) : (!a.pageAnimator && !a.pageTransitionContext && !a.pagePreviewTabID),@"the post-animation identity guard preserves both a synchronous cancellation and a replacement preview");
@@ -749,7 +748,7 @@ static void TestAcceptedSelectionReentry(void) {
         adapter.pageSelectionAccepted=NO;adapter.pageTransitionGeneration++;adapter.anchors[@"target"]=@91;
         refreshesAfterReentry=adapter.refreshes;generationAfterReentry=adapter.pageTransitionGeneration;
     };
-    [a selectSwipeIndex:1 direction:1];
+    [a selectSwipeIndex:1];
     Check(callbacks==1 && a.preferences.writes==1 && a.chrome.animatedSelections==1 && a.refreshes==refreshesAfterReentry,@"preview-exit refresh can synchronously replace the session after the accepted indicator animation without repeating publication");
     Check(a.pageAnimator==replacement && a.pageTransitionContext==replacementContext && a.pageTransitionGeneration==generationAfterReentry && [a.pagePreviewTabID isEqual:@"next-preview"] && replacement.active,@"the second post-restore identity guard preserves a session installed during preview-exit refresh");
     Check([a.anchors[@"target"] isEqual:@91] && !a.titles && !foldedRefreshes && !oldAnimator.settles && !replacement.settles,@"the second post-restore identity guard protects the replacement anchor and prevents old title, folded-list and settle effects");

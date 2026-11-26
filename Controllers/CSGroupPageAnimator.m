@@ -7,6 +7,10 @@
 @property(nonatomic, weak) UITableView *table;
 @property(nonatomic, weak) UIView *host, *rail, *window;
 @property(nonatomic) CGRect viewport;
+@property(nonatomic) CGRect sourceTableFrame, sourceTableBounds, sourceRailFrame, sourceRailBounds;
+@property(nonatomic) CGRect sourceHostBounds, sourceWindowBounds;
+@property(nonatomic) UIEdgeInsets sourceInset;
+@property(nonatomic) BOOL croppedViewport;
 @property(nonatomic) NSInteger direction;
 @property(nonatomic) NSUInteger generation;
 @property(nonatomic, readwrite) CGFloat progress;
@@ -28,7 +32,7 @@
     self.generation++;
     self.overlay=nil; self.outgoing=nil; self.incoming=nil; self.animating=NO;
     self.table=nil; self.host=nil; self.rail=nil; self.window=nil;
-    self.viewport=CGRectZero; self.direction=0; self.progress=0;
+    self.viewport=CGRectZero; self.croppedViewport=NO; self.direction=0; self.progress=0;
     for (UIView *page in overlay.subviews) [page.layer removeAllAnimations];
     [overlay.layer removeAllAnimations];
     [overlay removeFromSuperview];
@@ -83,6 +87,10 @@
     snapshot.frame=overlay.bounds;
     [overlay addSubview:snapshot];
     self.table=table; self.host=host; self.rail=rail; self.window=table.window;
+    self.sourceTableFrame=table.frame; self.sourceTableBounds=table.bounds;
+    self.sourceRailFrame=rail.frame; self.sourceRailBounds=rail.bounds;
+    self.sourceHostBounds=host.bounds; self.sourceWindowBounds=table.window.bounds;
+    self.sourceInset=table.adjustedContentInset;
     self.viewport=frame; self.direction=direction;
     self.overlay=overlay; self.outgoing=snapshot;
     // A sibling cover does not alter table/header geometry and cannot appear in
@@ -93,16 +101,55 @@
     return YES;
 }
 
+- (BOOL)hasStableScrollGeometryForTable:(UITableView *)table belowView:(UIView *)rail {
+    UIEdgeInsets inset=table.adjustedContentInset;
+    return table && rail && self.table==table && self.rail==rail && self.host==table.superview &&
+        self.overlay.superview==self.host && self.window && self.window==table.window &&
+        CGRectEqualToRect(self.sourceTableFrame,table.frame) &&
+        CGSizeEqualToSize(self.sourceTableBounds.size,table.bounds.size) && self.sourceTableBounds.origin.x==table.bounds.origin.x &&
+        CGRectEqualToRect(self.sourceRailFrame,rail.frame) && CGRectEqualToRect(self.sourceRailBounds,rail.bounds) &&
+        CGRectEqualToRect(self.sourceHostBounds,self.host.bounds) && CGRectEqualToRect(self.sourceWindowBounds,table.window.bounds) &&
+        self.sourceInset.top==inset.top && self.sourceInset.left==inset.left &&
+        self.sourceInset.bottom==inset.bottom && self.sourceInset.right==inset.right;
+}
 - (BOOL)matchesTable:(UITableView *)table belowView:(UIView *)rail {
+    CGRect visible=[self visibleFrameForTable:table belowView:rail];
+    // Rollback can restore the longer source's scroll height. The cropped
+    // common viewport remains valid only inside its still-visible pixels and
+    // under the original physical geometry; expansion never invents pixels.
+    if (self.croppedViewport) {
+        if (![self hasStableScrollGeometryForTable:table belowView:rail]) return NO;
+        visible=CGRectIntersection(visible,self.viewport);
+    }
     return self.overlay && self.table==table && self.rail==rail &&
         self.host==table.superview && self.overlay.superview==self.host &&
         self.window==table.window && self.window!=nil &&
-        CGRectEqualToRect(self.viewport,[self visibleFrameForTable:table belowView:rail]);
+        CGRectEqualToRect(self.viewport,visible);
 }
 
 - (BOOL)prepareIncomingWithTable:(UITableView *)table belowView:(UIView *)rail
                       readiness:(BOOL (^)(void))readiness {
     if (self.animating) return NO;
+    // A shorter target can clamp only the table's scroll origin, bringing its
+    // header/rail back on screen. Crop the existing outgoing snapshot to that
+    // smaller common viewport; never stretch it or waive matchesTable's proof.
+    // Replacement, rotation, inset changes and geometry expansion still reject.
+    if (!self.incoming && self.overlay && self.outgoing && self.sourceTableBounds.origin.y!=table.bounds.origin.y &&
+        [self hasStableScrollGeometryForTable:table belowView:rail]) {
+        CGRect current=[self visibleFrameForTable:table belowView:rail], previous=self.viewport;
+        if (!CGRectIsEmpty(current) && !CGRectEqualToRect(previous,current) && CGRectContainsRect(previous,current) &&
+            CGRectGetMinX(current)==CGRectGetMinX(previous) && CGRectGetWidth(current)==CGRectGetWidth(previous) &&
+            CGRectGetMaxY(current)==CGRectGetMaxY(previous)) {
+            NSUInteger cropGeneration=self.generation;
+            UIView *overlay=self.overlay, *outgoing=self.outgoing;
+            [UIView performWithoutAnimation:^{
+                overlay.frame=current;
+                outgoing.frame=CGRectOffset(outgoing.frame,previous.origin.x-current.origin.x,previous.origin.y-current.origin.y);
+            }];
+            if (self.generation!=cropGeneration || self.overlay!=overlay) return NO;
+            self.viewport=current; self.croppedViewport=YES;
+        }
+    }
     if (UIAccessibilityIsReduceMotionEnabled() || ![self matchesTable:table belowView:rail]) {
         [self cancel]; return NO;
     }

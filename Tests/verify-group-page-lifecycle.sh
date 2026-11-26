@@ -28,9 +28,8 @@ for marker in [
     '- (BOOL)validViewport:(NSDictionary *)viewport {',
     '- (void)preparePageSourceForPan {',
     '- (BOOL)beginSwipePageTransitionToIndex:(NSInteger)index direction:(NSInteger)direction {',
-    '- (void)preparePageTransitionForSelection:(NSInteger)index {',
     '- (void)rollbackPageTransitionWithVelocity:(CGFloat)velocity {',
-    '- (void)selectSwipeIndex:(NSInteger)index direction:(NSInteger)direction {',
+    '- (void)selectSwipeIndex:(NSInteger)index {',
     '- (BOOL)pageTransitionTargetIsReady {',
     '- (void)finishPageTransitionIfReady {',
 ]:

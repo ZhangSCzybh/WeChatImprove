@@ -1,0 +1,18 @@
+{
+  "checked_files": 1431,
+  "checked_artifact_files": 1430,
+  "changed_files": [
+    "packages/.DS_Store"
+  ],
+  "missing_files": [],
+  "all_existing_files_unchanged": false,
+  "all_existing_artifacts_unchanged": true,
+  "filesystem_metadata_changes": [
+    "packages/.DS_Store"
+  ],
+  "metadata_note": "macOS directory metadata changed during this interval; left in its current state. No binary or historical release file changed.",
+  "make_clean_executed": false,
+  "device_install_performed": false,
+  "database_modified": false,
+  "checkout": "/Users/zhangshichao/Documents/Workspace/WeChatImprove"
+}

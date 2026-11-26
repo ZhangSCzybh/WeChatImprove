@@ -1,0 +1,13 @@
+{
+  "baseline_files": 1461,
+  "unchanged_files": 1461,
+  "missing_files": [],
+  "modified_files": [],
+  "all_preserved": true,
+  "original_theos_preserved": true,
+  "previous_package_files_preserved": true,
+  "new_output_directory": "packages/3.0-2",
+  "make_clean": false,
+  "database_modified": false,
+  "service_started": false
+}

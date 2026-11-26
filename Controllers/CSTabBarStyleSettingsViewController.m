@@ -7,6 +7,8 @@
 
 #import "CSTabBarPreferences.h"
 #import "CSTabBarGeometry.h"
+#import "CSTabBarPreviewView.h"
+#import "CSQuickPanelPreferences.h"
 
 typedef NS_ENUM(NSInteger, TabBarIconType) {
     TabBarIconTypeChat = 0,
@@ -21,6 +23,15 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
 @property (nonatomic, strong) CSSettingItem *enableItem;
 @property (nonatomic, strong) CSSettingItem *hideTextItem;
 @property (nonatomic, strong) CSSettingItem *swipeSwitchItem;
+@property (nonatomic, strong) CSSettingItem *previewItem, *structureItem, *functionActionItem;
+@property (nonatomic, strong) CSSettingItem *functionGapItem, *functionSizeItem, *centerButtonScaleItem;
+@property (nonatomic, strong) CSSettingItem *resetItem, *descriptionItem;
+@property (nonatomic, strong) CSTabBarPreviewView *previewView;
+@property (nonatomic, strong) UISegmentedControl *structureControl;
+@property (nonatomic, strong) UILabel *previewCaption;
+@property (nonatomic) CSTabBarStructure structure;
+@property (nonatomic, copy) NSString *functionAction;
+@property (nonatomic) CGFloat functionGap, functionSize, centerButtonScale;
 
 @property (nonatomic, strong) CSSettingItem *chatIconItem;
 @property (nonatomic, strong) CSSettingItem *contactsIconItem;
@@ -32,7 +43,8 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
 @property (nonatomic, strong) CSSettingItem *cornerRadiusItem;
 @property (nonatomic, strong) CSSettingItem *bgColorItem;
 @property (nonatomic, strong) CSSettingItem *positionOffsetItem;
-@property (nonatomic, strong) CSSettingItem *scaleItem;
+@property (nonatomic, strong) CSSettingItem *quickStyleItem;
+@property (nonatomic, strong) CSSettingItem *contentWidthItem;
 @property (nonatomic, strong) CSSettingItem *contentHeightItem;
 @property (nonatomic, strong) CSSettingItem *borderWidthItem;
 @property (nonatomic, strong) CSSettingItem *hapticFeedbackItem;
@@ -64,6 +76,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
 @property (nonatomic, strong) UIColor *selectedIconColor;
 @property (nonatomic, assign) CGFloat positionOffset;
 @property (nonatomic, assign) CGFloat scale;
+@property (nonatomic, assign) CGFloat contentWidth;
 @property (nonatomic, assign) CGFloat contentHeight;
 @property (nonatomic, assign) CGFloat borderWidth;
 
@@ -99,8 +112,10 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
     CSTabBarPreferences *p=CSTabBarPreferences.current;
     self.tabBarStyleEnabled=p.enabled; self.hideText=p.hideText;
     self.swipeSwitch=p.swipeSwitch;
+    self.structure=p.structure; self.functionAction=p.functionAction;
+    self.functionGap=p.functionGap; self.functionSize=p.functionSize; self.centerButtonScale=p.centerButtonScale;
     self.cornerRadius=p.cornerRadius; self.positionOffset=p.lift; self.scale=p.scale;
-    self.contentHeight=p.contentHeight; self.borderWidth=p.borderWidth;
+    self.contentWidth=p.contentWidth; self.contentHeight=p.contentHeight; self.borderWidth=p.borderWidth;
     self.borderStyle=p.borderStyle; self.hapticFeedback=p.haptic; self.borderAnimation=p.animation;
     self.clickEffect=p.clickEffect;
     self.bgColor=p.backgroundColor; self.borderColor=p.borderColor;
@@ -126,6 +141,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
     // Keep the existing durability/backup boundary and external refresh signal.
     [self synchronizeSettings];
     [[NSNotificationCenter defaultCenter] postNotificationName:CSTabBarPreferencesDidChange object:nil];
+    [self refreshStylePreview];
 }
 
 - (void)saveColorSetting:(BOOL)border {
@@ -192,18 +208,35 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
     [self refreshVisibleItems:@[self.selectedIconColorItem]];
 }
 
+- (NSString *)widthPercentageInputValue {
+    double percentage=self.scale*100;
+    // Old point widths remain effective until the user explicitly changes width.
+    // Show their current ratio without rewriting preferences while opening this page.
+    CGFloat hostWidth=CGRectGetWidth(self.view.window.bounds);
+    if (!isfinite(hostWidth) || hostWidth<=0) hostWidth=CGRectGetWidth(self.view.bounds);
+    if (self.contentWidth>0 && isfinite(hostWidth) && hostWidth>0)
+        percentage=round(MIN(hostWidth,self.contentWidth)/hostWidth*1000)/10;
+    return [NSString stringWithFormat:@"%g",percentage];
+}
+
 - (void)refreshInputItem:(CSSettingItem *)item {
     // Display the same validated formats used by setupData, without rebuilding
     // unrelated models/previews or resetting the table's scroll position.
     if (item==self.cornerRadiusItem) item.inputValue=[NSString stringWithFormat:@"%.1f",self.cornerRadius];
     else if (item==self.positionOffsetItem) item.inputValue=[NSString stringWithFormat:@"%.1f",self.positionOffset];
-    else if (item==self.contentHeightItem) item.inputValue=[NSString stringWithFormat:@"%.0f",self.contentHeight];
+    else if (item==self.contentWidthItem) item.inputValue=[self widthPercentageInputValue];
+    else if (item==self.contentHeightItem) item.inputValue=[NSString stringWithFormat:@"%g",self.contentHeight];
     else if (item==self.borderWidthItem) item.inputValue=[NSString stringWithFormat:@"%.1f",self.borderWidth];
+    else if (item==self.functionGapItem) item.inputValue=[NSString stringWithFormat:@"%.0f",self.functionGap];
+    else if (item==self.functionSizeItem) item.inputValue=[NSString stringWithFormat:@"%.0f",self.functionSize];
+    else if (item==self.centerButtonScaleItem) item.inputValue=[NSString stringWithFormat:@"%.0f",self.centerButtonScale*100];
     else if (item==self.chatTextItem) item.inputValue=self.chatText ?: @"";
     else if (item==self.contactsTextItem) item.inputValue=self.contactsText ?: @"";
     else if (item==self.discoverTextItem) item.inputValue=self.discoverText ?: @"";
     else if (item==self.meTextItem) item.inputValue=self.meText ?: @"";
-    item.detail=item.inputValue;
+    if (item==self.contentWidthItem) item.detail=[item.inputValue stringByAppendingString:@"%"];
+    else if (item==self.contentHeightItem) item.detail=[NSString stringWithFormat:@"%g pt",self.contentHeight];
+    else item.detail=item.inputValue;
     [self refreshVisibleItems:@[item]];
 }
 
@@ -239,7 +272,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
 
 - (void)setupData {
     __weak typeof(self) weakSelf = self;
-    self.enableItem = [CSSettingItem switchItemWithTitle:@"启用悬浮底栏"
+    self.enableItem = [CSSettingItem switchItemWithTitle:@"启用底栏样式"
                                               iconName:@"rectangle.bottomthird.inset.filled"
                                              iconColor:[UIColor systemBlueColor]
                                             switchValue:self.tabBarStyleEnabled
@@ -592,54 +625,40 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
     }];
     self.positionOffsetItem.inputKeyboardType = UIKeyboardTypeDecimalPad; // 数字键盘
     
-    // 底栏大小选项
-    NSArray *scaleOptions = @[@"迷你", @"紧凑", @"中等", @"标准"];
-    NSArray *scaleValues = @[@0.6, @0.7, @0.8, @0.9];
-    NSInteger scaleIndex = 0;
-    for (NSInteger i = 0; i < scaleValues.count; i++) {
-        if (ABS([scaleValues[i] floatValue] - self.scale) < 0.01) {
-            scaleIndex = i;
-            break;
-        }
-    }
-    
-    self.scaleItem = [CSSettingItem itemWithTitle:@"选择底栏宽度"
-                                        iconName:@"slider.horizontal.3"
-                                       iconColor:[UIColor systemTealColor]
-                                          detail:scaleOptions[scaleIndex]];
-    self.scaleItem.actionBlock = ^{
-        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"选择底栏大小"
-                                                                       message:nil
-                                                                preferredStyle:UIAlertControllerStyleActionSheet];
-        
-        for (NSInteger i = 0; i < scaleOptions.count; i++) {
-            UIAlertAction *action = [UIAlertAction actionWithTitle:scaleOptions[i]
-                                                             style:UIAlertActionStyleDefault
-                                                           handler:^(UIAlertAction * _Nonnull action) {
-                weakSelf.scale = [scaleValues[i] floatValue];
-                weakSelf.scaleItem.detail = scaleOptions[i];
-                [weakSelf saveValue:@((float)weakSelf.scale) forKey:kTabBarScaleKey];
-                [weakSelf refreshVisibleItems:@[weakSelf.scaleItem]];
-            }];
-            [alert addAction:action];
-        }
-        
-        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"取消"
-                                                               style:UIAlertActionStyleCancel
-                                                             handler:nil];
-        [alert addAction:cancelAction];
-        
-        [weakSelf presentViewController:alert animated:YES completion:nil];
-    };
-    
+    self.quickStyleItem=[CSSettingItem actionItemWithTitle:@"快速风格"
+        iconName:@"slider.horizontal.3" iconColor:UIColor.systemTealColor];
+    [self updateQuickStyleDetail];
+    self.quickStyleItem.actionBlock=^{ [weakSelf showQuickStylePicker]; };
+    self.contentWidthItem=[CSSettingItem inputItemWithTitle:@"输入底栏宽度比例"
+        iconName:@"arrow.left.and.right" iconColor:UIColor.systemTealColor
+        inputValue:[self widthPercentageInputValue]
+        inputPlaceholder:@"60–100%，如 80；留空或 0 恢复 90%"
+        valueChangedBlock:^(NSString *value) {
+            typeof(self) strongSelf=weakSelf;
+            if (!strongSelf) return;
+            double percentage=value.doubleValue;
+            strongSelf.scale=isfinite(percentage) && percentage>0 ? CSTabBarClamp(percentage/100,.6,1,kDefaultScale) : kDefaultScale;
+            strongSelf.contentWidth=0;
+            // Commit ratio and remove the legacy override before one preview/runtime refresh.
+            NSUserDefaults *defaults=NSUserDefaults.standardUserDefaults;
+            [defaults setDouble:strongSelf.scale forKey:kTabBarScaleKey];
+            [defaults removeObjectForKey:kTabBarContentWidthKey];
+            [strongSelf finishSavingSettings];
+            [strongSelf refreshQuickStyleItem];
+        }];
+    self.contentWidthItem.inputKeyboardType=UIKeyboardTypeDecimalPad;
+    self.contentWidthItem.detail=[self.contentWidthItem.inputValue stringByAppendingString:@"%"];
+
     self.contentHeightItem=[CSSettingItem inputItemWithTitle:@"输入底栏高度"
         iconName:@"arrow.up.and.down" iconColor:UIColor.systemTealColor
-        inputValue:[NSString stringWithFormat:@"%.0f",self.contentHeight]
+        inputValue:[NSString stringWithFormat:@"%g",self.contentHeight]
         inputPlaceholder:@"内容高度（44–80 pt）" valueChangedBlock:^(NSString *value) {
             weakSelf.contentHeight=(float)CSTabBarClamp(value.doubleValue,44,80,52);
             [weakSelf saveValue:@((float)weakSelf.contentHeight) forKey:kTabBarContentHeightKey];
+            [weakSelf refreshQuickStyleItem];
         }];
     self.contentHeightItem.inputKeyboardType=UIKeyboardTypeDecimalPad;
+    self.contentHeightItem.detail=[NSString stringWithFormat:@"%g pt",self.contentHeight];
     self.borderWidthItem=[CSSettingItem inputItemWithTitle:@"描边宽度大小"
         iconName:@"pencil.tip" iconColor:UIColor.systemIndigoColor
         inputValue:[NSString stringWithFormat:@"%.1f",self.borderWidth]
@@ -649,79 +668,170 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
         }];
     self.borderWidthItem.inputKeyboardType=UIKeyboardTypeDecimalPad;
 
-    CSSettingSection *mainSection = [CSSettingSection sectionWithHeader:@"主设置"
-                                                                items:@[self.enableItem, self.hideTextItem, self.swipeSwitchItem]];
-    
-    CSSettingSection *iconSection = [CSSettingSection sectionWithHeader:@"图标自定义"
-                                                                items:@[self.chatIconItem,
-                                                                       self.contactsIconItem,
-                                                                       self.discoverIconItem,
-                                                                       self.meIconItem,
-                                                                       self.selectedIconColorItem]];
-    
-    CSSettingSection *textSection = [CSSettingSection sectionWithHeader:@"文本自定义"
-                                                                items:@[self.chatTextItem,
-                                                                       self.contactsTextItem,
-                                                                       self.discoverTextItem,
-                                                                       self.meTextItem]];
-    
-    CSSettingSection *styleSection = [CSSettingSection sectionWithHeader:@"样式设置"
-                                                                items:@[self.scaleItem,
-                                                                       self.contentHeightItem,
-                                                                       self.borderStyleItem,
-                                                                       self.cornerRadiusItem,
-                                                                       self.positionOffsetItem,
-                                                                       self.bgColorItem,
-                                                                       self.hapticFeedbackItem,
-                                                                       self.clickEffectItem,
-                                                                       self.indicatorColorItem,
-                                                                       self.borderAnimationItem,
-                                                                       self.borderColorItem,
-                                                                       self.borderWidthItem]];
-    
-    CSSettingItem *resetItem = [CSSettingItem actionItemWithTitle:@"恢复默认设置"
-                                                       iconName:@"arrow.counterclockwise"
-                                                      iconColor:[UIColor systemRedColor]];
-    resetItem.actionBlock = ^{
-        [weakSelf resetToDefault];
-    };
-    
-    CSSettingSection *resetSection = [CSSettingSection sectionWithHeader:@"重置"
-                                                                items:@[resetItem]];
-    
-    CSSettingItem *descriptionItem = [CSSettingItem itemWithTitle:@"说明"
-                                                       iconName:@"info.circle"
-                                                      iconColor:[UIColor systemGrayColor]
-                                                        detail:@"设置即时生效；红点与未读数字沿用微信原生显示。"];
-    
-    CSSettingSection *descriptionSection = [CSSettingSection sectionWithHeader:@""
-                                                                       items:@[descriptionItem]];
-    
-    self.sections = @[mainSection, iconSection, textSection, styleSection, resetSection, descriptionSection];
+    self.previewItem=[CSSettingItem itemWithTitle:@"样式预览" iconName:nil iconColor:nil detail:nil];
+    self.structureItem=[CSSettingItem itemWithTitle:@"底栏结构" iconName:nil iconColor:nil detail:nil];
+    self.functionActionItem=[CSSettingItem itemWithTitle:@"功能键入口"
+        iconName:[CSQuickPanelPreferences symbolNameForActionIdentifier:self.functionAction]
+        iconColor:UIColor.systemOrangeColor detail:[CSQuickPanelPreferences titleForActionIdentifier:self.functionAction]];
+    self.functionActionItem.actionBlock=^{ [weakSelf showFunctionActionPicker]; };
+    self.functionGapItem=[CSSettingItem inputItemWithTitle:@"功能键与主底栏间距"
+        iconName:@"arrow.left.and.right" iconColor:UIColor.systemOrangeColor
+        inputValue:[NSString stringWithFormat:@"%.0f",self.functionGap]
+        inputPlaceholder:@"间距（0–32 pt）" valueChangedBlock:^(NSString *value) {
+            weakSelf.functionGap=CSTabBarClamp(value.doubleValue,0,32,12);
+            [weakSelf saveValue:@(weakSelf.functionGap) forKey:kTabBarFunctionGapKey];
+        }];
+    self.functionSizeItem=[CSSettingItem inputItemWithTitle:@"功能键大小"
+        iconName:@"arrow.up.left.and.arrow.down.right" iconColor:UIColor.systemTealColor
+        inputValue:[NSString stringWithFormat:@"%.0f",self.functionSize]
+        inputPlaceholder:@"直径（44–80 pt）" valueChangedBlock:^(NSString *value) {
+            weakSelf.functionSize=CSTabBarClamp(value.doubleValue,44,80,52);
+            [weakSelf saveValue:@(weakSelf.functionSize) forKey:kTabBarFunctionSizeKey];
+        }];
+    self.centerButtonScaleItem=[CSSettingItem inputItemWithTitle:@"居中功能键大小"
+        iconName:@"arrow.left.and.right" iconColor:UIColor.systemTealColor
+        inputValue:[NSString stringWithFormat:@"%.0f",self.centerButtonScale*100]
+        inputPlaceholder:@"宽度比例（75–180%，100% 为底栏宽度的 1/5）" valueChangedBlock:^(NSString *value) {
+            weakSelf.centerButtonScale=CSTabBarClamp(value.doubleValue/100,.75,1.8,1);
+            [weakSelf saveValue:@(weakSelf.centerButtonScale) forKey:kTabBarCenterButtonScaleKey];
+        }];
+    for (CSSettingItem *item in @[self.functionGapItem,self.functionSizeItem,self.centerButtonScaleItem])
+        item.inputKeyboardType=UIKeyboardTypeDecimalPad;
+    self.resetItem=[CSSettingItem actionItemWithTitle:@"恢复默认设置" iconName:@"arrow.counterclockwise" iconColor:UIColor.systemRedColor];
+    self.resetItem.actionBlock=^{ [weakSelf resetToDefault]; };
+    self.descriptionItem=[CSSettingItem actionItemWithTitle:@"功能说明" iconName:@"info.circle" iconColor:UIColor.systemGrayColor];
+    self.descriptionItem.actionBlock=^{ [weakSelf showTabBarDescription]; };
+    [self rebuildSections];
+    [self refreshStylePreview];
+}
+
+- (NSArray<NSString *> *)quickStyleNames {
+    return @[@"紧凑低调",@"均衡默认",@"舒展高光"];
+}
+
+- (void)updateQuickStyleDetail {
+    int index=CSTabBarQuickStyleIndex(self.scale,self.contentHeight,self.contentWidth);
+    self.quickStyleItem.detail=index>=0 && index<3 ? self.quickStyleNames[(NSUInteger)index] : @"自定义";
+}
+
+- (void)refreshQuickStyleItem {
+    [self updateQuickStyleDetail];
+    [self refreshVisibleItems:@[self.quickStyleItem]];
+}
+
+- (void)showQuickStylePicker {
+    UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"快速风格"
+        message:@"选择后同时应用该风格的宽度比例和默认高度。" preferredStyle:UIAlertControllerStyleActionSheet];
+    __weak typeof(self) weakSelf=self;
+    NSArray<NSString *> *names=self.quickStyleNames;
+    for (unsigned index=0;index<3;index++) {
+        CSTabBarQuickStyle preset=CSTabBarQuickStyleAtIndex(index);
+        [alert addAction:[UIAlertAction actionWithTitle:names[index] style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action) {
+            typeof(self) strongSelf=weakSelf;
+            if (!strongSelf) return;
+            strongSelf.scale=preset.scale;
+            strongSelf.contentHeight=preset.contentHeight;
+            strongSelf.contentWidth=0;
+            // One explicit selection is one durable settings change and refresh.
+            NSUserDefaults *defaults=NSUserDefaults.standardUserDefaults;
+            [defaults setDouble:preset.scale forKey:kTabBarScaleKey];
+            [defaults setDouble:preset.contentHeight forKey:kTabBarContentHeightKey];
+            [defaults removeObjectForKey:kTabBarContentWidthKey];
+            [strongSelf finishSavingSettings];
+            [strongSelf refreshInputItem:strongSelf.contentWidthItem];
+            [strongSelf refreshInputItem:strongSelf.contentHeightItem];
+            [strongSelf refreshQuickStyleItem];
+        }]];
+    }
+    [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];
+    if (alert.popoverPresentationController) {
+        alert.popoverPresentationController.sourceView=self.view;
+        alert.popoverPresentationController.sourceRect=CGRectMake(CGRectGetMidX(self.view.bounds),CGRectGetMidY(self.view.bounds),1,1);
+        alert.popoverPresentationController.permittedArrowDirections=0;
+    }
+    [self presentViewController:alert animated:YES completion:nil];
+}
+
+- (void)showTabBarDescription {
+    NSMutableArray<NSString *> *presets=[NSMutableArray array];
+    NSArray<NSString *> *names=self.quickStyleNames;
+    for (unsigned index=0;index<3;index++) {
+        CSTabBarQuickStyle preset=CSTabBarQuickStyleAtIndex(index);
+        [presets addObject:[NSString stringWithFormat:@"%@：宽度 %.0f%%，高度 %.0f pt",names[index],preset.scale*100,preset.contentHeight]];
+    }
+    NSString *message=[NSString stringWithFormat:@"设置即时生效，关闭总开关后仍可配置与预览。红点与未读数字沿用微信原生显示，功能键入口独立于快捷面板。\n\n快速风格\n%@\n只有主动选择风格时才同时应用宽度比例和默认高度。\n\n自定义尺寸\n底栏宽度按可用宽度的百分比输入，支持 60–100%%，例如输入 80 表示 80%%；留空或输入 0 恢复 90%%，窄屏保留必要的最小宽度。高度支持 44–80 pt。旧版 pt 宽度继续生效，调整比例或选择风格后切换为比例设置。分离功能键大小支持 44–80 pt。手动修改即时保存，不匹配预设时显示“自定义”；再次进入本页保留当前设置。",[presets componentsJoinedByString:@"\n"]];
+    UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"功能说明" message:message preferredStyle:UIAlertControllerStyleAlert];
+    [alert addAction:[UIAlertAction actionWithTitle:@"知道了" style:UIAlertActionStyleCancel handler:nil]];
+    [self presentViewController:alert animated:YES completion:nil];
+}
+
+- (void)rebuildSections {
+    NSMutableArray *sections=[NSMutableArray arrayWithArray:@[
+        [CSSettingSection sectionWithHeader:@"主设置" items:@[self.enableItem]],
+        [CSSettingSection sectionWithHeader:@"样式预览" items:@[self.previewItem]],
+        [CSSettingSection sectionWithHeader:@"底栏结构" items:@[self.structureItem,self.quickStyleItem]]]];
+    if (self.structure!=CSTabBarStructureClassic) {
+        NSArray *items=self.structure==CSTabBarStructureSeparated ?
+            @[self.functionActionItem,self.functionGapItem,self.functionSizeItem] :
+            @[self.functionActionItem,self.centerButtonScaleItem];
+        [sections addObject:[CSSettingSection sectionWithHeader:@"功能键" items:items]];
+    }
+    [sections addObjectsFromArray:@[
+        [CSSettingSection sectionWithHeader:@"尺寸与位置" items:@[self.contentWidthItem,self.contentHeightItem,self.positionOffsetItem]],
+        [CSSettingSection sectionWithHeader:@"背景与边框" items:@[self.bgColorItem,self.borderStyleItem,self.cornerRadiusItem,self.borderColorItem,self.borderWidthItem,self.borderAnimationItem]],
+        [CSSettingSection sectionWithHeader:@"切换与交互" items:@[self.swipeSwitchItem,self.hapticFeedbackItem,self.clickEffectItem,self.indicatorColorItem]],
+        [CSSettingSection sectionWithHeader:@"图标自定义" items:@[self.chatIconItem,self.contactsIconItem,self.discoverIconItem,self.meIconItem,self.selectedIconColorItem]],
+        [CSSettingSection sectionWithHeader:@"标签与文字" items:@[self.hideTextItem,self.chatTextItem,self.contactsTextItem,self.discoverTextItem,self.meTextItem]],
+        [CSSettingSection sectionWithHeader:@"重置" items:@[self.resetItem]],
+        [CSSettingSection sectionWithHeader:@"" items:@[self.descriptionItem]]]];
+    self.sections=sections;
+}
+
+- (void)refreshStylePreview {
+    [CSTabBarPreferences reload];
+    [self.previewView updateWithPreferences:CSTabBarPreferences.current];
+    self.previewCaption.text=self.tabBarStyleEnabled ? @"轻点图标预览选中样式" : @"未启用 · 轻点图标预览样式";
+}
+
+- (void)structureChanged:(UISegmentedControl *)sender {
+    self.structure=(CSTabBarStructure)sender.selectedSegmentIndex;
+    [self saveValue:@(self.structure) forKey:kTabBarStructureKey];
+    [self rebuildSections];
+    [self.tableView reloadData];
+}
+
+- (void)showFunctionActionPicker {
+    UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"选择功能键入口"
+        message:@"与快捷面板共用入口选项，独立保存当前选择。" preferredStyle:UIAlertControllerStyleActionSheet];
+    __weak typeof(self) weakSelf=self;
+    for (NSString *identifier in CSQuickPanelPreferences.allActionIdentifiers) {
+        NSString *name=[CSQuickPanelPreferences titleForActionIdentifier:identifier];
+        if ([identifier isEqualToString:self.functionAction]) name=[name stringByAppendingString:@" ✓"];
+        [alert addAction:[UIAlertAction actionWithTitle:name style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action) {
+            weakSelf.functionAction=identifier;
+            weakSelf.functionActionItem.detail=[CSQuickPanelPreferences titleForActionIdentifier:identifier];
+            weakSelf.functionActionItem.iconName=[CSQuickPanelPreferences symbolNameForActionIdentifier:identifier];
+            [weakSelf saveValue:identifier forKey:kTabBarFunctionActionKey];
+            [weakSelf refreshVisibleItems:@[weakSelf.functionActionItem]];
+        }]];
+    }
+    [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];
+    if (alert.popoverPresentationController) {
+        alert.popoverPresentationController.sourceView=self.view;
+        alert.popoverPresentationController.sourceRect=CGRectMake(CGRectGetMidX(self.view.bounds),CGRectGetMidY(self.view.bounds),1,1);
+        alert.popoverPresentationController.permittedArrowDirections=0;
+    }
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 - (void)updateIconItemsState {
-    BOOL enabled = self.tabBarStyleEnabled;
-    
-    self.hideTextItem.switchValue = self.hideText;
-    
-    for (CSSettingItem *item in @[self.chatIconItem,self.contactsIconItem,self.discoverIconItem,self.meIconItem]) {
-        item.detail=enabled ? (item.customImage ? @"已设置" : @"点击设置") : @"未启用";
-    }
-    
+    self.hideTextItem.switchValue=self.hideText;
+    for (CSSettingItem *item in @[self.chatIconItem,self.contactsIconItem,self.discoverIconItem,self.meIconItem])
+        item.detail=item.customImage ? @"已设置" : @"点击设置";
     [self refreshVisibleItems:@[self.hideTextItem,self.chatIconItem,self.contactsIconItem,self.discoverIconItem,self.meIconItem]];
 }
 
 - (void)showIconSelectionAlertForType:(TabBarIconType)type {
-    if (!self.tabBarStyleEnabled) {
-        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"提示"
-                                                                     message:@"请先启用底栏样式功能"
-                                                              preferredStyle:UIAlertControllerStyleAlert];
-        [alert addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:nil]];
-        [self presentViewController:alert animated:YES completion:nil];
-        return;
-    }
-    
     self.currentIconType = type;
     
     NSString *title;
@@ -1070,6 +1180,8 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
         [defaults setBool:NO forKey:kTabBarStyleEnabledKey];
         [defaults setBool:NO forKey:kTabBarHideTextKey];
         [defaults removeObjectForKey:kTabBarSwipeSwitchKey];
+        for (NSString *key in @[kTabBarStructureKey,kTabBarFunctionActionKey,kTabBarFunctionGapKey,kTabBarFunctionSizeKey,kTabBarCenterButtonScaleKey])
+            [defaults removeObjectForKey:key];
         
         [defaults removeObjectForKey:kTabBarIconChatKey];
         [defaults removeObjectForKey:kTabBarIconContactsKey];
@@ -1086,7 +1198,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
         [defaults setFloat:kDefaultPositionOffset forKey:kTabBarPositionOffsetKey];
         [defaults setFloat:kDefaultScale forKey:kTabBarScaleKey];
         [defaults setInteger:kDefaultBorderStyle forKey:kTabBarBorderStyleKey];
-        for (NSString *key in @[kTabBarContentHeightKey,kTabBarBorderWidthKey,kTabBarHapticFeedbackKey,kTabBarClickEffectKey,kTabBarBorderAnimationKey,kTabBarBorderColorRedKey,kTabBarBorderColorGreenKey,kTabBarBorderColorBlueKey,kTabBarBorderColorAlphaKey]) [defaults removeObjectForKey:key];
+        for (NSString *key in @[kTabBarContentWidthKey,kTabBarContentHeightKey,kTabBarBorderWidthKey,kTabBarHapticFeedbackKey,kTabBarClickEffectKey,kTabBarBorderAnimationKey,kTabBarBorderColorRedKey,kTabBarBorderColorGreenKey,kTabBarBorderColorBlueKey,kTabBarBorderColorAlphaKey]) [defaults removeObjectForKey:key];
         for (NSString *key in @[kTabBarIndicatorColorRedKey,kTabBarIndicatorColorGreenKey,kTabBarIndicatorColorBlueKey,kTabBarIndicatorColorAlphaKey]) [defaults removeObjectForKey:key];
         for (NSString *key in @[kTabBarSelectedIconColorRedKey,kTabBarSelectedIconColorGreenKey,kTabBarSelectedIconColorBlueKey,kTabBarSelectedIconColorAlphaKey]) [defaults removeObjectForKey:key];
         
@@ -1214,9 +1326,10 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    CSSettingTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:[CSSettingTableViewCell reuseIdentifier] forIndexPath:indexPath];
-    
     CSSettingItem *item = self.sections[indexPath.section].items[indexPath.row];
+    if (item==self.previewItem) return [self previewCellForTableView:tableView];
+    if (item==self.structureItem) return [self structureCellForTableView:tableView];
+    CSSettingTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:[CSSettingTableViewCell reuseIdentifier] forIndexPath:indexPath];
     [cell configureWithItem:item];
     [self applyIndicatorAvailabilityToCell:cell item:item];
     
@@ -1240,6 +1353,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
 }
 
 - (void)showInputDialogForItem:(CSSettingItem *)item {
+    if (item==self.contentWidthItem) item.inputValue=[self widthPercentageInputValue];
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:item.title
                                                                    message:@"请输入数值"
                                                             preferredStyle:UIAlertControllerStyleAlert];
@@ -1278,14 +1392,81 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
     return self.sections[section].header;
 }
 
-- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
-    if (section == 0) {
-        return @"开启悬浮导航栏，配合隐藏文本使用更佳。";
-    } else if (section == 1) {
-        return @"图标支持普通和选中两种状态；上传图片始终保留原色，选中图标颜色仅作用于原生图标。";
-    } else if (section == 2) {
-        return @"开启隐藏标签文本后，自定义文本不会显示。";
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    CSSettingItem *item=self.sections[indexPath.section].items[indexPath.row];
+    if (item==self.previewItem) return 152;
+    if (item==self.structureItem) return 64;
+    return UITableViewAutomaticDimension;
+}
+
+- (UITableViewCell *)previewCellForTableView:(UITableView *)tableView {
+    UITableViewCell *cell=[tableView dequeueReusableCellWithIdentifier:@"CSTabBarPreviewCell"];
+    if (!cell) cell=[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"CSTabBarPreviewCell"];
+    // Match CSSettingTableViewCell; the inset-grouped table owns card rounding.
+    cell.backgroundColor=UIColor.secondarySystemGroupedBackgroundColor;
+    cell.selectionStyle=UITableViewCellSelectionStyleNone;
+    if (!self.previewView) {
+        self.previewView=[CSTabBarPreviewView new];
+        self.previewView.translatesAutoresizingMaskIntoConstraints=NO;
+        self.previewCaption=[UILabel new]; self.previewCaption.translatesAutoresizingMaskIntoConstraints=NO;
+        self.previewCaption.font=[UIFont systemFontOfSize:11];
+        self.previewCaption.textColor=UIColor.secondaryLabelColor;
+        self.previewCaption.textAlignment=NSTextAlignmentCenter;
+        self.previewCaption.adjustsFontSizeToFitWidth=YES;
     }
+    if (self.previewView.superview!=cell.contentView) {
+        [cell.contentView addSubview:self.previewView]; [cell.contentView addSubview:self.previewCaption];
+        [NSLayoutConstraint activateConstraints:@[
+            [self.previewView.leadingAnchor constraintEqualToAnchor:cell.contentView.leadingAnchor constant:15],
+            [self.previewView.trailingAnchor constraintEqualToAnchor:cell.contentView.trailingAnchor constant:-15],
+            [self.previewView.topAnchor constraintEqualToAnchor:cell.contentView.topAnchor constant:8],
+            [self.previewView.heightAnchor constraintEqualToConstant:104],
+            [self.previewCaption.topAnchor constraintEqualToAnchor:self.previewView.bottomAnchor constant:8],
+            [self.previewCaption.leadingAnchor constraintEqualToAnchor:cell.contentView.leadingAnchor constant:8],
+            [self.previewCaption.trailingAnchor constraintEqualToAnchor:cell.contentView.trailingAnchor constant:-8],
+            [self.previewCaption.bottomAnchor constraintEqualToAnchor:cell.contentView.bottomAnchor constant:-10]]];
+    }
+    [self refreshStylePreview];
+    return cell;
+}
+
+- (UITableViewCell *)structureCellForTableView:(UITableView *)tableView {
+    UITableViewCell *cell=[tableView dequeueReusableCellWithIdentifier:@"CSTabBarStructureCell"];
+    if (!cell) cell=[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"CSTabBarStructureCell"];
+    cell.backgroundColor=UIColor.secondarySystemGroupedBackgroundColor;
+    cell.selectionStyle=UITableViewCellSelectionStyleNone;
+    if (!self.structureControl) {
+        self.structureControl=[[UISegmentedControl alloc] initWithItems:@[@"经典悬浮",@"分离功能键",@"居中功能键"]];
+        self.structureControl.translatesAutoresizingMaskIntoConstraints=NO;
+        [self.structureControl setTitleTextAttributes:@{NSFontAttributeName:[UIFont systemFontOfSize:13 weight:UIFontWeightMedium]} forState:UIControlStateNormal];
+        [self.structureControl addTarget:self action:@selector(structureChanged:) forControlEvents:UIControlEventValueChanged];
+        self.structureControl.accessibilityLabel=@"底栏结构";
+    }
+    if (self.structureControl.superview!=cell.contentView) {
+        [cell.contentView addSubview:self.structureControl];
+        [NSLayoutConstraint activateConstraints:@[
+            [self.structureControl.leadingAnchor constraintEqualToAnchor:cell.contentView.leadingAnchor constant:15],
+            [self.structureControl.trailingAnchor constraintEqualToAnchor:cell.contentView.trailingAnchor constant:-15],
+            [self.structureControl.centerYAnchor constraintEqualToAnchor:cell.contentView.centerYAnchor],
+            [self.structureControl.heightAnchor constraintEqualToConstant:34]]];
+    }
+    self.structureControl.selectedSegmentIndex=self.structure;
+    return cell;
+}
+
+- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
+    NSString *header=self.sections[section].header;
+    if ([header isEqualToString:@"主设置"]) return @"设置即时生效；关闭后仍可配置与预览。";
+    if ([self.sections[section].items containsObject:self.structureItem]) {
+        if (self.structure==CSTabBarStructureSeparated) return @"四个页面入口与功能键分离排列。";
+        if (self.structure==CSTabBarStructureCentered) return @"功能键居中，两侧各保留两个页面入口。";
+        return @"经典悬浮沿用原有四入口布局。";
+    }
+    if ([header isEqualToString:@"功能键"]) return self.structure==CSTabBarStructureCentered ?
+        @"功能键随底栏宽度自动适配，75–180% 对应底栏总宽的 15–36%。放大时高度与图标同步增大，并轻叠在两侧入口上方，形成突出层次。" :
+        @"功能键位于主底栏右侧。调整间距时保留主底栏宽度，整组布局向外扩展；接近屏幕边缘时自动限制扩展范围。功能键直径可独立调整。";
+    if ([header isEqualToString:@"图标自定义"]) return @"图标支持普通和选中两种状态；上传图片保留原色，选中图标颜色仅作用于原生图标。";
+    if ([header isEqualToString:@"标签与文字"]) return @"开启隐藏标签文本后，自定义文本不会显示。";
     return nil;
 }
 

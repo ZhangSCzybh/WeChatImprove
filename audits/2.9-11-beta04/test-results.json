@@ -1,0 +1,91 @@
+{
+  "tabbar": {
+    "command": "bash Tests/verify-tabbar.sh",
+    "exit_code": 0,
+    "geometry": "PASS",
+    "selected_icon_native_restore": "PASS",
+    "native_touch_checks": 121,
+    "neo_touch_checks": 97,
+    "structure_lifecycle_checks": 290,
+    "preferences_native_lifecycle": "PASS",
+    "log": "logs/tabbar.log"
+  },
+  "settings_syntax": {
+    "commands": [
+      [
+        "xcrun",
+        "--sdk",
+        "iphoneos",
+        "clang",
+        "-fobjc-arc",
+        "-fblocks",
+        "-fsyntax-only",
+        "-miphoneos-version-min=15.0",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unused-parameter",
+        "-Wno-deprecated-declarations",
+        "-Wno-sign-compare",
+        "-IHeaders",
+        "-IHeadersFile",
+        "-IControllers",
+        "-arch",
+        "arm64",
+        "Controllers/CSTabBarPreviewView.m",
+        "Controllers/CSTabBarStyleSettingsViewController.m"
+      ],
+      [
+        "xcrun",
+        "--sdk",
+        "iphoneos",
+        "clang",
+        "-fobjc-arc",
+        "-fblocks",
+        "-fsyntax-only",
+        "-miphoneos-version-min=15.0",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unused-parameter",
+        "-Wno-deprecated-declarations",
+        "-Wno-sign-compare",
+        "-IHeaders",
+        "-IHeadersFile",
+        "-IControllers",
+        "-arch",
+        "arm64e",
+        "Controllers/CSTabBarPreviewView.m",
+        "Controllers/CSTabBarStyleSettingsViewController.m"
+      ]
+    ],
+    "exit_codes": [
+      0,
+      0
+    ],
+    "existing_warning_exclusions": [
+      "deprecated-declarations",
+      "sign-compare",
+      "unused-parameter"
+    ]
+  },
+  "source_delta_since_beta03": [
+    "Controllers/CSReleaseNotesViewController.m",
+    "Controllers/CSTabBarPreviewView.m",
+    "Controllers/CSTabBarStyleSettingsViewController.m",
+    "Headers/CSUserInfoHelper.h",
+    "control"
+  ],
+  "native_geometry_preferences_router_unchanged": true,
+  "device_verified": false,
+  "preview_review": {
+    "blocking_findings": 0,
+    "scope": [
+      "repeat layout",
+      "relative geometry and RTL",
+      "preview click routing",
+      "stable fit for structure/size/gap",
+      "shadow clearance"
+    ]
+  }
+}

@@ -136,6 +136,487 @@ static void VerifyDynamicNamedBubbleSeams(void) {
     }
 }
 
+static NSUInteger VerifyVoiceTransTextSeams(void) {
+    NSString *previousVersion=CSMessageMergeTestProfileVersion;
+    NSUInteger scenarios=0;
+    NSArray *orders=@[
+        @[TextMessageViewModel.class,VoiceTransTextMessageViewModel.class,VoiceTransTextMessageViewModelV2.class],
+        @[VoiceTransTextMessageViewModel.class,VoiceTransTextMessageViewModelV2.class,TextMessageViewModel.class],
+        @[VoiceTransTextMessageViewModelV2.class,TextMessageViewModel.class,VoiceTransTextMessageViewModel.class]
+    ];
+    // These fixtures deliberately inherit ordinary text geometry. Their exact
+    // classes exercise the sent-message path, separately from voice transcripts.
+    for (NSString *version in @[@"8.0.80",@"8.0.99"]) for (NSArray *order in orders)
+    for (NSUInteger style=0;style<2;style++) for (NSUInteger outgoing=0;outgoing<2;outgoing++)
+    for (NSString *session in @[@"alice",@"group@chatroom"]) {
+        CSMessageMergeTestProfileVersion=version;BOOL qualified=[version isEqual:@"8.0.80"];
+        ConfigureIntegration(style,2);scenarios++;
+        BubbleInfo *info=[BubbleInfo new];info.normal=NativeCapsTemplate(2,1,3);info.pressed=info.normal;
+        TestController *page=[TestController new];page.session=session;page.nodes=[NSMutableArray array];
+        UIWindow *window=[UIWindow new];UITableView *table=[UITableView new];page.table=table;page.view=table;table.window=window;
+        table.bounds=CGRectMake(0,0,320,600);table.contentSize=CGSizeMake(320,1200);table.contentOffset=CGPointMake(0,19);
+        for (NSUInteger i=0;i<order.count;i++) {
+            TextMessageViewModel *m=[order[i] new];m.messageWrap=model(28000+(unsigned)i).messageWrap;
+            m.messageWrap.m_nsFromUsr=session;m.messageWrap.m_uiMessageType=1;m.isSender=outgoing;
+            m.contentViewSize=CGSizeMake(180,38);m.bgBubbleInfo=info;m.chatRoomTextStateIconDescription=@"";
+            [page.nodes addObject:m];
+        }
+        CSMessageMergeActivate(page);
+        NSMutableArray *views=[NSMutableArray array],*paths=[NSMutableArray array],*heights=[NSMutableArray array],*nativeHeights=[NSMutableArray array];
+        NSMutableDictionary *cells=[NSMutableDictionary dictionary];
+        for (NSUInteger i=0;i<order.count;i++) {
+            BOOL named=i==0 && !outgoing && [session hasSuffix:@"@chatroom"];
+            CGFloat y=named ? 17 : 8,native=named ? 67 : 55;
+            NSIndexPath *path=[NSIndexPath indexPathForRow:0 inSection:i];[paths addObject:path];
+            CSMessageMergePrepare(page,table,path);CGFloat height=CSMessageMergeRowHeight(page,table,path,native);
+            CGFloat expected=!qualified ? native : (i==0 ? y+36 : (i==order.count-1 ? native-y : 36));
+            CHECK(fabs(height-expected)<.01); // The first plan must work before any cell exists.
+            [heights addObject:@(height)];[nativeHeights addObject:@(native)];
+            Class cellClass=order[i]==VoiceTransTextMessageViewModel.class ? VoiceTransTextMessageCellView.class :
+                (order[i]==VoiceTransTextMessageViewModelV2.class ? VoiceTransTextMessageCellViewV2.class : TextMessageCellView.class);
+            NativeHierarchyCellView *v=[cellClass new];v.viewModel=page.nodes[i];
+            v.container=[UIView new];[v addSubview:v.container];
+            v.head=[UIView new];v.head.bounds=CGRectMake(0,0,38,38);[v addSubview:v.head];
+            YYAsyncImageView *bg=[YYAsyncImageView new];bg.image=[ForbiddenYYImage deferredImageWithUIImage:info.normal];
+            bg.highlightedImage=[ForbiddenYYImage deferredImageWithUIImage:info.pressed];
+            v.content=bg;[v.container addSubview:bg];
+            if (named) {
+                v->m_chatRoomNameLabel=[UIView new];v->m_chatRoomNameLabel.frame=CGRectMake(50,0,160,14);
+                v->m_chatRoomNameLabel.bounds=CGRectMake(0,0,160,14);[v addSubview:v->m_chatRoomNameLabel];
+            }
+            TestTableCell *cell=[TestTableCell new];cell.cellView=v;cells[path]=cell;[views addObject:v];
+        }
+        table.testCells=cells;table.testHeights=heights;table.indexPathsForVisibleRows=paths;
+        for (NSUInteger binding=0;binding<2;binding++) {
+            for (NSUInteger i=0;i<views.count;i++) {
+                NativeHierarchyCellView *v=views[i];BOOL named=i==0 && !outgoing && [session hasSuffix:@"@chatroom"];
+                v.frame=CGRectMake(0,0,320,[heights[i] doubleValue]);v.bounds=CGRectMake(0,0,320,[heights[i] doubleValue]);
+                v.head.frame=CGRectMake(outgoing ? 282 : 0,5,38,38);
+                v.container.frame=CGRectMake(40,named ? 17 : 8,240,38);v.container.bounds=CGRectMake(0,0,240,38);
+                v.content.frame=CGRectMake(10,0,180,38);v.content.bounds=CGRectMake(0,0,180,38);
+                CSMessageMergeBind(page,table,paths[i],cells[paths[i]]);
+            }
+            for (NSUInteger pass=0;pass<8;pass++) {
+                table.dragging=pass<3;table.decelerating=pass>=3 && pass<6;
+                for (NSUInteger i=0;i<views.count;i++) {
+                    NativeHierarchyCellView *v=views[i];
+                    if (pass==1 || pass==3) { ((YYAsyncImageView *)v.content).highlighted=pass==3;Display((id)v.content); }
+                    CSMessageMergeRender(v);
+                    CHECK(fabs(CSMessageMergeRowHeight(page,table,paths[i],[nativeHeights[i] doubleValue])-[heights[i] doubleValue])<.01);
+                    if (!qualified) CHECK(v.frame.origin.y==0);
+                    if (i) {
+                        NativeHierarchyCellView *previous=views[i-1];
+                        // Read the actual nested bubble frames. The synthetic
+                        // source image has independently known 1pt/3pt alpha insets.
+                        CGFloat end=previous.frame.origin.y+CGRectGetMaxY([previous convertRect:previous.content.bounds fromView:previous.content])-3;
+                        CGFloat start=v.frame.origin.y+CGRectGetMinY([v convertRect:v.content.bounds fromView:v.content])+1;
+                        CGFloat expected=qualified ? 2 : (i==1 && !outgoing && [session hasSuffix:@"@chatroom"] ? 24 : 21);
+                        CHECK(fabs([heights[i-1] doubleValue]+start-end-expected)<.01);
+                    }
+                }
+                CSMessageMergeFlush(page);CHECK(table.updateCount==0);CHECK(table.contentOffset.y==19);
+            }
+            for (NativeHierarchyCellView *v in views) { CSMessageMergeReuse(v);CSBubbleStyleDetach(v);CHECK(v.frame.origin.y==0); }
+        }
+        CSMessageMergeDeactivate(page);
+    }
+    CSMessageMergeTestProfileVersion=previousVersion;
+    return scenarios;
+}
+
+// Only this fixture table replays native delegate height queries after a real
+// begin/endUpdates transaction; the shared UIKit double stays unchanged.
+@interface VoiceTransAnimationTable : UITableView
+@property(nonatomic,weak) TestController *owner;
+@property(nonatomic) NSUInteger heightQueries, finalLayouts;
+@end
+@implementation VoiceTransAnimationTable
+- (void)endUpdates {
+    [super endUpdates];
+    NSMutableArray *heights=[NSMutableArray array];
+    for (NSUInteger i=0;i<self.owner.nodes.count;i++) {
+        self.heightQueries++;
+        NSIndexPath *path=[NSIndexPath indexPathForRow:0 inSection:i];
+        CGFloat height=[self.owner tableView:self heightForRowAtIndexPath:path];
+        [heights addObject:@(height)];
+        TextMessageCellView *v=(id)[self.testCells[path] cellView];
+        if (fabs(v.bounds.size.height-height)>.01) {
+            CGRect frame=v.frame,bounds=v.bounds;frame.size.height=height;bounds.size.height=height;
+            v.frame=frame;v.bounds=bounds;v.nativeLayoutCacheClean=NO;[v setNeedsLayout];
+        }
+    }
+    self.testHeights=heights;
+}
+- (void)layoutIfNeeded {
+    [super layoutIfNeeded];
+    // One UIKit tick consumes only requested cells. Native layoutSubviews first
+    // checks model readiness, then animation/size-cache gates. The lifecycle's
+    // Render still runs when either native gate returns early.
+    for (NSUInteger i=0;i<self.owner.nodes.count;i++) {
+        TextMessageCellView *v=(id)[self.testCells[[NSIndexPath indexPathForRow:0 inSection:i]] cellView];
+        if (v.nativeConsumedLayoutRequests==v.layoutRequests) continue;
+        v.nativeConsumedLayoutRequests=v.layoutRequests;CSMessageMergeRestore(v);
+        BOOL animating=[v respondsToSelector:@selector(isAnimating)] && ((VoiceTransTextMessageCellView *)v).isAnimating;
+        if (v.nativeModelGateBlocks) { v.nativeModelGateBlocks--;v.nativeSkippedLayouts++; }
+        else if (animating || v.nativeLayoutCacheClean) v.nativeSkippedLayouts++;
+        else {
+            CSMessageMergePerformNativeLayout(v,^{
+                CGFloat body=v.viewModel.contentViewSize.height;
+                v.container.frame=CGRectMake(40,8,240,body);v.container.bounds=CGRectMake(0,0,240,body);
+                v.content.frame=CGRectMake(10,0,v.viewModel.contentViewSize.width,body);v.content.bounds=CGRectMake(0,0,v.viewModel.contentViewSize.width,body);
+                v.nativeLayoutCacheClean=YES;v.nativeLayouts++;self.finalLayouts++;
+            });
+        }
+        CSMessageMergeRender(v);CSMessageMergeNativeLayoutPassEnded(v);
+    }
+}
+@end
+
+@interface VoiceTransAnimationFixture : NSObject
+@property(nonatomic,strong) TestController *page;
+@property(nonatomic,strong) VoiceTransAnimationTable *table;
+@property(nonatomic,strong) UIWindow *window;
+@property(nonatomic,strong) NSArray *views, *extras, *paths, *heights;
+@end
+@implementation VoiceTransAnimationFixture @end
+
+static VoiceTransAnimationFixture *CreateVoiceTransAnimationFixture(BOOL style) {
+    NSArray *models=@[TextMessageViewModel.class,VoiceTransTextMessageViewModel.class,VoiceTransTextMessageViewModelV2.class,TextMessageViewModel.class];
+    NSArray *cellClasses=@[TextMessageCellView.class,VoiceTransTextMessageCellView.class,VoiceTransTextMessageCellViewV2.class,TextMessageCellView.class];
+    ConfigureIntegration(style,2);
+    BOOL qualified=[CSMessageMergeTestProfileVersion isEqual:@"8.0.80"];
+    BubbleInfo *info=[BubbleInfo new];info.normal=NativeCapsTemplate(2,1,3);info.pressed=info.normal;
+    TestController *page=[TestController new];page.session=@"alice";page.nodes=[NSMutableArray array];
+    UIWindow *window=[UIWindow new];VoiceTransAnimationTable *table=[VoiceTransAnimationTable new];
+    table.owner=page;page.table=table;page.view=table;table.window=window;
+    table.bounds=CGRectMake(0,0,320,600);table.contentSize=CGSizeMake(320,1200);table.contentOffset=CGPointMake(0,19);
+    for (NSUInteger i=0;i<models.count;i++) {
+        TextMessageViewModel *m=[models[i] new];m.messageWrap=model(30000+(unsigned)i).messageWrap;
+        m.messageWrap.m_nsFromUsr=@"alice";m.messageWrap.m_uiMessageType=1;m.isSender=YES;
+        m.contentViewSize=CGSizeMake(180,38);m.nativeCachedHeight=55;m.bgBubbleInfo=info;[page.nodes addObject:m];
+    }
+    CSMessageMergeActivate(page);
+    NSMutableArray *views=[NSMutableArray array],*extras=[NSMutableArray array],*paths=[NSMutableArray array],*heights=[NSMutableArray array];
+    NSMutableDictionary *cells=[NSMutableDictionary dictionary];
+    for (NSUInteger i=0;i<models.count;i++) {
+        NSIndexPath *path=[NSIndexPath indexPathForRow:0 inSection:i];[paths addObject:path];
+        CSMessageMergePrepare(page,table,path);CGFloat height=CSMessageMergeRowHeight(page,table,path,55);
+        CHECK(height==(qualified ? (i==0 ? 44 : (i==models.count-1 ? 47 : 36)) : 55));[heights addObject:@(height)];
+        NativeHierarchyCellView *v=[cellClasses[i] new];v.viewModel=page.nodes[i];
+        v.frame=CGRectMake(0,0,320,height);v.bounds=CGRectMake(0,0,320,height);
+        v.head=[UIView new];v.head.frame=CGRectMake(282,5,38,38);v.head.bounds=CGRectMake(0,0,38,38);[v addSubview:v.head];
+        v.container=[UIView new];v.container.frame=CGRectMake(40,8,240,38);v.container.bounds=CGRectMake(0,0,240,38);[v addSubview:v.container];
+        YYAsyncImageView *bg=[YYAsyncImageView new];bg.image=[YYImage imageWithUIImage:info.normal];bg.highlightedImage=[YYImage imageWithUIImage:info.pressed];
+        bg.frame=CGRectMake(10,0,180,38);bg.bounds=CGRectMake(0,0,180,38);v.content=bg;[v.container addSubview:bg];
+        UIView *extra=[UIView new];extra.frame=CGRectMake(50,44,20,8);extra.bounds=CGRectMake(0,0,20,8);extra.hidden=YES;[v addSubview:extra];[extras addObject:extra];
+        TestTableCell *cell=[TestTableCell new];cell.cellView=v;cells[path]=cell;[views addObject:v];
+        CSMessageMergeBind(page,table,path,cell);CSMessageMergeRender(v);
+    }
+    table.testCells=cells;table.testHeights=heights;
+    table.indexPathsForVisibleRows=@[paths[1],paths[2]];
+    for (TextMessageCellView *v in views) { v.nativeLayoutCacheClean=YES;v.nativeConsumedLayoutRequests=v.layoutRequests; }
+    VoiceTransAnimationFixture *fixture=[VoiceTransAnimationFixture new];
+    fixture.page=page;fixture.table=table;fixture.window=window;
+    fixture.views=views;fixture.extras=extras;fixture.paths=paths;fixture.heights=heights;
+    return fixture;
+}
+static void FinishVoiceTransAnimationFixture(VoiceTransAnimationFixture *fixture) {
+    for (NativeHierarchyCellView *v in fixture.views) { CSMessageMergeReuse(v);CSBubbleStyleDetach(v); }
+    CSMessageMergeDeactivate(fixture.page);
+}
+
+static NSUInteger VerifyVoiceTransTextAnimationSeams(void) {
+    NSString *previousVersion=CSMessageMergeTestProfileVersion;CSMessageMergeTestProfileVersion=@"8.0.80";
+    NSUInteger scenarios=0;
+    for (NSUInteger style=0;style<2;style++) for (NSUInteger variant=0;variant<3;variant++)
+    for (NSUInteger pending=0;pending<2;pending++) for (NSUInteger interaction=0;interaction<2;interaction++) {
+        scenarios++;VoiceTransAnimationFixture *fixture=CreateVoiceTransAnimationFixture(style);
+        TestController *page=fixture.page;VoiceTransAnimationTable *table=fixture.table;
+        NSArray *views=fixture.views,*extras=fixture.extras,*heights=fixture.heights;
+        for (NSUInteger i=1;i<=2;i++) {
+            VoiceTransTextMessageCellView *v=views[i];v.isAnimating=YES;[v resetLayoutCache];
+            CSMessageMergeRestore(v);
+            if (variant==0) { CGRect frame=v.container.frame;frame.origin.y=11;v.container.frame=frame; }
+            if (variant==1) v.container.transform=CGAffineTransformMakeScale(.95,.95);
+            if (variant==2) ((UIView *)extras[i]).hidden=NO;
+            NSUInteger requests=v.layoutRequests;CSMessageMergeNativeAnimationEnded(v);CHECK(v.layoutRequests==requests);
+            CSMessageMergeRender(v);
+        }
+        CSMessageMergeFlush(page);
+        // A transient frame must not publish a wider permanent safety envelope.
+        CHECK(table.updateCount==0);CHECK(table.heightQueries==0);CHECK([table.testHeights isEqual:heights]);
+        if (pending) {
+            // A real model width change independently needs layout while the
+            // native animation gate is closed. Heights and final y stay unchanged.
+            for (NSUInteger i=1;i<=2;i++) ((TextMessageViewModel *)page.nodes[i]).contentViewSize=CGSizeMake(181,38);
+            CSMessageMergeInvalidateLayout(page);CSMessageMergeWillMutate(page);CSMessageMergeDidMutate(page);CSMessageMergeFlush(page);
+            CHECK(table.updateCount==0);CHECK(table.heightQueries==0);CHECK([table.testHeights isEqual:heights]);
+        }
+        table.dragging=interaction==0;table.decelerating=interaction==1;
+        for (NSUInteger i=1;i<=2;i++) {
+            VoiceTransTextMessageCellView *v=views[i];v.isAnimating=NO;
+            NSUInteger requests=v.layoutRequests;CSMessageMergeNativeAnimationEnded(v);CHECK(v.layoutRequests==requests+1);
+            v.container.transform=CGAffineTransformIdentity;((UIView *)extras[i]).hidden=YES;
+        }
+        // Native completion clears only the flag. Replay the requested final
+        // layout explicitly; height queries belong exclusively to table updates.
+        NSUInteger layouts=table.finalLayouts;[table layoutIfNeeded];CHECK(table.finalLayouts==layouts+2);
+        CSMessageMergeFlush(page);CHECK(table.updateCount==0);CHECK(table.heightQueries==0);
+        CHECK(!CSMessageMergeLayoutSettled(page));
+        table.dragging=NO;table.decelerating=NO;CSMessageMergeFlush(page);
+        CHECK(table.updateCount==1);CHECK(table.heightQueries==4);CHECK([table.testHeights isEqual:heights]);
+        for (NSUInteger pass=0;pass<8;pass++) {
+            [table layoutIfNeeded];CSMessageMergeFlush(page);
+            CHECK(table.updateCount==1);CHECK(table.heightQueries==4);
+            for (NSUInteger i=1;i<views.count;i++) {
+                NativeHierarchyCellView *previous=views[i-1],*v=views[i];
+                CGFloat end=previous.frame.origin.y+CGRectGetMaxY([previous convertRect:previous.content.bounds fromView:previous.content])-3;
+                CGFloat start=v.frame.origin.y+CGRectGetMinY([v convertRect:v.content.bounds fromView:v.content])+1;
+                CHECK(fabs([table.testHeights[i-1] doubleValue]+start-end-2)<.01);
+            }
+        }
+        CHECK(CSMessageMergeLayoutSettled(page));CHECK(table.contentOffset.y==19);
+        FinishVoiceTransAnimationFixture(fixture);
+    }
+    CSMessageMergeTestProfileVersion=previousVersion;return scenarios;
+}
+
+static void SetVoiceTransFixtureAnimating(VoiceTransAnimationFixture *fixture, BOOL animating) {
+    for (NSUInteger i=1;i<=2;i++) ((VoiceTransTextMessageCellView *)fixture.views[i]).isAnimating=animating;
+}
+static void ScheduleVoiceTransFixture(VoiceTransAnimationFixture *fixture) {
+    CSMessageMergeInvalidateLayout(fixture.page);
+    CSMessageMergeWillMutate(fixture.page);CSMessageMergeDidMutate(fixture.page);CSMessageMergeFlush(fixture.page);
+}
+static void CompleteVoiceTransFixture(VoiceTransAnimationFixture *fixture) {
+    SetVoiceTransFixtureAnimating(fixture,NO);
+    for (NSUInteger i=1;i<=2;i++) CSMessageMergeNativeAnimationEnded(fixture.views[i]);
+    [fixture.table layoutIfNeeded];CSMessageMergeFlush(fixture.page);
+}
+static NSUInteger VerifyVoiceTransTextAnimationBoundaries(void) {
+    NSString *previousVersion=CSMessageMergeTestProfileVersion;CSMessageMergeTestProfileVersion=@"8.0.80";
+    NSUInteger scenarios=0;
+    {
+        scenarios++;VoiceTransAnimationFixture *fixture=CreateVoiceTransAnimationFixture(NO);
+        SetVoiceTransFixtureAnimating(fixture,YES);
+        TextMessageViewModel *first=fixture.page.nodes[1],*second=fixture.page.nodes[2];
+        NSUInteger firstResets=first.resetCount,secondResets=second.resetCount;
+        // Break only the preceding join while both native cells suppress layout.
+        ((TextMessageViewModel *)fixture.page.nodes[0]).isSender=NO;
+        ScheduleVoiceTransFixture(fixture);
+        CHECK(first.resetCount==firstResets);CHECK(second.resetCount==secondResets);
+        CHECK(fixture.table.updateCount==0);CHECK(fixture.table.heightQueries==0);
+        CHECK(!CSMessageMergeLayoutSettled(fixture.page));
+        CompleteVoiceTransFixture(fixture);
+        CHECK(fixture.table.updateCount==1);CHECK(fixture.table.heightQueries==4);
+        CHECK(([fixture.table.testHeights isEqual:@[@55,@44,@36,@47]]));
+        CHECK(CSMessageMergeLayoutSettled(fixture.page));
+        for (NSUInteger i=2;i<fixture.views.count;i++) {
+            NativeHierarchyCellView *previous=fixture.views[i-1],*v=fixture.views[i];
+            CGFloat end=previous.frame.origin.y+CGRectGetMaxY([previous convertRect:previous.content.bounds fromView:previous.content])-3;
+            CGFloat start=v.frame.origin.y+CGRectGetMinY([v convertRect:v.content.bounds fromView:v.content])+1;
+            CHECK(fabs([fixture.table.testHeights[i-1] doubleValue]+start-end-2)<.01);
+        }
+        CSMessageMergeFlush(fixture.page);CHECK(fixture.table.updateCount==1);
+        FinishVoiceTransAnimationFixture(fixture);
+    }
+    for (NSUInteger change=0;change<2;change++) {
+        scenarios++;VoiceTransAnimationFixture *fixture=CreateVoiceTransAnimationFixture(NO);
+        SetVoiceTransFixtureAnimating(fixture,YES);ScheduleVoiceTransFixture(fixture);
+        CHECK(!CSMessageMergeLayoutSettled(fixture.page));CHECK(fixture.table.updateCount==0);
+        NSMutableDictionary *settings=[[NSUserDefaults.standardUserDefaults volatileDomainForName:NSArgumentDomain] mutableCopy];
+        if (change==0) settings[CSMessageMergeEnabledKey]=@NO;
+        else settings[CSMessageMergeScopeKey]=@1; // The fixture is a private chat.
+        [NSUserDefaults.standardUserDefaults setVolatileDomain:settings forName:NSArgumentDomain];
+        CSMessageMergeActivate(fixture.page);CSMessageMergeFlush(fixture.page);
+        CHECK(fixture.table.updateCount==1);CHECK(fixture.table.heightQueries==4);
+        CHECK(([fixture.table.testHeights isEqual:@[@55,@55,@55,@55]]));
+        CHECK(CSMessageMergeLayoutSettled(fixture.page));
+        CompleteVoiceTransFixture(fixture);CHECK(fixture.table.updateCount==1);
+        FinishVoiceTransAnimationFixture(fixture);
+    }
+    {
+        scenarios++;VoiceTransAnimationFixture *fixture=CreateVoiceTransAnimationFixture(NO);
+        for (NSUInteger i=1;i<=2;i++) ((TextMessageViewModel *)fixture.page.nodes[i]).messageWrap.m_uiMessageType=34;
+        ScheduleVoiceTransFixture(fixture);
+        CHECK(fixture.table.updateCount==1);CHECK(([fixture.table.testHeights isEqual:@[@55,@55,@55,@55]]));
+        SetVoiceTransFixtureAnimating(fixture,YES);
+        for (NSUInteger i=1;i<=2;i++) ((TextMessageViewModel *)fixture.page.nodes[i]).messageWrap.m_uiMessageType=1;
+        // Old inactive ownership must not defer the first eligible preparation.
+        ScheduleVoiceTransFixture(fixture);
+        CHECK(fixture.table.updateCount==2);CHECK(fixture.table.heightQueries==8);
+        CHECK([fixture.table.testHeights isEqual:fixture.heights]);CHECK(CSMessageMergeLayoutSettled(fixture.page));
+        CompleteVoiceTransFixture(fixture);CHECK(fixture.table.updateCount==3);CHECK(CSMessageMergeLayoutSettled(fixture.page));
+        FinishVoiceTransAnimationFixture(fixture);
+    }
+    {
+        scenarios++;VoiceTransAnimationFixture *fixture=CreateVoiceTransAnimationFixture(NO);
+        SetVoiceTransFixtureAnimating(fixture,YES);ScheduleVoiceTransFixture(fixture);
+        CHECK(!CSMessageMergeLayoutSettled(fixture.page));CHECK(fixture.table.updateCount==0);
+        for (NSUInteger i=1;i<=2;i++) CSMessageMergeReuse(fixture.views[i]);
+        fixture.table.indexPathsForVisibleRows=@[];SetVoiceTransFixtureAnimating(fixture,NO);
+        for (NSUInteger i=1;i<=2;i++) {
+            UIView *v=fixture.views[i];NSUInteger requests=v.layoutRequests;
+            CSMessageMergeNativeAnimationEnded(v);CHECK(v.layoutRequests==requests);
+        }
+        // Scroll-end flush has no dirty model or bound completion state left.
+        CSMessageMergeFlush(fixture.page);
+        CHECK(CSMessageMergeLayoutSettled(fixture.page));CHECK(fixture.table.updateCount==0);CHECK(fixture.table.heightQueries==0);
+        FinishVoiceTransAnimationFixture(fixture);
+    }
+    {
+        scenarios++;VoiceTransAnimationFixture *fixture=CreateVoiceTransAnimationFixture(NO);
+        SetVoiceTransFixtureAnimating(fixture,YES);ScheduleVoiceTransFixture(fixture);
+        CHECK(!CSMessageMergeLayoutSettled(fixture.page));CSMessageMergeDeactivate(fixture.page);
+        VoiceTransTextMessageCellView *v=fixture.views[1];v.nativeModelGateBlocks=1;
+        CompleteVoiceTransFixture(fixture);CHECK(fixture.table.updateCount==0);CHECK(v.nativeLayouts==0);
+        CSMessageMergeActivate(fixture.page);CSMessageMergeFlush(fixture.page);
+        CHECK(fixture.table.updateCount==1);CHECK(fixture.table.heightQueries==4);
+        CHECK(v.nativeLayouts==0);CHECK(!CSMessageMergeLayoutSettled(fixture.page));
+        for (NSUInteger tick=0;tick<4;tick++) { DrainIntegration();[fixture.table layoutIfNeeded];CSMessageMergeFlush(fixture.page); }
+        CHECK(v.nativeLayouts>0);CHECK(CSMessageMergeLayoutSettled(fixture.page));CHECK(fixture.table.updateCount==1);
+        FinishVoiceTransAnimationFixture(fixture);
+    }
+    {
+        scenarios++;CSMessageMergeTestProfileVersion=@"8.0.99";
+        VoiceTransAnimationFixture *fixture=CreateVoiceTransAnimationFixture(NO);
+        SetVoiceTransFixtureAnimating(fixture,YES);
+        for (NSUInteger i=1;i<=2;i++) ((TextMessageViewModel *)fixture.page.nodes[i]).contentViewSize=CGSizeMake(181,38);
+        ScheduleVoiceTransFixture(fixture);
+        CHECK(fixture.table.updateCount==1);CHECK(fixture.table.heightQueries==4);
+        CHECK(([fixture.table.testHeights isEqual:@[@55,@55,@55,@55]]));CHECK(CSMessageMergeLayoutSettled(fixture.page));
+        SetVoiceTransFixtureAnimating(fixture,NO);
+        for (NSUInteger i=1;i<=2;i++) {
+            UIView *v=fixture.views[i];NSUInteger requests=v.layoutRequests;
+            CSMessageMergeNativeAnimationEnded(v);CHECK(v.layoutRequests==requests);
+        }
+        CSMessageMergeFlush(fixture.page);CHECK(CSMessageMergeLayoutSettled(fixture.page));CHECK(fixture.table.updateCount==1);
+        FinishVoiceTransAnimationFixture(fixture);
+    }
+    CSMessageMergeTestProfileVersion=previousVersion;return scenarios;
+}
+
+static void AdvanceVoiceTransNativeTicks(VoiceTransAnimationFixture *fixture) {
+    for (NSUInteger tick=0;tick<4;tick++) {
+        DrainIntegration();[fixture.table layoutIfNeeded];CSMessageMergeFlush(fixture.page);
+    }
+}
+static void CheckVoiceTransNativeSeams(VoiceTransAnimationFixture *fixture, NSArray *heights) {
+    CHECK([fixture.table.testHeights isEqual:heights]);CHECK(CSMessageMergeLayoutSettled(fixture.page));
+    for (NSUInteger i=1;i<fixture.views.count;i++) {
+        NativeHierarchyCellView *previous=fixture.views[i-1],*v=fixture.views[i];
+        CGFloat end=previous.frame.origin.y+CGRectGetMaxY([previous convertRect:previous.content.bounds fromView:previous.content])-3;
+        CGFloat start=v.frame.origin.y+CGRectGetMinY([v convertRect:v.content.bounds fromView:v.content])+1;
+        CHECK(fabs([fixture.table.testHeights[i-1] doubleValue]+start-end-2)<.01);
+    }
+}
+static NSUInteger VerifyVoiceTransTextNativeCompletion(void) {
+    NSString *previousVersion=CSMessageMergeTestProfileVersion;CSMessageMergeTestProfileVersion=@"8.0.80";
+    NSUInteger scenarios=0;
+    // The first requested native pass may stop at the model gate; an already
+    // clean cell cache independently requires invalidation at completion.
+    for (NSUInteger blocked=0;blocked<2;blocked++) {
+        scenarios++;VoiceTransAnimationFixture *fixture=CreateVoiceTransAnimationFixture(NO);
+        VoiceTransTextMessageCellView *v=fixture.views[1];v.isAnimating=YES;
+        CSMessageMergeRestore(v);CGRect frame=v.container.frame;frame.origin.y=11;v.container.frame=frame;
+        v.nativeLayoutCacheClean=blocked==0;v.nativeModelGateBlocks=blocked;
+        ScheduleVoiceTransFixture(fixture);CHECK(!CSMessageMergeLayoutSettled(fixture.page));
+        v.isAnimating=NO;CSMessageMergeNativeAnimationEnded(v);
+        NSUInteger layouts=v.nativeLayouts;[fixture.table layoutIfNeeded];
+        CHECK(v.nativeLayouts==layouts+(blocked ? 0 : 1));
+        if (blocked) {
+            CHECK(v.container.frame.origin.y==11);CHECK(!CSMessageMergeLayoutSettled(fixture.page));
+            CHECK(fixture.table.updateCount==0); // No transient-frame rejection.
+            // Pause after the retry was queued. Its callback must preserve the
+            // single opportunity for activation's next native readiness gate.
+            CSMessageMergeDeactivate(fixture.page);DrainIntegration();
+            CHECK(v.nativeLayouts==layouts);CHECK(fixture.table.updateCount==0);
+            v.nativeModelGateBlocks=1;CSMessageMergeActivate(fixture.page);CSMessageMergeFlush(fixture.page);
+            CHECK(v.nativeLayouts==layouts);CHECK(!CSMessageMergeLayoutSettled(fixture.page));
+        }
+        AdvanceVoiceTransNativeTicks(fixture);
+        CHECK(v.nativeLayouts>layouts);CHECK(fixture.table.updateCount==1);CHECK(fixture.table.heightQueries==4);
+        CheckVoiceTransNativeSeams(fixture,fixture.heights);
+        NSUInteger requests=v.layoutRequests,resets=v.nativeCellResets,updates=fixture.table.updateCount;
+        AdvanceVoiceTransNativeTicks(fixture);
+        CHECK(v.layoutRequests==requests);CHECK(v.nativeCellResets==resets);CHECK(fixture.table.updateCount==updates);
+        FinishVoiceTransAnimationFixture(fixture);
+    }
+    {
+        scenarios++;VoiceTransAnimationFixture *fixture=CreateVoiceTransAnimationFixture(NO);
+        VoiceTransTextMessageCellView *v=fixture.views[1];v.isAnimating=YES;v.nativeModelGateBlocks=10;
+        ScheduleVoiceTransFixture(fixture);v.isAnimating=NO;CSMessageMergeNativeAnimationEnded(v);
+        [fixture.table layoutIfNeeded];AdvanceVoiceTransNativeTicks(fixture);
+        CHECK(v.nativeLayouts==0);CHECK(fixture.table.updateCount==1);CHECK(!CSMessageMergeLayoutSettled(fixture.page));
+        NSUInteger requests=v.layoutRequests,resets=v.nativeCellResets,skipped=v.nativeSkippedLayouts;
+        AdvanceVoiceTransNativeTicks(fixture);
+        CHECK(v.layoutRequests==requests);CHECK(v.nativeCellResets==resets);CHECK(v.nativeSkippedLayouts==skipped);
+        CHECK(fixture.table.updateCount==1); // No polling after the single retry.
+        v.nativeModelGateBlocks=0;[v setNeedsLayout];AdvanceVoiceTransNativeTicks(fixture);
+        CHECK(v.nativeLayouts==1);CHECK(fixture.table.updateCount==1);CheckVoiceTransNativeSeams(fixture,fixture.heights);
+        FinishVoiceTransAnimationFixture(fixture);
+    }
+    {
+        scenarios++;VoiceTransAnimationFixture *fixture=CreateVoiceTransAnimationFixture(NO);
+        VoiceTransTextMessageCellView *v=fixture.views[1];v.isAnimating=YES;ScheduleVoiceTransFixture(fixture);
+        v.isAnimating=NO;CSMessageMergeNativeAnimationEnded(v);CSMessageMergeRestore(v);
+        CSMessageMergePerformNativeLayout(v,^{
+            v.nativeLayouts++; // A newer animation completion arrives inside this older native pass.
+            v.isAnimating=YES;CGRect frame=v.container.frame;frame.origin.y=11;v.container.frame=frame;
+            v.isAnimating=NO;CSMessageMergeNativeAnimationEnded(v);
+        });
+        CSMessageMergeRender(v);
+        CHECK(CSMessageMergeMeasure(v.viewModel,CGSizeMake(320,55)).height==36);
+        CHECK(fixture.table.updateCount==0);CHECK(!CSMessageMergeLayoutSettled(fixture.page));
+        AdvanceVoiceTransNativeTicks(fixture);
+        CHECK(v.nativeLayouts>1);CHECK(fixture.table.updateCount==1);CheckVoiceTransNativeSeams(fixture,fixture.heights);
+        FinishVoiceTransAnimationFixture(fixture);
+    }
+    {
+        scenarios++;VoiceTransAnimationFixture *fixture=CreateVoiceTransAnimationFixture(NO);
+        VoiceTransTextMessageCellView *v=fixture.views[1];NSString *identity=CSMessageNativeIdentity(v.viewModel);
+        v.isAnimating=YES;CSMessageMergeRestore(v);
+        [v.viewModel resetLayoutCache];[v resetLayoutCache];
+        v.viewModel.contentViewSize=CGSizeMake(180,62);v.viewModel.nativeCachedHeight=79;
+        // Reproduce updateLayoutsWithoutReload's native height transaction while
+        // common layoutInternal is suppressed; layoutUI changes only body size.
+        [fixture.table beginUpdates];[fixture.table endUpdates];[fixture.table layoutIfNeeded];
+        CGRect frame=v.container.frame;frame.origin.y=11;frame.size.height=62;v.container.frame=frame;
+        v.container.bounds=CGRectMake(0,0,240,62);v.content.frame=CGRectMake(10,0,180,62);v.content.bounds=CGRectMake(0,0,180,62);
+        CSMessageMergeRender(v);CHECK(v.nativeLayouts==0);CHECK([CSMessageNativeIdentity(v.viewModel) isEqual:identity]);
+        v.isAnimating=NO;CSMessageMergeNativeAnimationEnded(v);AdvanceVoiceTransNativeTicks(fixture);
+        CHECK(v.nativeLayouts>0);CHECK(fixture.table.updateCount==2);CHECK(fixture.table.heightQueries==8);
+        CheckVoiceTransNativeSeams(fixture,@[@44,@60,@36,@47]);
+        FinishVoiceTransAnimationFixture(fixture);
+    }
+    {
+        scenarios++;VoiceTransAnimationFixture *fixture=CreateVoiceTransAnimationFixture(NO);
+        TextMessageViewModel *m=[VoiceTransTextMessageViewModel new];m.messageWrap=model(30004).messageWrap;
+        m.messageWrap.m_nsFromUsr=@"alice";m.messageWrap.m_uiMessageType=1;m.isSender=YES;
+        m.contentViewSize=CGSizeMake(180,38);m.nativeCachedHeight=55;m.bgBubbleInfo=((TextMessageViewModel *)fixture.page.nodes[0]).bgBubbleInfo;
+        VoiceTransTextMessageCellView *v=[VoiceTransTextMessageCellView new];v.viewModel=m;v.isAnimating=YES;
+        v.frame=CGRectMake(0,0,320,55);v.bounds=CGRectMake(0,0,320,55);
+        v.head=[UIView new];v.head.frame=CGRectMake(282,5,38,38);v.head.bounds=CGRectMake(0,0,38,38);[v addSubview:v.head];
+        v.container=[UIView new];v.container.frame=CGRectMake(40,11,240,38);v.container.bounds=CGRectMake(0,0,240,38);[v addSubview:v.container];
+        YYAsyncImageView *bg=[YYAsyncImageView new];BubbleInfo *info=m.bgBubbleInfo;
+        bg.image=[YYImage imageWithUIImage:info.normal];bg.highlightedImage=[YYImage imageWithUIImage:info.pressed];
+        bg.frame=CGRectMake(10,0,180,38);bg.bounds=CGRectMake(0,0,180,38);v.content=bg;[v.container addSubview:bg];
+        CSMessageMergeWillMutate(fixture.page);[fixture.page.nodes addObject:m];
+        NSIndexPath *path=[NSIndexPath indexPathForRow:0 inSection:4];TestTableCell *cell=[TestTableCell new];cell.cellView=v;
+        NSMutableDictionary *cells=[fixture.table.testCells mutableCopy];cells[path]=cell;fixture.table.testCells=cells;
+        fixture.views=[fixture.views arrayByAddingObject:v];fixture.paths=[fixture.paths arrayByAddingObject:path];
+        fixture.table.testHeights=[fixture.table.testHeights arrayByAddingObject:@55];fixture.table.indexPathsForVisibleRows=fixture.paths;
+        CSMessageMergeBind(fixture.page,fixture.table,path,cell);
+        [fixture.table beginUpdates];[fixture.table endUpdates];[fixture.table layoutIfNeeded];
+        CSMessageMergeDidMutate(fixture.page);CSMessageMergeFlush(fixture.page);CHECK(v.nativeLayouts==0);
+        v.isAnimating=NO;CSMessageMergeNativeAnimationEnded(v);AdvanceVoiceTransNativeTicks(fixture);
+        CHECK(v.nativeLayouts>0);CHECK(fixture.table.updateCount==2);CHECK(fixture.table.heightQueries==10);
+        CheckVoiceTransNativeSeams(fixture,@[@44,@36,@36,@36,@47]);
+        FinishVoiceTransAnimationFixture(fixture);
+    }
+    CSMessageMergeTestProfileVersion=previousVersion;return scenarios;
+}
+
 static NSUInteger VerifyVoiceTranslationSeams(void) {
     NSUInteger scenarios=0;
     // Text, side-button voice, quote, expanded voice. Rotate the two voice states
@@ -283,8 +764,18 @@ static NSUInteger VerifyVoiceTranslationSeams(void) {
     return scenarios;
 }
 
-int main(void) { @autoreleasepool {
+int main(int argc, const char *argv[]) { @autoreleasepool {
+    if (argc==2 && !strcmp(argv[1],"--voice-animation-core")) {
+        NSUInteger scenarios=VerifyVoiceTransTextNativeCompletion();
+        printf("PASS: %lu core native completion scenarios; %u checks\n",(unsigned long)scenarios,checks);
+        return 0;
+    }
+    if (argc!=1) { fprintf(stderr,"Usage: %s [--voice-animation-core]\n",argv[0]);return 2; }
     VerifyDynamicNamedBubbleSeams();
+    NSUInteger voiceTransTextScenarios=VerifyVoiceTransTextSeams();
+    printf("PASS: %lu sent speech-to-text mixed seam/fallback/rebind scenarios\n",(unsigned long)voiceTransTextScenarios);
+    NSUInteger animationScenarios=VerifyVoiceTransTextAnimationSeams()+VerifyVoiceTransTextAnimationBoundaries()+VerifyVoiceTransTextNativeCompletion();
+    printf("PASS: %lu sent speech-to-text animation/deferred-flush scenarios\n",(unsigned long)animationScenarios);
     NSUInteger translationScenarios=VerifyVoiceTranslationSeams();
     ConfigureIntegration(NO,2);
     // Regression: a 38pt body exactly fits the native fixed caps. Requiring an
@@ -322,7 +813,7 @@ int main(void) { @autoreleasepool {
         CHECK(padding.top==1 && padding.bottom==3);
         CHECK(!CSBubbleStyleModelInsets(m,appearance,CGSizeMake(60,5),&padding));
     }
-    NSUInteger scenarios=translationScenarios;
+    NSUInteger scenarios=translationScenarios+voiceTransTextScenarios+animationScenarios;
     for (NSUInteger heightCase=0;heightCase<2;heightCase++)
     for (NSUInteger templateKind=0;templateKind<3;templateKind++)
     for (NSUInteger style=0;style<2;style++) for (NSUInteger dark=0;dark<2;dark++)

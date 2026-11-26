@@ -1,8 +1,0 @@
-Command: bash Tests/verify-group-banner.sh
-Working directory: /Users/zhangshichao/Documents/Workspace/WeChatImprove
-Started UTC: 2026-11-24T03:31:00.785902+00:00
-
-Group banner: 72 checks, 0 failures
-
-Exit code: 0
-Elapsed seconds: 1.520

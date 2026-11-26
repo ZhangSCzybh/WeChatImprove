@@ -1,0 +1,66 @@
+{
+  "version": "2.9-10",
+  "baseline_version": "2.9-8",
+  "gates": [
+    {
+      "gate": "tabbar",
+      "exit_code": 0,
+      "log": "logs/tabbar.log",
+      "last_lines": [
+        "2026-11-26 06:39:03.528 native[48195:35588249] tabbar selected icon color/native restore: PASS",
+        "2026-11-26 06:39:03.539 native[48195:35588249] tabbar Neo touch/animation: 97 checks passed",
+        "2026-11-26 06:39:03.543 native[48195:35588249] tabbar modern native hierarchy: PASS (121 total touch checks)",
+        "2026-11-26 06:39:03.555 native[48195:35588249] tabbar preferences/native lifecycle: PASS"
+      ],
+      "baseline_exit_code": 0
+    },
+    {
+      "gate": "settings-tab-bar",
+      "exit_code": 0,
+      "log": "logs/settings-tab-bar.log",
+      "last_lines": [
+        "SettingsTabBarTests: 85 checks passed"
+      ],
+      "baseline_exit_code": 0
+    },
+    {
+      "gate": "settings-home",
+      "exit_code": 0,
+      "log": "logs/settings-home.log",
+      "last_lines": [
+        "SettingsHomeModelTests: 803 checks, 0 failures (real production model and layout helpers; four Tabs/shared About, global visible-only search, identity/routes, rebuild/account reset, sticky rail/safe areas, legal scrolling and asynchronous reflow)",
+        "SettingsHomeControllerTests: 227 checks, 0 failures (real setupData, selection and lifecycle methods; quick-panel routes, no duplicate completion reload, preserved user scroll, privacy/account/authorization boundaries, width-dependent verse reflow, existing search/Tab restoration and rail geometry; UIKit/navigation/layout/animation are fixtures)"
+      ],
+      "baseline_exit_code": 0
+    },
+    {
+      "gate": "moments-card",
+      "exit_code": 0,
+      "log": "logs/moments-card.log",
+      "last_lines": [
+        "Moments card geometry: 73467 checks passed (natural covers, two-line titles, optional location, stacked author/date, dynamic fonts, large counts, no overlaps).",
+        "Moments card configuration: 113 checks passed (production configure/cleanup, first cover, video reuse/fallback, native emoji text/ABI, larger fonts, counts, timestamp/timezone/DST, optional location)."
+      ],
+      "baseline_exit_code": 0
+    },
+    {
+      "gate": "moments-share",
+      "exit_code": 0,
+      "log": "logs/moments-share.log",
+      "last_lines": [
+        "Moments shared cover: 103 checks passed (production adapter, native routing, thumbnail URL, compact icon, fallback, gesture cleanup)."
+      ],
+      "baseline_exit_code": 0
+    },
+    {
+      "gate": "plugin-header-entry",
+      "exit_code": 0,
+      "log": "logs/plugin-header-entry.log",
+      "last_lines": [
+        "Plugin header verse entry: 35 checks, 0 failures"
+      ],
+      "baseline_exit_code": 0
+    }
+  ],
+  "new_failures": 0
+}

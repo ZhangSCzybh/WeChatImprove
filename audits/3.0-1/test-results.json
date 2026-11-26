@@ -1,0 +1,94 @@
+{
+  "tabbar": {
+    "command": "bash Tests/verify-tabbar.sh",
+    "exit_code": 0,
+    "geometry": "PASS",
+    "selected_icon_native_restore": "PASS",
+    "neo_touch_checks": 97,
+    "native_touch_checks": 121,
+    "structure_lifecycle_checks": 666,
+    "preferences_native_lifecycle": "PASS",
+    "log": "logs/tabbar.log"
+  },
+  "backup_registry": {
+    "command": "bash Tests/verify-backup-registry.sh",
+    "exit_code": 0,
+    "assertions": 2455,
+    "log": "logs/backup-registry.log"
+  },
+  "syntax": [
+    {
+      "architecture": "arm64",
+      "command": [
+        "xcrun",
+        "--sdk",
+        "iphoneos",
+        "clang",
+        "-fobjc-arc",
+        "-fblocks",
+        "-fsyntax-only",
+        "-miphoneos-version-min=15.0",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unused-parameter",
+        "-Wno-deprecated-declarations",
+        "-Wno-sign-compare",
+        "-IHeaders",
+        "-IHeadersFile",
+        "-IControllers",
+        "-arch",
+        "arm64",
+        "Controllers/CSReleaseNotesViewController.m"
+      ],
+      "exit_code": 0
+    },
+    {
+      "architecture": "arm64e",
+      "command": [
+        "xcrun",
+        "--sdk",
+        "iphoneos",
+        "clang",
+        "-fobjc-arc",
+        "-fblocks",
+        "-fsyntax-only",
+        "-miphoneos-version-min=15.0",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unused-parameter",
+        "-Wno-deprecated-declarations",
+        "-Wno-sign-compare",
+        "-IHeaders",
+        "-IHeadersFile",
+        "-IControllers",
+        "-arch",
+        "arm64e",
+        "Controllers/CSReleaseNotesViewController.m"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "source_delta_since_beta06": {
+    "changed": [
+      "Controllers/CSReleaseNotesViewController.m",
+      "Headers/CSUserInfoHelper.h",
+      "control"
+    ],
+    "removed": [],
+    "source_files": 42687,
+    "functional_sources_unchanged": true
+  },
+  "release_metadata_review": {
+    "blocking_findings": 0,
+    "package_version": "3.0-1",
+    "in_app_version": "3.0-1",
+    "release_notes_key": "3.0-1",
+    "current_readme_version": "3.0-1",
+    "current_beta_label": false,
+    "historical_releases_preserved": true,
+    "dpkg_version_newer_than_beta06": true
+  },
+  "device_verified": false
+}

@@ -2,7 +2,7 @@
 
 面向 iOS 微信的 Theos 插件，使用 Objective-C / Logos 接入微信原生界面，提供聊天分组、界面定制、消息增强、自动回复和配置备份等功能，可在插件设置中按需开启。
 
-**源码版本：`2.9-7`** · **架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
+**源码版本：`3.0-2`（完整版）** · **架构：`arm64` / `arm64e`** · **最低编译目标：iOS 15.0**
 
 [功能概览](#功能概览) · [安装与入口](#安装与入口) · [使用说明](#使用说明) · [配置与备份](#配置与备份) · [源码编译](#源码编译) · [开发与验证](#开发与验证) · [常见问题](#常见问题)
 
@@ -32,16 +32,18 @@
 
 需要能够向微信加载插件的 iOS 注入环境。近期适配参考为微信 `8.0.78`、`8.0.80`，广告净化等私有接口以 `8.0.80.34` 为核验依据；这不代表所有系统、微信版本及插件组合均已通过真机验证。安装包声明依赖 `mobilesubstrate >= 0.9.5000`。
 
-当前源码版本为 **2.9-7 完整版**，沿用 beta06 的功能实现，完整包含聊天分组、界面定制、朋友圈布局、消息增强、自动回复、输入框操作、密友保护与配置备份等现有功能。聊天分组提供独立的“页面转场动画”开关，默认关闭；开启后，原列表与真实相邻列表跟随横滑同步移动，取消时回弹，确认后从当前进度完成切换，指示器与页面进度同步。包含连续快滑接续和返回聊天页首次来源准备、位置恢复及布局验证调整；系统“减弱动态效果”继续生效。按现有注入环境选择：
+当前源码与构建版本为 **3.0-2 完整版**。本版将底栏宽度输入调整为 60–100% 的比例，输入 80 表示 80%，留空或 0 恢复默认 90%；旧版 pt 宽度继续兼容，仅在主动编辑比例或选择快速风格后清除旧宽度覆盖。分离功能键大小扩展至 44–80pt，预览按同一上限适配。快速风格保留用户设置的紧凑低调（72% × 54pt）、均衡默认（80% × 60pt）、舒展高光（90% × 62pt），选择列表仅显示名称。经典悬浮、分离功能键、居中功能键三种结构及全部既有功能继续包含。本轮验证聚焦底栏尺寸、结构、交互、配置兼容和完整产物；**尚未安装原设备，实际画面与触摸体验仍需验收。**
 
-| 环境／产物    | 下载                                                                           | 说明                                                      |
-| -------- | ---------------------------------------------------------------------------- | ------------------------------------------------------- |
-| Rootless | [安装包](packages/2.9-7/com.wechat.improve_2.9-7_iphoneos-arm64.deb) | 安装至 `/var/jb/Library/MobileSubstrate/DynamicLibraries/` |
-| Rootful  | [安装包](packages/2.9-7/com.wechat.improve_2.9-7_iphoneos-arm.deb) | 安装至 `/Library/MobileSubstrate/DynamicLibraries/`        |
-| 重签用动态库   | [WeChatImprove.dylib](packages/2.9-7/WeChatImprove.dylib)              | 与 Rootful 包内动态库一致                                       |
-| 校验与调试    | [SHA-256 清单](packages/2.9-7/SHA256SUMS) · [调试符号](packages/2.9-7/symbols.zip) | 产物详情见[发布说明](packages/2.9-7/README.md)     |
+本版包含全部既有功能。完整产物按现有注入环境选择：
 
-本版聚焦分组手势、选择、搜索、滚动位置、页面转场生命周期与开关备份回归；两种安装包与符号的核验结果见随包说明。交付目录保留两种 deb、动态库、调试符号、校验清单和说明六个文件。主机检查不代表原设备触摸与视觉效果已通过验收。
+| 环境／产物 | 下载 | 说明 |
+| --- | --- | --- |
+| Rootless | [安装包](packages/3.0-2/com.wechat.improve_3.0-2_iphoneos-arm64.deb) | 安装至 `/var/jb/Library/MobileSubstrate/DynamicLibraries/` |
+| Rootful | [安装包](packages/3.0-2/com.wechat.improve_3.0-2_iphoneos-arm.deb) | 安装至 `/Library/MobileSubstrate/DynamicLibraries/` |
+| 重签用动态库 | [WeChatImprove.dylib](packages/3.0-2/WeChatImprove.dylib) | 与 Rootful 包内动态库一致 |
+| 校验与调试 | [SHA-256 清单](packages/3.0-2/SHA256SUMS) · [调试符号](packages/3.0-2/symbols.zip) | 产物详情见[发布说明](packages/3.0-2/README.md) |
+
+本轮构建与主机核验结果记录在[审计报告](audits/3.0-2/README.md)，不代替原设备运行验证。[3.0-1 历史安装包](packages/3.0-1/README.md)与[审计记录](audits/3.0-1/README.md)继续保留。[beta06 历史安装包](packages/2.9-11-beta06/README.md)、[beta05 历史安装包](packages/2.9-11-beta05/README.md)、[beta04 历史安装包](packages/2.9-11-beta04/README.md)、[beta03 历史安装包](packages/2.9-11-beta03/README.md)、[beta02 历史安装包](packages/2.9-11-beta02/README.md)、[beta01 历史安装包](packages/2.9-11-beta01/README.md)与既有历史发布继续保留。
 
 两种安装包均包含 `arm64` / `arm64e`。包名中的 `iphoneos-arm64` / `iphoneos-arm` 是打包方案的架构标识，应按注入环境选择。Roothide 保留源码构建入口，尚无当前版本的运行验证结论。仓库未提供可直接安装的 IPA 或一键重签流程。
 
@@ -72,7 +74,7 @@
 - **页面转场动画**：在“聊天分组 → 其他设置”中独立开启，默认关闭。横滑时，原页面跟随手指移出，真实相邻页面同步进入；取消或未达到切组阈值时回弹，确认后从当前进度完成剩余位移。松手收尾按剩余距离和速度控制在 `0.12–0.28` 秒。邻页预览与取消不保存选择，确认后才写入。开启指示器动画时，其拖动进度跟随实际页面；确认后从当前进度自然收尾，列表刷新不再提前将指示器直接推到目标。上一段收尾或回弹期间可继续横滑，按当前已提交分组接续；回到聊天页后，先完成待处理的位置恢复再准备首次预览。点击标签沿用原有直接切组，开关支持备份、恢复与重置，并遵循系统“减弱动态效果”。若短目标分组使顶部布局改变，或预览状态失效，则安全回退到原有直接切组；同一手势不重复渲染失败的预览。
 - **折叠的聊天**：跟随当前分组与密友规则筛选；折叠状态仍由微信全局管理。
 - **气泡与合并**：在“气泡样式”中配置圆角和浅深色收发配色。“连续消息合并”可独立开启，支持保留首条或末条头像，以及正常／紧密间距；昵称、头像和未适配的附加内容仍可能保留必要空间。
-- **列表与底栏**：“列表圆角”调整卡片、边距和背景；“底栏样式”配置悬浮布局、图标、文字与动画。系统开启“减弱动态效果”时停用相关动画。
+- **列表与底栏**：“列表圆角”调整卡片、边距和背景；“底栏样式”在开关下方以紧凑卡片实时预览，示例居中并随尺寸等比适配；下方使用常规分组和三段选择，提供经典悬浮、分离功能键、居中功能键三种结构，并分类配置尺寸位置、外观、交互、图标和文字。“快速风格”提供紧凑低调（72% × 54pt）、均衡默认（80% × 60pt）、舒展高光（90% × 62pt），选择列表仅显示名称，只有主动选择时才同时应用宽高；可继续输入 60–100% 的宽度比例和 44–80pt 的高度。宽度填 80 表示可用宽度的 80%，留空或 0 恢复默认 90%，窄屏保留必要的最小宽度。旧版保存的 176–1024pt 宽度继续生效，打开设置页不会改写配置；主动编辑比例或选择快速风格时清除旧 pt 覆盖，手动修改即时保存。底部“功能说明”点击打开弹窗。分离功能键支持 44–80pt 大小与 0–32pt 间距，预览与实际底栏共用 80pt 上限，调整间距时主栏宽度保持不变，屏幕边缘不足时限制实际间距；居中功能键按底栏宽度自动适配，支持 75%–180% 比例，按钮高度和图标同步变化，并以描边、阴影与轻度叠放形成突出效果。功能键默认扫一扫，可从快捷面板现有 21 个入口中独立选择。系统开启“减弱动态效果”时停用相关动画。
 
 列表圆角在通讯录、发现和“我”页面同步适配浅色、深色外观，包括卡片外围、分组标题和页脚；切换外观后刷新当前页面，保留各自配置的卡片颜色。底栏样式中的“选中图标颜色”可自定义，也可恢复微信原生默认；默认颜色跟随微信当前外观。上传的普通或选中图标优先保留图片原色，未上传选中图片时沿用普通上传图片，因此选中色仅用于实际使用原生图标的项目。
 
@@ -192,16 +194,21 @@ git clone https://github.com/ZhangSCzybh/WeChatImprove.git
 cd WeChatImprove
 xcrun --sdk iphoneos --show-sdk-path
 
-# Rootless
-make package -j4 THEOS="$HOME/theos" SCHEME=rootless \
-  PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
+task_version=$(awk '/^Version:/{print $2}' control)
+task_project=$PWD
+task_build_root=$(mktemp -d "${TMPDIR:-/tmp}/wechat-${task_version}.XXXXXX")
 
-# Rootful
-make package -j4 THEOS="$HOME/theos" SCHEME=rootful \
-  PACKAGE_VERSION="$(awk '/^Version:/{print $2}' control)"
+for task_scheme in rootless rootful; do
+  make package -j4 THEOS="$HOME/theos" SCHEME="$task_scheme" \
+    _THEOS_LOCAL_DATA_DIR="$task_build_root/build-$task_scheme" \
+    _THEOS_SWIFT_AUXILIARY_DIR="$task_build_root/swift-$task_scheme" \
+    THEOS_PACKAGE_DIR="$task_project/packages/$task_version" \
+    PACKAGE_VERSION="$task_version" PACKAGE_BUILDNAME= \
+    DEBUG=0 FINALPACKAGE=1 KEEP_LOGOS_INTERMEDIATES=1 || exit $?
+done
 ```
 
-Makefile 内含开发机的固定 Theos 路径，命令中应显式传入本机实际 `THEOS` 路径。上述示例从 `control` 读取版本，构建产物默认位于 `packages/`。Roothide 使用 `SCHEME=roothide`，需安装匹配的 Theos 方案支持。
+Makefile 内含开发机的固定 Theos 路径，命令中应显式传入本机实际 `THEOS` 路径。上述命令从 `control` 读取本版版本，两种方案各用独立临时构建目录，完整产物写入 `packages/3.0-2/`，保留调试符号与 Logos 中间文件。Roothide 使用 `SCHEME=roothide`，需安装匹配的 Theos 方案支持。
 
 > `make clean` 会删除整个 `.theos/` 和 `packages/`，包括已有安装包与调试符号。清理前先将需要保留的产物保存到这两个目录之外。
 

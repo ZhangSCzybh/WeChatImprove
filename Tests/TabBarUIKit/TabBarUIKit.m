@@ -44,7 +44,7 @@ static NSUInteger CSTestAnimationKind;
 - (CGPoint)center { return CGPointMake(CGRectGetMidX(self.frame),CGRectGetMidY(self.frame)); }
 - (void)setCenter:(CGPoint)center { CGRect frame=self.frame;frame.origin=CGPointMake(center.x-frame.size.width/2,center.y-frame.size.height/2);self.frame=frame; }
 - (UIWindow *)window { if ([self isKindOfClass:UIWindow.class]) return (id)self; return self.superview.window; }
-- (void)addSubview:(UIView *)view { [self insertSubview:view atIndex:self.subviews.count]; }
+- (void)addSubview:(UIView *)view { if (view.superview==self) [view removeFromSuperview]; [self insertSubview:view atIndex:self.subviews.count]; }
 - (void)insertSubview:(UIView *)view atIndex:(NSInteger)index { [view removeFromSuperview];view.superview=self;[self.subviews insertObject:view atIndex:index]; }
 - (void)removeFromSuperview { [self.superview.subviews removeObjectIdenticalTo:self];self.superview=nil; }
 - (BOOL)isDescendantOfView:(UIView *)view { for (UIView *v=self;v;v=v.superview) if(v==view)return YES;return NO; }
@@ -65,6 +65,7 @@ static NSUInteger CSTestAnimationKind;
 - (NSSet<UITouch *> *)touchesForView:(UIView *)view { return self.allTouches; }
 @end
 @implementation UIImage
++ (instancetype)systemImageNamed:(NSString *)name { UIImage *image=[self new];image.path=name;return image; }
 + (instancetype)imageWithContentsOfFile:(NSString *)path { if (![NSFileManager.defaultManager fileExistsAtPath:path]) return nil;UIImage *image=[self new];image.path=path;return image; }
 - (UIImage *)imageWithTintColor:(UIColor *)color renderingMode:(NSInteger)mode {
     UIImage *image=[UIImage new];image.sourceImage=self;image.appliedTint=color;image.renderedSize=self.renderedSize;return image;

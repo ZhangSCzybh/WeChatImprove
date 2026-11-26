@@ -1,6 +1,9 @@
 #import "CSTabBarNativeAdapter.h"
 #import "CSTabBarSwipeSwitcher.h"
 #import "CSTabBarPreferences.h"
+#import "CSTabBarGeometry.h"
+#import "CSQuickPanelPreferences.h"
+#import "CSQuickPanelActionRouter.h"
 #import <objc/runtime.h>
 #import <assert.h>
 
@@ -36,6 +39,25 @@ static void RemoveAllAnimations(CALayer *layer,SEL selector) {
     [objc_getAssociatedObject(layer,&SubmittedAnimationsKey) removeAllObjects];
     ((void(*)(id,SEL))originalRemoveAllAnimations)(layer,selector);
 }
+// Route acceptance is recorded here; native route behavior has its own suite.
+static NSUInteger functionActionCount;
+static NSString *lastFunctionAction;
+static UIViewController *lastFunctionSource;
+@implementation CSQuickPanelActionRouter
++ (BOOL)performActionWithIdentifier:(NSString *)identifier fromViewController:(UIViewController *)source {
+    functionActionCount++; lastFunctionAction=identifier; lastFunctionSource=source; return YES;
+}
+@end
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wincomplete-implementation"
+@implementation CSQuickPanelPreferences
++ (NSArray<NSString *> *)allActionIdentifiers {
+    return @[@"scan",@"wallet",@"moments",@"my_qrcode",@"favorites",@"plugin_home",@"profile",@"create_group",@"add_friend",@"emoji_store",@"panel_settings",@"payment_code",@"channels",@"file_transfer",@"chat_background",@"receive_code",@"my_moments",@"create_note",@"switch_account",@"dark_mode",@"global_search"];
+}
++ (NSString *)titleForActionIdentifier:(NSString *)identifier { return [self.allActionIdentifiers containsObject:identifier] ? identifier : nil; }
++ (NSString *)symbolNameForActionIdentifier:(NSString *)identifier { return [self.allActionIdentifiers containsObject:identifier] ? @"qrcode.viewfinder" : nil; }
+@end
+#pragma clang diagnostic pop
 static NSUserDefaults *isolated;
 static NSUserDefaults *TestDefaults(id self,SEL selector) { return isolated; }
 @implementation MMTabbarItem @end
@@ -112,6 +134,7 @@ static NSProcessInfoThermalState testThermalState=NSProcessInfoThermalStateNomin
 @end
 #import "TabBarClickEffectTests.h"
 #import "TabBarSelectedIconColorTests.h"
+#import "TabBarStructureTests.h"
 int main(int argc,const char *argv[]) { @autoreleasepool {
     NSString *suite=[@"com.wechatimprove.test.tabbar." stringByAppendingString:NSUUID.UUID.UUIDString];
     isolated=[[NSUserDefaults alloc] initWithSuiteName:suite];
@@ -292,6 +315,7 @@ int main(int argc,const char *argv[]) { @autoreleasepool {
         TestSelectedIconColor(bar,items,imagePath);
         TestClickEffects(controller,bar,items,buttons,suite,imagePath);
         TestModernTouchHierarchy(suite);
+        TestTabBarStructures(controller,bar,items,buttons,suite);
         // Border pulses must never tint a transparent bar interior or animate its background.
         [isolated setDouble:0 forKey:kTabBarBgColorAlphaKey];
         [isolated setDouble:1 forKey:kTabBarBorderColorAlphaKey];

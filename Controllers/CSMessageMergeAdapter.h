@@ -19,6 +19,9 @@ FOUNDATION_EXPORT unsigned long long CSMessageMergeHistoryContentHeight(id contr
 FOUNDATION_EXPORT void CSMessageMergeFlush(id controller);
 FOUNDATION_EXPORT void CSMessageMergeRestore(UIView *cellView);
 FOUNDATION_EXPORT void CSMessageMergeRender(UIView *cellView);
+FOUNDATION_EXPORT void CSMessageMergeNativeAnimationEnded(UIView *cellView);
+FOUNDATION_EXPORT void CSMessageMergePerformNativeLayout(UIView *cellView, void (^native)(void));
+FOUNDATION_EXPORT void CSMessageMergeNativeLayoutPassEnded(UIView *cellView);
 FOUNDATION_EXPORT void CSMessageMergeReuse(UIView *cellView);
 FOUNDATION_EXPORT BOOL CSMessageMergeHidesName(id model);
 FOUNDATION_EXPORT CGSize CSMessageMergeMeasure(id model, CGSize nativeSize);

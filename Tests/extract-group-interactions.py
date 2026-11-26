@@ -6,7 +6,7 @@ source = (Path(sys.argv[2]) if len(sys.argv) > 2 else root / 'Controllers/CSGrou
 methods = []
 for marker in ['- (void)cancelScheduledRefresh {', '- (void)consumeRefreshRequest {', '- (void)requestRecovery {', '- (void)ensureListPanHost {', '- (BOOL)groupPanMoving', '- (NSInteger)listZoneForTouch:', '- (BOOL)nativeMenuGesture:', '- (BOOL)closeMenusForGroupSwitch', '- (BOOL)gestureRecognizerShouldBegin:', '- (void)groupPan:', '- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gesture shouldBeRequiredToFailByGestureRecognizer:', '- (NSUInteger)nativeMenuState', '- (void)nativeMenuDidChange', '- (void)updateGroupGestureAvailability', '- (void)endSwipeEditing', '- (void)reconcileDeletedSwipeRow',
                '- (BOOL)performNativeEditingContext:', '- (BOOL)forwardSwipeInvocation:',
-               '- (void)selectSwipeIndex:(NSInteger)index direction:(NSInteger)direction {',
+               '- (void)selectSwipeIndex:(NSInteger)index {',
                '- (BOOL)keepsGroupHeaderDuringSearch', '+ (NSString *)groupTitleForTitleView:', '+ (void)recordNativeTitle:', '- (void)refreshNavigationTitle', '- (BOOL)groupSwipesAvailable',
                '- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gesture shouldReceiveTouch:']:
     if marker in ['- (BOOL)groupPanMoving', '- (NSInteger)listZoneForTouch:', '- (BOOL)nativeMenuGesture:', '- (BOOL)closeMenusForGroupSwitch'] and marker not in source:

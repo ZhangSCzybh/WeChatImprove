@@ -8,7 +8,15 @@
 @interface BaseMsgContentViewController : UIViewController @end
 @interface CommonMessageViewModel : NSObject @end
 @interface BaseMessageViewModel : NSObject @end
+@interface BaseChatCellView : UIView @end
 @interface CommonMessageCellView : UIView @end
+@interface TextMessageCellView : CommonMessageCellView @end
+@interface VoiceTransTextMessageCellView : TextMessageCellView
+- (BOOL)isAnimating;
+@end
+@interface VoiceTransTextMessageCellViewV2 : TextMessageCellView
+- (BOOL)isAnimating;
+@end
 
 %hook BaseMsgContentViewController
 - (void)viewDidLoad { %orig; CSMessageMergeActivate(self); }
@@ -109,6 +117,32 @@
 
 %hook BaseMessageViewModel
 - (void)resetLayoutCache { CSMessageMergeResetGeometry(self); %orig; }
+%end
+
+%hook BaseChatCellView
+- (void)layoutSubviews { %orig; CSMessageMergeNativeLayoutPassEnded((UIView *)self); }
+%end
+
+%hook CommonMessageCellView
+- (void)layoutInternal { CSMessageMergePerformNativeLayout((UIView *)self,^{ %orig; }); }
+%end
+
+// These native completions clear a flag without requesting the layout skipped
+// during the speech-to-text send animation.
+%hook VoiceTransTextMessageCellView
+- (void)setIsAnimating:(BOOL)animating {
+    BOOL wasAnimating=[self isAnimating];
+    %orig;
+    if (wasAnimating && !animating) CSMessageMergeNativeAnimationEnded((UIView *)self);
+}
+%end
+
+%hook VoiceTransTextMessageCellViewV2
+- (void)setIsAnimating:(BOOL)animating {
+    BOOL wasAnimating=[self isAnimating];
+    %orig;
+    if (wasAnimating && !animating) CSMessageMergeNativeAnimationEnded((UIView *)self);
+}
 %end
 
 %ctor {

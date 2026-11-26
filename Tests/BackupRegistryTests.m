@@ -97,6 +97,30 @@ int main(void) { @autoreleasepool {
         CHECK([CSBackupRegistry entryForDomain:@"legacy" key:key]==nil);
     }
     CHECK(Entry(@"com.wechat.enhance.tabbar_style.selected_icon_color.purple")==nil);
+    NSDictionary *contentWidth=Entry(@"com.wechat.enhance.tabbar_style.content_width");
+    CHECK([contentWidth[@"module"] isEqual:@"tabbar"] && [contentWidth[@"scope"] isEqual:@"global"] && [contentWidth[@"type"] isEqual:@"number"]);
+    for (NSNumber *value in @[@0,@176,@300.5,@1024]) CHECK(Valid(value,contentWidth));
+    for (id value in @[@(-1),@1,@175.99,@1024.01,@(NAN),@(INFINITY),@"300",@[@300]]) CHECK(!Valid(value,contentWidth));
+    CHECK([CSBackupRegistry entryForDomain:@"legacy" key:@"com.wechat.enhance.tabbar_style.content_width"]==nil);
+    NSDictionary *structure=Entry(@"com.wechat.enhance.tabbar_style.structure");
+    CHECK([structure[@"module"] isEqual:@"tabbar"] && [structure[@"scope"] isEqual:@"global"]);
+    CHECK(Valid(@0,structure) && Valid(@1,structure) && Valid(@2,structure));
+    CHECK(!Valid(@(-1),structure) && !Valid(@3,structure) && !Valid(@0.5,structure) && !Valid(@"1",structure));
+    for (NSArray *range in @[@[@"function_gap",@0,@32],@[@"function_size",@44,@80],@[@"center_button_scale",@0.75,@1.8]]) {
+        NSString *key=[@"com.wechat.enhance.tabbar_style." stringByAppendingString:range[0]];
+        NSDictionary *entry=Entry(key);
+        CHECK([entry[@"module"] isEqual:@"tabbar"] && [entry[@"scope"] isEqual:@"global"] && [entry[@"type"] isEqual:@"number"]);
+        CHECK(Valid(range[1],entry) && Valid(range[2],entry));
+        CHECK(!Valid(@([range[1] doubleValue]-0.01),entry) && !Valid(@([range[2] doubleValue]+0.01),entry));
+        CHECK(!Valid(@(NAN),entry) && !Valid(@(INFINITY),entry) && !Valid(@"52",entry));
+        CHECK([CSBackupRegistry entryForDomain:@"legacy" key:key]==nil);
+    }
+    NSDictionary *functionSize=Entry(@"com.wechat.enhance.tabbar_style.function_size");
+    CHECK(Valid(@72,functionSize) && Valid(@80,functionSize) && !Valid(@81,functionSize));
+    NSDictionary *functionAction=Entry(@"com.wechat.enhance.tabbar_style.function_action");
+    CHECK([functionAction[@"module"] isEqual:@"tabbar"] && [functionAction[@"type"] isEqual:@"string"]);
+    for (NSString *identifier in @[@"scan",@"wallet",@"moments",@"my_qrcode",@"favorites",@"plugin_home",@"profile",@"create_group",@"add_friend",@"emoji_store",@"panel_settings",@"payment_code",@"channels",@"file_transfer",@"chat_background",@"receive_code",@"my_moments",@"create_note",@"switch_account",@"dark_mode",@"global_search"]) CHECK(Valid(identifier,functionAction));
+    CHECK(!Valid(@"unknown",functionAction) && !Valid(@"",functionAction) && !Valid(@1,functionAction) && !Valid(@[@"scan"],functionAction));
     NSDictionary *panelEnabled=Entry(@"com.wechat.enhance.quick_panel.enabled");
     NSDictionary *panelLocations=Entry(@"com.wechat.enhance.quick_panel.trigger_locations");
     NSDictionary *panelActions=Entry(@"com.wechat.enhance.quick_panel.selected_actions");

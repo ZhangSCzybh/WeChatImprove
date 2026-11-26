@@ -1,0 +1,25 @@
+{
+  "version": "2.9-11-beta01",
+  "voice_animation_core": {
+    "command": "bash Tests/verify-merge-bubble-integration.sh --voice-animation-core",
+    "scenarios": 6,
+    "checks": 386,
+    "exit_code": 0
+  },
+  "merge": {
+    "command": "bash Tests/verify-message-merge.sh",
+    "policy_checks": 235148,
+    "adapter_checks": 41190,
+    "exit_code": 0
+  },
+  "gesture_lifecycle": {
+    "command": "bash Tests/verify-message-gesture.sh",
+    "checks": 370,
+    "exit_code": 0
+  },
+  "negative_controls": {
+    "actual_old_adapter_exit_code": 1,
+    "without_same_token_guard_exit_code": 1
+  },
+  "native_device_test": false
+}

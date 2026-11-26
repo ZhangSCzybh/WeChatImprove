@@ -1,0 +1,18 @@
+{
+  "CSGroupListAdapter.m": {
+    "diagnostics_off_tokens_equal": true,
+    "old_tokens": 34108,
+    "new_tokens": 34108
+  },
+  "CSGroupPageAnimator.m": {
+    "diagnostics_off_tokens_equal": true,
+    "old_tokens": 2114,
+    "new_tokens": 2114
+  },
+  "CSGroupNativeSessionCoordinator.m": {
+    "diagnostics_off_tokens_equal": true,
+    "old_tokens": 11648,
+    "new_tokens": 11648
+  },
+  "message_merge_unchanged": true
+}
