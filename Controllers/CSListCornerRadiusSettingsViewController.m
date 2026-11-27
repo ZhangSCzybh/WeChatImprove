@@ -3,6 +3,8 @@
 #import "CSSettingTableViewCell.h"
 
 #import "CSListCornerConfiguration.h"
+#import "CSListCornerPreviewView.h"
+#import "CSSettingsPreviewCell.h"
 
 @interface ListColorPreviewView : UIView
 @property (nonatomic, strong) UIColor *previewColor;
@@ -40,6 +42,8 @@
 @property (nonatomic, strong) CSSettingItem *normalSessionTopMarginBgColorItem;
 @property (nonatomic, strong) CSSettingItem *lightModeBgColorItem;
 @property (nonatomic, strong) CSSettingItem *darkModeBgColorItem;
+@property (nonatomic, strong) CSSettingItem *previewItem;
+@property (nonatomic, strong) CSListCornerPreviewView *stylePreview;
 
 @property (nonatomic, strong) ListColorPreviewView *lightModeBgColorPreview;
 @property (nonatomic, strong) ListColorPreviewView *darkModeBgColorPreview;
@@ -71,6 +75,7 @@
     self.tableView.separatorInset = UIEdgeInsetsMake(0, 54, 0, 0);
 
     [CSSettingTableViewCell registerToTableView:self.tableView];
+    [self.tableView registerClass:CSSettingsPreviewCell.class forCellReuseIdentifier:CSSettingsPreviewCell.reuseIdentifier];
 
     self.lightModeBgColorPreview = [[ListColorPreviewView alloc] initWithFrame:CGRectMake(0, 0, 28, 28)];
     self.darkModeBgColorPreview = [[ListColorPreviewView alloc] initWithFrame:CGRectMake(0, 0, 28, 28)];
@@ -79,6 +84,14 @@
 
     [self loadCurrentSettings];
     [self setupData];
+}
+
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+    if (!self.isViewLoaded || previousTraitCollection.userInterfaceStyle==self.traitCollection.userInterfaceStyle) return;
+    [self loadCurrentSettings];
+    [self setupData];
+    [self.tableView reloadData];
 }
 
 - (void)loadCurrentSettings {
@@ -136,8 +149,7 @@
                                                            switchValue:[[CSListCornerConfiguration sharedConfiguration] snapshot].enabled
                                                      valueChangedBlock:^(BOOL isOn) {
         [[CSListCornerConfiguration sharedConfiguration] saveEnabled:isOn];
-
-
+        [weakSelf refreshStylePreview];
         [weakSelf showRestartAlert];
     }];
 
@@ -231,23 +243,28 @@
         [weakSelf resetToDefaultSettings];
     };
 
-    CSSettingSection *mainSection = [CSSettingSection sectionWithHeader:@"功能设置"
-                                                                 items:@[listEnabledItem,
-                                                                         self.cornerRadiusItem,
-                                                                         self.leftMarginItem,
-                                                                         self.rightMarginItem,
-                                                                         self.topSessionTopMarginItem,
-                                                                         self.topSessionTopMarginBgColorItem,
-                                                                         self.normalSessionTopMarginItem,
-                                                                         self.normalSessionTopMarginBgColorItem]];
+    self.previewItem=[CSSettingItem itemWithTitle:@"样式预览" iconName:nil iconColor:nil detail:nil];
+    CSSettingSection *mainSection=[CSSettingSection sectionWithHeader:@"功能开关" items:@[listEnabledItem]];
+    CSSettingSection *previewSection=[CSSettingSection sectionWithHeader:@"样式预览" items:@[self.previewItem]];
+    CSSettingSection *shapeSection=[CSSettingSection sectionWithHeader:@"圆角与边距"
+        items:@[self.cornerRadiusItem,self.leftMarginItem,self.rightMarginItem]];
+    CSSettingSection *spacingSection=[CSSettingSection sectionWithHeader:@"会话间距与颜色"
+        items:@[self.topSessionTopMarginItem,self.topSessionTopMarginBgColorItem,
+                self.normalSessionTopMarginItem,self.normalSessionTopMarginBgColorItem]];
 
-    CSSettingSection *bgColorSection = [CSSettingSection sectionWithHeader:@"背景色设置"
+    CSSettingSection *bgColorSection = [CSSettingSection sectionWithHeader:@"列表背景"
                                                                      items:@[self.lightModeBgColorItem, self.darkModeBgColorItem]];
 
     CSSettingSection *resetSection = [CSSettingSection sectionWithHeader:@"重置设置"
                                                                   items:@[resetItem]];
 
-    self.sections = @[mainSection, bgColorSection, resetSection];
+    self.sections = @[mainSection, previewSection, shapeSection, spacingSection, bgColorSection, resetSection];
+    [self refreshStylePreview];
+}
+
+- (void)refreshStylePreview {
+    if (!self.stylePreview) self.stylePreview=[[CSListCornerPreviewView alloc] initWithFrame:CGRectZero];
+    [self.stylePreview configureWithSnapshot:[[CSListCornerConfiguration sharedConfiguration] snapshot]];
 }
 
 #pragma mark - Table view data source
@@ -262,6 +279,11 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     CSSettingItem *item = self.sections[indexPath.section].items[indexPath.row];
+    if (item==self.previewItem) {
+        CSSettingsPreviewCell *cell=[tableView dequeueReusableCellWithIdentifier:CSSettingsPreviewCell.reuseIdentifier forIndexPath:indexPath];
+        [cell configureWithPreview:self.stylePreview caption:@"示例会话 · 修改后更新预览，关闭功能仍可配置"];
+        return cell;
+    }
     CSSettingTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:[CSSettingTableViewCell reuseIdentifier] forIndexPath:indexPath];
     [cell configureWithItem:item];
 
@@ -283,16 +305,16 @@
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
-    switch (section) {
-        case 0:
-            return @"开启后将为微信、发现、我的页面的列表项添加圆角效果，重启后生效。距离背景色默认透明。";
-        case 1:
-            return @"点击可选择列表项背景颜色，支持自定义透明度。";
-        case 2:
-            return @"恢复默认的圆角、边距和颜色设置。";
-        default:
-            return nil;
-    }
+    NSString *header=self.sections[section].header;
+    if ([header isEqualToString:@"功能开关"]) return @"开启后为微信、通讯录、发现和“我”页面的列表应用圆角，重启微信后生效。";
+    if ([header isEqualToString:@"会话间距与颜色"]) return @"分别调整置顶与普通会话上方的距离和背景色；距离背景色默认透明，浅色与深色分别保存。";
+    if ([header isEqualToString:@"列表背景"]) return @"列表卡片随系统外观使用对应颜色，支持自定义透明度。";
+    if ([header isEqualToString:@"重置设置"]) return @"恢复默认的圆角、边距和颜色设置。";
+    return nil;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return self.sections[indexPath.section].items[indexPath.row]==self.previewItem ? 220 : tableView.rowHeight;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -683,6 +705,7 @@
     }
 
 
+    [self refreshStylePreview];
     [self.tableView reloadData];
 
     [self showRestartAlert];
@@ -690,6 +713,7 @@
 
 - (void)colorPickerViewControllerDidSelectColor:(UIColorPickerViewController *)viewController {
     UIColor *selectedColor = viewController.selectedColor;
+    [self.stylePreview previewColor:selectedColor component:self.currentColorType style:self.traitCollection.userInterfaceStyle];
 
     switch (self.currentColorType) {
         case 0:

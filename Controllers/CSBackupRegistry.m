@@ -279,6 +279,14 @@ static BOOL CSContacts(id value) {
             @[@"standard",@"com.wechat.enhance.tabbar_style.function_gap",@"tabbar",@"number",@"global",@""],
             @[@"standard",@"com.wechat.enhance.tabbar_style.function_size",@"tabbar",@"number",@"global",@""],
             @[@"standard",@"com.wechat.enhance.tabbar_style.center_button_scale",@"tabbar",@"number",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.tabbar_style.function_background_color.red",@"tabbar",@"number",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.tabbar_style.function_background_color.green",@"tabbar",@"number",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.tabbar_style.function_background_color.blue",@"tabbar",@"number",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.tabbar_style.function_background_color.alpha",@"tabbar",@"number",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.tabbar_style.function_icon_color.red",@"tabbar",@"number",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.tabbar_style.function_icon_color.green",@"tabbar",@"number",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.tabbar_style.function_icon_color.blue",@"tabbar",@"number",@"global",@""],
+            @[@"standard",@"com.wechat.enhance.tabbar_style.function_icon_color.alpha",@"tabbar",@"number",@"global",@""],
             @[@"standard",@"com.wechat.enhance.tabbar_style.haptic_feedback",@"tabbar",@"number",@"global",@""],
             @[@"standard",@"com.wechat.enhance.tabbar_style.hide_text",@"tabbar",@"bool",@"global",@""],
             @[@"standard",@"com.wechat.enhance.tabbar_style.icon.chat",@"tabbar",@"string",@"global",@"file"],
@@ -503,7 +511,10 @@ static BOOL CSContacts(id value) {
             if (valid && [key isEqual:@"com.wechat.enhance.quick_panel.background_opacity"]) valid=[value doubleValue]>=0 && [value doubleValue]<=1;
             if (valid && ([@[@"com.wechat.enhance.inputText.gesture.leftAction",@"com.wechat.enhance.inputText.gesture.rightAction"] containsObject:key]))
                 valid=[value doubleValue]>=0 && [value doubleValue]<=5 && floor([value doubleValue])==[value doubleValue];
-            if (valid && [key hasPrefix:@"com.wechat.enhance.tabbar_style.selected_icon_color."]) valid=[value doubleValue]>=0 && [value doubleValue]<=1;
+            if (valid && ([key hasPrefix:@"com.wechat.enhance.tabbar_style.selected_icon_color."] ||
+                          [key hasPrefix:@"com.wechat.enhance.tabbar_style.function_background_color."] ||
+                          [key hasPrefix:@"com.wechat.enhance.tabbar_style.function_icon_color."]))
+                valid=[value doubleValue]>=0 && [value doubleValue]<=1;
             if (valid && [key isEqual:@"com.wechat.enhance.tabbar_style.structure"]) valid=[value doubleValue]>=0 && [value doubleValue]<=2 && floor([value doubleValue])==[value doubleValue];
             if (valid && [key isEqual:@"com.wechat.enhance.tabbar_style.function_gap"]) valid=[value doubleValue]>=0 && [value doubleValue]<=32;
             if (valid && [key isEqual:@"com.wechat.enhance.tabbar_style.function_size"]) valid=[value doubleValue]>=44 && [value doubleValue]<=80;

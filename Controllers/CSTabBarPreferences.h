@@ -30,6 +30,16 @@ static NSString * const kTabBarFunctionActionKey = @"com.wechat.enhance.tabbar_s
 static NSString * const kTabBarFunctionGapKey = @"com.wechat.enhance.tabbar_style.function_gap";
 static NSString * const kTabBarFunctionSizeKey = @"com.wechat.enhance.tabbar_style.function_size";
 static NSString * const kTabBarCenterButtonScaleKey = @"com.wechat.enhance.tabbar_style.center_button_scale";
+static NSString * const kTabBarFunctionBackgroundColorKey = @"com.wechat.enhance.tabbar_style.function_background_color";
+static NSString * const kTabBarFunctionBackgroundColorRedKey = @"com.wechat.enhance.tabbar_style.function_background_color.red";
+static NSString * const kTabBarFunctionBackgroundColorGreenKey = @"com.wechat.enhance.tabbar_style.function_background_color.green";
+static NSString * const kTabBarFunctionBackgroundColorBlueKey = @"com.wechat.enhance.tabbar_style.function_background_color.blue";
+static NSString * const kTabBarFunctionBackgroundColorAlphaKey = @"com.wechat.enhance.tabbar_style.function_background_color.alpha";
+static NSString * const kTabBarFunctionIconColorKey = @"com.wechat.enhance.tabbar_style.function_icon_color";
+static NSString * const kTabBarFunctionIconColorRedKey = @"com.wechat.enhance.tabbar_style.function_icon_color.red";
+static NSString * const kTabBarFunctionIconColorGreenKey = @"com.wechat.enhance.tabbar_style.function_icon_color.green";
+static NSString * const kTabBarFunctionIconColorBlueKey = @"com.wechat.enhance.tabbar_style.function_icon_color.blue";
+static NSString * const kTabBarFunctionIconColorAlphaKey = @"com.wechat.enhance.tabbar_style.function_icon_color.alpha";
 
 static NSString * const kTabBarIconChatKey = @"com.wechat.enhance.tabbar_style.icon.chat";
 static NSString * const kTabBarIconContactsKey = @"com.wechat.enhance.tabbar_style.icon.contacts";
@@ -92,6 +102,10 @@ static NSString * const CSTabBarPreferencesDidChange = @"com.wechat.enhance.tabb
 @property(nonatomic) CSTabBarStructure structure;
 @property(nonatomic, copy) NSString *functionAction;
 @property(nonatomic) CGFloat functionGap, functionSize, centerButtonScale;
+// nil keeps the function key's native material or appearance-dependent icon color.
+// Loading either optional color never persists a default.
+@property(nonatomic, strong) UIColor *functionBackgroundColor;
+@property(nonatomic, strong) UIColor *functionIconColor;
 @property(nonatomic) CGFloat scale, contentHeight, contentWidth, lift, cornerRadius, borderWidth;
 @property(nonatomic) NSInteger borderStyle, haptic, animation;
 @property(nonatomic) CSTabBarClickEffect clickEffect;

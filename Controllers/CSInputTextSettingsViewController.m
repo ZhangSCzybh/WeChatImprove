@@ -1,6 +1,8 @@
 #import "CSInputTextStyle.h"
 #import "CSInputTextGesturePreferences.h"
 #import "CSInputTextSettingsViewController.h"
+#import "CSInputTextPreviewView.h"
+#import "CSSettingsPreviewCell.h"
 #import <UIKit/UIKit.h>
 
 // UserDefaults Key常量
@@ -27,6 +29,11 @@ static CGFloat const kDefaultCornerRadius = 18.0f;
 // 输入框边框默认值
 static CGFloat const kDefaultBorderWidth = 1.0f;
 
+@interface CSInputTextSettingsViewController ()
+@property(nonatomic, strong) CSSettingItem *previewItem;
+@property(nonatomic, strong) CSInputTextPreviewView *stylePreview;
+@end
+
 @implementation CSInputTextSettingsViewController
 
 - (void)viewDidLoad {
@@ -42,12 +49,17 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
     
     // 注册设置单元格
     [CSSettingTableViewCell registerToTableView:self.tableView];
+    [self.tableView registerClass:CSSettingsPreviewCell.class forCellReuseIdentifier:CSSettingsPreviewCell.reuseIdentifier];
     
     // 加载保存的颜色
     [self loadSavedColors];
     
     // 设置数据
     [self setupData];
+}
+
+- (void)refreshInputPreview {
+    [self.stylePreview reloadWithDefaults:NSUserDefaults.standardUserDefaults textColor:self.textColor borderColor:self.borderColor];
 }
 
 - (void)loadSavedColors {
@@ -99,6 +111,7 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
         [defaults setBool:isOn forKey:kInputTextEnabledKey];
         [defaults synchronize];
         CSInputTextStylePreferencesChanged();
+        [weakSelf refreshInputPreview];
         
         // 重新构建菜单并刷新整个表格
         [weakSelf setupData];
@@ -114,6 +127,7 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
         [defaults setBool:isOn forKey:kInputTextRoundedCornersKey];
         [defaults synchronize];
         CSInputTextStylePreferencesChanged();
+        [weakSelf refreshInputPreview];
         
         // 重新构建菜单并刷新整个表格
         [weakSelf setupData];
@@ -129,6 +143,7 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
         [defaults setBool:isOn forKey:kInputTextBorderEnabledKey];
         [defaults synchronize];
         CSInputTextStylePreferencesChanged();
+        [weakSelf refreshInputPreview];
         
         // 重新构建菜单并刷新整个表格
         [weakSelf setupData];
@@ -145,7 +160,11 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
     BOOL isBorderEnabled = [defaults boolForKey:kInputTextBorderEnabledKey];
     
     // 准备可能的section数组
-    NSMutableArray *sectionsArray = [NSMutableArray arrayWithObject:basicSection];
+    if (!self.stylePreview) self.stylePreview=[CSInputTextPreviewView new];
+    self.previewItem=[CSSettingItem itemWithTitle:@"样式预览" iconName:nil iconColor:nil detail:nil];
+    NSMutableArray *sectionsArray = [NSMutableArray arrayWithObjects:basicSection,
+        [CSSettingSection sectionWithHeader:@"样式预览" items:@[self.previewItem]],nil];
+    [self refreshInputPreview];
 
     // Input gestures are independent of placeholder and border appearance.
     CSSettingItem *gestureEnabledItem = [CSSettingItem switchItemWithTitle:@"启用输入框滑动"
@@ -247,6 +266,7 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
             [defaults setBool:isOn forKey:kInputTextBoldKey];
             [defaults synchronize];
             CSInputTextStylePreferencesChanged();
+            [weakSelf refreshInputPreview];
         }];
         
         CSSettingSection *styleSection = [CSSettingSection sectionWithHeader:@"样式设置" 
@@ -303,6 +323,11 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (self.sections[indexPath.section].items[indexPath.row]==self.previewItem) {
+        CSSettingsPreviewCell *previewCell=[tableView dequeueReusableCellWithIdentifier:CSSettingsPreviewCell.reuseIdentifier forIndexPath:indexPath];
+        [previewCell configureWithPreview:self.stylePreview caption:@"示例输入栏，按聊天比例展示占位、圆角和边框"];
+        return previewCell;
+    }
     CSSettingTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:[CSSettingTableViewCell reuseIdentifier]];
     
     // 获取当前项数据并配置cell
@@ -338,6 +363,11 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
     }
     
     return cell;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (self.sections[indexPath.section].items[indexPath.row]==self.previewItem) return 128;
+    return tableView.rowHeight;
 }
 
 // 为颜色项添加颜色预览指示器
@@ -493,6 +523,7 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
             [defaults setObject:inputValue forKey:kInputTextContentKey];
             [defaults synchronize];
             CSInputTextStylePreferencesChanged();
+            [self refreshInputPreview];
             
             // 更新UI
             // 找到内容设置组的索引
@@ -541,6 +572,7 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
         [defaults setFloat:fontSize forKey:kInputTextFontSizeKey];
         [defaults synchronize];
         CSInputTextStylePreferencesChanged();
+        [self refreshInputPreview];
         
         // 更新UI
         // 找到高级样式组的索引
@@ -590,6 +622,7 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
         [defaults setFloat:alpha forKey:kInputTextAlphaKey];
         [defaults synchronize];
         CSInputTextStylePreferencesChanged();
+        [self refreshInputPreview];
         
         // 更新UI
         // 找到高级样式组的索引
@@ -649,6 +682,7 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
     
     [defaults synchronize];
     CSInputTextStylePreferencesChanged();
+    [self refreshInputPreview];
     
     // 重新加载颜色指示器显示 - 根据section标题来刷新
     for (NSUInteger i = 0; i < self.sections.count; i++) {
@@ -671,6 +705,7 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
     } else {
         self.borderColor = selectedColor;
     }
+    [self refreshInputPreview];
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -714,6 +749,7 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
         [defaults setFloat:radius forKey:kInputTextCornerRadiusKey];
         [defaults synchronize];
         CSInputTextStylePreferencesChanged();
+        [self refreshInputPreview];
         
         // 更新UI
         // 找到圆角设置组的索引
@@ -762,6 +798,7 @@ static CGFloat const kDefaultBorderWidth = 1.0f;
         [defaults setFloat:width forKey:kInputTextBorderWidthKey];
         [defaults synchronize];
         CSInputTextStylePreferencesChanged();
+        [self refreshInputPreview];
         
         // 更新UI
         // 找到边框设置组的索引

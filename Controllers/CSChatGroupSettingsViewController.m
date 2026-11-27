@@ -2,6 +2,8 @@
 #import "WESessionTabItem.h"
 #import "CSGroupPreferences.h"
 #import "CSGroupAppearance.h"
+#import "CSChatGroupPreviewView.h"
+#import "CSSettingsPreviewCell.h"
 
 extern NSString *CSGroupCurrentAccountID(void);
 #import "CSSettingTableViewCell.h"
@@ -68,6 +70,9 @@ static NSString * const kScrollSensitivityKey = @"com.wechat.enhance.scroll_sens
 @property (nonatomic, weak) CSGroupColorPicker *activeColorPicker;
 @property (nonatomic, strong) CSGroupPreferences *groupPreferences;
 @property (nonatomic, strong) NSTimer *accountCheckTimer;
+@property (nonatomic, strong) CSSettingItem *previewItem;
+@property (nonatomic, strong) CSChatGroupPreviewView *groupPreview;
+@property (nonatomic, strong) CSSettingSection *mainSection, *groupSection, *appearanceSection, *badgeSection, *interactionSection, *filterSection;
 
 @end
 
@@ -82,6 +87,8 @@ static NSString * const kScrollSensitivityKey = @"com.wechat.enhance.scroll_sens
     self.tableView.separatorInset = UIEdgeInsetsMake(0, 54, 0, 0);
     
     [CSSettingTableViewCell registerToTableView:self.tableView];
+    [self.tableView registerClass:CSSettingsPreviewCell.class forCellReuseIdentifier:CSSettingsPreviewCell.reuseIdentifier];
+    self.groupPreview=[[CSChatGroupPreviewView alloc] initWithFrame:CGRectZero];
     
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"排序"
                                                                               style:UIBarButtonItemStylePlain
@@ -215,6 +222,7 @@ static NSString * const kScrollSensitivityKey = @"com.wechat.enhance.scroll_sens
 }
 
 - (void)reloadChatGroupSettings {
+    [self refreshGroupPreview];
     CFNotificationCenterPostNotification(
         CFNotificationCenterGetDarwinNotifyCenter(),
         CFSTR("com.wechat.enhance.chat_group.settings_changed"),
@@ -423,19 +431,41 @@ static NSString * const kScrollSensitivityKey = @"com.wechat.enhance.scroll_sens
         [weakSelf showInfoAlert];
     };
     
-    CSSettingSection *mainSection = [CSSettingSection sectionWithHeader:@"功能设置"
-                                                                 items:@[enableItem]];
-    
-    CSSettingSection *groupSection = [CSSettingSection sectionWithHeader:@"分组列表"
-                                                                  items:groupItems];
-    
-    CSSettingSection *otherSection = [CSSettingSection sectionWithHeader:@"其他设置"
-                                                                  items:@[fontSizeItem, searchButtonItem, indicatorColorItem, selectedTextColorItem, indicatorAnimationItem, hapticFeedbackItem, filterDuplicateItem, swipeGestureItem, pageTransitionItem, hideGroupBadgeItem, hideAllBadgeItem, scrollSensitivityItem]];
+    self.mainSection = [CSSettingSection sectionWithHeader:@"功能设置" items:@[enableItem]];
+    self.previewItem=[CSSettingItem itemWithTitle:@"样式预览" iconName:nil iconColor:nil detail:nil];
+    CSSettingSection *previewSection=[CSSettingSection sectionWithHeader:@"样式预览" items:@[self.previewItem]];
+    self.groupSection=[CSSettingSection sectionWithHeader:@"分组管理" items:groupItems];
+    self.appearanceSection=[CSSettingSection sectionWithHeader:@"标签与指示器" items:@[fontSizeItem,searchButtonItem,indicatorColorItem,selectedTextColorItem,indicatorAnimationItem]];
+    self.badgeSection=[CSSettingSection sectionWithHeader:@"角标显示" items:@[hideGroupBadgeItem,hideAllBadgeItem]];
+    self.interactionSection=[CSSettingSection sectionWithHeader:@"切换与手势" items:@[hapticFeedbackItem,swipeGestureItem,pageTransitionItem,scrollSensitivityItem]];
+    self.filterSection=[CSSettingSection sectionWithHeader:@"会话筛选" items:@[filterDuplicateItem]];
     
     CSSettingSection *infoSection = [CSSettingSection sectionWithHeader:@""
                                                                   items:@[infoItem]];
     
-    self.sections = @[mainSection, groupSection, otherSection, infoSection];
+    self.sections = @[self.mainSection,previewSection,self.groupSection,self.appearanceSection,self.badgeSection,self.interactionSection,self.filterSection,infoSection];
+    [self refreshGroupPreview];
+}
+
+- (BOOL)isGroupSectionAtIndex:(NSInteger)section {
+    return section>=0 && section<(NSInteger)self.sections.count && self.sections[(NSUInteger)section]==self.groupSection;
+}
+
+- (void)refreshGroupPreview {
+    if (!self.groupPreview) return;
+    NSMutableArray<WESessionTabItem *> *tabs=[NSMutableArray array];
+    for (NSString *tabID in self.tabOrder) {
+        if ([self.hiddenPresetTabs containsObject:tabID]) continue;
+        WESessionTabItem *source=[self customTabWithID:tabID];
+        WESessionTabItem *tab=nil;
+        if ([tabID hasPrefix:@"preset_"]) tab=[WESessionTabItem tabWithType:(WETabType)[[tabID substringFromIndex:7] integerValue]];
+        else if (source) { tab=[WESessionTabItem new]; tab.type=source.type; tab.tabId=source.tabId; tab.tabName=source.tabName; }
+        if (!tab) continue;
+        NSString *name=self.presetTabNames[tabID];
+        if (name.length) tab.tabName=name;
+        [tabs addObject:tab];
+    }
+    [self.groupPreview configureWithTabs:tabs];
 }
 
 #pragma mark - UITableViewDataSource
@@ -450,6 +480,11 @@ static NSString * const kScrollSensitivityKey = @"com.wechat.enhance.scroll_sens
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     CSSettingItem *item = self.sections[indexPath.section].items[indexPath.row];
+    if (item==self.previewItem) {
+        CSSettingsPreviewCell *cell=[tableView dequeueReusableCellWithIdentifier:CSSettingsPreviewCell.reuseIdentifier forIndexPath:indexPath];
+        [cell configureWithPreview:self.groupPreview caption:@"示例消息与角标；点选标签仅切换预览"];
+        return cell;
+    }
     CSSettingTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:[CSSettingTableViewCell reuseIdentifier] forIndexPath:indexPath];
     [cell configureWithItem:item];
     
@@ -466,14 +501,25 @@ static NSString * const kScrollSensitivityKey = @"com.wechat.enhance.scroll_sens
     return self.sections[section].header;
 }
 
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return self.sections[indexPath.section].items[indexPath.row]==self.previewItem ? 200 : tableView.rowHeight;
+}
+
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
-    if (section == 0) {
+    CSSettingSection *model=self.sections[section];
+    if (model==self.mainSection) {
         return @"开启后，聊天列表顶部将显示会话分组，可快速切换查看不同类型的会话，在列表安全更新后生效";
-    } else if (section == 1) {
+    } else if (model==self.groupSection) {
         if (!self.groupPreferences.accountID.length) return @"当前账号尚未确认，账号分组暂不可编辑；确认登录账号后将自动载入。";
         return @"点击右上角\"排序\"可拖拽调整分组顺序，左滑可编辑或隐藏或删除";
-    } else if (section == 2){
-        return @"分组标签字号：默认 18 pt，可自定义 12–28 pt，并随系统文字大小缩放。\n显示分组栏搜索按钮：开启时使用标签栏右侧搜索入口，收起聊天列表整块原生搜索区域（含背景、留白和占位）；关闭时恢复。\n添加分组：请在本页点击“添加自定义分组”。\n过滤重复会话：开启后分组内的好友、群聊将不会出现在私信和群列表，在列表安全更新后生效。\n分组切换手势：在会话区域左侧 85% 起手横滑可切换分组；从会话右侧 15% 起手左滑可展开原生菜单。按手指落点区分，滑动中途不改变用途；菜单展开时暂停切组。分组栏也支持横滑，标签过多时优先滚动标签。\n页面转场动画：默认关闭；开启后，横滑时原页与相邻页跟随手指移动，取消回弹，松手确认后进入新页，遵循系统减弱动态效果。\n隐藏分组角标：隐藏除\"全部\"外的其他分组角标。\n隐藏全部角标：隐藏\"全部\"分组的角标。\n滑动灵敏度：建议默认，相对流畅。\n分组指示器切换动画：可选下划线、胶囊包裹或关闭，升级沿用原开关状态。下划线保留移动伸展；胶囊按下时立即以 Neo 的0.12秒 EaseOut预览，仅背景微扩至1.08×1.04，标题和角标不缩放；松手沿用单次选择，取消或滑出标签时恢复；选中及横滑过渡沿用0.28秒，背景直接使用指示器颜色，标题使用选中文本颜色。关闭后保留下划线并直接落位。遵循系统减弱动态效果。";
+    } else if (model==self.appearanceSection) {
+        return @"字号支持 12–28 pt，并随系统文字大小缩放。搜索按钮开启时收起聊天列表整块原生搜索区域，关闭时恢复。颜色按浅色／深色分别保存。指示器可选下划线、胶囊包裹或关闭，关闭后保留静态下划线。";
+    } else if (model==self.badgeSection) {
+        return @"分组角标与“全部”角标分别控制；预览数字仅为示例，不代表实际未读数。";
+    } else if (model==self.interactionSection) {
+        return @"会话区域左侧 85% 起手横滑切组，右侧 15% 起手左滑展开原生菜单；分组标签过多时优先滚动标签。页面转场动画默认关闭，开启后横滑跟手、取消回弹；动画遵循系统减弱动态效果。";
+    } else if (model==self.filterSection) {
+        return @"开启过滤后，自定义分组内的好友、群聊不再重复出现在私聊和群聊分组，在列表安全更新后生效。";
     } else {
         return nil;
     }
@@ -719,20 +765,20 @@ static NSString * const kScrollSensitivityKey = @"com.wechat.enhance.scroll_sens
 }
 
 - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section != 1 || !self.groupPreferences.accountID.length) return NO;
+    if (![self isGroupSectionAtIndex:indexPath.section] || !self.groupPreferences.accountID.length) return NO;
     
     NSInteger totalTabs = self.tabOrder.count;
     return indexPath.row < totalTabs;
 }
 
 - (NSIndexPath *)tableView:(UITableView *)tableView targetIndexPathForMoveFromRowAtIndexPath:(NSIndexPath *)sourceIndexPath toProposedIndexPath:(NSIndexPath *)proposedDestinationIndexPath {
-    if (proposedDestinationIndexPath.section != 1) {
+    if (![self isGroupSectionAtIndex:sourceIndexPath.section] || ![self isGroupSectionAtIndex:proposedDestinationIndexPath.section]) {
         return sourceIndexPath;
     }
     
     NSInteger totalTabs = self.tabOrder.count;
     if (proposedDestinationIndexPath.row >= totalTabs) {
-        return [NSIndexPath indexPathForRow:totalTabs - 1 inSection:1];
+        return totalTabs>0 ? [NSIndexPath indexPathForRow:totalTabs - 1 inSection:sourceIndexPath.section] : sourceIndexPath;
     }
     
     return proposedDestinationIndexPath;
@@ -740,7 +786,7 @@ static NSString * const kScrollSensitivityKey = @"com.wechat.enhance.scroll_sens
 
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
     if ([self refreshAccountIfNeeded] || !self.groupPreferences.accountID.length) return;
-    if (sourceIndexPath.section != 1 || destinationIndexPath.section != 1) return;
+    if (![self isGroupSectionAtIndex:sourceIndexPath.section] || ![self isGroupSectionAtIndex:destinationIndexPath.section]) return;
     if (sourceIndexPath.row >= self.tabOrder.count || destinationIndexPath.row >= self.tabOrder.count) return;
     
     NSString *movedTabId = self.tabOrder[sourceIndexPath.row];
@@ -756,7 +802,7 @@ static NSString * const kScrollSensitivityKey = @"com.wechat.enhance.scroll_sens
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     if ([self refreshAccountIfNeeded]) return;
     
-    if (indexPath.section == 1) {
+    if ([self isGroupSectionAtIndex:indexPath.section]) {
         NSInteger totalTabs = self.tabOrder.count;
         if (indexPath.row < totalTabs) {
             NSString *tabId = self.tabOrder[indexPath.row];
@@ -896,7 +942,7 @@ static NSString * const kScrollSensitivityKey = @"com.wechat.enhance.scroll_sens
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section != 1 || !self.groupPreferences.accountID.length) return NO;
+    if (![self isGroupSectionAtIndex:indexPath.section] || !self.groupPreferences.accountID.length) return NO;
     
     NSInteger totalTabs = self.tabOrder.count;
     return indexPath.row < totalTabs;
@@ -908,7 +954,7 @@ static NSString * const kScrollSensitivityKey = @"com.wechat.enhance.scroll_sens
 
 - (UISwipeActionsConfiguration *)tableView:(UITableView *)tableView trailingSwipeActionsConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath {
     if ([self refreshAccountIfNeeded] || !self.groupPreferences.accountID.length) return nil;
-    if (indexPath.section != 1 || indexPath.row >= self.tabOrder.count) return nil;
+    if (![self isGroupSectionAtIndex:indexPath.section] || indexPath.row >= self.tabOrder.count) return nil;
     NSString *accountID = [self.groupPreferences.accountID copy];
     NSString *tabID = [self.tabOrder[indexPath.row] copy];
     __weak typeof(self) weakSelf = self;

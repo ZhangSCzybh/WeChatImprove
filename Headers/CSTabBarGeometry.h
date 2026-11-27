@@ -29,7 +29,7 @@ static inline CSTabBarRect CSTabBarFloatingRectWithWidth(double hostWidth, doubl
     return rect;
 }
 static inline CSTabBarQuickStyle CSTabBarQuickStyleAtIndex(unsigned index) {
-    if (index==0) return (CSTabBarQuickStyle){.72,58};
+    if (index==0) return (CSTabBarQuickStyle){.72,54};
     if (index==1) return (CSTabBarQuickStyle){.8,60};
     return (CSTabBarQuickStyle){.9,62};
 }

@@ -89,6 +89,7 @@ static void CSSetFrame(UIView *view, CGRect frame) {
 @property(nonatomic, strong) CAShapeLayer *functionBorder;
 @property(nonatomic, copy) NSString *renderedFunctionAction;
 @property(nonatomic) UIUserInterfaceStyle renderedFunctionStyle;
+@property(nonatomic, strong) UIColor *renderedFunctionColor;
 - (void)performFunctionAction;
 @property(nonatomic, strong) UIColor *nativeBackground;
 @property(nonatomic, strong) NSMapTable<UIView *,NSNumber *> *backgroundHidden;
@@ -697,14 +698,20 @@ static void CSRenderFunction(CSTabBarState *s, UIView *container) {
     CGFloat radius=MIN(s.functionRect.size.width,s.functionRect.size.height)/2;
     s.functionButton.layer.cornerRadius=radius;
     s.functionMaterial.layer.cornerRadius=radius; s.functionMaterial.clipsToBounds=YES;
-    s.functionMaterial.hidden=p.backgroundColor!=nil;
-    s.functionButton.backgroundColor=p.backgroundColor ?: s.nativeBackground ?: UIColor.clearColor;
+    s.functionMaterial.hidden=p.functionBackgroundColor!=nil;
+    // A snapshot inherits the live native material, independently of the main
+    // surface's custom background and the snapshot's temporary background.
+    MMTabBar *nativeBar=s.snapshotSource ?: s.bar;
+    CSTabBarState *nativeState=s.snapshotSource ? CSState(s.snapshotSource,NO) : s;
+    s.functionButton.backgroundColor=p.functionBackgroundColor ?: nativeState.nativeBackground ?: CSNativeBackground(nativeBar).backgroundColor ?: UIColor.clearColor;
     BOOL dark=s.bar.traitCollection.userInterfaceStyle==UIUserInterfaceStyleDark;
-    UIColor *foreground=[UIColor colorWithRed:dark?1:0 green:dark?1:0 blue:dark?1:0 alpha:1];
-    if (![s.renderedFunctionAction isEqualToString:p.functionAction] || s.renderedFunctionStyle!=s.bar.traitCollection.userInterfaceStyle) {
+    UIColor *foreground=[(p.functionIconColor ?: [UIColor colorWithRed:dark?1:0 green:dark?1:0 blue:dark?1:0 alpha:1]) resolvedColorWithTraitCollection:s.bar.traitCollection];
+    BOOL changedColor=!s.renderedFunctionColor || !CGColorEqualToColor(s.renderedFunctionColor.CGColor,foreground.CGColor);
+    if (![s.renderedFunctionAction isEqualToString:p.functionAction] || s.renderedFunctionStyle!=s.bar.traitCollection.userInterfaceStyle || changedColor) {
         NSString *symbol=[CSQuickPanelPreferences symbolNameForActionIdentifier:p.functionAction] ?: @"qrcode.viewfinder";
         s.functionImage.image=[[UIImage systemImageNamed:symbol] imageWithTintColor:foreground renderingMode:UIImageRenderingModeAlwaysOriginal];
         s.renderedFunctionAction=p.functionAction; s.renderedFunctionStyle=s.bar.traitCollection.userInterfaceStyle;
+        s.renderedFunctionColor=foreground;
     }
     BOOL centered=p.structure==CSTabBarStructureCentered;
     CGFloat edge=MIN(s.functionRect.size.width,s.functionRect.size.height);

@@ -2,6 +2,8 @@
 #import "CSManagedImageFile.h"
 #import "CSNavigationTitleSettingsViewController.h"
 #import "CSSettingTableViewCell.h"
+#import "CSSettingsPreviewCell.h"
+#import "CSNavigationTitlePreviewView.h"
 #import <objc/runtime.h>
 
 // 常量定义
@@ -64,7 +66,8 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
 @property (nonatomic, assign) CGFloat avatarSpacing; // 添加头像间距属性
 @property (nonatomic, assign) CGFloat verticalOffset; // 添加垂直偏移属性
 @property (nonatomic, strong) UIImage *separatorImage; // 添加分隔符图片属性
-@property (nonatomic, strong) UIButton *previewButton; // 预览按钮
+@property (nonatomic, strong) CSSettingItem *titlePreviewItem;
+@property (nonatomic, strong) CSNavigationTitlePreviewView *titlePreviewView;
 // 新增网名位置和大小属性
 @property (nonatomic, assign) CSNavigationNicknamePosition nicknamePosition;
 @property (nonatomic, assign) CGFloat nicknameSize;
@@ -88,6 +91,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
     
     // 注册单元格
     [CSSettingTableViewCell registerToTableView:self.tableView];
+    [self.tableView registerClass:CSSettingsPreviewCell.class forCellReuseIdentifier:CSSettingsPreviewCell.reuseIdentifier];
     
     // 加载设置
     [self loadSettings];
@@ -244,13 +248,41 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
     
     // 可选：发送通知，让正在显示的头像视图立即更新
     [[NSNotificationCenter defaultCenter] postNotificationName:@"CSNavigationTitleSettingsChanged" object:nil];
+    [self refreshTitlePreview];
 }
 
 #pragma mark - 数据设置
 
+- (void)refreshTitlePreview {
+    if (!self.titlePreviewView) self.titlePreviewView=[CSNavigationTitlePreviewView new];
+    CSNavigationTitlePreviewConfiguration *snapshot=[CSNavigationTitlePreviewConfiguration new];
+    snapshot.enabled=self.showAvatar;
+    snapshot.showSelfAvatar=self.showSelfAvatar;
+    snapshot.showOtherAvatar=self.showOtherAvatar;
+    snapshot.showNickname=self.showOtherNickname;
+    snapshot.showRemarkName=self.showRemarkName;
+    snapshot.avatarSize=self.avatarSize;
+    snapshot.avatarRadius=self.avatarRadius;
+    snapshot.separatorSize=self.separatorSize;
+    snapshot.avatarSpacing=self.avatarSpacing;
+    snapshot.verticalOffset=self.verticalOffset;
+    snapshot.nicknameSize=self.nicknameSize;
+    snapshot.nicknamePosition=self.nicknamePosition;
+    snapshot.separatorText=[NSUserDefaults.standardUserDefaults stringForKey:kNavigationSeparatorTextKey] ?: @"💗";
+    snapshot.separatorImage=self.separatorImage;
+    [self.titlePreviewView configureWithSettings:snapshot];
+}
+
+- (CSSettingSection *)titlePreviewSection {
+    if (!self.titlePreviewItem) self.titlePreviewItem=[CSSettingItem itemWithTitle:@"顶栏样式预览" iconName:nil iconColor:nil detail:nil];
+    [self refreshTitlePreview];
+    return [CSSettingSection sectionWithHeader:@"样式预览" items:@[self.titlePreviewItem]];
+}
+
 - (void)setupData {
     // 基本设置组
     __weak typeof(self) weakSelf = self;
+    CSSettingSection *previewSection=[self titlePreviewSection];
     
     // 1. 显示头像开关
     CSSettingItem *showAvatarItem = [CSSettingItem switchItemWithTitle:@"显示会话头像" 
@@ -263,15 +295,9 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
         // 删除自动开启所有场景的逻辑，让用户自行控制各场景设置
         [weakSelf saveSettings];
         
-        // 如果关闭了头像显示，则刷新整个表格（隐藏头像模式选择）
-        if (!isOn) {
-            [weakSelf setupData];
-            [weakSelf.tableView reloadData];
-        } else if (weakSelf.sections.count == 1) {
-            // 如果开启了头像显示，并且当前只有一个分组，则刷新整个表格（显示详细设置）
-            [weakSelf setupData];
-            [weakSelf.tableView reloadData];
-        }
+        // The trailing preview is always present; rebuild details by the switch state.
+        [weakSelf setupData];
+        [weakSelf.tableView reloadData];
     }];
     
     // 2. 点击头像显示信息开关
@@ -290,7 +316,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
     
     // 如果没有启用头像显示，则只显示基本设置组
     if (!self.showAvatar) {
-        self.sections = @[basicSection];
+        self.sections = @[basicSection, previewSection];
         return;
     }
     
@@ -768,7 +794,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
                                                                       items:appearanceItems];
         
         // 设置数据 - 包含网名设置分区
-        self.sections = @[basicSection, sceneSection, displaySection, nicknameSection, appearanceSection];
+        self.sections = @[basicSection, sceneSection, displaySection, nicknameSection, appearanceSection, previewSection];
     } else {
         // 在同时显示两个头像模式下添加分隔符相关设置项
         if (self.showSelfAvatar && self.showOtherAvatar) {
@@ -916,7 +942,7 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
                                                                       items:appearanceItems];
         
         // 设置数据 - 包含网名设置分区
-        self.sections = @[basicSection, sceneSection, displaySection, appearanceSection];
+        self.sections = @[basicSection, sceneSection, displaySection, appearanceSection, previewSection];
     }
 }
 
@@ -931,10 +957,15 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    CSSettingTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:[CSSettingTableViewCell reuseIdentifier]];
-    
     // 获取当前项数据
     CSSettingItem *item = self.sections[indexPath.section].items[indexPath.row];
+    if (item==self.titlePreviewItem) {
+        CSSettingsPreviewCell *cell=[tableView dequeueReusableCellWithIdentifier:CSSettingsPreviewCell.reuseIdentifier forIndexPath:indexPath];
+        [self refreshTitlePreview];
+        [cell configureWithPreview:self.titlePreviewView caption:self.showAvatar ? @"示例头像与名称 · 按当前外观设置展示" : @"功能已关闭 · 当前显示微信原生标题示例"];
+        return cell;
+    }
+    CSSettingTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:[CSSettingTableViewCell reuseIdentifier]];
     
     // 特殊处理分隔符设置项
     if ([item.title isEqualToString:@"设置分隔符号"] && self.separatorImage) {
@@ -969,6 +1000,10 @@ CGFloat const kMaxNicknameSize = 24.0f;        // 最大网名字体大小
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
     return self.sections[section].header;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return self.sections[indexPath.section].items[indexPath.row]==self.titlePreviewItem ? 190 : tableView.rowHeight;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {

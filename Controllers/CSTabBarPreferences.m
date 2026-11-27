@@ -47,6 +47,8 @@ static CGFloat CSLayoutNumber(NSUserDefaults *d, NSString *key, CGFloat fallback
     p.functionGap=CSLayoutNumber(d,kTabBarFunctionGapKey,12,0,32);
     p.functionSize=CSLayoutNumber(d,kTabBarFunctionSizeKey,52,44,80);
     p.centerButtonScale=CSLayoutNumber(d,kTabBarCenterButtonScaleKey,1,.75,1.8);
+    p.functionBackgroundColor=[self colorInDefaults:d prefix:kTabBarFunctionBackgroundColorKey];
+    p.functionIconColor=[self colorInDefaults:d prefix:kTabBarFunctionIconColorKey];
     p.scale=CSNumber(d,kTabBarScaleKey,kDefaultScale,.6,1);
     p.contentHeight=CSNumber(d,kTabBarContentHeightKey,52,44,80);
     id contentWidth=[d objectForKey:kTabBarContentWidthKey];

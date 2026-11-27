@@ -97,6 +97,20 @@ int main(void) { @autoreleasepool {
         CHECK([CSBackupRegistry entryForDomain:@"legacy" key:key]==nil);
     }
     CHECK(Entry(@"com.wechat.enhance.tabbar_style.selected_icon_color.purple")==nil);
+    for (NSString *color in @[@"function_background_color",@"function_icon_color"]) {
+        NSString *colorPrefix=[@"com.wechat.enhance.tabbar_style." stringByAppendingString:color];
+        for (NSString *component in @[@"red",@"green",@"blue",@"alpha"]) {
+            NSString *key=[[colorPrefix stringByAppendingString:@"."] stringByAppendingString:component];
+            NSDictionary *entry=Entry(key);
+            CHECK([entry[@"module"] isEqual:@"tabbar"] && [entry[@"scope"] isEqual:@"global"] &&
+                  [entry[@"type"] isEqual:@"number"] && [entry[@"domain"] isEqual:@"standard"] && entry[@"resource"]==nil);
+            CHECK(Valid(@0,entry) && Valid(@0.5,entry) && Valid(@1,entry));
+            for (id value in @[@(-0.01),@1.01,@(NAN),@(INFINITY),@"0.5",NSNull.null,@[],@{}]) CHECK(!Valid(value,entry));
+            CHECK([CSBackupRegistry entryForDomain:@"legacy" key:key]==nil);
+        }
+        for (NSString *suffix in @[@"",@".purple",@".alpha.extra"])
+            CHECK(Entry([colorPrefix stringByAppendingString:suffix])==nil);
+    }
     NSDictionary *contentWidth=Entry(@"com.wechat.enhance.tabbar_style.content_width");
     CHECK([contentWidth[@"module"] isEqual:@"tabbar"] && [contentWidth[@"scope"] isEqual:@"global"] && [contentWidth[@"type"] isEqual:@"number"]);
     for (NSNumber *value in @[@0,@176,@300.5,@1024]) CHECK(Valid(value,contentWidth));

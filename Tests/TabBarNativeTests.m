@@ -135,6 +135,7 @@ static NSProcessInfoThermalState testThermalState=NSProcessInfoThermalStateNomin
 #import "TabBarClickEffectTests.h"
 #import "TabBarSelectedIconColorTests.h"
 #import "TabBarStructureTests.h"
+#import "TabBarFunctionColorTests.h"
 int main(int argc,const char *argv[]) { @autoreleasepool {
     NSString *suite=[@"com.wechatimprove.test.tabbar." stringByAppendingString:NSUUID.UUID.UUIDString];
     isolated=[[NSUserDefaults alloc] initWithSuiteName:suite];
@@ -316,6 +317,7 @@ int main(int argc,const char *argv[]) { @autoreleasepool {
         TestClickEffects(controller,bar,items,buttons,suite,imagePath);
         TestModernTouchHierarchy(suite);
         TestTabBarStructures(controller,bar,items,buttons,suite);
+        TestTabBarFunctionColors(suite);
         // Border pulses must never tint a transparent bar interior or animate its background.
         [isolated setDouble:0 forKey:kTabBarBgColorAlphaKey];
         [isolated setDouble:1 forKey:kTabBarBorderColorAlphaKey];

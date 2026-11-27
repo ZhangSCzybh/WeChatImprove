@@ -141,15 +141,15 @@ static CGRect CSPreviewRect(CSTabBarRect rect) {
     CGFloat actionRadius=MIN(CGRectGetWidth(self.functionSurface.bounds),CGRectGetHeight(self.functionSurface.bounds))/2;
     self.functionSurface.layer.cornerRadius=actionRadius;
     self.functionMaterial.layer.cornerRadius=actionRadius; self.functionMaterial.clipsToBounds=YES;
-    self.functionMaterial.hidden=p.backgroundColor!=nil;
-    self.functionSurface.backgroundColor=p.backgroundColor ?: UIColor.tertiarySystemGroupedBackgroundColor;
+    self.functionMaterial.hidden=p.functionBackgroundColor!=nil;
+    self.functionSurface.backgroundColor=p.functionBackgroundColor ?: UIColor.tertiarySystemGroupedBackgroundColor;
     BOOL centered=p.structure==CSTabBarStructureCentered;
     BOOL dark=self.traitCollection.userInterfaceStyle==UIUserInterfaceStyleDark;
     self.functionSurface.layer.borderWidth=p.borderColor ? p.borderWidth : (centered ? 1.25 : 0);
     UIColor *functionOutline=p.borderColor ?: [UIColor colorWithWhite:dark ? 1 : 0 alpha:.18];
     self.functionSurface.layer.borderColor=[functionOutline resolvedColorWithTraitCollection:self.traitCollection].CGColor;
     self.functionImage.image=[UIImage systemImageNamed:[CSQuickPanelPreferences symbolNameForActionIdentifier:p.functionAction] ?: @"qrcode.viewfinder"];
-    self.functionImage.tintColor=UIColor.labelColor;
+    self.functionImage.tintColor=[(p.functionIconColor ?: [UIColor colorWithRed:dark?1:0 green:dark?1:0 blue:dark?1:0 alpha:1]) resolvedColorWithTraitCollection:self.traitCollection];
     CGFloat minimumSide=MIN(CGRectGetWidth(self.functionSurface.bounds),CGRectGetHeight(self.functionSurface.bounds));
     CGFloat actionIcon=centered ? MIN(42,MAX(22,minimumSide*.56)) : MIN(32,MAX(20,minimumSide*.48));
     self.functionImage.frame=CGRectMake((CGRectGetWidth(self.functionSurface.bounds)-actionIcon)/2,(CGRectGetHeight(self.functionSurface.bounds)-actionIcon)/2,actionIcon,actionIcon);

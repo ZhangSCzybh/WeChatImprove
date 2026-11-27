@@ -25,6 +25,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
 @property (nonatomic, strong) CSSettingItem *swipeSwitchItem;
 @property (nonatomic, strong) CSSettingItem *previewItem, *structureItem, *functionActionItem;
 @property (nonatomic, strong) CSSettingItem *functionGapItem, *functionSizeItem, *centerButtonScaleItem;
+@property (nonatomic, strong) CSSettingItem *functionBackgroundColorItem, *functionIconColorItem;
 @property (nonatomic, strong) CSSettingItem *resetItem, *descriptionItem;
 @property (nonatomic, strong) CSTabBarPreviewView *previewView;
 @property (nonatomic, strong) UISegmentedControl *structureControl;
@@ -74,6 +75,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
 @property (nonatomic, strong) UIColor *borderColor;
 @property (nonatomic, strong) UIColor *indicatorColor;
 @property (nonatomic, strong) UIColor *selectedIconColor;
+@property (nonatomic, strong) UIColor *functionBackgroundColor, *functionIconColor;
 @property (nonatomic, assign) CGFloat positionOffset;
 @property (nonatomic, assign) CGFloat scale;
 @property (nonatomic, assign) CGFloat contentWidth;
@@ -121,6 +123,8 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
     self.bgColor=p.backgroundColor; self.borderColor=p.borderColor;
     self.indicatorColor=p.indicatorColor;
     self.selectedIconColor=p.selectedIconColor;
+    self.functionBackgroundColor=p.functionBackgroundColor;
+    self.functionIconColor=p.functionIconColor;
     self.chatText=[p titleAtIndex:0]; self.contactsText=[p titleAtIndex:1];
     self.discoverText=[p titleAtIndex:2]; self.meText=[p titleAtIndex:3];
 }
@@ -206,6 +210,50 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
 - (void)refreshSelectedIconColorItem {
     [self updateSelectedIconColorDetail];
     [self refreshVisibleItems:@[self.selectedIconColorItem]];
+}
+
+- (void)updateFunctionColorDetails {
+    for (NSNumber *background in @[@YES,@NO]) {
+        UIColor *color=background.boolValue ? self.functionBackgroundColor : self.functionIconColor;
+        CSSettingItem *item=background.boolValue ? self.functionBackgroundColorItem : self.functionIconColorItem;
+        CGFloat red=0,green=0,blue=0,alpha=0;
+        item.detail=color && [color getRed:&red green:&green blue:&blue alpha:&alpha] ?
+            [NSString stringWithFormat:@"R:%.0f G:%.0f B:%.0f A:%.0f",red*255,green*255,blue*255,alpha*100] : @"原生默认";
+    }
+}
+
+- (void)saveFunctionColorSetting:(BOOL)background {
+    [self saveColor:background ? self.functionBackgroundColor : self.functionIconColor
+          withRedKey:background ? kTabBarFunctionBackgroundColorRedKey : kTabBarFunctionIconColorRedKey
+          greenKey:background ? kTabBarFunctionBackgroundColorGreenKey : kTabBarFunctionIconColorGreenKey
+          blueKey:background ? kTabBarFunctionBackgroundColorBlueKey : kTabBarFunctionIconColorBlueKey
+          alphaKey:background ? kTabBarFunctionBackgroundColorAlphaKey : kTabBarFunctionIconColorAlphaKey];
+    [self finishSavingSettings];
+    [self updateFunctionColorDetails];
+    [self refreshVisibleItems:@[background ? self.functionBackgroundColorItem : self.functionIconColorItem]];
+}
+
+- (void)showFunctionColorOptions:(BOOL)background {
+    NSString *title=background ? @"功能键背景颜色" : @"功能键图标颜色";
+    NSString *message=background ? @"默认使用微信原生底栏背景与材质。自定义后只改变功能键背景，可单独恢复原生默认。" :
+        @"默认随微信浅色和深色外观适配。自定义后只改变功能键图标，可单独恢复原生默认。";
+    UIAlertController *alert=[UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleActionSheet];
+    __weak typeof(self) weakSelf=self;
+    [alert addAction:[UIAlertAction actionWithTitle:@"自定义颜色" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action) {
+        [weakSelf showFunctionColorPicker:background];
+    }]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"恢复原生默认" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action) {
+        if (background) weakSelf.functionBackgroundColor=nil;
+        else weakSelf.functionIconColor=nil;
+        [weakSelf saveFunctionColorSetting:background];
+    }]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];
+    if (alert.popoverPresentationController) {
+        alert.popoverPresentationController.sourceView=self.view;
+        alert.popoverPresentationController.sourceRect=CGRectMake(CGRectGetMidX(self.view.bounds),CGRectGetMidY(self.view.bounds),1,1);
+        alert.popoverPresentationController.permittedArrowDirections=0;
+    }
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 - (NSString *)widthPercentageInputValue {
@@ -674,6 +722,13 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
         iconName:[CSQuickPanelPreferences symbolNameForActionIdentifier:self.functionAction]
         iconColor:UIColor.systemOrangeColor detail:[CSQuickPanelPreferences titleForActionIdentifier:self.functionAction]];
     self.functionActionItem.actionBlock=^{ [weakSelf showFunctionActionPicker]; };
+    self.functionBackgroundColorItem=[CSSettingItem itemWithTitle:@"功能键背景颜色"
+        iconName:@"circle.fill" iconColor:UIColor.systemOrangeColor detail:nil];
+    self.functionBackgroundColorItem.actionBlock=^{ [weakSelf showFunctionColorOptions:YES]; };
+    self.functionIconColorItem=[CSSettingItem itemWithTitle:@"功能键图标颜色"
+        iconName:@"paintpalette.fill" iconColor:UIColor.systemOrangeColor detail:nil];
+    self.functionIconColorItem.actionBlock=^{ [weakSelf showFunctionColorOptions:NO]; };
+    [self updateFunctionColorDetails];
     self.functionGapItem=[CSSettingItem inputItemWithTitle:@"功能键与主底栏间距"
         iconName:@"arrow.left.and.right" iconColor:UIColor.systemOrangeColor
         inputValue:[NSString stringWithFormat:@"%.0f",self.functionGap]
@@ -760,6 +815,7 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
         [presets addObject:[NSString stringWithFormat:@"%@：宽度 %.0f%%，高度 %.0f pt",names[index],preset.scale*100,preset.contentHeight]];
     }
     NSString *message=[NSString stringWithFormat:@"设置即时生效，关闭总开关后仍可配置与预览。红点与未读数字沿用微信原生显示，功能键入口独立于快捷面板。\n\n快速风格\n%@\n只有主动选择风格时才同时应用宽度比例和默认高度。\n\n自定义尺寸\n底栏宽度按可用宽度的百分比输入，支持 60–100%%，例如输入 80 表示 80%%；留空或输入 0 恢复 90%%，窄屏保留必要的最小宽度。高度支持 44–80 pt。旧版 pt 宽度继续生效，调整比例或选择风格后切换为比例设置。分离功能键大小支持 44–80 pt。手动修改即时保存，不匹配预设时显示“自定义”；再次进入本页保留当前设置。",[presets componentsJoinedByString:@"\n"]];
+    message=[message stringByAppendingString:@"\n\n功能键配色\n背景和图标颜色可分别设置。默认背景使用微信原生底栏材质，默认图标随浅色和深色外观适配；两项均可单独恢复原生默认。配色即时保存并同步预览，支持备份与重置。"];
     UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"功能说明" message:message preferredStyle:UIAlertControllerStyleAlert];
     [alert addAction:[UIAlertAction actionWithTitle:@"知道了" style:UIAlertActionStyleCancel handler:nil]];
     [self presentViewController:alert animated:YES completion:nil];
@@ -772,8 +828,8 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
         [CSSettingSection sectionWithHeader:@"底栏结构" items:@[self.structureItem,self.quickStyleItem]]]];
     if (self.structure!=CSTabBarStructureClassic) {
         NSArray *items=self.structure==CSTabBarStructureSeparated ?
-            @[self.functionActionItem,self.functionGapItem,self.functionSizeItem] :
-            @[self.functionActionItem,self.centerButtonScaleItem];
+            @[self.functionActionItem,self.functionBackgroundColorItem,self.functionIconColorItem,self.functionGapItem,self.functionSizeItem] :
+            @[self.functionActionItem,self.functionBackgroundColorItem,self.functionIconColorItem,self.centerButtonScaleItem];
         [sections addObject:[CSSettingSection sectionWithHeader:@"功能键" items:items]];
     }
     [sections addObjectsFromArray:@[
@@ -1120,11 +1176,23 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
     [self presentViewController:colorPicker animated:YES completion:nil];
 }
 
+- (void)showFunctionColorPicker:(BOOL)background {
+    UIColorPickerViewController *colorPicker=[UIColorPickerViewController new];
+    colorPicker.delegate=self;
+    colorPicker.title=background ? @"功能键背景颜色" : @"功能键图标颜色";
+    colorPicker.supportsAlpha=YES;
+    colorPicker.selectedColor=background ? (self.functionBackgroundColor ?: UIColor.tertiarySystemGroupedBackgroundColor) :
+        (self.functionIconColor ?: UIColor.labelColor);
+    colorPicker.view.tag=background ? 1004 : 1005;
+    [self presentViewController:colorPicker animated:YES completion:nil];
+}
+
 #pragma mark - UIColorPickerViewControllerDelegate
 
 - (void)colorPickerViewControllerDidFinish:(UIColorPickerViewController *)viewController {
     // Selecting a color saves live. Merely opening/dismissing must preserve nil.
-    if (viewController.view.tag==1002 || viewController.view.tag==1003) return;
+    if (viewController.view.tag==1002 || viewController.view.tag==1003 ||
+        viewController.view.tag==1004 || viewController.view.tag==1005) return;
     BOOL border=viewController.view.tag==1001;
     if (border) self.borderColor=viewController.selectedColor;
     else self.bgColor=viewController.selectedColor;
@@ -1133,6 +1201,13 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
 }
 
 - (void)colorPickerViewControllerDidSelectColor:(UIColorPickerViewController *)viewController {
+    if (viewController.view.tag==1004 || viewController.view.tag==1005) {
+        BOOL background=viewController.view.tag==1004;
+        if (background) self.functionBackgroundColor=viewController.selectedColor;
+        else self.functionIconColor=viewController.selectedColor;
+        [self saveFunctionColorSetting:background];
+        return;
+    }
     if (viewController.view.tag==1003) {
         self.selectedIconColor=viewController.selectedColor;
         [self saveSelectedIconColorSetting];
@@ -1201,6 +1276,10 @@ typedef NS_ENUM(NSInteger, TabBarIconType) {
         for (NSString *key in @[kTabBarContentWidthKey,kTabBarContentHeightKey,kTabBarBorderWidthKey,kTabBarHapticFeedbackKey,kTabBarClickEffectKey,kTabBarBorderAnimationKey,kTabBarBorderColorRedKey,kTabBarBorderColorGreenKey,kTabBarBorderColorBlueKey,kTabBarBorderColorAlphaKey]) [defaults removeObjectForKey:key];
         for (NSString *key in @[kTabBarIndicatorColorRedKey,kTabBarIndicatorColorGreenKey,kTabBarIndicatorColorBlueKey,kTabBarIndicatorColorAlphaKey]) [defaults removeObjectForKey:key];
         for (NSString *key in @[kTabBarSelectedIconColorRedKey,kTabBarSelectedIconColorGreenKey,kTabBarSelectedIconColorBlueKey,kTabBarSelectedIconColorAlphaKey]) [defaults removeObjectForKey:key];
+        for (NSString *key in @[kTabBarFunctionBackgroundColorRedKey,kTabBarFunctionBackgroundColorGreenKey,
+                kTabBarFunctionBackgroundColorBlueKey,kTabBarFunctionBackgroundColorAlphaKey,
+                kTabBarFunctionIconColorRedKey,kTabBarFunctionIconColorGreenKey,
+                kTabBarFunctionIconColorBlueKey,kTabBarFunctionIconColorAlphaKey]) [defaults removeObjectForKey:key];
         
         [defaults removeObjectForKey:kTabBarBgColorRedKey];
         [defaults removeObjectForKey:kTabBarBgColorGreenKey];
